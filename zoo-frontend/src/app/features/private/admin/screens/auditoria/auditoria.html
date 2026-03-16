@@ -1,0 +1,64 @@
+<zoo-main-container>
+  <p-dataview
+    [value]="auditorias()"
+    [rows]="rows()"
+    [paginator]="true"
+    [totalRecords]="totalRecords()"
+    [first]="first()"
+    [lazy]="true"
+    (onPage)="onPageChange($event)"
+    [loading]="isLoading()"
+    paginatorPosition="bottom"
+  >
+    <ng-template #list let-items>
+      <div class="audit-list-container">
+        @for (item of items; track item.id) {
+        <div class="audit-item">
+          <div class="audit-header">
+            <p-tag
+              [value]="item.event"
+              [severity]="getSeverity(item.event)"
+            ></p-tag>
+            <span class="audit-timestamp"
+              >{{ item.timestamp | date : "medium" }}</span
+            >
+          </div>
+          <div class="audit-body">
+            <div class="audit-detail">
+              <strong>Usuario:</strong>
+              <span>{{ item.user.username }} ({{ item.user.email }})</span>
+            </div>
+            @if(item.attempted_email) {
+            <div class="audit-detail">
+              <strong>Email Intentado:</strong>
+              <span>{{ item.attempted_email }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        } @empty {
+        <div class="empty-message">
+          <span>No se encontraron registros de auditoría.</span>
+        </div>
+        }
+      </div>
+    </ng-template>
+
+    <ng-template #loading>
+      <div class="audit-list-container">
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+        <div class="audit-item-skeleton">
+          <div class="audit-header-skeleton">
+            <p-skeleton width="6rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="10rem" height="1rem"></p-skeleton>
+          </div>
+          <div class="audit-body-skeleton">
+            <p-skeleton width="100%" height="1rem"></p-skeleton>
+            <p-skeleton width="70%" height="1rem"></p-skeleton>
+          </div>
+        </div>
+        }
+      </div>
+    </ng-template>
+  </p-dataview>
+</zoo-main-container>

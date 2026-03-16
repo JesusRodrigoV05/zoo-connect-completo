@@ -1,0 +1,65 @@
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { inject, Injectable } from "@angular/core";
+import { environment } from "@env";
+import { map, Observable } from "rxjs";
+import {
+  CreateUnidadMedida,
+  UnidadMedida,
+  UpdateUnidadMedida,
+} from "../models/productos.model";
+import { PaginatedResponse } from "@models/common";
+import { UnidadMedidaAdapter } from "../adapters/producto.adapter";
+
+@Injectable({
+  providedIn: "root",
+})
+export class AdminUnidadesMedida {
+  private http = inject(HttpClient);
+
+  private readonly apiUrl = environment.apiUrl;
+  private readonly inventoryUrl = `${this.apiUrl}/inventario/unidades-medida`;
+
+  getUnidades(
+    page: number = 1,
+    size: number = 20,
+    includeInactive = false,
+  ): Observable<PaginatedResponse<UnidadMedida>> {
+    const params = new HttpParams()
+      .set("page", page)
+      .set("size", size)
+      .set("include_inactive", includeInactive);
+
+    return this.http.get<any>(this.inventoryUrl, { params }).pipe(
+      map((response) => ({
+        ...response,
+        items: response.items.map((item: any) =>
+          UnidadMedidaAdapter.fromBackend(item),
+        ),
+      })),
+    );
+  }
+
+  getUnidadById(id: number): Observable<UnidadMedida> {
+    return this.http
+      .get<any>(`${this.inventoryUrl}/${id}`)
+      .pipe(map((item) => UnidadMedidaAdapter.fromBackend(item)));
+  }
+
+  createUnidad(data: CreateUnidadMedida): Observable<UnidadMedida> {
+    const payload = UnidadMedidaAdapter.toCreate(data);
+    return this.http
+      .post<any>(this.inventoryUrl, payload)
+      .pipe(map((item) => UnidadMedidaAdapter.fromBackend(item)));
+  }
+
+  updateUnidad(id: number, data: UpdateUnidadMedida): Observable<UnidadMedida> {
+    const payload = UnidadMedidaAdapter.toUpdate(data);
+    return this.http
+      .put<any>(`${this.inventoryUrl}/${id}`, payload)
+      .pipe(map((item) => UnidadMedidaAdapter.fromBackend(item)));
+  }
+
+  deleteUnidad(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.inventoryUrl}/${id}`);
+  }
+}

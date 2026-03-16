@@ -1,0 +1,69 @@
+@let weather = $weather() | async; @if (weather) {
+<section class="weather-glass-panel">
+  <div class="hero-data">
+    <div class="icon-glow">
+      <img
+        [ngSrc]="'https:' + weather.current.condition.icon"
+        width="80"
+        height="80"
+        alt="Clima actual"
+        priority
+      />
+    </div>
+    <div class="temp-block">
+      <span class="big-temp"
+        >{{ weather.current.temp_c | number:'1.0-0' }}°</span
+      >
+      <span class="condition-text">{{ weather.current.condition.text }}</span>
+    </div>
+  </div>
+
+  <div class="context-message">
+    <header class="location-header">
+      <span class="city">{{ weather.location.name }}</span>
+      <span class="separator">•</span>
+      <span class="date">{{ today | date:'EEEE, d MMMM' }}</span>
+    </header>
+
+    <div class="zoo-status-pill" [class]="zooStatus.colorClass">
+      <div class="status-dot"></div>
+      <div class="status-text">
+        <span class="main">{{ zooStatus.message }}</span>
+        <span class="sub">{{ zooStatus.subMessage }}</span>
+      </div>
+    </div>
+
+    <div class="smart-tip" [class]="weather.ui.messageType">
+      <p>{{ weather.ui.message }}</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-item">
+      <i class="pi pi-user"></i>
+      <div class="stat-info">
+        <span class="label">Sensación</span>
+        <span class="value"
+          >{{ weather.current.feelslike_c | number:'1.0-0' }}°</span
+        >
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <i class="pi pi-percentage"></i>
+      <div class="stat-info">
+        <span class="label">Humedad</span>
+        <span class="value">{{ weather.current.humidity }}%</span>
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <i class="pi pi-sun"></i>
+      <div class="stat-info">
+        <span class="label">Índice UV</span>
+        <span class="value">{{ weather.current.uv }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+}

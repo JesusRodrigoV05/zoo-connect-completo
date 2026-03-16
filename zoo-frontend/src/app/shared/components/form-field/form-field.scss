@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.form-field {
+  margin-bottom: 1.5rem;
+  
+  p-floatlabel {
+    width: 100%;
+    
+    input, p-password {
+      width: 100%;
+    }
+  }
+}
+
+:host ::ng-deep p-message {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.form-field-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 3rem;
+  
+  p {
+    color: var(--p-text-muted-color);
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,17 @@
+<zoo-main-container>
+  @if (surveys$ | async; as surveys) {
+  <div class="surveys-grid">
+    @for(survey of surveys; track $index){
+    <app-encuesta-item [encuesta]="survey" />
+    } @empty {
+    <p class="no-data">No hay encuestas disponibles.</p>
+    }
+  </div>
+  } @else {
+  <div class="surveys-grid">
+    @for(placeholder of [1,2,3,4]; track placeholder){
+    <p-skeleton height="200px" styleClass="mb-2" borderRadius="16px" />
+    }
+  </div>
+  }
+</zoo-main-container>

@@ -1,0 +1,100 @@
+@defer(on viewport; prefetch on idle; hydrate on viewport){
+<div class="list-page-container">
+  <div class="header-actions">
+    <h2>Gestión de Hábitats</h2>
+    <div class="buttons">
+      <p-button
+        variant="text"
+        (onClick)="loadHabitats(currentPage(), pageSize())"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Recargar"
+      />
+      <p-button
+        icon="pi pi-plus"
+        label="Registrar Hábitat"
+        [rounded]="true"
+        severity="primary"
+        (click)="navigateToCreate()"
+      />
+    </div>
+  </div>
+
+  @if(loading() && !habitatData()){
+  <zoo-loader />
+  } @else if(error()) { } @else if (habitatData()) { @let response =
+  habitatData()!;
+  <p-dataview
+    #dv
+    [value]="response.items"
+    [paginator]="true"
+    [rows]="response.size"
+    [totalRecords]="response.total"
+    [first]="(response.page - 1) * response.size"
+    paginatorPosition="bottom"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    [loading]="loading()"
+    [layout]="layout()"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ response.total }} hábitats</span>
+        <span>Página {{ response.page }} de {{ response.pages }}</span>
+
+        <p-selectbutton
+          [ngModel]="layout()"
+          (ngModelChange)="layout.set($event)"
+          [options]="options"
+          [allowEmpty]="false"
+        >
+          <ng-template #item let-item>
+            <i
+              class="pi"
+              [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"
+            ></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      @for(habitat of items; track habitat.id){
+      <zoo-habitat-item
+        [habitat]="habitat"
+        (onDelete)="deleteHabitat(habitat.id)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #grid let-items>
+      @for(habitat of items; track habitat.id){
+      <zoo-habitat-item
+        [habitat]="habitat"
+        (onDelete)="deleteHabitat(habitat.id)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <p>No hay hábitats disponibles.</p>
+        <p-button
+          icon="pi pi-plus"
+          label="Registrar Primer Hábitat"
+          [rounded]="true"
+          severity="primary"
+          (click)="navigateToCreate()"
+        />
+      </div>
+    </ng-template>
+  </p-dataview>
+  } @else { }
+</div>
+} @placeholder{
+<p>Cargando...</p>
+} @loading {
+<zoo-loader />
+}

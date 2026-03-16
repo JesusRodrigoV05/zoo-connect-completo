@@ -1,0 +1,29 @@
+<article class="news-card">
+  <div class="image-wrapper">
+    <img
+      [ngSrc]="news().imageUrl"
+      [alt]="news().title"
+      fill
+      priority
+      class="card-img"
+    />
+
+    <span class="badge" [ngClass]="news().tag.type">
+      {{ news().tag.label }}
+    </span>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="meta">
+      <i class="bx bx-calendar"></i>
+      <span class="date">{{ news().date }}</span>
+    </div>
+
+    <h3>{{ news().title }}</h3>
+    <p>{{ news().description }}</p>
+
+    <button class="read-more">
+      Leer más <i class="bx bx-right-arrow-alt"></i>
+    </button>
+  </div>
+</article>

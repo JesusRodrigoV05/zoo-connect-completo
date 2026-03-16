@@ -1,0 +1,84 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1rem;
+}
+
+.opciones-section {
+  border: 1px solid var(--p-surface-border);
+  border-radius: var(--p-border-radius-lg);
+  padding: 1rem;
+  background-color: var(--p-surface-50);
+}
+
+.opciones-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h4 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+}
+
+.opciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.opcion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  position: relative;
+
+  .p-floatlabel {
+    flex-grow: 1;
+  }
+
+  .p-button {
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+  }
+
+  p-message {
+    position: absolute;
+    bottom: -1.2rem;
+    left: 0;
+    width: calc(100% - 40px);
+    font-size: 0.75rem;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+:host ::ng-deep {
+  .field .p-inputtextarea,
+  .field .p-select,
+  .opcion-item .p-inputtext {
+    width: 100%;
+  }
+
+  .p-message.p-message-error[data-pc-section="root"] {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin-top: 0.25rem;
+  }
+
+  .p-message-summary {
+    font-size: 0.875rem;
+  }
+}

@@ -1,0 +1,110 @@
+:host {
+  display: block;
+}
+
+.news-section {
+  padding: 6rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+
+  .bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.03;
+    background-image: radial-gradient(
+      var(--p-primary-500) 1px,
+      transparent 1px
+    );
+    background-size: 30px 30px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.section-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 4rem;
+
+  .icon-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-surface-border);
+    color: var(--p-primary-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+
+  h2 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: var(--p-text-color);
+    margin: 0 0 1rem;
+    line-height: 1.1;
+
+    .highlight {
+      position: relative;
+      color: var(--p-primary-600);
+      white-space: nowrap;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 4px;
+        left: 0;
+        width: 100%;
+        height: 8px;
+        background: var(--p-teagreen-300);
+        z-index: -1;
+        border-radius: 4px;
+        opacity: 0.6;
+        transform: rotate(-1deg);
+      }
+    }
+  }
+
+  p {
+    font-size: 1.15rem;
+    color: var(--p-text-muted-color);
+    line-height: 1.6;
+  }
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .section-header h2 {
+    font-size: 2rem;
+  }
+  .news-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}

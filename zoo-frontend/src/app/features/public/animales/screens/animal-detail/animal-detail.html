@@ -1,0 +1,102 @@
+@if (animal(); as data) {
+<header class="hero-section">
+  <button class="back-nav-btn" (click)="goBack()">
+    <box-icon name="arrow-back" color="white"></box-icon>
+    <span>Volver</span>
+  </button>
+  <div class="hero-bg">
+    <img
+      [src]="data.media && data.media.length > 0 ? data.media[0].url : 'assets/placeholder-zoo.jpg'"
+      [alt]="data.nombre"
+      class="hero-img"
+    />
+    <div class="cinema-overlay"></div>
+  </div>
+
+  <div class="hero-content">
+    <div
+      class="status-badge"
+      [class.healthy]="data.estado_operativo === 'Saludable'"
+    >
+      <span class="dot"></span>
+      {{ data.estado_operativo }}
+    </div>
+
+    <h1 class="animal-name">{{ data.nombre }}</h1>
+
+    <p class="scientific-name">
+      {{ data.especie.nombreCientifico }}
+      <span class="common-name">({{ data.especie.nombreComun }})</span>
+    </p>
+  </div>
+</header>
+
+<div class="glass-stats-bar">
+  <div class="stat-group">
+    <span class="label">Edad</span>
+    <span class="value">{{ data.age }} Años</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stat-group">
+    <span class="label">Género</span>
+    <span class="value"> {{ data.genero ? 'Macho' : 'Hembra' }} </span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stat-group interactive">
+    <button (click)="toggleFav()" class="fav-btn" [class.active]="isFavorite()">
+      <box-icon
+        name="heart"
+        [attr.type]="isFavorite() ? 'solid' : 'regular'"
+        [attr.color]="isFavorite() ? '#ef4444' : 'currentColor'"
+        animation="tada-hover"
+        size="md"
+      ></box-icon>
+    </button>
+    <span class="label">Favorito</span>
+  </div>
+</div>
+
+<main class="content-grid">
+  <section class="story-column">
+    <h2 class="section-title">Descripción</h2>
+    <p class="narrative-text">{{ data.descripcion }}</p>
+
+    <div class="taxonomy-box">
+      <h3>Ficha Taxonómica</h3>
+      <ul>
+        <li><span>Clase:</span> {{ data.especie.clase }}</li>
+        <li><span>Orden:</span> {{ data.especie.orden }}</li>
+        <li><span>Familia:</span> {{ data.especie.familia }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <aside class="habitat-column">
+    <div class="habitat-card">
+      <div class="card-header">
+        <span class="subtitle">Reside en</span>
+        <h3>{{ data.habitat.nombre }}</h3>
+      </div>
+
+      <p class="habitat-desc">{{ data.habitat.descripcion }}</p>
+
+      <div class="weather-widget">
+        <box-icon name="cloud" color="var(--p-primary-600)"></box-icon>
+        <div class="weather-info">
+          <span class="label">Condiciones</span>
+          <span class="value">{{ data.habitat.condicionesClimaticas }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+} @else {
+<div class="loader-container">
+  <zoo-loader />
+</div>
+}

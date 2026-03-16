@@ -1,0 +1,12 @@
+.font-medium {
+  font-weight: 500;
+  color: var(--p-text-color);
+}
+.text-secondary {
+  color: var(--p-text-muted-color);
+}
+.row-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}

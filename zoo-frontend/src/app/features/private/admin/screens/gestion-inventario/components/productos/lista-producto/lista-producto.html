@@ -1,0 +1,128 @@
+@defer(on viewport; prefetch on idle){
+<div class="list-page-container">
+  <p-confirmDialog />
+
+  <div class="header-actions">
+    <h2>Inventario General</h2>
+    <div class="buttons">
+      <p-button
+        icon="pi pi-file"
+        label="Generar Reporte"
+        (onClick)="descargarReporteKardex()"
+        [rounded]="true"
+        severity="primary"
+        pTooltip="Generar Reporte"
+      />
+      <p-button
+        label="Alertas"
+        (onClick)="store.loadStockAlerts()"
+        [rounded]="true"
+        pTooltip="Alertas"
+      />
+      <p-button
+        variant="text"
+        (onClick)="store.loadProducts()"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Recargar"
+      />
+      <p-button
+        icon="pi pi-plus"
+        label="Nuevo Producto"
+        [rounded]="true"
+        severity="primary"
+        routerLink="../crear"
+      />
+    </div>
+  </div>
+
+  @if(store.loading() && store.products().length === 0){
+  <zoo-loader />
+  } @else if(store.error()) {
+  <div class="error-state">
+    <i class="pi pi-times-circle"></i>
+    <p>Error al cargar inventario:</p>
+    <p>{{ store.error() }}</p>
+    <p-button
+      label="Reintentar"
+      (onClick)="store.loadProducts()"
+      severity="danger"
+      [rounded]="true"
+    />
+  </div>
+  } @else {
+  <p-dataview
+    #dv
+    [value]="store.products()"
+    [paginator]="true"
+    [rows]="store.size()"
+    [totalRecords]="store.total()"
+    [first]="(store.page() - 1) * store.size()"
+    [layout]="store.layout()"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPage)="onPageChange($event)"
+    paginatorPosition="bottom"
+    [lazy]="true"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ store.total() }} productos</span>
+
+        <p-selectbutton
+          [options]="layoutOptions"
+          [ngModel]="store.layout()"
+          (ngModelChange)="store.setLayout($event)"
+          optionLabel="icon"
+          optionValue="value"
+          [allowEmpty]="false"
+        >
+          <ng-template #item let-item>
+            <i [class]="item.icon"></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      @for (product of items; track product.id_producto) {
+      <zoo-producto-item
+        [product]="product"
+        layout="list"
+        (onDelete)="confirmDelete($event)"
+        (onEdit)="editProduct($event)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #grid let-items>
+      @for (product of items; track product.id_producto) {
+      <zoo-producto-item
+        [product]="product"
+        layout="grid"
+        (onDelete)="confirmDelete($event)"
+        (onEdit)="editProduct($event)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <i class="bx bx-box" style="font-size: 3rem"></i>
+        <p>No hay productos registrados.</p>
+        <p-button
+          label="Registrar Primero"
+          icon="pi pi-plus"
+          [rounded]="true"
+          routerLink="../crear"
+        />
+      </div>
+    </ng-template>
+  </p-dataview>
+  }
+</div>
+} @placeholder {
+<div class="loading-placeholder">
+  <p>Cargando módulo...</p>
+</div>
+}

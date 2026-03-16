@@ -1,0 +1,88 @@
+@defer(on viewport; prefetch on idle){
+<div class="list-page-container">
+  <p-confirmDialog />
+
+  <div class="header-actions">
+    <div>
+      <h2>Configuración de Tipos</h2>
+      <p style="margin: 0; color: var(--p-text-muted-color)">
+        Diccionario de actividades
+      </p>
+    </div>
+
+    <div class="flex gap-2 align-items-center">
+      <div class="buttons">
+        <p-button
+          icon="pi pi-refresh"
+          [text]="true"
+          severity="secondary"
+          (onClick)="store.loadItems()"
+        />
+        <p-button
+          label="Nuevo Tipo"
+          icon="pi pi-plus"
+          [rounded]="true"
+          (onClick)="openCreate()"
+        />
+      </div>
+    </div>
+  </div>
+
+  @if(store.loading() && store.items().length === 0){
+  <zoo-loader />
+  } @else {
+  <p-dataview #dv [value]="store.items()" [layout]="layout">
+    <ng-template pTemplate="header">
+      <div class="dataview-header">
+        <span>{{ store.items().length }} tipos registrados</span>
+        <p-selectButton
+          [options]="layoutOptions"
+          [(ngModel)]="layout"
+          optionLabel="icon"
+          optionValue="value"
+          [allowEmpty]="false"
+        >
+          <ng-template let-item pTemplate="item"
+            ><i [class]="item.icon"></i
+          ></ng-template>
+        </p-selectButton>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      <div class="flex flex-column gap-3">
+        @for (item of items; track item.id) {
+        <zoo-tipo-tarea-item
+          [tipo]="item"
+          layout="list"
+          (onEdit)="openEdit($event)"
+          (onDelete)="deleteItem($event)"
+        />
+        }
+      </div>
+    </ng-template>
+
+    <ng-template #grid let-items>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        @for (item of items; track item.id) {
+        <zoo-tipo-tarea-item
+          [tipo]="item"
+          layout="grid"
+          (onEdit)="openEdit($event)"
+          (onDelete)="deleteItem($event)"
+        />
+        }
+      </div>
+    </ng-template>
+  </p-dataview>
+  }
+
+  <zoo-crear-tipo-tarea
+    [visible]="modalVisible()"
+    [editingItem]="editingItem()"
+    (onClose)="modalVisible.set(false)"
+  />
+</div>
+} @placeholder {
+<div class="loading-placeholder"><p>Cargando configuración...</p></div>
+}

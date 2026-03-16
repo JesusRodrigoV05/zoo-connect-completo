@@ -1,0 +1,69 @@
+<td>
+  <div class="animal-info">
+    <p-avatar
+      [image]="item().animal?.foto"
+      [label]="!item().animal?.foto ? item().animal?.nombre?.charAt(0) : ''"
+      shape="circle"
+      size="large"
+      styleClass="mr-2"
+    />
+    <div class="flex flex-column">
+      <span class="font-bold text-900">{{ item().animal?.nombre }}</span>
+      <span class="text-sm text-500">{{ item().animal?.especie }}</span>
+    </div>
+  </div>
+</td>
+
+<td>
+  <div class="flex flex-column">
+    <span class="font-medium text-800">
+      {{ item().fechaAtencion | date:'dd MMM yyyy' }}
+    </span>
+    <span class="text-sm text-500">
+      {{ item().fechaAtencion | date:'shortTime' }} • {{
+      item().tipoAtencion?.nombre }}
+    </span>
+  </div>
+</td>
+
+<td>
+  <p
+    class="m-0 text-700 text-overflow-ellipsis"
+    pTooltip="{{ item().anamnesis }}"
+    tooltipPosition="top"
+  >
+    {{ item().anamnesis }}
+  </p>
+</td>
+
+<td class="text-center">
+  @if(item().abierto) {
+  <p-tag
+    severity="success"
+    value="En Curso"
+    [rounded]="true"
+    icon="pi pi-spin pi-spinner"
+  />
+  } @else {
+  <p-tag
+    severity="secondary"
+    value="Finalizado"
+    [rounded]="true"
+    icon="pi pi-check"
+  />
+  }
+</td>
+
+<td class="text-center">
+  <zoo-item-action-button
+    tipo="download"
+    (click)="onDownload.emit(item().id)"
+  />
+  <p-button
+    icon="pi pi-chevron-right"
+    [rounded]="true"
+    [text]="true"
+    pTooltip="Ver Expediente Completo"
+    (onClick)="onView.emit(item().id)"
+  />
+</td>

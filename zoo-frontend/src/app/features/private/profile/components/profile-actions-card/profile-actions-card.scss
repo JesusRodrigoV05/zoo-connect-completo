@@ -1,0 +1,88 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+:host ::ng-deep .actions-card.p-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+:host ::ng-deep .actions-card .p-card-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  padding: 1.5rem;
+}
+
+.buttons-header {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.logout-btn {
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .menu-option.p-button {
+  color: var(--p-text-color);
+  padding: 0.875rem 0.5rem;
+  margin: 0;
+  width: 100%;
+  justify-content: space-between;
+
+  .p-button-icon-left {
+    color: var(--p-primary-color);
+  }
+
+  .p-button-label {
+    flex-grow: 1;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  &::after {
+    font-family: "primeicons";
+    content: "\e901";
+    color: var(--p-text-muted-color);
+    font-size: 0.875rem;
+    transition: transform 0.2s ease;
+  }
+
+  &:not(:disabled):hover {
+    &::after {
+      transform: translateX(2px);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 1px;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: transparent !important;
+  }
+}
+
+:host ::ng-deep .logout-btn.p-button {
+  justify-content: center;
+}
+
+:host ::ng-deep p-divider.p-divider {
+  margin: 1.5rem 0;
+  flex-shrink: 0;
+}

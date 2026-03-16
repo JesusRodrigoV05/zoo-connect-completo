@@ -1,0 +1,117 @@
+$gap-size: 1.5rem;
+$radius: 12px;
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.card-form {
+  background: var(--p-surface-card);
+  border-radius: $radius;
+  border: 1px solid var(--p-surface-border);
+  box-shadow: var(--p-shadow-1);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--p-surface-border);
+  padding-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    color: var(--p-text-color);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+}
+
+.form-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $gap-size;
+  margin-bottom: 0;
+}
+
+.accordion-container {
+  margin-top: 2rem;
+  display: block;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 600;
+    color: var(--p-text-color);
+    font-size: 0.95rem;
+
+    .required {
+      color: var(--p-red-500);
+    }
+  }
+
+  .error-msg {
+    color: var(--p-red-500);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.animal-item {
+  display: flex;
+  flex-direction: column;
+
+  .animal-name {
+    font-weight: 700;
+    color: var(--p-text-color);
+  }
+
+  .animal-details {
+    font-size: 0.85rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--p-surface-border);
+  padding-top: 2rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .card-form {
+    padding: 1.5rem;
+  }
+
+  .form-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+::ng-deep .input-full {
+  width: 100%;
+
+  &.p-select,
+  .p-inputnumber-input,
+  &.p-textarea {
+    width: 100%;
+  }
+}

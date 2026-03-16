@@ -1,0 +1,80 @@
+:host {
+  display: block;
+}
+
+.mini-task-row {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--p-surface-border);
+  gap: 1rem;
+  transition:
+    background-color 0.2s,
+    opacity 0.2s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.completed {
+    .task-title {
+      text-decoration: line-through;
+      color: var(--p-text-muted-color);
+    }
+
+    .status-indicator i {
+      color: var(--p-primary-color);
+    }
+  }
+
+  &:not(.completed) {
+    .status-indicator i {
+      color: var(--p-rosybrown-500);
+    }
+  }
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+.task-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+
+  .task-title {
+    font-weight: 500;
+    color: var(--p-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s;
+  }
+
+  .task-location {
+    font-size: 0.85rem;
+    color: var(--p-text-muted-color);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    .location-icon {
+      font-size: 0.75rem;
+    }
+  }
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.25rem;
+}

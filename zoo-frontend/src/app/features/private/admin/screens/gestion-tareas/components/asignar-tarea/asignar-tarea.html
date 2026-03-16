@@ -1,0 +1,94 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event ? onCancel.emit() : null"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="assign-dialog-modern"
+  [maskStyle]="{ 'backdrop-filter': 'blur(4px)' }"
+>
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <div class="icon-wrapper">
+        <i class="pi pi-user-plus"></i>
+      </div>
+      <div class="header-text">
+        <h3>Asignar Responsable</h3>
+        <p>Selecciona un miembro del equipo para esta tarea.</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="dialog-content">
+    <div class="field-container">
+      <label for="caretaker" class="modern-label">Usuario</label>
+
+      <p-select
+        inputId="caretaker"
+        [options]="usuarios()"
+        [ngModel]="selectedUserId()"
+        (ngModelChange)="selectedUserId.set($event)"
+        optionLabel="username"
+        optionValue="id"
+        placeholder="Seleccionar usuario..."
+        [showClear]="true"
+        [filter]="true"
+        filterBy="username,email"
+        [loading]="loadingUsuarios()"
+        styleClass="w-full"
+        appendTo="body"
+        panelStyleClass="modern-select-panel"
+      >
+        <ng-template let-user pTemplate="item">
+          <div class="user-list-item">
+            <div class="avatar-wrapper" [ngClass]="getRoleClass(user.rol.id)">
+              <span class="initials"
+                >{{ user.username.charAt(0).toUpperCase() }}</span
+              >
+            </div>
+
+            <div class="user-details">
+              <span class="username">{{ user.username }}</span>
+              <span class="email">{{ user.email }}</span>
+            </div>
+
+            <div class="role-badge" [ngClass]="getRoleClass(user.rol.id)">
+              {{ user.rol.nombre }}
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="selectedItem" let-user>
+          @if(user) {
+          <div class="selected-value-template">
+            <div class="mini-avatar" [ngClass]="getRoleClass(user.rol.id)">
+              {{ user.username.charAt(0).toUpperCase() }}
+            </div>
+            <span class="font-medium">{{ user.username }}</span>
+            <span class="role-tag-mini">{{ user.rol.nombre }}</span>
+          </div>
+          }
+        </ng-template>
+      </p-select>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-actions">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        (onClick)="onCancel.emit()"
+      />
+      <p-button
+        label="Confirmar"
+        icon="pi pi-check"
+        [rounded]="true"
+        [disabled]="!selectedUserId()"
+        (onClick)="confirm()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

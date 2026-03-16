@@ -1,0 +1,192 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .assign-dialog-modern {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  .p-dialog-header {
+    background: var(--p-surface-0);
+    padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+    border: none;
+  }
+
+  .p-dialog-content {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+
+  .p-dialog-footer {
+    padding: 1rem 1.5rem;
+    background: var(--p-surface-50);
+    border-top: 1px solid var(--p-surface-border);
+  }
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+
+  .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    background: var(--p-primary-50);
+    color: var(--p-primary-500);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.5rem;
+    }
+  }
+
+  .header-text {
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--p-text-color);
+    }
+    p {
+      margin: 0.25rem 0 0 0;
+      color: var(--p-text-muted-color);
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.field-container {
+  margin-top: 1rem;
+}
+
+.modern-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--p-text-color);
+  margin-bottom: 0.5rem;
+}
+
+.user-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  width: 100%;
+
+  .avatar-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+
+    &.role-cuidador {
+      background: #10b981;
+    }
+    &.role-veterinario {
+      background: #8b5cf6;
+    }
+    &.role-admin {
+      background: #3b82f6;
+    }
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    .username {
+      font-weight: 600;
+      color: var(--p-text-color);
+      font-size: 0.95rem;
+    }
+
+    .email {
+      font-size: 0.8rem;
+      color: var(--p-text-muted-color);
+    }
+  }
+
+  .role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &.role-cuidador {
+      background: #ecfdf5;
+      color: #059669;
+    }
+    &.role-veterinario {
+      background: #f5f3ff;
+      color: #7c3aed;
+    }
+    &.role-admin {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+  }
+}
+
+.selected-value-template {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .mini-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: white;
+    font-weight: bold;
+
+    &.role-cuidador {
+      background: #10b981;
+    }
+    &.role-veterinario {
+      background: #8b5cf6;
+    }
+    &.role-admin {
+      background: #3b82f6;
+    }
+  }
+
+  .role-tag-mini {
+    background: var(--p-surface-200);
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+::ng-deep .modern-select-panel .p-select-list-container {
+  padding: 0.5rem;
+}

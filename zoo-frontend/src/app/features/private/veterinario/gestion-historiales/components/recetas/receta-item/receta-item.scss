@@ -1,0 +1,62 @@
+$text-primary: var(--p-text-color);
+$text-secondary: var(--p-text-color-secondary);
+$text-muted: var(--p-text-muted-color);
+
+:host {
+  td {
+    padding: 1rem 0.5rem;
+    vertical-align: middle;
+  }
+}
+
+.col-product {
+  .product-info {
+    display: flex;
+    flex-direction: column;
+
+    .product-name {
+      font-weight: 700;
+      color: $text-primary;
+    }
+
+    .dosage-details {
+      font-size: 0.875rem;
+      color: $text-muted;
+    }
+  }
+}
+
+.col-instructions {
+  .instructions-text {
+    color: $text-primary;
+    white-space: normal;
+    display: block;
+    max-width: 300px;
+    line-height: 1.4;
+  }
+}
+
+.col-duration {
+  .duration-text {
+    font-weight: 500;
+    color: $text-primary;
+  }
+}
+
+.col-auto-task {
+  text-align: center;
+
+  .no-task {
+    color: $text-muted;
+    font-size: 0.875rem;
+  }
+}
+
+.col-actions {
+  text-align: center;
+
+  .actions-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+}

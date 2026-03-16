@@ -1,0 +1,64 @@
+@if (loading()) {
+<zoo-loader />
+} @else if (animal()) { @let animalito = animal();
+<div class="detalle-container">
+  <div class="detalle-header">
+    <h2>{{ animalito!.nombre }}</h2>
+    <p>
+      {{ animalito!.especie.nombreComun }} ({{
+      animalito!.especie.nombreCientifico }})
+    </p>
+    <p-tag
+      [value]="animalito!.estado_operativo"
+      [severity]="estadoSeverity()"
+      [rounded]="true"
+    />
+  </div>
+
+  <div class="detalle-body">
+    <h4>Descripción</h4>
+    <p>{{ animalito!.descripcion }}</p>
+
+    <h4>Información General</h4>
+    <div class="taxonomia-grid-detalle">
+      <div class="tax-item">
+        <span class="tax-label">Género</span>
+        <span class="tax-value">{{ generoTexto() }}</span>
+      </div>
+      <div class="tax-item">
+        <span class="tax-label">Edad (aprox.)</span>
+        <span class="tax-value">{{ animalito!.age }} años</span>
+      </div>
+      <div class="tax-item">
+        <span class="tax-label">Fecha Nacimiento</span>
+        <span class="tax-value"
+          >{{ animalito!.fecha_nacimiento | date:'dd/MM/yyyy' }}</span
+        >
+      </div>
+      <div class="tax-item">
+        <span class="tax-label">Fecha Ingreso</span>
+        <span class="tax-value"
+          >{{ animalito!.fecha_ingreso | date:'dd/MM/yyyy' }}</span
+        >
+      </div>
+    </div>
+
+    <h4>Datos de Origen</h4>
+    <div class="taxonomia-grid-detalle">
+      <div class="tax-item">
+        <span class="tax-label">Hábitat Asignado</span>
+        <span class="tax-value">{{ animalito!.habitat.nombre }}</span>
+      </div>
+      <div class="tax-item">
+        <span class="tax-label">Procedencia</span>
+        <span class="tax-value">{{ animalito!.procedencia }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+} @else {
+<div class="detalle-error">
+  <i class="pi pi-info-circle"></i>
+  <p>No se pudo cargar la información del animal.</p>
+</div>
+}

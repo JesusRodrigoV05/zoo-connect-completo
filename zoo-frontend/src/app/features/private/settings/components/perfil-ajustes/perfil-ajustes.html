@@ -1,0 +1,47 @@
+<p-card styleClass="ajustes-card">
+  <ng-template pTemplate="title"> Perfil y Apariencia </ng-template>
+  <ng-template pTemplate="subtitle">
+    Ajusta la apariencia y tu información personal.
+  </ng-template>
+
+  <div class="settings-section">
+    <h3 class="section-title">Foto de Perfil</h3>
+
+    <div class="current-avatar-display">
+      <zoo-user-avatar [size]="100" [priority]="true" />
+      <div class="current-avatar-info">
+        <h4>Avatar Actual</h4>
+        <p>Esta es tu imagen de perfil visible.</p>
+      </div>
+    </div>
+
+    <h4 class="gallery-title">Elige tu avatar</h4>
+    <div class="avatar-gallery">
+      @for (avatarUrl of availableAvatars; track avatarUrl) {
+      <button
+        class="avatar-option"
+        [class.selected]="currentUser()?.fotoUrl === avatarUrl"
+        (click)="onAvatarSelect(avatarUrl)"
+      >
+        <img [ngSrc]="avatarUrl" alt="Avatar opción" width="60" height="60" />
+      </button>
+      }
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <div class="settings-section">
+    <h3 class="section-title">Apariencia</h3>
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Modo Oscuro</h4>
+        <p>Cambia entre tema claro y oscuro</p>
+      </div>
+      <p-toggleswitch
+        [(ngModel)]="darkModeModel"
+        (ngModelChange)="onThemeChange($event)"
+      />
+    </div>
+  </div>
+</p-card>

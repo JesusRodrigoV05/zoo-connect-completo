@@ -1,0 +1,39 @@
+<p-card class="usuario-card">
+  <div class="usuario-content">
+    <div class="usuario-info">
+      <div class="usuario-header">
+        <h3>{{ usuario().username }}</h3>
+        <div class="usuario-badges">
+          <p-tag
+            [value]="usuario().rol.nombre"
+            [severity]="getSeverityForRole(usuario().rol.id)"
+          />
+        </div>
+      </div>
+      <p class="email">{{ usuario().email }}</p>
+    </div>
+
+    <div class="usuario-actions">
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        severity="info"
+        [outlined]="true"
+        pTooltip="Editar usuario"
+        tooltipPosition="top"
+        (onClick)="editUser()"
+      />
+
+      <p-button
+        [icon]="usuario().activo ? 'pi pi-trash' : 'pi pi-undo'"
+        [rounded]="true"
+        [severity]="usuario().activo ? 'danger' : 'success'"
+        [outlined]="true"
+        [pTooltip]="usuario().activo ? 'Desactivar usuario' : 'Reactivar usuario'"
+        tooltipPosition="top"
+        (onClick)="toggleUserStatus()"
+        [disabled]="isSelf() || isAuthLoading()"
+      />
+    </div>
+  </div>
+</p-card>

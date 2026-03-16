@@ -1,0 +1,131 @@
+@defer(on viewport; prefetch on idle; hydrate on viewport){
+<div class="list-page-container">
+  <p-confirmDialog />
+
+  <div class="header-actions">
+    <h2>Gestión de Animales</h2>
+    <div class="buttons">
+      <p-button
+        variant="text"
+        (onClick)="loadAnimales(currentPage(), pageSize())"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Recargar"
+      />
+      <p-button
+        icon="pi pi-plus"
+        label="Registrar Animal"
+        [rounded]="true"
+        severity="primary"
+        routerLink="/admin/animales/crear"
+      />
+    </div>
+  </div>
+
+  @if(loading() && !animalData()){
+  <zoo-loader />
+  } @else if(error()) { @let errorMsg = error();
+  <div class="error-state">
+    <i class="pi pi-times-circle"></i>
+    <p>Error al cargar animales:</p>
+    <p>{{ errorMsg }}</p>
+    <p-button
+      label="Reintentar"
+      (onClick)="loadAnimales(currentPage(), pageSize())"
+      icon="pi pi-refresh"
+      severity="danger"
+      [rounded]="true"
+    />
+  </div>
+  } @else if (animalData()) { @let response = animalData()!;
+  <p-dataview
+    #dv
+    [value]="response.items"
+    [paginator]="true"
+    [rows]="response.size"
+    [totalRecords]="response.total"
+    [first]="(response.page - 1) * response.size"
+    paginatorPosition="bottom"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    [loading]="loading()"
+    [layout]="layout()"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ response.total }} animales</span>
+        <span>Página {{ response.page }} de {{ response.pages }}</span>
+        <p-selectbutton
+          [ngModel]="layout()"
+          (ngModelChange)="layout.set($event)"
+          [options]="options"
+          [allowEmpty]="false"
+        >
+          <ng-template #item let-item>
+            <i
+              class="pi"
+              [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"
+            ></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      @for(item of items; track item.id_animal){
+      <zoo-animal-item
+        [animal]="item"
+        (onDetails)="viewDetails(item.id_animal)"
+        (onDelete)="deleteAnimal(item.id_animal)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #grid let-items>
+      @for(item of items; track item.id_animal){
+      <zoo-animal-item
+        [animal]="item"
+        (onDetails)="viewDetails(item.id_animal)"
+        (onDelete)="deleteAnimal(item.id_animal)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <p>No hay animales disponibles.</p>
+        <p-button
+          icon="pi pi-plus"
+          label="Registrar Primer Animal"
+          [rounded]="true"
+          severity="primary"
+          routerLink="/admin/animal/crear"
+        />
+      </div>
+    </ng-template>
+  </p-dataview>
+  } @else {
+  <div class="loading-placeholder">
+    <p>Cargando animales...</p>
+  </div>
+  }
+
+  <p-drawer
+    header="Detalle del Animal"
+    [visible]="detalleVisible()"
+    (visibleChange)="detalleVisible.set($event)"
+    position="right"
+    styleClass="drawer-detalle"
+  >
+    @if (detalleVisible() && idDetalleSeleccionado(); as id) {
+    <zoo-animal-detalle [animalId]="id" />
+    }
+  </p-drawer>
+</div>
+} @placeholder{
+<p>Cargando...</p>
+} @loading {
+<zoo-loader />
+}

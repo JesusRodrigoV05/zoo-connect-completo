@@ -1,0 +1,89 @@
+:host {
+  display: block;
+  width: 100%;
+  padding: 2rem;
+}
+
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.product-card {
+  ::ng-deep .p-card {
+    border-radius: 1.5rem;
+    box-shadow: var(--p-shadow-2);
+    border: 1px solid var(--p-surface-border);
+  }
+  ::ng-deep .p-card-body {
+    padding: 2rem;
+  }
+}
+
+.card-header {
+  padding: 1.5rem 2rem 0;
+  border-bottom: 1px solid var(--p-surface-border);
+  margin-bottom: 1.5rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+  }
+  .subtitle {
+    margin: 0.5rem 0 1.5rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+.empty-upload {
+  border: 2px dashed var(--p-surface-border);
+  border-radius: 1rem;
+  background: var(--p-surface-50);
+}
+
+::ng-deep {
+  .p-stepper {
+    background: transparent;
+  }
+  .p-stepper-nav {
+    background: transparent;
+    margin-bottom: 2rem;
+  }
+  .p-floatlabel,
+  .p-inputtext,
+  .p-inputnumber,
+  .p-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,41 @@
+<td class="col-product">
+  <div class="product-info">
+    <span class="product-name">{{ item().producto.nombre }}</span>
+    <span class="dosage-details">
+      {{ item().dosis }} {{ item().unidadMedida.abreviatura || '' }} • {{
+      item().frecuencia }}
+    </span>
+  </div>
+</td>
+
+<td class="col-instructions">
+  <span class="instructions-text">{{ item().instrucciones }}</span>
+</td>
+
+<td class="col-duration">
+  <span class="duration-text">{{ item().duracionDias }} días</span>
+</td>
+
+<td class="col-auto-task">
+  @if (item().generaTarea) {
+  <p-tag severity="info" value="Sí" icon="pi pi-cog" [rounded]="true" />
+  } @else {
+  <span class="no-task">-</span>
+  }
+</td>
+
+<td class="col-actions">
+  <div class="actions-wrapper">
+    @if (!bloqueado()) {
+    <p-button
+      icon="pi pi-trash"
+      [text]="true"
+      severity="danger"
+      [rounded]="true"
+      pTooltip="Eliminar receta"
+      tooltipPosition="top"
+      (onClick)="onDelete()"
+    />
+    }
+  </div>
+</td>

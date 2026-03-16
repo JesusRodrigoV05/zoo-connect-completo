@@ -1,0 +1,81 @@
+<form [formGroup]="form" class="upload-container">
+  <div class="info-header">
+    <i class="pi pi-cloud-upload"></i>
+    <div class="header-content">
+      <h3 class="header-title">Adjuntar Evidencia</h3>
+      <p class="header-description">
+        Sube el informe de laboratorio o la imagen radiológica.
+      </p>
+    </div>
+  </div>
+
+  <div class="file-area">
+    <label class="file-label">
+      Archivo (PDF, JPG, PNG) <span class="required">*</span>
+    </label>
+
+    <div class="file-selection-container">
+      <p-fileUpload
+        mode="basic"
+        chooseLabel="Seleccionar Archivo"
+        chooseIcon="pi pi-paperclip"
+        name="file"
+        accept="image/*,application/pdf"
+        [maxFileSize]="5000000"
+        (onSelect)="onFileSelect($event)"
+        [auto]="false"
+        styleClass="p-button-outlined"
+      />
+
+      @if (selectedFile(); as file) {
+      <div class="selected-file-badge fade-in">
+        <i class="pi pi-file file-icon"></i>
+        <span class="file-name">{{ file.name }}</span>
+        <i
+          class="pi pi-times remove-icon"
+          (click)="onClearFile()"
+          pTooltip="Quitar"
+        ></i>
+      </div>
+      }
+    </div>
+
+    @if (!selectedFile() && form.touched) {
+    <small class="validation-error">Debes seleccionar un archivo.</small>
+    }
+  </div>
+
+  <div class="field">
+    <label class="field-label">
+      Conclusiones / Informe <span class="required">*</span>
+    </label>
+    <textarea
+      pTextarea
+      formControlName="conclusiones"
+      rows="5"
+      placeholder="Escribe aquí el resumen del resultado o hallazgos principales..."
+      class="full-width-textarea"
+    ></textarea>
+  </div>
+
+  @if (loading()) {
+  <p-progressBar mode="indeterminate" class="loading-bar"></p-progressBar>
+  }
+
+  <div class="form-actions">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      [text]="true"
+      [disabled]="loading()"
+      (onClick)="cancelar()"
+    />
+    <p-button
+      label="Subir Resultado"
+      icon="pi pi-check"
+      [loading]="loading()"
+      [disabled]="form.invalid || !selectedFile()"
+      (onClick)="subir()"
+    />
+  </div>
+</form>

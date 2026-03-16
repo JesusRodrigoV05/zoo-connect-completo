@@ -1,0 +1,54 @@
+<form [formGroup]="form" class="form-content">
+  <div class="info-box">
+    <i class="pi pi-info-circle info-icon"></i>
+    <p class="info-text">
+      Solicita pruebas de laboratorio o imagenología. El resultado se subirá
+      posteriormente.
+    </p>
+  </div>
+
+  <div class="field">
+    <label class="field-label">
+      Tipo de Examen <span class="required">*</span>
+    </label>
+    <p-select
+      [options]="configStore.tiposExamenActivos()"
+      optionLabel="nombre"
+      optionValue="id"
+      formControlName="tipoExamenId"
+      placeholder="Seleccione el estudio..."
+      appendTo="body"
+      class="full-width-select"
+      [filter]="true"
+      filterBy="nombre"
+    />
+  </div>
+
+  <div class="field">
+    <label class="field-label">
+      Instrucciones / Motivo Clínico <span class="required">*</span>
+    </label>
+    <textarea
+      pTextarea
+      formControlName="instrucciones"
+      rows="4"
+      placeholder="Ej: Descartar fractura en miembro posterior derecho..."
+      class="full-width-textarea"
+    ></textarea>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      [text]="true"
+      (onClick)="cancelar()"
+    />
+    <p-button
+      label="Solicitar Examen"
+      icon="pi pi-send"
+      [disabled]="form.invalid"
+      (onClick)="guardar()"
+    />
+  </div>
+</form>

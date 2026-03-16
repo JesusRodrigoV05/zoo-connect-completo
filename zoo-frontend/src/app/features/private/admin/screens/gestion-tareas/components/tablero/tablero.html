@@ -1,0 +1,69 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <div class="header-title">
+      <h1>Tablero de Operaciones</h1>
+      <p class="text-muted">Gestión en tiempo real del zoológico</p>
+    </div>
+
+    <div class="header-actions">
+      <p-button
+        label="Actualizar"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [rounded]="true"
+        [text]="true"
+        [loading]="store.loading()"
+        (onClick)="store.loadDashboard()"
+      />
+
+      <p-button
+        label="Crear Tarea Manual"
+        icon="pi pi-plus"
+        severity="success"
+        [rounded]="true"
+        (onClick)="isCreateModalOpen.set(true)"
+      />
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    <p-splitter layout="horizontal" [panelSizes]="[45, 55]" gutterSize="8">
+      <ng-template pTemplate>
+        <section class="panel inbox-panel">
+          <header class="panel-header">
+            <h2>Bandeja de Entrada</h2>
+            <span class="badge badge-danger"
+              >{{ store.unassignedTasks().length }}</span
+            >
+          </header>
+          <zoo-task-inbox
+            [tasks]="store.unassignedTasks()"
+            (onAssign)="onRequestAssign($event)"
+          />
+        </section>
+      </ng-template>
+
+      <ng-template pTemplate>
+        <section class="panel radar-panel">
+          <header class="panel-header">
+            <h2>Asignadas Hoy</h2>
+            <span class="badge badge-info"
+              >{{ store.assignedTasks().length }}</span
+            >
+          </header>
+          <zoo-task-radar [tasksMap]="store.tasksByCaretaker()" />
+        </section>
+      </ng-template>
+    </p-splitter>
+  </main>
+
+  <zoo-asignar-tarea
+    [visible]="isAssignModalOpen()"
+    (onConfirm)="confirmAssignment($event)"
+    (onCancel)="isAssignModalOpen.set(false)"
+  />
+</div>
+<zoo-crear-tarea
+  [visible]="isCreateModalOpen()"
+  (onClose)="isCreateModalOpen.set(false)"
+/>

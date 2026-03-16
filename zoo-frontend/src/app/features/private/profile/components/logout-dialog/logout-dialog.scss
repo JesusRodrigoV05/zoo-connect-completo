@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .logout-dialog {
+  .p-dialog-header {
+    padding-bottom: 0.75rem;
+  }
+
+  .p-dialog-content {
+    padding-top: 0;
+    padding-bottom: 1.5rem;
+  }
+
+  .p-dialog-footer {
+    padding-top: 0;
+  }
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--p-text-color);
+}
+
+.danger-icon {
+  color: var(--p-danger-color);
+}
+
+.dialog-content {
+  p {
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .text-muted {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

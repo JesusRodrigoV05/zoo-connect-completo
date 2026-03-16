@@ -1,0 +1,107 @@
+@defer(on viewport; prefetch on idle; hydrate on viewport){
+<div class="list-page-container">
+  <p-confirmDialog />
+
+  <div class="header-actions">
+    <h2>Gestión de Especies</h2>
+    <div class="buttons">
+      <p-button
+        variant="text"
+        (onClick)="loadEspecies(currentPage(), pageSize())"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Recargar"
+      />
+      <p-button
+        icon="pi pi-plus"
+        label="Registrar Especie"
+        [rounded]="true"
+        severity="primary"
+        (onClick)="navigateToCreate()"
+      />
+    </div>
+  </div>
+
+  @if(loading() && !especieData()){
+  <zoo-loader />
+
+  } @else if(error()) { @let errorMsg = error();
+  <div class="error-state">
+    <i class="pi pi-times-circle"></i>
+    <p>Error al cargar especies:</p>
+    <p>{{ errorMsg }}</p>
+    <p-button
+      label="Reintentar"
+      (onClick)="loadEspecies(currentPage(), pageSize())"
+      icon="pi pi-refresh"
+      severity="danger"
+      [rounded]="true"
+    />
+  </div>
+
+  } @else if (especieData()) { @let response = especieData()!;
+  <p-dataview
+    #dv
+    [value]="response.items"
+    [paginator]="true"
+    [rows]="response.size"
+    [totalRecords]="response.total"
+    [first]="(response.page - 1) * response.size"
+    paginatorPosition="bottom"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    [loading]="loading()"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ response.total }} especies</span>
+        <span>Página {{ response.page }} de {{ response.pages }}</span>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      @for(item of items; track item.idEspecie){
+      <zoo-especie-item
+        [especie]="item"
+        (verDetalles)="viewDetails(item.idEspecie)"
+        (editar)="navigateToEdit(item.idEspecie)"
+        (eliminar)="deleteEspecie(item.idEspecie)"
+      />
+      } @empty {
+      <div class="empty-state">
+        <p>No hay especies disponibles.</p>
+        <p-button
+          icon="pi pi-plus"
+          label="Registrar Primera Especie"
+          [rounded]="true"
+          severity="primary"
+          (onClick)="navigateToCreate()"
+        />
+      </div>
+      }
+    </ng-template>
+  </p-dataview>
+  } @else {
+  <div class="loading-placeholder">
+    <p>Cargando especies...</p>
+  </div>
+  }
+  <p-drawer
+    header="Detalle de la Especie"
+    [visible]="detalleVisible()"
+    (visibleChange)="detalleVisible.set($event)"
+    position="right"
+    styleClass="drawer-detalle"
+  >
+    @if (detalleVisible() && idDetalleSeleccionado(); as id) {
+    <zoo-especie-detalle [especieId]="id" />
+    }
+  </p-drawer>
+</div>
+} @placeholder{
+<p>Cargando...</p>
+} @loading {
+<zoo-loader />
+}

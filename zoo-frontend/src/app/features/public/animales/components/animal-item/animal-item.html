@@ -1,0 +1,15 @@
+<article class="animal-card" (click)="navigateToAnimalDetails()">
+  <div class="image-wrapper">
+    <img
+      [ngSrc]="animalImage()"
+      [alt]="animal().nombre"
+      fill
+      class="animal-img"
+      [style.view-transition-name]="'animal-img-' + animal().id_animal"
+    />
+  </div>
+  <div class="card-content">
+    <h3>{{ animal().nombre }}</h3>
+    <p class="species-badge">{{ animal().especie.nombreComun }}</p>
+  </div>
+</article>

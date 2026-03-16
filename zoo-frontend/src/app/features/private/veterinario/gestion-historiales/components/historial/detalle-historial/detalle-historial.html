@@ -1,0 +1,188 @@
+<div class="detalle-page fade-in">
+  <p-confirmDialog />
+
+  <div class="nav-bar">
+    <p-button
+      label="Volver a la lista"
+      icon="pi pi-arrow-left"
+      [text]="true"
+      styleClass="back-btn"
+      (onClick)="volver()"
+      [rounded]="true"
+    />
+  </div>
+
+  @if (store.loading()) {
+  <div class="loading-container">
+    <p-skeleton height="200px" styleClass="mb-3" borderRadius="16px" />
+    <p-skeleton height="150px" borderRadius="16px" />
+  </div>
+  } @else if (store.historial(); as historial) {
+
+  <div class="patient-card">
+    <div class="patient-header">
+      <div class="patient-identity">
+        <p-avatar
+          [image]="historial.animal?.foto"
+          [label]="!historial.animal?.foto ? historial.animal?.nombre?.charAt(0) : ''"
+          size="xlarge"
+          shape="circle"
+          class="patient-avatar shadow-4"
+        />
+        <div class="identity-text">
+          <div class="name-row">
+            <h1 class="patient-name">{{ historial.animal?.nombre }}</h1>
+            <span class="species-badge">{{ historial.animal?.especie }}</span>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-item">
+              <i class="pi pi-calendar"></i>
+              {{ historial.fechaAtencion | date:'longDate' }}
+            </span>
+            <span class="divider">•</span>
+            <span class="meta-item">
+              <i class="pi pi-user-edit"></i>
+              Dr. {{ historial.veterinario?.nombre }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-actions">
+        @if (historial.abierto) {
+        <div class="status-badge success">
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>En Curso</span>
+        </div>
+        } @else {
+        <div class="status-badge closed">
+          <i class="pi pi-lock"></i>
+          <span>Cerrado</span>
+        </div>
+        } @if (historial.abierto) {
+        <p-button
+          label="Finalizar"
+          icon="pi pi-check-circle"
+          severity="danger"
+          [outlined]="true"
+          class="action-btn"
+          (onClick)="confirmarCierre()"
+          [rounded]="true"
+        />
+        }
+      </div>
+    </div>
+
+    <p-divider styleClass="my-4"></p-divider>
+
+    <div class="vitals-dashboard">
+      <div class="vital-card weight">
+        <div class="vital-icon"><i class="pi pi-chart-bar"></i></div>
+        <div class="vital-data">
+          <span class="label">Peso</span>
+          <span class="value"
+            >{{ historial.peso | number:'1.1-2' }} <small>kg</small></span
+          >
+        </div>
+      </div>
+
+      <div class="vital-card temp">
+        <div class="vital-icon"><i class="pi pi-sun"></i></div>
+        <div class="vital-data">
+          <span class="label">Temp</span>
+          <span class="value"
+            >{{ historial.temperatura | number:'1.1-1' }}
+            <small>°C</small></span
+          >
+        </div>
+      </div>
+
+      <div class="vital-card heart">
+        <div class="vital-icon"><i class="pi pi-heart-fill"></i></div>
+        <div class="vital-data">
+          <span class="label">Frec. Card.</span>
+          <span class="value"
+            >{{ historial.frecuenciaCardiaca || '--' }} <small>lpm</small></span
+          >
+        </div>
+      </div>
+
+      <div class="vital-card lungs">
+        <div class="vital-icon"><i class="pi pi-cloud"></i></div>
+        <div class="vital-data">
+          <span class="label">Frec. Resp.</span>
+          <span class="value"
+            >{{ historial.frecuenciaRespiratoria || '--' }}
+            <small>rpm</small></span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diagnosis-section">
+    <div class="diagnosis-card">
+      <div class="section-title">
+        <i class="pi pi-align-left"></i>
+        <h3>Anamnesis</h3>
+      </div>
+      <p class="section-content">{{ historial.anamnesis }}</p>
+    </div>
+
+    <div class="diagnosis-card highlight">
+      <div class="section-title">
+        <i class="pi pi-verified"></i>
+        <h3>Diagnóstico Presuntivo</h3>
+      </div>
+      <p class="section-content">
+        {{ historial.diagnosticoPresuntivo || 'Sin diagnóstico registrado' }}
+      </p>
+    </div>
+  </div>
+
+  <div class="tabs-wrapper">
+    <p-tabs value="0">
+      <p-tablist>
+        <p-tab value="0">
+          <i class="pi pi-list tab-icon"></i>
+          <span>Recetas</span>
+          @if(store.recetas().length > 0) {
+          <span class="badge-count">{{store.recetas().length}}</span>
+          }
+        </p-tab>
+        <p-tab value="1">
+          <i class="pi pi-heart tab-icon"></i>
+          <span>Procedimientos</span>
+          @if(store.procedimientos().length > 0) {
+          <span class="badge-count warn"
+            >{{store.procedimientos().length}}</span
+          >
+          }
+        </p-tab>
+        <p-tab value="2">
+          <i class="pi pi-file tab-icon"></i>
+          <span>Exámenes</span>
+          @if(store.ordenes().length > 0) {
+          <span class="badge-count success">{{store.ordenes().length}}</span>
+          }
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0"><app-seccion-receta /></p-tabpanel>
+        <p-tabpanel value="1"><app-seccion-procedimiento /></p-tabpanel>
+        <p-tabpanel value="2"><app-seccion-examenes /></p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+
+  } @else if (store.error()) {
+  <div class="error-state">
+    <i class="pi pi-exclamation-triangle"></i>
+    <h2>No se pudo cargar la información</h2>
+    <p>{{ store.error() }}</p>
+    <p-button label="Reintentar" (onClick)="ngOnInit()" [rounded]="true" />
+  </div>
+  }
+</div>

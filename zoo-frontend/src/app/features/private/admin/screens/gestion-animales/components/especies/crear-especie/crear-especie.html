@@ -1,0 +1,182 @@
+@defer (on viewport; prefetch on idle; hydrate on hover) {
+<p-card class="crear-usuario-card">
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <h2>{{ pageTitle() }}</h2>
+      <p class="subtitle">{{pageSubtitle()}}</p>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="especieForm" (ngSubmit)="onSubmit()" class="usuario-form">
+    <div class="form-grid">
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="nombreCientifico"
+            pInputText
+            type="text"
+            formControlName="nombreCientifico"
+            autocomplete="off"
+          />
+          <label for="nombreCientifico">Nombre Científico</label>
+        </p-floatlabel>
+        @if (isInvalid('nombreCientifico')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'nombreCientifico' }"
+        />
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="nombreComun"
+            pInputText
+            type="text"
+            formControlName="nombreComun"
+            autocomplete="off"
+          />
+          <label for="nombreComun">Nombre Común</label>
+        </p-floatlabel>
+        @if (isInvalid('nombreComun')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'nombreComun' }"
+        />
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="filo"
+            pInputText
+            type="text"
+            formControlName="filo"
+            autocomplete="off"
+          />
+          <label for="filo">Filo</label>
+        </p-floatlabel>
+        @if (isInvalid('filo')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'filo' }"
+        />
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="clase"
+            pInputText
+            type="text"
+            formControlName="clase"
+            autocomplete="off"
+          />
+          <label for="clase">Clase</label>
+        </p-floatlabel>
+        @if (isInvalid('clase')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'clase' }"
+        />
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="orden"
+            pInputText
+            type="text"
+            formControlName="orden"
+            autocomplete="off"
+          />
+          <label for="orden">Orden</label>
+        </p-floatlabel>
+        @if (isInvalid('orden')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'orden' }"
+        />
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="familia"
+            pInputText
+            type="text"
+            formControlName="familia"
+            autocomplete="off"
+          />
+          <label for="familia">Familia</label>
+        </p-floatlabel>
+        @if (isInvalid('familia')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'familia' }"
+        />
+        }
+      </div>
+
+      <div class="field full-width">
+        <p-floatlabel variant="on">
+          <textarea
+            pTextarea
+            id="descripcion"
+            rows="5"
+            formControlName="descripcion"
+            [autoResize]="true"
+          ></textarea>
+          <label for="descripcion">Descripción</label>
+        </p-floatlabel>
+        @if (isInvalid('descripcion')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'descripcion' }"
+        />
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <p-button
+        type="button"
+        label="Cancelar"
+        [rounded]="true"
+        severity="secondary"
+        (click)="cancelar()"
+        [disabled]="isLoading()"
+      />
+      <p-button
+        type="submit"
+        [label]="buttonText()"
+        [rounded]="true"
+        severity="primary"
+        [loading]="isLoading()"
+        [disabled]="(formSubmitted() && !especieForm.valid) || isLoading()"
+      />
+    </div>
+  </form>
+
+  <ng-template #alerta let-fieldName="fieldName">
+    <p-message severity="error" size="small" variant="simple">
+      {{ getErrorMessage(fieldName) }}
+    </p-message>
+  </ng-template>
+</p-card>
+
+<p-confirmpopup />
+
+} @placeholder {
+<div class="loading-placeholder">
+  <zoo-loader [size]="50" />
+  <p>Cargando formulario...</p>
+</div>
+} @loading (minimum 500ms) {
+<zoo-loader [size]="50" />
+}

@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: zoo-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ZOOCONNECT
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - zoo_network
+
+  redis:
+    image: redis:alpine
+    container_name: zoo-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - zoo_network
+
+  backend:
+    build:
+      context: ./zoo-backend
+      dockerfile: Dockerfile
+    container_name: zoo-backend
+    restart: always
+    env_file:
+      - ./zoo-backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - zoo_network
+
+  frontend:
+    build:
+      context: ./zoo-frontend
+      dockerfile: Dockerfile
+    container_name: zoo-frontend
+    restart: always
+    environment:
+      - BACKEND_INTERNAL_URL=http://backend:8000/zooconnect
+    env_file:
+      - ./zoo-frontend/.env
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+    networks:
+      - zoo_network
+
+networks:
+  zoo_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,8 @@
+<td class="font-medium">{{ item().nombre }}</td>
+<td class="text-secondary">{{ item().descripcion }}</td>
+<td class="text-center">
+  <div class="row-actions">
+    <zoo-item-action-button tipo="edit" (click)="onEdit.emit(item())" />
+    <zoo-item-action-button tipo="delete" (click)="onDelete.emit(item().id)" />
+  </div>
+</td>

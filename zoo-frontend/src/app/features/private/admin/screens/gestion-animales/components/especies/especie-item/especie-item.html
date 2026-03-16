@@ -1,0 +1,44 @@
+<p-card class="especie-card">
+  <div class="item-content">
+    <div class="item-info">
+      <div class="item-header">
+        <h3>{{ especie().nombreComun }}</h3>
+      </div>
+
+      <p class="scientific-name">{{ especie().nombreCientifico }}</p>
+      <p class="taxonomy-text">{{ taxonomiaResumen() }}</p>
+    </div>
+
+    <div class="item-actions">
+      <p-button
+        icon="pi pi-eye"
+        [rounded]="true"
+        severity="secondary"
+        [outlined]="true"
+        pTooltip="Ver detalles"
+        tooltipPosition="top"
+        (onClick)="verDetalles.emit(especie().idEspecie)"
+      />
+
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        severity="info"
+        [outlined]="true"
+        pTooltip="Editar especie"
+        tooltipPosition="top"
+        (onClick)="editar.emit(especie().idEspecie)"
+      />
+
+      <p-button
+        [icon]="especie().isActive ? 'pi pi-trash' : 'pi pi-undo'"
+        [rounded]="true"
+        [severity]="especie().isActive ? 'danger' : 'success'"
+        [outlined]="true"
+        [pTooltip]="especie().isActive ? 'Desactivar especie' : 'Reactivar especie'"
+        tooltipPosition="top"
+        (onClick)="eliminar.emit(especie().idEspecie)"
+      />
+    </div>
+  </div>
+</p-card>

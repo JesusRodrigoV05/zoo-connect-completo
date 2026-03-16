@@ -1,0 +1,56 @@
+<p-card class="encuesta-card">
+  <div class="item-content">
+    <div class="item-info">
+      <div class="item-header">
+        <h3>{{ encuesta().titulo }}</h3>
+      </div>
+
+      <p class="descripcion">{{ encuesta().descripcion }}</p>
+
+      <div class="meta-info">
+        <i class="pi pi-calendar"></i>
+        <span>
+          {{ encuesta().fechaInicio | date:'d MMM' }} - {{ encuesta().fechaFin |
+          date:'d MMM, y' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="item-actions">
+      <zoo-qr-download-button
+        [url]="urlQR()"
+        [nombreArchivo]="encuesta().titulo"
+      />
+
+      <p-button
+        icon="pi pi-chart-line"
+        [rounded]="true"
+        severity="secondary"
+        [outlined]="true"
+        pTooltip="Ver resultados"
+        tooltipPosition="top"
+        (onClick)="onView.emit(encuesta())"
+      />
+
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        severity="info"
+        [outlined]="true"
+        pTooltip="Editar encuesta"
+        tooltipPosition="top"
+        (onClick)="onEdit.emit(encuesta())"
+      />
+
+      <p-button
+        [icon]="encuesta().isActive ? 'pi pi-trash' : 'pi pi-undo'"
+        [rounded]="true"
+        [severity]="encuesta().isActive ? 'danger' : 'success'"
+        [outlined]="true"
+        [pTooltip]="encuesta().isActive ? 'Desactivar encuesta' : 'Reactivar encuesta'"
+        tooltipPosition="top"
+        (onClick)="onDelete.emit(encuesta().idEncuesta)"
+      />
+    </div>
+  </div>
+</p-card>

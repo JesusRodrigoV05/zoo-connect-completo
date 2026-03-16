@@ -1,0 +1,109 @@
+:host {
+  display: block;
+}
+
+::ng-deep .proveedor-card {
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--p-surface-border);
+  background: var(--p-surface-card);
+  border-radius: 12px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: var(--p-primary-color);
+  }
+
+  .p-card-body {
+    padding: 1rem;
+  }
+}
+
+.item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+
+  .item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--p-text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--p-text-muted-color);
+      font-size: 0.875rem;
+
+      i {
+        font-size: 0.9rem;
+        color: var(--p-primary-500); // Color sutil para iconos
+      }
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+
+  ::ng-deep .p-button.p-button-rounded {
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+
+    .p-button-icon {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .item-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item-info {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .item-actions {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px dashed var(--p-surface-border);
+    padding-top: 0.75rem;
+  }
+}

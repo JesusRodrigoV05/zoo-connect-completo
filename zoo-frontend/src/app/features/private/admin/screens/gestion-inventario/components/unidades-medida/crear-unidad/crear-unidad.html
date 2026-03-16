@@ -1,0 +1,73 @@
+<div class="form-container">
+  <p-card class="unidad-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <h2>{{ pageTitle() }}</h2>
+        <p class="subtitle">Estandarización de inventario</p>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      <div class="form-section">
+        <h4>Datos de la Unidad</h4>
+
+        <div class="form-grid">
+          <div class="field">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="nombre"
+                formControlName="nombre"
+                class="w-full"
+              />
+              <label for="nombre">Nombre Completo *</label>
+            </p-floatlabel>
+            @if (isInvalid('nombre')) {
+            <p-message severity="error" variant="simple" size="small">
+              {{ getError('nombre') }}
+            </p-message>
+            }
+          </div>
+
+          <div class="field">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="abreviatura"
+                formControlName="abreviatura"
+                class="w-full uppercase-input"
+              />
+              <label for="abreviatura">Símbolo/Abreviatura *</label>
+            </p-floatlabel>
+            @if (isInvalid('abreviatura')) {
+            <p-message severity="error" variant="simple" size="small">
+              {{ getError('abreviatura') }}
+            </p-message>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isProcessing()"
+        >
+        </p-button>
+
+        <p-button
+          [label]="submitLabel()"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+          [rounded]="true"
+          type="submit"
+          [disabled]="isProcessing()"
+        >
+        </p-button>
+      </div>
+    </form>
+  </p-card>
+</div>

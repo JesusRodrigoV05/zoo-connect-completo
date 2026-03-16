@@ -1,0 +1,70 @@
+<zoo-main-container>
+  <header class="page-header">
+    <h1>Conoce a nuestros <span class="highlight">Amigos</span></h1>
+    <p>
+      Descubre la increíble diversidad de vida silvestre que llama hogar a
+      nuestro refugio, desde lo majestuoso hasta lo minúsculo.
+    </p>
+  </header>
+
+  <div class="explorer-layout">
+    <!-- --
+    <aside class="filters-sidebar">
+      <div class="search-wrapper">
+        <i class="pi pi-search"></i>
+        <input type="text" placeholder="Buscar un amigo..." />
+      </div>
+
+      <div class="filter-group">
+        <h3><i class="pi pi-globe"></i> Hábitat</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" /> <span>Selva Húmeda</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" /> <span>Sabana</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" /> <span>Montaña</span>
+        </label>
+      </div>
+
+      <div class="filter-group">
+        <h3><i class="pi pi-heart"></i> Estado</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" /> <span>En Tratamiento</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" /> <span>Saludable</span>
+        </label>
+      </div>
+
+      <button class="clear-btn">Limpiar Filtros</button>
+    </aside>
+    -->
+
+    <main class="content-area">
+      <section class="grid-container">
+        @for (animal of animals(); track animal.id_animal) {
+        <app-animal-item [animal]="animal" />
+        }
+      </section>
+
+      @if (hasMoreData()) {
+      <div
+        appInfiniteScroll
+        (scrolled)="onScrollDown()"
+        class="loading-trigger"
+      >
+        @if (isLoading()) {
+        <div class="spinner-wrapper">
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>Cargando más amigos...</span>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="end-message">🍃 Has conocido a todos nuestros amigos.</div>
+      }
+    </main>
+  </div>
+</zoo-main-container>

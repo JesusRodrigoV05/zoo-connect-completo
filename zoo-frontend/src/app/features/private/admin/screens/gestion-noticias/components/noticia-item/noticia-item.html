@@ -1,0 +1,20 @@
+<div class="noticia-card" [ngClass]="layout()">
+  <div class="image-container">
+    <img
+      [src]="noticia().imagen || 'assets/images/placeholder-news.jpg'"
+      [alt]="noticia().titulo"
+    />
+  </div>
+
+  <div class="content">
+    <div class="text-section">
+      <h3 class="title">{{ noticia().titulo }}</h3>
+    </div>
+
+    <div class="actions">
+      <zoo-item-action-button tipo="view" (click)="onDetails.emit()" />
+      <zoo-item-action-button tipo="edit" (click)="onEdit.emit(noticia().id)" />
+      <zoo-item-action-button tipo="delete" (click)="onDelete.emit()" />
+    </div>
+  </div>
+</div>

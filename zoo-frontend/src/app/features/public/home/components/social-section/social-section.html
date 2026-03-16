@@ -1,0 +1,19 @@
+<section class="social-section">
+  <h3 data-aos="fade-down">Síguenos en Redes Sociales</h3>
+  <div class="social-links">
+    @for (button of socialButtons; track $index) {
+    <a
+      [href]="button.link"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="social-button"
+      [class]="button.variant"
+      [attr.aria-label]="button.label"
+      data-aos="fade-up"
+      [attr.data-aos-delay]="$index * 100 + 100"
+    >
+      <i [class]="button.icon"></i>
+    </a>
+    }
+  </div>
+</section>

@@ -1,0 +1,13 @@
+@defer (on viewport; hydrate on viewport; prefetch on idle) {
+<img
+  [ngSrc]="logoSrc()"
+  [alt]="alt()"
+  [width]="size()"
+  [height]="size()"
+  [class]="logoClasses()"
+  priority
+  routerLink="/"
+/>
+}@placeholder {
+<zoo-loader />
+}

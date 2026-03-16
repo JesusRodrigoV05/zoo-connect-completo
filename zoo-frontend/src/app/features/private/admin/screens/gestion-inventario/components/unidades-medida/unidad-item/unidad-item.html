@@ -1,0 +1,36 @@
+<p-card class="unidad-card">
+  <div class="item-content">
+    <div class="item-info">
+      <div class="item-header">
+        <i class="pi pi-box item-icon"></i>
+        <h3>{{ unidad().nombre }}</h3>
+      </div>
+
+      <p class="abreviatura">
+        Símbolo: <strong>{{ unidad().abreviatura }}</strong>
+      </p>
+    </div>
+
+    <div class="item-actions">
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        severity="info"
+        [outlined]="true"
+        pTooltip="Editar Unidad"
+        tooltipPosition="top"
+        (onClick)="editar()"
+      />
+
+      <p-button
+        [icon]="unidad().isActive ? 'pi pi-trash' : 'pi pi-undo'"
+        [rounded]="true"
+        [severity]="unidad().isActive ? 'danger' : 'success'"
+        [outlined]="true"
+        [pTooltip]="unidad().isActive ? 'Desactivar' : 'Reactivar'"
+        tooltipPosition="top"
+        (onClick)="toggleStatus()"
+      />
+    </div>
+  </div>
+</p-card>

@@ -1,0 +1,40 @@
+@if (isOpen()) {
+<div class="modal-container">
+  <div class="modal-overlay" (click)="handleClose()"></div>
+
+  <div
+    class="modal-content"
+    (clickOutside)="handleClose()"
+    role="dialog"
+    aria-modal="true"
+  >
+    <button
+      class="modal-close-btn"
+      (click)="handleClose()"
+      aria-label="Cerrar modal"
+    >
+      <i class="pi pi-times"></i>
+    </button>
+    <p class="modal-category">{{ card().category }}</p>
+    <p class="modal-title">{{ card().title }}</p>
+    <div class="py-10">
+      @if (card().content) {
+      <ng-container [ngComponentOutlet]="card().content ?? null" />
+      }
+    </div>
+  </div>
+</div>
+}
+
+<button class="card-button" (click)="handleOpen()">
+  <div class="card-gradient"></div>
+  <div class="card-text-content">
+    <p class="card-category">{{ card().category }}</p>
+    <p class="card-title">{{ card().title }}</p>
+  </div>
+  <app-blur-image
+    [src]="card().src"
+    [alt]="card().title"
+    extraClass="absolute inset-0 z-10 object-cover"
+  />
+</button>

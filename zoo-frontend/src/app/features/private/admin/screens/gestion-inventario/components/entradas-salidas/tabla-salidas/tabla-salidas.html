@@ -1,0 +1,152 @@
+<div class="table-container">
+  <p-table
+    [value]="salidas()"
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="20"
+    [totalRecords]="totalRecords()"
+    [lazy]="true"
+    (onLazyLoad)="onPage($event)"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    dataKey="id"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem"></th>
+        <th>ID</th>
+        <th>Fecha</th>
+        <th>Motivo (Tipo Salida)</th>
+        <th>Registrado Por</th>
+        <th>Total Items</th>
+        <th class="text-right">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-salida let-expanded="expanded">
+      <tr>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            [pRowToggler]="salida"
+            class="p-button-text p-button-rounded p-button-plain"
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+          ></button>
+        </td>
+        <td><span class="font-bold">#{{ salida.id }}</span></td>
+        <td>
+          <div class="flex flex-column">
+            <span class="font-medium"
+              >{{ salida.fecha | date:'dd MMM yyyy' }}</span
+            >
+            <span class="text-xs text-500"
+              >{{ salida.fecha | date:'HH:mm' }}</span
+            >
+          </div>
+        </td>
+        <td>
+          <p-tag
+            [value]="salida.tipoSalida?.nombre || 'Desconocido'"
+            [severity]="'warn'"
+            [rounded]="true"
+          >
+          </p-tag>
+        </td>
+        <td>
+          <div class="user-badge">
+            <i class="pi pi-user"></i>
+            {{ salida.usuario?.username || 'Sistema' }}
+          </div>
+        </td>
+        <td>
+          <span class="font-bold">{{ salida.detalles?.length }}</span> items
+        </td>
+        <td class="text-right">
+          <p-button
+            icon="pi pi-print"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            pTooltip="Imprimir Comprobante"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="rowexpansion" let-salida>
+      <tr>
+        <td colspan="7">
+          <div class="p-3 pl-6 detail-row">
+            <span class="detail-title">📤 Productos Entregados</span>
+
+            <p-table
+              [value]="salida.detalles"
+              styleClass="p-datatable-sm sub-table"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Destino / Uso</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-detalle>
+                <tr>
+                  <td>
+                    <span class="font-medium text-primary-700"
+                      >{{ detalle.producto?.nombre }}</span
+                    >
+                    <small class="block text-muted-color"
+                      >{{ detalle.producto?.tipoProducto?.nombre }}</small
+                    >
+                  </td>
+
+                  <td class="font-bold">
+                    {{ detalle.cantidad }} {{
+                    detalle.producto?.unidadMedida?.abreviatura }}
+                  </td>
+
+                  <td>
+                    @if (detalle.animal) {
+                    <div class="destination-badge animal">
+                      <i class="pi pi-github"></i>
+                      <span>{{ detalle.animal.nombre_animal }}</span>
+                    </div>
+                    } @else if (detalle.habitat) {
+                    <div class="destination-badge habitat">
+                      <i class="pi pi-map-marker"></i>
+                      <span>{{ detalle.habitat.nombre_habitat }}</span>
+                    </div>
+                    } @else {
+                    <span class="text-muted-color italic">Uso General</span>
+                    }
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+
+            @if (salida.observacion) {
+            <div class="observacion-box mt-2">
+              <strong>Observaciones:</strong> {{ salida.observacion }}
+            </div>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">
+          <div class="empty-state">
+            <i class="pi pi-folder-open"></i>
+            <p>No hay registros de salidas.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

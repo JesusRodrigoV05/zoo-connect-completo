@@ -1,0 +1,75 @@
+<div class="modal-container">
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="form-content">
+      <div class="field">
+        <label for="nombre">
+          Nombre del Procedimiento <span class="required">*</span>
+        </label>
+        <input
+          pInputText
+          id="nombre"
+          formControlName="nombre"
+          placeholder="Ej. Limpieza dental"
+          autofocus
+        />
+        @if (form.controls.nombre.dirty && form.controls.nombre.invalid) {
+        <small class="error-text">El nombre es requerido (min 3 chars).</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="fecha">
+          Fecha y Hora <span class="required">*</span>
+        </label>
+        <p-datepicker
+          formControlName="fechaProgramada"
+          [showTime]="true"
+          hourFormat="12"
+          [minDate]="minDate"
+          appendTo="body"
+          placeholder="Seleccione fecha..."
+          styleClass="full-width"
+        />
+      </div>
+
+      <div class="field">
+        <label for="estado"> Estado <span class="required">*</span> </label>
+        <p-select
+          [options]="estados"
+          formControlName="estado"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione estado"
+          styleClass="full-width"
+        />
+      </div>
+
+      <div class="field">
+        <label for="descripcion">Descripción / Notas</label>
+        <textarea
+          pTextarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="4"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        (onClick)="cancelar()"
+      />
+      <p-button
+        [label]="isEditMode ? 'Actualizar' : 'Agendar'"
+        icon="pi pi-check"
+        [rounded]="true"
+        type="submit"
+        [disabled]="form.invalid"
+      />
+    </div>
+  </form>
+</div>

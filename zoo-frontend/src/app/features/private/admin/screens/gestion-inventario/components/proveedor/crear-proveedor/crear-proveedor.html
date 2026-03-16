@@ -1,0 +1,91 @@
+<div class="form-container">
+  <p-card class="proveedor-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <h2>{{ pageTitle() }}</h2>
+        <p class="subtitle">Gestión de aliados y suministros</p>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      <div class="form-section">
+        <h4>Información de Contacto</h4>
+
+        <div class="form-grid">
+          <div class="field full-width">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="nombre"
+                formControlName="nombre"
+                class="w-full"
+              />
+              <label for="nombre">Nombre de la Empresa o Proveedor *</label>
+            </p-floatlabel>
+            @if (isInvalid('nombre')) {
+            <p-message severity="error" variant="simple" size="small">
+              {{ getError('nombre') }}
+            </p-message>
+            }
+          </div>
+
+          <div class="field">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="email"
+                formControlName="email"
+                type="email"
+                class="w-full"
+              />
+              <label for="email">Correo Electrónico *</label>
+            </p-floatlabel>
+            @if (isInvalid('email')) {
+            <p-message severity="error" variant="simple" size="small">
+              {{ getError('email') }}
+            </p-message>
+            }
+          </div>
+
+          <div class="field">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="telefono"
+                formControlName="telefono"
+                class="w-full"
+              />
+              <label for="telefono">Teléfono de Contacto *</label>
+            </p-floatlabel>
+            @if (isInvalid('telefono')) {
+            <p-message severity="error" variant="simple" size="small">
+              {{ getError('telefono') }}
+            </p-message>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isProcessing()"
+        >
+        </p-button>
+
+        <p-button
+          [label]="submitLabel()"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+          [rounded]="true"
+          type="submit"
+          [disabled]="isProcessing()"
+        >
+        </p-button>
+      </div>
+    </form>
+  </p-card>
+</div>

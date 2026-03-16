@@ -1,0 +1,219 @@
+<div class="form-container">
+  <p-card styleClass="diet-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="pi pi-apple"></i>
+        </div>
+        <div>
+          <h2>{{ pageTitle() }}</h2>
+          <p class="subtitle">Planificación nutricional</p>
+        </div>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      <div class="form-section">
+        <h4>Datos Generales</h4>
+
+        <div class="form-grid">
+          <div class="field full-width">
+            <p-floatlabel>
+              <input pInputText id="nombre" formControlName="nombre" fluid />
+              <label for="nombre"
+                >Nombre de la Dieta (ej. Dieta Felinos Standard) *</label
+              >
+            </p-floatlabel>
+            @if(isInvalid('nombre')) {
+            <p-message severity="error" variant="simple" size="small"
+              >Requerido</p-message
+            >
+            }
+          </div>
+
+          <div class="field radio-group full-width">
+            <label class="block mb-2 font-semibold text-color-secondary"
+              >Asignar a:</label
+            >
+            <div class="flex gap-4">
+              <div class="flex align-items-center">
+                <p-radiobutton
+                  name="targetType"
+                  value="especie"
+                  formControlName="targetType"
+                  inputId="typeEspecie"
+                  (onClick)="onTargetTypeChange()"
+                />
+                <label for="typeEspecie" class="ml-2 cursor-pointer"
+                  >Especie (General)</label
+                >
+              </div>
+              <div class="flex align-items-center">
+                <p-radiobutton
+                  name="targetType"
+                  value="animal"
+                  formControlName="targetType"
+                  inputId="typeAnimal"
+                  (onClick)="onTargetTypeChange()"
+                />
+                <label for="typeAnimal" class="ml-2 cursor-pointer"
+                  >Animal (Específico)</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="field full-width">
+            @if (form.get('targetType')?.value === 'especie') {
+            <p-floatlabel>
+              <p-select
+                inputId="targetEsp"
+                formControlName="targetId"
+                [options]="especieStore.activeEspecies()"
+                optionLabel="nombreComun"
+                optionValue="idEspecie"
+                [filter]="true"
+                filterPlaceholder="Buscar especie..."
+                fluid
+              />
+              <label for="targetEsp">Seleccionar Especie *</label>
+            </p-floatlabel>
+            } @else {
+            <p-floatlabel>
+              <p-select
+                inputId="targetAnim"
+                formControlName="targetId"
+                [options]="animalList()"
+                optionLabel="label"
+                optionValue="value"
+                [filter]="true"
+                filterPlaceholder="Buscar animal..."
+                fluid
+              />
+              <label for="targetAnim">Seleccionar Animal *</label>
+            </p-floatlabel>
+            } @if(isInvalid('targetId')) {
+            <p-message severity="error" variant="simple" size="small"
+              >Debes seleccionar un objetivo</p-message
+            >
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section mt-4">
+        <div class="flex justify-between align-items-center mb-3">
+          <h4>Ingredientes y Raciones</h4>
+          <p-button
+            label="Agregar Ingrediente"
+            icon="pi pi-plus"
+            size="small"
+            [outlined]="true"
+            (onClick)="addDetalle()"
+          />
+        </div>
+
+        <div formArrayName="detalles">
+          <p-table
+            [value]="detalles.controls"
+            styleClass="p-datatable-sm ingredient-table"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 35%">Producto (Alimento) *</th>
+                <th style="width: 15%">Cantidad *</th>
+                <th style="width: 20%">Unidad *</th>
+                <th style="width: 25%">Frecuencia/Notas *</th>
+                <th style="width: 5%"></th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-group let-i="rowIndex">
+              <tr [formGroupName]="i">
+                <td>
+                  <p-select
+                    formControlName="productoId"
+                    [options]="productStore.products()"
+                    optionLabel="nombre"
+                    optionValue="id"
+                    [filter]="true"
+                    placeholder="Seleccionar..."
+                    appendTo="body"
+                    styleClass="w-full table-input"
+                    fluid
+                    [invalid]="isInvalid('productoId', i)"
+                  />
+                </td>
+
+                <td>
+                  <p-inputNumber
+                    formControlName="cantidad"
+                    [min]="0"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full text-center p-1"
+                    fluid
+                    class="compact-number"
+                    [invalid]="isInvalid('cantidad', i)"
+                  />
+                </td>
+
+                <td>
+                  <p-select
+                    formControlName="unidadMedidaId"
+                    [options]="unidadesStore.items()"
+                    optionLabel="abreviatura"
+                    optionValue="id"
+                    placeholder="U.M."
+                    appendTo="body"
+                    styleClass="w-full table-input"
+                    fluid
+                    [invalid]="isInvalid('unidadMedidaId', i)"
+                  />
+                </td>
+
+                <td>
+                  <input
+                    pInputText
+                    formControlName="frecuencia"
+                    placeholder="Ej. Diario, Lun-Mie"
+                    class="w-full p-2 table-text"
+                    fluid
+                    [ngClass]="{'ng-invalid ng-dirty': isInvalid('frecuencia', i)}"
+                  />
+                </td>
+
+                <td class="text-center">
+                  <p-button
+                    icon="pi pi-trash"
+                    class="p-button-text p-button-danger p-button-rounded p-button-sm"
+                    (click)="removeDetalle(i)"
+                    pTooltip="Quitar"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <div class="form-actions mt-5">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isProcessing()"
+        />
+        <p-button
+          [label]="isEditMode() ? 'Actualizar Dieta' : 'Guardar Dieta'"
+          icon="pi pi-check"
+          type="submit"
+          [loading]="isProcessing()"
+          [rounded]="true"
+          severity="success"
+        />
+      </div>
+    </form>
+  </p-card>
+</div>

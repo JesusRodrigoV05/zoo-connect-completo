@@ -1,0 +1,102 @@
+<p-card styleClass="ajustes-card">
+  <ng-template pTemplate="title"> Preferencias de Notificación </ng-template>
+  <ng-template pTemplate="subtitle">
+    Elige cómo y cuándo quieres recibir notificaciones.
+  </ng-template>
+
+  <div class="settings-section">
+    <h3 class="section-title">Canales de Notificación</h3>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Notificaciones Push</h4>
+        <p>Recibe notificaciones en tiempo real en tu navegador</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationSettings().pushEnabled"
+        (ngModelChange)="updateNotificationSetting('pushEnabled', $event)"
+      />
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Notificaciones por Correo</h4>
+        <p>Recibe actualizaciones importantes en tu email</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationSettings().emailEnabled"
+        (ngModelChange)="updateNotificationSetting('emailEnabled', $event)"
+      />
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Notificaciones por Telegram</h4>
+        <p>Recibe alertas directamente en Telegram</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationSettings().telegramEnabled"
+        (ngModelChange)="updateNotificationSetting('telegramEnabled', $event)"
+      />
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Notificaciones por WhatsApp</h4>
+        <p>Recibe mensajes importantes en WhatsApp</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationSettings().whatsappEnabled"
+        (ngModelChange)="updateNotificationSetting('whatsappEnabled', $event)"
+      />
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3 class="section-title">Tipos de Notificación</h3>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Nuevos Eventos</h4>
+        <p>Recibe notificaciones sobre nuevos eventos del zoológico</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationPreferences().newEvents"
+        (ngModelChange)="updateNotificationPreference('newEvents', $event)"
+      />
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Actualizaciones de Animales</h4>
+        <p>Notificaciones sobre nuevos animales o actualizaciones</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationPreferences().animalUpdates"
+        (ngModelChange)="updateNotificationPreference('animalUpdates', $event)"
+      />
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Quizzes y Encuestas</h4>
+        <p>Avisos sobre nuevos quizzes y encuestas disponibles</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationPreferences().quizSurveys"
+        (ngModelChange)="updateNotificationPreference('quizSurveys', $event)"
+      />
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Noticias del Zoo</h4>
+        <p>Mantente informado sobre las últimas noticias</p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="notificationPreferences().zooNews"
+        (ngModelChange)="updateNotificationPreference('zooNews', $event)"
+      />
+    </div>
+  </div>
+</p-card>

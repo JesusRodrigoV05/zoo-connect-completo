@@ -1,0 +1,101 @@
+<div class="quiz-container">
+  @if (!isFinished()) {
+  <div class="quiz-header">
+    <div class="meta-info">
+      <span class="badge-topic">{{ quiz().tema }}</span>
+      <span class="counter">
+        {{ currentQuestionIndex() + 1 }} / {{ quiz().preguntas.length }}
+      </span>
+    </div>
+    <p-progressBar
+      [value]="progress"
+      [showValue]="false"
+      styleClass="h-1"
+    ></p-progressBar>
+  </div>
+
+  <p-card styleClass="question-card">
+    <h2 class="question-title">{{ currentQuestion.pregunta }}</h2>
+
+    <div class="options-list">
+      @for (option of currentQuestion.opciones; track $index) {
+      <button
+        pButton
+        class="option-btn"
+        [ngClass]="{
+              'correct': isAnswered() && option === currentQuestion.respuestaCorrecta,
+              'wrong': isAnswered() && selectedOption() === option && !isCorrect(),
+              'dimmed': isAnswered() && option !== currentQuestion.respuestaCorrecta && selectedOption() !== option
+            }"
+        [disabled]="isAnswered()"
+        (click)="selectOption(option)"
+      >
+        {{ option }} @if (isAnswered()) { @if (option ===
+        currentQuestion.respuestaCorrecta) {
+        <i class="pi pi-check"></i>
+        } @else if (selectedOption() === option) {
+        <i class="pi pi-times"></i>
+        } }
+      </button>
+      }
+    </div>
+
+    @if (isAnswered()) {
+    <div
+      class="explanation-box"
+      [class.success]="isCorrect()"
+      [class.error]="!isCorrect()"
+    >
+      <div class="box-header">
+        <i
+          [class]="isCorrect() ? 'pi pi-check-circle' : 'pi pi-info-circle'"
+        ></i>
+        <strong
+          >{{ isCorrect() ? '¡Bien hecho!' : 'Respuesta correcta:' }}</strong
+        >
+      </div>
+      <p>{{ currentQuestion.explicacion }}</p>
+
+      <div class="actions">
+        <p-button
+          label="Siguiente"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (onClick)="nextQuestion()"
+        >
+        </p-button>
+      </div>
+    </div>
+    }
+  </p-card>
+
+  } @else {
+  <p-card styleClass="result-card">
+    <div class="result-content">
+      @if (isSaving()) {
+      <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
+      <p>Guardando tus resultados...</p>
+      } @else {
+      <i
+        class="pi pi-trophy"
+        style="font-size: 4rem; color: var(--p-primary-500)"
+      ></i>
+      <h2>¡Desafío Completado!</h2>
+
+      <div class="score-circle">
+        <span class="score">{{ score() }}</span>
+        <span class="total">/ {{ quiz().preguntas.length }}</span>
+      </div>
+
+      <p class="summary">Dominas el tema: <strong>{{ quiz().tema }}</strong></p>
+
+      <p-button
+        label="Volver al menú"
+        icon="pi pi-home"
+        [routerLink]="['/quizzes']"
+      ></p-button>
+      }
+    </div>
+  </p-card>
+  }
+</div>

@@ -1,0 +1,92 @@
+<section class="zoo-mission-section">
+  <div class="organic-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <div class="content-container">
+    <header class="section-header" data-aos="fade-up">
+      <span class="subtitle">El Legado de Elias Thorne</span>
+      <h2 class="title">
+        Más que un zoológico, <span class="highlight">un Refugio</span>
+      </h2>
+      <p class="description">
+        "No quiero un museo para exhibir trofeos, quiero un hospital para
+        sanar". Continuamos la promesa hecha en 1980: devolver la dignidad a la
+        vida silvestre y conectar tu corazón con la selva a través de la
+        tecnología.
+      </p>
+    </header>
+
+    <div class="cards-grid">
+      <article
+        class="organic-card history"
+        data-aos="fade-right"
+        data-aos-delay="100"
+      >
+        <div class="card-content">
+          <div class="icon-blob">
+            <i class="pi pi-hourglass"></i>
+          </div>
+          <h3>Nuestro Origen</h3>
+          <p>
+            Nacimos de la "Operación Arca" en 1978. Lo que empezó como un
+            rescate de emergencia contra el tráfico ilegal, hoy es el santuario
+            de referencia en el trópico.
+          </p>
+        </div>
+        <div class="card-decoration"></div>
+      </article>
+
+      <article class="organic-card mission featured" data-aos="zoom-in">
+        <div class="card-content">
+          <div class="icon-blob main">
+            <i class="pi pi-heart-fill"></i>
+          </div>
+          <h3>Nuestra Misión</h3>
+          <p>
+            Sanar, no solo exhibir. Utilizamos la innovación de ZooConnect para
+            brindar transparencia radical y bienestar absoluto a cada animal
+            rescatado que llamamos familia.
+          </p>
+        </div>
+        <div class="texture-overlay"></div>
+      </article>
+
+      <article
+        class="organic-card vision"
+        data-aos="fade-left"
+        data-aos-delay="200"
+      >
+        <div class="card-content">
+          <div class="icon-blob">
+            <i class="pi pi-eye"></i>
+          </div>
+          <h3>Nuestra Visión</h3>
+          <p>
+            Ser el puente digital entre la sociedad y la naturaleza. Crear una
+            generación que no solo mire a los animales, sino que entienda sus
+            historias y actúe para protegerlos.
+          </p>
+        </div>
+        <div class="card-decoration"></div>
+      </article>
+    </div>
+
+    <div class="features-strip">
+      @for (item of features; track $index) {
+      <div
+        class="feature-item"
+        data-aos="fade-up"
+        [attr.data-aos-delay]="300 + ($index * 100)"
+      >
+        <i [class]="item.icon"></i>
+        <div class="feature-text">
+          <strong>{{ item.title }}</strong>
+          <span>{{ item.text }}</span>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</section>

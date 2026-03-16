@@ -1,0 +1,118 @@
+:host {
+  display: block;
+  padding: 2rem;
+  width: 100%;
+}
+
+.form-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.diet-card {
+  ::ng-deep .p-card {
+    border-radius: 1.5rem;
+    box-shadow: var(--p-shadow-2);
+    border: 1px solid var(--p-surface-border);
+  }
+  ::ng-deep .p-card-body {
+    padding: 2rem;
+  }
+}
+
+.card-header {
+  padding: 1.5rem 2rem 0;
+  border-bottom: 1px solid var(--p-surface-border);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .header-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--p-green-50);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-green-600);
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+  }
+  .subtitle {
+    margin: 0;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.form-section {
+  h4 {
+    font-size: 1.1rem;
+    color: var(--p-primary-500);
+    margin-bottom: 1rem;
+    font-weight: 600;
+    border-bottom: 1px dashed var(--p-surface-border);
+    padding-bottom: 0.5rem;
+  }
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.5rem;
+  // Para la cabecera, 1 columna está bien o 2 si prefieres
+  grid-template-columns: 1fr;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--p-surface-border);
+  padding-top: 1.5rem;
+}
+
+// Ajustes de tabla para ingredientes
+::ng-deep {
+  .ingredient-table .p-datatable-thead > tr > th {
+    background: var(--p-surface-50);
+    font-size: 0.85rem;
+  }
+
+  .table-input .p-select {
+    width: 100%;
+    min-width: 140px;
+  }
+  .table-text {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .compact-number .p-inputnumber-input {
+    padding: 0.25rem;
+    width: 60px !important;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+}

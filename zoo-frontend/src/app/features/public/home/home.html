@@ -1,0 +1,29 @@
+<div class="home-page">
+  <app-hero-section />
+
+  @defer (on viewport) {
+  <app-carousel />
+  } @placeholder {
+  <div style="height: 400px; background: var(--p-surface-ground)"></div>
+  } @defer (on viewport) {
+  <app-services-section />
+  } @placeholder {
+  <div style="height: 300px"></div>
+  } @defer (on viewport) {
+  <app-noticias-section />
+  } @placeholder {
+  <div style="height: 400px"></div>
+  } @defer (on viewport) {
+  <app-weather-section />
+  } @placeholder {
+  <div style="height: 200px"></div>
+  } @defer (on viewport) {
+  <app-contact-section (submitContact)="onSubmitContact()" />
+  } @placeholder {
+  <div style="height: 500px"></div>
+  } @defer (on viewport) {
+  <app-social-section />
+  } @placeholder {
+  <div style="height: 100px"></div>
+  }
+</div>

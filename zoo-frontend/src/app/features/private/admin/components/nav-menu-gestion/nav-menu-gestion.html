@@ -1,0 +1,15 @@
+<div class="menu-botones-container">
+  @for(button of buttons(); track button.ruta) {
+    <p-button
+        [icon]="button.icono"
+        [label]="button.texto"
+        variant="outlined"
+        [rounded]="true"
+        [routerLink]="[button.ruta]"
+        styleClass="boton-menu-individual"
+        routerLinkActive="boton-activo"
+        [routerLinkActiveOptions]="{ exact: true }"
+        fluid
+    />
+  }
+</div>

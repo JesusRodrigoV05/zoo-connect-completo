@@ -1,0 +1,83 @@
+<div class="verify-2fa-page-container">
+  <p-card class="verify-2fa-card">
+    <div class="card-content">
+      <div class="verify-2fa-form-container">
+        <div class="verify-2fa-header">
+          <i class="pi pi-shield header-icon"></i>
+          <h1>Verificación de Dos Factores</h1>
+          <p class="subtitle">
+            Ingresa el código de 6 dígitos de tu app de autenticación
+          </p>
+        </div>
+
+        <div class="verify-2fa-content">
+          <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+            <div class="field">
+              <p-floatlabel variant="on">
+                <input
+                  pInputText
+                  id="code"
+                  formControlName="code"
+                  maxlength="10"
+                  placeholder="000000"
+                  autocomplete="one-time-code"
+                  [style]="{
+                    'width': '100%',
+                    'text-align': 'center',
+                    'font-size': '2rem',
+                    'letter-spacing': '0.5rem',
+                    'font-weight': '600'
+                  }"
+                  fluid
+                />
+
+                <label for="code">Código de Verificación</label>
+              </p-floatlabel>
+
+              @if (isInvalid('code')) {
+              <ng-container
+                [ngTemplateOutlet]="alerta"
+                [ngTemplateOutletContext]="{fieldName: 'code'}"
+              />
+              }
+            </div>
+
+            <div class="info-box">
+              <i class="pi pi-info-circle"></i>
+              <p>
+                Abre tu app de autenticación (Google Authenticator, Authy, etc.)
+                y ingresa el código de 6 dígitos que aparece.
+              </p>
+            </div>
+
+            <div class="button-container">
+              <p-button
+                type="submit"
+                [rounded]="true"
+                [disabled]="verifyForm.invalid || isVerifying()"
+                fluid
+              >
+                @if (isVerifying()) {
+                <zoo-loader [size]="20" [color]="'white'" />
+                } @else {
+                <span class="p-button-label">Verificar</span>
+                }
+              </p-button>
+            </div>
+          </form>
+
+          <div class="help-link">
+            ¿Problemas para verificar?
+            <a routerLink="/login">Volver al inicio de sesión</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-card>
+</div>
+
+<ng-template #alerta let-fieldName="fieldName">
+  <p-message severity="error" variant="simple" size="small">
+    {{ getErrorMessage(fieldName) }}
+  </p-message>
+</ng-template>

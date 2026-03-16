@@ -1,0 +1,109 @@
+:host {
+  display: block;
+}
+
+.radar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.caretaker-group {
+  background: var(--p-surface-card);
+  border: 1px solid var(--p-surface-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--p-surface-border);
+  background: transparent;
+
+  .caretaker-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .avatar-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--p-highlight-background);
+      color: var(--p-highlight-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: 2px solid var(--p-surface-card);
+    }
+
+    .info-text {
+      display: flex;
+      flex-direction: column;
+
+      h4 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--p-text-color);
+        font-weight: 700;
+      }
+
+      .role-badge {
+        font-size: 0.75rem;
+        color: var(--p-text-muted-color);
+      }
+    }
+  }
+
+  .task-count-pill {
+    background: var(--p-surface-border);
+    color: var(--p-text-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+}
+
+.group-tasks {
+  padding: 0.5rem 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background: var(--p-surface-card);
+  border: 1px dashed var(--p-surface-border);
+  border-radius: 12px;
+  text-align: center;
+  gap: 1rem;
+
+  .empty-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--p-green-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 2rem;
+      color: var(--p-green-500);
+    }
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: var(--p-text-color);
+    font-weight: 600;
+  }
+}

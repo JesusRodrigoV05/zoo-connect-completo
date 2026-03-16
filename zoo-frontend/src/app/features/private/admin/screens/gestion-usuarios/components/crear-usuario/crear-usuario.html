@@ -1,0 +1,110 @@
+<p-card class="crear-usuario-card">
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <h2>{{ pageTitle }}</h2>
+
+      <p class="subtitle">Ingresa los datos del usuario</p>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()" class="usuario-form">
+    <div class="form-grid">
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="email"
+            pInputText
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+          />
+
+          <label for="email">Email</label>
+        </p-floatlabel>
+
+        @if (isInvalid('email')) {
+
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{fieldName: 'email'}"
+        />
+
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="username"
+            pInputText
+            type="text"
+            formControlName="username"
+            autocomplete="username"
+          />
+
+          <label for="username">Nombre de Usuario</label>
+        </p-floatlabel>
+
+        @if (isInvalid('username')) {
+
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{fieldName: 'username'}"
+        />
+
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-select
+            id="rol"
+            formControlName="rol"
+            [options]="roleOptions"
+            optionLabel="label"
+            optionValue="value"
+            [pTooltip]="usuarioForm.get('rol')?.disabled ? 'No puedes editar tu propio rol' : ''"
+            placeholder="Selecciona un rol"
+          />
+
+          <label for="rol">Rol</label>
+        </p-floatlabel>
+
+        @if (isInvalid('rol')) {
+
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{fieldName: 'rol'}"
+        />
+
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <p-button
+        type="button"
+        label="Cancelar"
+        [rounded]="true"
+        severity="secondary"
+        (onClick)="onCancel()"
+        [disabled]="isLoading()"
+      />
+
+      <p-button
+        type="submit"
+        [label]="buttonText"
+        [rounded]="true"
+        severity="primary"
+        [loading]="isLoading()"
+        [disabled]="usuarioForm.invalid || isLoading()"
+      />
+    </div>
+  </form>
+</p-card>
+
+<ng-template #alerta let-fieldName="fieldName">
+  <p-message severity="error" variant="simple" size="small">
+    {{ getErrorMessage(fieldName) }}
+  </p-message>
+</ng-template>

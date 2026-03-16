@@ -1,0 +1,57 @@
+<div class="product-card" [ngClass]="[layout(), stockState()]">
+  <div class="image-wrapper">
+    <img
+      [ngSrc]="product().photoUrl || 'assets/images/placeholder-inventory.png'"
+      [alt]="product().nombre"
+      width="200"
+      height="200"
+      class="prod-img"
+    />
+
+    @if(layout() === 'grid') {
+    <p-tag
+      [value]="product().tipoProducto.nombre"
+      severity="info"
+      styleClass="category-badge"
+    />
+    }
+  </div>
+
+  <div class="content-wrapper">
+    <div class="header-info">
+      <div class="title-row">
+        <h3>{{ product().nombre }}</h3>
+        @if(layout() === 'list') {
+        <p-tag [value]="product().tipoProducto.nombre" severity="info" />
+        }
+      </div>
+      <p class="description">{{ product().descripcion }}</p>
+    </div>
+
+    <div class="inventory-stats">
+      <div class="stat main-stat">
+        <span class="label">Stock Actual</span>
+        <span class="value" [class]="stockState()">
+          {{ product().stockActual | number:'1.0-2' }}
+          <small>{{ product().unidadMedida.abreviatura }}</small>
+        </span>
+      </div>
+
+      <div class="stat-mini">
+        <i class="pi pi-info-circle"></i>
+        <span
+          >Mínimo requerido: <strong>{{ product().stockMinimo }}</strong></span
+        >
+      </div>
+    </div>
+
+    <div class="actions">
+      <zoo-item-action-button tipo="edit" (click)="onEdit.emit(product().id)" />
+
+      <zoo-item-action-button
+        tipo="delete"
+        (click)="onDelete.emit(product().id)"
+      />
+    </div>
+  </div>
+</div>

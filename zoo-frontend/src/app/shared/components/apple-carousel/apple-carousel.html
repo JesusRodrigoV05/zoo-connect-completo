@@ -1,0 +1,27 @@
+<div class="relative w-full">
+  <div #carouselHost class="carousel-container" (scroll)="checkScrollability()">
+    <div class="carousel-fade-right"></div>
+    <div class="carousel-content-wrapper">
+      <ng-content></ng-content>
+    </div>
+  </div>
+
+  <div class="carousel-nav">
+    <button
+      class="nav-button"
+      (click)="scrollLeft()"
+      [disabled]="!canScrollLeft()"
+      aria-label="Desplazar a la izquierda"
+    >
+      <i class="pi pi-arrow-left"></i>
+    </button>
+    <button
+      class="nav-button"
+      (click)="scrollRight()"
+      [disabled]="!canScrollRight()"
+      aria-label="Desplazar a la derecha"
+    >
+      <i class="pi pi-arrow-right"></i>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+$spacing-standard: 1.5rem;
+$spacing-field: 0.75rem;
+$text-color: var(--p-text-color);
+$text-secondary: var(--p-text-muted-color);
+$color-error: var(--p-red-500);
+
+:host {
+  display: block;
+}
+
+.modal-container {
+  padding: 0.5rem;
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-standard;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-color;
+
+    .required {
+      color: $color-error;
+      margin-left: 0.25rem;
+    }
+  }
+
+  .error-text {
+    color: $color-error;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+::ng-deep {
+  .full-width {
+    width: 100%;
+
+    .p-datepicker,
+    .p-select {
+      width: 100%;
+    }
+  }
+
+  .p-inputtext {
+    width: 100%;
+  }
+}

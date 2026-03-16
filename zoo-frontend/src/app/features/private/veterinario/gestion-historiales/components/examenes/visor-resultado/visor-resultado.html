@@ -1,0 +1,35 @@
+<div class="visor-layout">
+  <div class="toolbar">
+    <p-button
+      label="Cerrar"
+      icon="pi pi-times"
+      [text]="true"
+      severity="secondary"
+      (onClick)="cerrar()"
+    />
+  </div>
+
+  <div class="image-container">
+    @if (url) { @if (isLoading()) {
+    <div class="loader-wrapper">
+      <zoo-loader />
+    </div>
+    }
+
+    <img
+      [ngSrc]="url"
+      alt="Resultado del examen"
+      fill
+      priority
+      class="result-image"
+      (load)="onImageLoad()"
+    />
+
+    } @else {
+    <div class="error-msg">
+      <i class="pi pi-image mr-2"></i>
+      No se pudo cargar la imagen.
+    </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,83 @@
+:host {
+  display: block;
+  padding: 2rem;
+  width: 100%;
+}
+
+.form-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.entry-card {
+  ::ng-deep .p-card {
+    border-radius: 1.5rem;
+    box-shadow: var(--p-shadow-2);
+    border: 1px solid var(--p-surface-border);
+  }
+  ::ng-deep .p-card-body {
+    padding: 2rem;
+  }
+}
+
+.card-header {
+  padding: 1.5rem 2rem 0;
+  border-bottom: 1px solid var(--p-surface-border);
+  margin-bottom: 1.5rem;
+  h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+  }
+  .subtitle {
+    margin: 0.5rem 0 1.5rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.form-section {
+  h4 {
+    font-size: 1.1rem;
+    color: var(--p-primary-500);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--p-surface-border);
+  padding-top: 1.5rem;
+}
+
+::ng-deep {
+  .table-input .p-select {
+    min-width: 150px;
+  }
+  .table-date .p-inputtext {
+    padding: 0.5rem;
+  }
+
+  .compact-number .p-inputnumber-input {
+    padding: 0.25rem;
+    width: 50px !important;
+  }
+  .compact-number .p-button {
+    padding: 0 0.5rem;
+    width: 2rem;
+  }
+
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 0.5rem;
+    vertical-align: top;
+  }
+}
+
+@media (max-width: 768px) {
+  .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+}

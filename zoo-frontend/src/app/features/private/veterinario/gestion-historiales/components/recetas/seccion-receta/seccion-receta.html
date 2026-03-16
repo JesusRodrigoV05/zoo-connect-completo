@@ -1,0 +1,50 @@
+<div class="section-container">
+  <header class="section-header">
+    <div class="header-info">
+      <h3>Recetas y Medicación</h3>
+      <p>Gestiona el tratamiento farmacológico del paciente.</p>
+    </div>
+
+    <p-button
+      label="Agregar Medicamento"
+      icon="pi pi-plus"
+      [rounded]="true"
+      severity="primary"
+      [disabled]="store.bloqueado()"
+      (onClick)="openCrear()"
+    />
+  </header>
+
+  <p-table
+    [value]="store.recetas()"
+    styleClass="p-datatable-sm"
+    [rowHover]="true"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="th-product">Producto / Dosis</th>
+        <th class="th-instructions">Instrucciones</th>
+        <th class="th-duration">Duración</th>
+        <th class="th-task">Tarea Auto</th>
+        <th class="th-actions"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr
+        zoo-item-receta
+        [item]="item"
+        [bloqueado]="store.bloqueado()"
+        (delete)="deleteReceta($event)"
+      ></tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="empty-message">
+          No hay recetas prescritas para este historial.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -1,0 +1,105 @@
+:host {
+  display: block;
+}
+
+.table-container {
+  background: var(--p-surface-card);
+  border-radius: 1rem;
+  border: 1px solid var(--p-surface-border);
+  overflow: hidden;
+  box-shadow: var(--p-shadow-1);
+}
+
+::ng-deep .p-datatable {
+  .p-datatable-header {
+    background: transparent;
+    border: none;
+  }
+
+  .p-datatable-thead > tr > th {
+    background: var(--p-surface-50);
+    color: var(--p-text-muted-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--p-surface-border);
+  }
+
+  .p-datatable-tbody > tr > td {
+    border-bottom: 1px solid var(--p-surface-border);
+    color: var(--p-text-color);
+    padding: 1rem;
+  }
+}
+
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--p-surface-100);
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+}
+
+.detail-row {
+  background: var(--p-surface-50);
+  border-left: 4px solid var(--p-orange-500);
+  margin: 0.5rem 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.detail-title {
+  display: block;
+  font-weight: 700;
+  color: var(--p-text-muted-color);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.destination-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  &.animal {
+    background: var(--p-green-100);
+    color: var(--p-green-700);
+    i {
+      color: var(--p-green-600);
+    }
+  }
+
+  &.habitat {
+    background: var(--p-blue-100);
+    color: var(--p-blue-700);
+    i {
+      color: var(--p-blue-600);
+    }
+  }
+}
+
+.observacion-box {
+  font-size: 0.9rem;
+  color: var(--p-text-muted-color);
+  font-style: italic;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--p-surface-border);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem;
+  color: var(--p-text-muted-color);
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,25 @@
+<p-card class="user-card">
+  <zoo-user-avatar [size]="120" [priority]="true" />
+
+  <h2>{{ user().username }}</h2>
+
+  <div class="membership">
+    <i class="pi pi-check-circle"></i>
+    <span>{{ membershipText() }}</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="number">{{ stats().quizzes }}</span>
+      <span class="label">Quiz</span>
+    </div>
+    <div class="stat">
+      <span class="number">{{ stats().points }}</span>
+      <span class="label">Puntos</span>
+    </div>
+    <div class="stat">
+      <span class="number">{{ stats().surveys }}</span>
+      <span class="label">Encuestas</span>
+    </div>
+  </div>
+</p-card>

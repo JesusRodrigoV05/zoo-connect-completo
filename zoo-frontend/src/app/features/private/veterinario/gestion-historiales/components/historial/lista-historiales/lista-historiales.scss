@@ -1,0 +1,155 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.list-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--p-surface-card);
+  border-radius: 12px;
+  border: 1px solid var(--p-surface-border);
+  padding: 1.5rem;
+  box-shadow: var(--p-shadow-1);
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  .filters-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      user-select: none;
+
+      ::ng-deep .p-checkbox-label {
+        margin-left: 0.5rem;
+        color: var(--p-text-color);
+        cursor: pointer;
+      }
+    }
+
+    .status-select {
+      width: 15rem; // Ancho fijo para el select
+    }
+
+    .search-input-wrapper {
+      position: relative;
+
+      .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--p-text-muted-color);
+      }
+
+      input {
+        padding-left: 2.5rem; // Espacio para el ícono
+        width: 12rem;
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.table-container {
+  flex: 1;
+  overflow: hidden; // Para que el scroll lo maneje la tabla internamente si es necesario
+  border-radius: 8px;
+  border: 1px solid var(--p-surface-border);
+  display: flex;
+  flex-direction: column;
+
+  // Ajustes profundos para p-table
+  ::ng-deep .p-datatable {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .p-datatable-wrapper {
+      flex: 1;
+      overflow-y: auto; // Scroll vertical en el cuerpo
+    }
+
+    .p-datatable-header {
+      background: transparent;
+      border: none;
+    }
+
+    // Encabezados de tabla
+    .p-datatable-thead > tr > th {
+      background-color: var(--p-surface-ground);
+      color: var(--p-text-color);
+      font-weight: 600;
+      padding: 1rem;
+      border-bottom: 1px solid var(--p-surface-border);
+    }
+  }
+
+  .empty-message-cell {
+    text-align: center;
+    padding: 3rem;
+  }
+
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+
+    .empty-icon {
+      font-size: 2.5rem;
+      color: var(--p-text-muted-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-title {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--p-text-color);
+    }
+
+    .empty-subtitle {
+      color: var(--p-text-muted-color);
+    }
+  }
+}
+
+// Media query simple para móviles
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+
+    .filters-group {
+      flex-direction: column;
+      align-items: stretch;
+
+      .status-select,
+      .search-input-wrapper input {
+        width: 100%;
+      }
+    }
+
+    .action-buttons {
+      justify-content: flex-end;
+    }
+  }
+}

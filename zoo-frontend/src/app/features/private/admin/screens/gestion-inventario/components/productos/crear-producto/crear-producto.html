@@ -1,0 +1,205 @@
+<div class="form-container">
+  <p-stepper [value]="activeStep()">
+    <p-step-list>
+      <p-step [value]="1">Detalles del Producto</p-step>
+      <p-step [value]="2">Imagen y Finalizar</p-step>
+    </p-step-list>
+
+    <p-step-panels>
+      <p-step-panel [value]="1">
+        <ng-template #content>
+          <p-card class="product-card">
+            <ng-template pTemplate="header">
+              <div class="card-header">
+                <h2>{{ pageTitle() }}</h2>
+                <p class="subtitle">Paso 1: Información general del ítem</p>
+              </div>
+            </ng-template>
+
+            <form [formGroup]="form" class="form-content">
+              <div class="form-grid">
+                <div class="field full-width">
+                  <p-floatlabel>
+                    <input
+                      pInputText
+                      id="nombre"
+                      formControlName="nombre"
+                      class="w-full"
+                    />
+                    <label for="nombre">Nombre del Producto *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('nombre')) {
+                  <p-message severity="error" variant="simple" size="small"
+                    >Requerido</p-message
+                  >
+                  }
+                </div>
+
+                <div class="field full-width">
+                  <p-floatlabel>
+                    <textarea
+                      pTextarea
+                      id="desc"
+                      formControlName="descripcion"
+                      rows="3"
+                      class="w-full"
+                      [autoResize]="true"
+                    ></textarea>
+                    <label for="desc">Descripción *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('descripcion')) {
+                  <p-message severity="error" variant="simple" size="small"
+                    >Requerido</p-message
+                  >
+                  }
+                </div>
+
+                <div class="field">
+                  <p-floatlabel>
+                    <p-select
+                      inputId="tipo"
+                      formControlName="tipoProductoId"
+                      [options]="tiposStore.items()"
+                      optionLabel="nombre"
+                      optionValue="id"
+                      [loading]="isLoadingOptions()"
+                      [filter]="true"
+                      filterPlaceholder="Buscar tipo"
+                      styleClass="w-full"
+                    />
+                    <label for="tipo">Tipo de Producto *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('tipoProductoId')) {
+                  <p-message severity="error" variant="simple" size="small"
+                    >Requerido</p-message
+                  >
+                  }
+                </div>
+
+                <div class="field">
+                  <p-floatlabel>
+                    <p-select
+                      inputId="unidad"
+                      formControlName="unidadMedidaId"
+                      [options]="unidadesStore.items()"
+                      optionLabel="nombre"
+                      optionValue="id"
+                      [loading]="isLoadingOptions()"
+                      styleClass="w-full"
+                    />
+                    <label for="unidad">Unidad de Medida *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('unidadMedidaId')) {
+                  <p-message severity="error" variant="simple" size="small"
+                    >Requerido</p-message
+                  >
+                  }
+                </div>
+
+                <div class="field">
+                  <p-floatlabel>
+                    <p-inputNumber
+                      inputId="stockMin"
+                      formControlName="stockMinimo"
+                      [min]="0"
+                      styleClass="w-full"
+                    />
+                    <label for="stockMin">Stock Mínimo (Alerta) *</label>
+                  </p-floatlabel>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <p-button
+                  label="Cancelar"
+                  icon="pi pi-times"
+                  [text]="true"
+                  severity="secondary"
+                  (onClick)="onCancel()"
+                />
+                <p-button
+                  label="Siguiente"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  [rounded]="true"
+                  (onClick)="nextStep()"
+                />
+              </div>
+            </form>
+          </p-card>
+        </ng-template>
+      </p-step-panel>
+
+      <p-step-panel [value]="2">
+        <ng-template #content>
+          <p-card class="product-card">
+            <ng-template pTemplate="header">
+              <div class="card-header">
+                <h2>Imagen del Producto</h2>
+                <p class="subtitle">Paso 2: Visualización</p>
+              </div>
+            </ng-template>
+
+            <div class="upload-section">
+              @if(isEditMode() && currentImageUrl() && !selectedFile()) {
+              <div class="current-image mb-4 text-center">
+                <p>Imagen Actual:</p>
+                <p-image
+                  [src]="currentImageUrl()"
+                  alt="Producto"
+                  width="200"
+                  [preview]="true"
+                />
+              </div>
+              }
+
+              <p-fileupload
+                #fileUploader
+                mode="advanced"
+                [customUpload]="true"
+                [multiple]="false"
+                accept="image/*"
+                maxFileSize="2000000"
+                chooseLabel="Seleccionar Imagen"
+                [showUploadButton]="false"
+                [showCancelButton]="true"
+                (onSelect)="onFileSelect($event)"
+                (onClear)="onFileClear()"
+                [disabled]="isProcessing()"
+              >
+                <ng-template pTemplate="empty">
+                  <div class="empty-upload text-center p-5">
+                    <i
+                      class="pi pi-image"
+                      style="font-size: 3rem; color: var(--p-text-muted-color)"
+                    ></i>
+                    <p class="mt-2">Arrastra una imagen aquí (Opcional)</p>
+                  </div>
+                </ng-template>
+              </p-fileupload>
+            </div>
+
+            <div class="form-actions mt-4">
+              <p-button
+                label="Atrás"
+                icon="pi pi-arrow-left"
+                [text]="true"
+                severity="secondary"
+                (onClick)="prevStep()"
+                [disabled]="isProcessing()"
+              />
+
+              <p-button
+                [label]="isProcessing() ? 'Guardando...' : (isEditMode() ? 'Actualizar Todo' : 'Crear Producto')"
+                [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+                [rounded]="true"
+                (onClick)="finishProcess()"
+                [disabled]="isProcessing()"
+              />
+            </div>
+          </p-card>
+        </ng-template>
+      </p-step-panel>
+    </p-step-panels>
+  </p-stepper>
+</div>

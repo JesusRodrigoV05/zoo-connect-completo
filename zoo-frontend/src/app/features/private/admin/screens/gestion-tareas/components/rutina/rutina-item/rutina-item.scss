@@ -1,0 +1,85 @@
+.description-text {
+  color: var(--p-text-muted-color);
+}
+
+.location-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .location-icon {
+    color: var(--p-primary-500);
+  }
+}
+
+.general-text {
+  color: var(--p-text-muted-color);
+  font-style: italic;
+}
+
+.cron-badge {
+  background: var(--p-surface-100);
+  color: var(--p-text-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-family: "Courier New", monospace;
+  font-size: 0.85rem;
+  border: 1px solid var(--p-surface-border);
+}
+
+.actions-cell {
+  text-align: right;
+
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+
+.description-text {
+  color: var(--p-text-muted-color);
+  display: block;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .location-icon {
+    color: var(--p-primary-500);
+  }
+}
+
+.general-text {
+  color: var(--p-text-muted-color);
+  font-style: italic;
+}
+
+.cron-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--p-text-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  .cron-icon {
+    color: var(--p-text-muted-color);
+    font-size: 0.85rem;
+  }
+}
+
+.actions-cell {
+  text-align: right;
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}

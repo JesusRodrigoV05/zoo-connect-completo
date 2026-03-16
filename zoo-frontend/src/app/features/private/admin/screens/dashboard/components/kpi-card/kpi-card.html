@@ -1,0 +1,14 @@
+<div class="kpi-card">
+  <div class="kpi-content">
+    <div>
+      <span class="kpi-title">{{ item().title }}</span>
+      <div class="kpi-value">{{ item().value }}</div>
+      @if (item().diff) {
+      <span class="kpi-diff">{{ item().diff }}</span>
+      }
+    </div>
+    <div class="kpi-icon-wrapper" [ngClass]="item().bgClass">
+      <zoo-icon [name]="item().iconName" [color]="item().iconColor" size="md" />
+    </div>
+  </div>
+</div>

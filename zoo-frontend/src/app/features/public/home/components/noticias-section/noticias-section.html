@@ -1,0 +1,20 @@
+<section class="news-section">
+  <div class="bg-pattern"></div>
+
+  <div class="container">
+    <header class="section-header">
+      <div class="icon-pill">
+        <i class="bx bx-news"></i>
+        <span>Actualidad</span>
+      </div>
+      <h2>Noticias del <span class="highlight">Refugio</span></h2>
+      <p>Mantente al día con los últimos rescates, eventos y promociones.</p>
+    </header>
+
+    <div class="news-grid">
+      @for (item of newsList(); track item.id) {
+      <app-noticia-item [news]="item" />
+      }
+    </div>
+  </div>
+</section>

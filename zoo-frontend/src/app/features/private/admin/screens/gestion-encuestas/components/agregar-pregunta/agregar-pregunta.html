@@ -1,0 +1,145 @@
+<div class="dialog-content">
+  <form [formGroup]="questionForm">
+    <div class="field mb-4">
+      <p-floatlabel variant="on">
+        <textarea
+          pInputTextarea
+          id="texto-pregunta"
+          formControlName="textoPregunta"
+          rows="3"
+          placeholder="Titulo de la pregunta"
+          [autoResize]="true"
+          class="w-full"
+        ></textarea>
+        <label for="texto-pregunta">Pregunta</label>
+      </p-floatlabel>
+      @if (isInvalid('textoPregunta')) {
+      <ng-container
+        [ngTemplateOutlet]="alerta"
+        [ngTemplateOutletContext]="{ fieldName: 'textoPregunta' }"
+      />
+      }
+    </div>
+
+    <div class="field mb-4">
+      <p-floatlabel variant="on">
+        <p-select
+          id="tipo-pregunta"
+          formControlName="tipoPregunta"
+          [options]="tipoOpciones"
+          optionLabel="nombre"
+          optionValue="value"
+          placeholder="Selecciona una opción"
+          styleClass="w-full"
+          [invalid]="isInvalid('tipoPregunta')"
+          (onChange)="onTipoChange()"
+        >
+        </p-select>
+        <label for="tipo-pregunta">Tipo Pregunta</label>
+      </p-floatlabel>
+      @if (isInvalid('tipoPregunta')) {
+      <ng-container
+        [ngTemplateOutlet]="alerta"
+        [ngTemplateOutletContext]="{ fieldName: 'tipoPregunta' }"
+      />
+      }
+    </div>
+
+    @if (tipoSeleccionado() === 'opcion_unica') {
+    <div class="opciones-section">
+      <div class="opciones-header">
+        <h4>Opciones de respuesta</h4>
+        <p-button
+          type="button"
+          icon="pi pi-plus"
+          [text]="true"
+          [rounded]="true"
+          (onClick)="addOpcion()"
+          pTooltip="Añadir opción"
+          tooltipPosition="top"
+          [disabled]="opciones.length >= 10"
+        />
+      </div>
+
+      @if (opciones.controls.length === 0) {
+      <p-message severity="info" styleClass="w-full mt-2">
+        No hay opciones. Agrega al menos 2 opciones.
+      </p-message>
+      } @else {
+      <div class="opciones-list" formArrayName="opciones">
+        @for (opcion of opciones.controls; track $index; let i = $index) {
+        <div class="opcion-item" [formGroupName]="i">
+          <p-floatlabel variant="on" styleClass="flex-grow-1">
+            <input
+              pInputText
+              [id]="'opcion' + i"
+              formControlName="texto_opcion"
+              class="w-full"
+            />
+            <label [for]="'opcion' + i">Opción {{ i + 1 }}</label>
+          </p-floatlabel>
+
+          <p-button
+            type="button"
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [rounded]="true"
+            (onClick)="removeOpcion(i, $event)"
+            pTooltip="Eliminar opción"
+            tooltipPosition="top"
+            [disabled]="opciones.controls.length <= 1"
+          />
+
+          @if (isOpcionInvalid(i, 'texto_opcion')) {
+          <ng-container
+            [ngTemplateOutlet]="alertaOpcion"
+            [ngTemplateOutletContext]="{ index: i, fieldName: 'texto_opcion' }"
+          />
+          }
+        </div>
+        }
+      </div>
+      @if (opciones.errors?.['minTwoOptions'] && formSubmitted()) {
+      <p-message
+        severity="error"
+        size="small"
+        variant="simple"
+        styleClass="mt-2"
+      >
+        Se requieren al menos 2 opciones para este tipo de pregunta.
+      </p-message>
+      } }
+    </div>
+    }
+  </form>
+
+  <div class="dialog-actions">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [rounded]="true"
+      [text]="true"
+      (onClick)="cancel()"
+    />
+    <p-button
+      label="Guardar"
+      severity="primary"
+      [rounded]="true"
+      (onClick)="save()"
+      [disabled]="formSubmitted() && !isFormValid()"
+    />
+  </div>
+</div>
+
+<ng-template #alerta let-fieldName="fieldName">
+  <p-message severity="error" size="small" variant="simple">
+    {{ getErrorMessage(fieldName) }}
+  </p-message>
+</ng-template>
+
+<ng-template #alertaOpcion let-index="index" let-fieldName="fieldName">
+  <p-message severity="error" size="small" variant="simple">
+    {{ getOpcionErrorMessage(index, fieldName) }}
+  </p-message>
+</ng-template>

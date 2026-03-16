@@ -1,0 +1,117 @@
+:host {
+  display: block;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.stats-header {
+  margin-bottom: 2rem;
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+    margin: 0 0 0.5rem 0;
+  }
+}
+
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+
+  background-color: var(--p-teagreen-100);
+  color: var(--p-teagreen-800);
+  font-size: 0.95rem;
+
+  :host-context(.dark-mode) & {
+    background-color: rgba(161, 225, 164, 0.15);
+    color: var(--p-teagreen-300);
+  }
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+}
+
+.chart-card {
+  background: var(--p-surface-card);
+  border: 1px solid var(--p-surface-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  min-height: 3.5rem;
+}
+
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--p-text-color);
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.chart-controls {
+  flex-shrink: 0;
+
+  ::ng-deep .p-selectbutton .p-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+
+    i {
+      font-size: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      padding: 0.4rem 0.6rem;
+    }
+  }
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: var(--p-text-muted-color);
+  background: var(--p-surface-ground);
+  border-radius: 12px;
+  border: 1px dashed var(--p-surface-border);
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+
+  i {
+    font-size: 2.5rem;
+    color: var(--p-primary-color);
+  }
+}

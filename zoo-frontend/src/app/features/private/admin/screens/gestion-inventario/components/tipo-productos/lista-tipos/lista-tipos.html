@@ -1,0 +1,113 @@
+@defer(on viewport; prefetch on idle){
+<div class="list-page-container">
+  <p-confirmDialog />
+
+  <div class="header-actions">
+    <h2>Tipos de Producto</h2>
+    <div class="buttons">
+      <p-button
+        variant="text"
+        (onClick)="store.loadItems()"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Recargar"
+      />
+      <p-button
+        icon="pi pi-plus"
+        label="Nuevo Tipo"
+        [rounded]="true"
+        severity="primary"
+        routerLink="../crear"
+      />
+    </div>
+  </div>
+
+  @if(store.loading() && store.items().length === 0){
+  <zoo-loader />
+  } @else if(store.error()) {
+  <div class="error-state">
+    <i class="pi pi-times-circle"></i>
+    <p>Error al cargar tipos:</p>
+    <p>{{ store.error() }}</p>
+    <p-button
+      label="Reintentar"
+      (onClick)="store.loadItems()"
+      severity="danger"
+      [rounded]="true"
+    />
+  </div>
+  } @else {
+  <p-dataview
+    #dv
+    [value]="store.items()"
+    [paginator]="true"
+    [rows]="store.size()"
+    [totalRecords]="store.total()"
+    [first]="(store.page() - 1) * store.size()"
+    [layout]="layout"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPage)="onPageChange($event)"
+    paginatorPosition="bottom"
+    [lazy]="true"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ store.total() }} tipos</span>
+
+        <p-selectButton
+          [options]="layoutOptions"
+          [(ngModel)]="layout"
+          optionLabel="icon"
+          optionValue="value"
+          [allowEmpty]="false"
+        >
+          <ng-template let-item #item>
+            <i [class]="item.icon"></i>
+          </ng-template>
+        </p-selectButton>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      @for (tipo of items; track tipo.id) {
+      <zoo-tipo-item
+        [tipo]="tipo"
+        layout="list"
+        (onDelete)="confirmDelete($event)"
+        (onEdit)="editTipo($event)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #grid let-items>
+      @for (tipo of items; track tipo.id) {
+      <zoo-tipo-item
+        [tipo]="tipo"
+        layout="grid"
+        (onDelete)="confirmDelete($event)"
+        (onEdit)="editTipo($event)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <i class="pi pi-tags" style="font-size: 3rem"></i>
+        <p>No hay tipos registrados.</p>
+        <p-button
+          label="Registrar Primero"
+          icon="pi pi-plus"
+          [rounded]="true"
+          routerLink="../crear"
+        />
+      </div>
+    </ng-template>
+  </p-dataview>
+  }
+</div>
+} @placeholder {
+<div class="loading-placeholder">
+  <p>Cargando módulo...</p>
+</div>
+}

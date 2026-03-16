@@ -1,0 +1,161 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:host {
+  display: block;
+  animation: fadeIn 0.5s ease-out both;
+}
+
+.modal-container {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  height: 100vh;
+  overflow-y: auto;
+  animation: fadeInModal 0.3s ease-out;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.modal-content {
+  position: relative;
+  z-index: 60;
+  margin: 2.5rem auto;
+  max-width: 64rem;
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  background: var(--p-surface-card);
+  color: var(--p-text-color);
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.modal-close-btn {
+  position: sticky;
+  top: 1rem;
+  right: 0;
+  margin-left: auto;
+  display: flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--p-surface-900);
+  color: var(--p-surface-0);
+  border: none;
+  cursor: pointer;
+  z-index: 70;
+
+  i {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+}
+
+.modal-category {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.modal-title {
+  margin-top: 1rem;
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--p-surface-700);
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.card-button {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: var(--p-surface-100);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  height: 20rem;
+  width: 14rem;
+
+  @media (min-width: 768px) {
+    height: 40rem;
+    width: 24rem;
+  }
+}
+
+.card-gradient {
+  pointer-events: none;
+  position: absolute;
+  inset-x: 0;
+  top: 0;
+  z-index: 30;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    transparent,
+    transparent
+  );
+}
+
+.card-text-content {
+  position: relative;
+  z-index: 40;
+  padding: 2rem;
+  text-align: left;
+  color: white;
+}
+
+.card-category {
+  font-size: 0.875rem;
+  font-weight: 500;
+  @media (min-width: 768px) {
+    font-size: 1rem;
+  }
+}
+
+.card-title {
+  margin-top: 0.5rem;
+  max-width: 20rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-wrap: balance;
+  @media (min-width: 768px) {
+    font-size: 1.875rem;
+  }
+}

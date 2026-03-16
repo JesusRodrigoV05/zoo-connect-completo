@@ -1,0 +1,32 @@
+<p-card styleClass="ajustes-card">
+  <ng-template pTemplate="title"> Seguridad de la Cuenta </ng-template>
+  <ng-template pTemplate="subtitle">
+    Gestiona la contraseña y la autenticación de dos factores.
+  </ng-template>
+
+  <div class="settings-section">
+    <h3 class="section-title">Autenticación</h3>
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Autenticación de Dos Factores (2FA)</h4>
+        <p>Agrega una capa extra de seguridad a tu cuenta</p>
+      </div>
+      <p-toggleswitch
+        [(ngModel)]="twoFaModel"
+        (ngModelChange)="on2FAToggle($event)"
+      />
+    </div>
+  </div>
+
+  @if (showEnable2FA()) {
+  <app-enable-2fa-dialog
+    (confirmed)="on2FAEnabled()"
+    (cancelled)="onEnable2FACancelled()"
+  />
+  } @if (showDisable2FA()) {
+  <app-disable-2fa-dialog
+    (confirmed)="on2FADisabled()"
+    (cancelled)="onDisable2FACancelled()"
+  />
+  }
+</p-card>

@@ -1,0 +1,75 @@
+<div class="login-page-container">
+  <p-card class="login-card">
+    <div class="card-content">
+      <div class="login-image-container">
+        <img
+          ngSrc="/assets/images/login.png"
+          alt="Imagen de un tigre"
+          width="600"
+          height="400"
+          priority
+        />
+      </div>
+
+      <div class="login-form-container">
+        <div class="login-header">
+          <app-logo-image [size]="150" />
+          <h1>¡Bienvenido a {{ authStore.nombreMarca() }}!</h1>
+          <p class="subtitle">Inicia sesión para continuar</p>
+        </div>
+
+        @defer(on viewport; prefetch on idle; hydrate on viewport) {
+        <div class="login-content">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <zoo-form-field
+              label="Usuario"
+              type="email"
+              [control]="email"
+              [errorMessage]="getEmailError()"
+            />
+
+            <zoo-form-field
+              label="Contraseña"
+              type="password"
+              [control]="password"
+              [errorMessage]="getPasswordError()"
+              [showPasswordToggle]="true"
+            />
+
+            <div class="forgot-password-link">
+              <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <div class="button-container">
+              <p-button
+                type="submit"
+                label="Iniciar Sesión"
+                severity="primary"
+                [rounded]="true"
+                [disabled]="loading()"
+                styleClass="login-button"
+                fluid
+              >
+                @if (loading()) {
+                <zoo-loader
+                  [size]="20"
+                  [color]="'var(--p-primary-contrast-color)'"
+                />
+                }
+              </p-button>
+            </div>
+          </form>
+          <p class="signup-link">
+            ¿No tienes una cuenta?
+            <a routerLink="/signup">Crea una cuenta</a>
+          </p>
+        </div>
+        } @placeholder {
+        <div class="login-placeholder">
+          <p>Cargando formulario...</p>
+        </div>
+        }
+      </div>
+    </div>
+  </p-card>
+</div>

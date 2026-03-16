@@ -1,0 +1,155 @@
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: var(--p-surface-ground);
+  padding: 1rem;
+  border-radius: 8px;
+
+  i {
+    font-size: 1.5rem;
+    color: var(--p-primary-color);
+  }
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--p-text-color);
+}
+
+.header-description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
+}
+
+.file-area {
+  margin-bottom: 1rem;
+}
+
+.file-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--p-text-color);
+}
+
+.required {
+  color: var(--p-red-500);
+}
+
+.file-selection-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selected-file-badge {
+  display: flex;
+  align-items: center;
+  background-color: var(--p-primary-50);
+  color: var(--p-primary-700);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--p-primary-200);
+}
+
+.file-icon {
+  margin-right: 0.25rem;
+}
+
+.file-name {
+  font-weight: 500;
+  margin-right: 0.5rem;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.remove-icon {
+  cursor: pointer;
+  color: var(--p-red-500);
+
+  &:hover {
+    font-weight: bold;
+  }
+}
+
+.validation-error {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--p-red-500);
+  font-size: 0.875rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--p-text-color);
+}
+
+.full-width-textarea {
+  width: 100%;
+}
+
+.loading-bar {
+  height: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  border-top: 1px solid var(--p-surface-border);
+  padding-top: 1rem;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::ng-deep {
+  .p-button {
+    min-width: 120px;
+  }
+
+  .p-button.p-button-text {
+    color: var(--p-text-color);
+
+    &:hover {
+      background-color: var(--p-surface-hover);
+    }
+  }
+}

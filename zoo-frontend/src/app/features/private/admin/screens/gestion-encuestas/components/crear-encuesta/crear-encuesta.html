@@ -1,0 +1,210 @@
+@defer (on viewport; prefetch on idle; hydrate on viewport) {
+<p-card class="crear-usuario-card">
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <h2>{{ pageTitle }}</h2>
+      <p class="subtitle">Ingresa los datos de la nueva encuesta</p>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="encuestaForm" (ngSubmit)="onSubmit()" class="usuario-form">
+    <div class="form-grid">
+      <div class="field full-width">
+        <p-floatlabel variant="on">
+          <input id="titulo" pInputText type="text" formControlName="titulo" />
+          <label for="titulo">Título</label>
+        </p-floatlabel>
+        @if (isInvalid('titulo')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'titulo' }"
+        />
+        }
+      </div>
+
+      <div class="field full-width">
+        <p-floatlabel variant="on">
+          <textarea
+            pTextarea
+            id="descripcion"
+            rows="5"
+            formControlName="descripcion"
+            [autoResize]="true"
+          ></textarea>
+          <label for="descripcion">Descripción</label>
+        </p-floatlabel>
+        @if (isInvalid('descripcion')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'descripcion' }"
+        />
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="fecha-inicio"
+            formControlName="fechaInicio"
+            [minDate]="minDateInicio"
+            [invalid]="isInvalid('fechaInicio')"
+            showIcon
+            dateFormat="dd-mm-yy"
+            iconDisplay="input"
+          />
+          <label for="fecha-inicio">Fecha Inicio</label>
+        </p-floatlabel>
+        @if (isInvalid('fechaInicio')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'fechaInicio' }"
+        />
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="fecha-fin"
+            formControlName="fechaFin"
+            [minDate]="minDateFin()"
+            [invalid]="isInvalid('fechaFin')"
+            showIcon
+            dateFormat="dd-mm-yy"
+            iconDisplay="input"
+          />
+          <label for="fecha-fin">Fecha Fin</label>
+        </p-floatlabel>
+        @if (isInvalid('fechaFin')) {
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{ fieldName: 'fechaFin' }"
+        />
+        }
+      </div>
+
+      <div class="field full-width">
+        <div class="section-header">
+          <h4>Preguntas</h4>
+          <span class="section-counter">
+            {{ preguntas.controls.length }} pregunta{{ preguntas.controls.length
+            !== 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        @if (preguntas.controls.length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-question-circle"></i>
+          <h5>No hay preguntas aún</h5>
+          <p>Agrega preguntas para tu encuesta</p>
+        </div>
+        } @else {
+        <p-accordion
+          [value]="['0']"
+          [multiple]="true"
+          formArrayName="preguntas"
+        >
+          @for (pregunta of preguntas.controls; track $index; let i = $index) {
+          <p-accordion-panel [value]="i.toString()" [formGroupName]="i">
+            <p-accordion-header>
+              <div class="pregunta-header">
+                <span class="pregunta-numero">{{ i + 1 }}</span>
+                <span class="pregunta-texto"
+                  >{{ pregunta.get('texto_pregunta')?.value }}</span
+                >
+
+                <span class="pregunta-tipo">
+                  {{ getPreguntaTipoTexto(pregunta) }}
+                </span>
+              </div>
+            </p-accordion-header>
+            <p-accordion-content>
+              @if (pregunta.get('es_opcion_unica')?.value &&
+              getOpciones(pregunta).controls.length > 0) {
+              <div class="opciones-content" formArrayName="opciones">
+                <h5>Opciones:</h5>
+                <ul class="opciones-list">
+                  @for (opcion of getOpciones(pregunta).controls; track $index;
+                  let j = $index) {
+                  <li [formGroupName]="j">
+                    {{ opcion.get('texto_opcion')?.value }}
+                  </li>
+                  }
+                </ul>
+              </div>
+              }
+              <div class="pregunta-actions">
+                <p-button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  (onClick)="removePregunta(i, $event)"
+                  [disabled]="isCreating()"
+                  [rounded]="true"
+                  [text]="true"
+                  pTooltip="Eliminar pregunta"
+                />
+              </div>
+            </p-accordion-content>
+          </p-accordion-panel>
+          }
+        </p-accordion>
+        }
+
+        <p-button
+          label="Agregar Pregunta"
+          icon="pi pi-plus"
+          (onClick)="addPregunta()"
+          [disabled]="isCreating()"
+          [rounded]="true"
+          severity="secondary"
+          [outlined]="true"
+          styleClass="mt-3"
+        />
+      </div>
+    </div>
+    <div class="form-actions">
+      <p-button
+        type="button"
+        label="Cancelar"
+        [rounded]="true"
+        severity="secondary"
+        (onClick)="onCancel()"
+        [disabled]="isCreating()"
+      />
+      <p-button
+        type="submit"
+        [label]="isCreating() ? 'Guardando...' : buttonText"
+        [rounded]="true"
+        severity="primary"
+        [loading]="isCreating()"
+        [disabled]="(formSubmitted() && encuestaForm.invalid) || isCreating()"
+      />
+    </div>
+  </form>
+
+  <p-dialog
+    header="Nueva Pregunta"
+    [modal]="true"
+    [(visible)]="showDialog"
+    [style]="{ width: '600px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <zoo-agregar-pregunta (dialogResult)="onDialogResult($event)" />
+  </p-dialog>
+
+  <ng-template #alerta let-fieldName="fieldName">
+    <p-message severity="error" size="small" variant="simple">
+      {{ getErrorMessage(fieldName) }}
+    </p-message>
+  </ng-template>
+</p-card>
+} @placeholder {
+<div class="loading-placeholder">
+  <zoo-loader [size]="50" />
+  <p>Cargando formulario...</p>
+</div>
+} @loading (minimum 500ms) {
+<zoo-loader [size]="50" />
+}

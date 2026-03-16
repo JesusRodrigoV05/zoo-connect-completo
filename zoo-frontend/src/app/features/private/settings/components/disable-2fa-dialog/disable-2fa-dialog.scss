@@ -1,0 +1,61 @@
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  i {
+    font-size: 1.5rem;
+    color: var(--p-primary-color);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+
+  .warning-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--p-orange-50);
+    border-left: 4px solid var(--p-orange-500);
+    border-radius: 6px;
+    color: var(--p-orange-900);
+    margin: 0;
+
+    i {
+      color: var(--p-orange-500);
+      font-size: 1.25rem;
+    }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    p-floatlabel {
+      width: 100%;
+    }
+  }
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+:host-context(.dark-mode) .warning-text {
+  background: rgba(251, 146, 60, 0.1);
+  color: var(--p-orange-200);
+}

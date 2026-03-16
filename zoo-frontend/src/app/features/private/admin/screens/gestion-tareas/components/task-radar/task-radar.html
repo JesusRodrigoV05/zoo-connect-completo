@@ -1,0 +1,33 @@
+<div class="radar-list">
+  @for (group of tasksMap(); track group[0]) {
+  <div class="caretaker-group">
+    <div class="group-header">
+      <div class="caretaker-info">
+        <div class="avatar-badge">{{ group[0].charAt(0) | uppercase }}</div>
+        <div class="info-text">
+          <h4>{{ group[0] }}</h4>
+          <span class="role-badge">Cuidador</span>
+        </div>
+      </div>
+      <span class="task-count-pill">{{ group[1].length }}</span>
+    </div>
+
+    <div class="group-tasks">
+      @for (task of group[1]; track task.id) {
+      <zoo-radar-task-item
+        [task]="task"
+        (reassign)="onReassign.emit($event)"
+        (view)="onView.emit($event)"
+      />
+      }
+    </div>
+  </div>
+  } @empty {
+  <div class="empty-state">
+    <div class="empty-icon">
+      <i class="pi pi-check-circle"></i>
+    </div>
+    <p>Todo está tranquilo por ahora.</p>
+  </div>
+  }
+</div>

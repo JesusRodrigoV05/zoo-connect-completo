@@ -1,0 +1,78 @@
+<div class="form-container">
+  <p-card class="tipo-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <h2>{{ pageTitle() }}</h2>
+        <p class="subtitle">Categorización del inventario</p>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      <div class="form-section">
+        <h4>Datos Generales</h4>
+
+        <div class="form-grid">
+          <div class="field full-width">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="nombre"
+                formControlName="nombre"
+                class="w-full"
+              />
+              <label for="nombre"
+                >Nombre del Tipo (ej. Alimentos, Medicinas) *</label
+              >
+            </p-floatlabel>
+            @if (isInvalid('nombre')) {
+            <p-message severity="error" variant="simple" size="small">
+              {{ getError('nombre') }}
+            </p-message>
+            }
+          </div>
+
+          <div class="field full-width">
+            <p-floatlabel>
+              <textarea
+                id="descripcion"
+                pTextarea
+                formControlName="descripcion"
+                rows="3"
+                class="w-full"
+                [autoResize]="true"
+              >
+              </textarea>
+              <label for="descripcion">Descripción detallada *</label>
+            </p-floatlabel>
+            @if (isInvalid('descripcion')) {
+            <p-message severity="error" variant="simple" size="small">
+              {{ getError('descripcion') }}
+            </p-message>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isProcessing()"
+        >
+        </p-button>
+
+        <p-button
+          [label]="submitLabel()"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+          [rounded]="true"
+          type="submit"
+          [disabled]="isProcessing()"
+        >
+        </p-button>
+      </div>
+    </form>
+  </p-card>
+</div>

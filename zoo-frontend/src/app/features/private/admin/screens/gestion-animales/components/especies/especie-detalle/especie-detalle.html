@@ -1,0 +1,45 @@
+@if (loading()) {
+<zoo-loader />
+} @else if (especie()) { @let esp = especie();
+<div class="detalle-container">
+  <div class="detalle-header">
+    <h2>{{ esp!.nombreComun }}</h2>
+    <p>{{ esp!.nombreCientifico }}</p>
+    <p-tag
+      [value]="esp!.isActive ? 'Activa' : 'Inactiva'"
+      [severity]="esp!.isActive ? 'success' : 'danger'"
+      [rounded]="true"
+    />
+  </div>
+
+  <div class="detalle-body">
+    <h4>Descripción</h4>
+    <p>{{ esp!.descripcion }}</p>
+
+    <h4>Clasificación Taxonómica</h4>
+    <div class="taxonomia-grid-detalle">
+      <div class="tax-item">
+        <span class="tax-label">Filo:</span>
+        <span class="tax-value">{{ esp!.filo }}</span>
+      </div>
+      <div class="tax-item">
+        <span class="tax-label">Clase:</span>
+        <span class="tax-value">{{ esp!.clase }}</span>
+      </div>
+      <div class="tax-item">
+        <span class="tax-label">Orden:</span>
+        <span class="tax-value">{{ esp!.orden }}</span>
+      </div>
+      <div class="tax-item">
+        <span class="tax-label">Familia:</span>
+        <span class="tax-value">{{ esp!.familia }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+} @else {
+<div class="detalle-error">
+  <i class="pi pi-info-circle"></i>
+  <p>No se pudo cargar la información de la especie.</p>
+</div>
+}

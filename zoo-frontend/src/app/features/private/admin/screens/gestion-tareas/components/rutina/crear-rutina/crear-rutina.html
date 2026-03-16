@@ -1,0 +1,216 @@
+<div class="form-container">
+  <p-card class="rutina-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <div class="header-content">
+          <p-button
+            icon="pi pi-arrow-left"
+            [rounded]="true"
+            [text]="true"
+            severity="secondary"
+            (onClick)="cancel()"
+            pTooltip="Volver"
+            class="back-btn"
+          />
+          <div>
+            <h2>{{ pageTitle() }}</h2>
+            <p class="subtitle">
+              Configura la frecuencia y detalles de la tarea recurrente
+            </p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" class="form-content">
+      <div class="form-section">
+        <h4>Información General</h4>
+        <div class="form-grid">
+          <div class="field full-width">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="titulo"
+                formControlName="titulo"
+                class="w-full"
+              />
+              <label for="titulo">Título de la Rutina *</label>
+            </p-floatlabel>
+            @if (form.get('titulo')?.invalid && form.get('titulo')?.touched) {
+            <small class="p-error">El título es requerido</small>
+            }
+          </div>
+
+          <div class="field">
+            <p-floatlabel>
+              <p-select
+                inputId="tipo"
+                formControlName="tipoTareaId"
+                [options]="tiposStore.items()"
+                optionLabel="nombre"
+                optionValue="id"
+                class="w-full"
+                [loading]="tiposStore.loading()"
+                appendTo="body"
+              />
+              <label for="tipo">Tipo de Actividad *</label>
+            </p-floatlabel>
+          </div>
+
+          <div class="field">
+            <p-floatlabel>
+              <p-select
+                inputId="lugar"
+                formControlName="lugarSeleccionado"
+                [options]="lugares()"
+                optionLabel="label"
+                [filter]="true"
+                filterBy="label"
+                class="w-full"
+                [showClear]="true"
+                appendTo="body"
+              />
+              <label for="lugar">Ubicación / Animal (Opcional)</label>
+            </p-floatlabel>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4>Programación de Frecuencia</h4>
+
+        <div class="field mb-4">
+          <p-floatlabel>
+            <p-select
+              inputId="freqType"
+              formControlName="frecuenciaType"
+              [options]="frecuenciaOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              appendTo="body"
+            >
+              <ng-template pTemplate="selectedItem" let-selectedOption>
+                <div class="flex items-center gap-2">
+                  <i [class]="selectedOption.icon"></i>
+                  <div>{{ selectedOption.label }}</div>
+                </div>
+              </ng-template>
+              <ng-template let-option pTemplate="item">
+                <div class="flex items-center gap-2">
+                  <i [class]="option.icon"></i>
+                  <div>{{ option.label }}</div>
+                </div>
+              </ng-template>
+            </p-select>
+            <label for="freqType">Frecuencia de Repetición</label>
+          </p-floatlabel>
+        </div>
+
+        <div class="cron-builder-panel">
+          @if (form.get('frecuenciaType')?.value !== 'avanzado') {
+          <div class="form-grid">
+            <div class="field">
+              <label class="control-label">Hora de ejecución</label>
+              <p-datepicker
+                formControlName="horaProgramada"
+                [timeOnly]="true"
+                hourFormat="24"
+                [showIcon]="true"
+                iconDisplay="input"
+                inputId="timepicker"
+                appendTo="body"
+                placeholder="HH:mm"
+                class="w-full"
+              />
+            </div>
+
+            @if (form.get('frecuenciaType')?.value === 'semanal') {
+            <div class="field full-width">
+              <label class="control-label">Días de la semana</label>
+              <p-selectButton
+                [options]="weekDaysOptions"
+                formControlName="diasSemana"
+                multiple="true"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"
+              />
+              @if(form.get('diasSemana')?.invalid &&
+              form.get('diasSemana')?.touched) {
+              <small class="p-error">Selecciona al menos un día.</small>
+              }
+            </div>
+            } @if (form.get('frecuenciaType')?.value === 'mensual') {
+            <div class="field full-width">
+              <label class="control-label">Día del mes</label>
+              <div class="days-grid">
+                @for (day of monthDaysGrid; track day) {
+                <div
+                  class="day-cell"
+                  [class.selected]="form.get('diaMes')?.value === day"
+                  (click)="toggleDay(day)"
+                >
+                  {{ day }}
+                </div>
+                }
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="field full-width">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="rawCron"
+                formControlName="frecuenciaCron"
+                class="w-full"
+              />
+              <label for="rawCron">Expresión CRON</label>
+            </p-floatlabel>
+            <small class="text-muted mt-1 block"
+              >Formato: Minuto Hora DiaMes Mes DiaSemana</small
+            >
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4>Instrucciones</h4>
+        <div class="field full-width">
+          <p-floatlabel>
+            <textarea
+              id="desc"
+              pTextarea
+              formControlName="descripcion"
+              rows="5"
+              class="w-full"
+              [autoResize]="true"
+            ></textarea>
+            <label for="desc">Instrucciones Detalladas</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          (onClick)="cancel()"
+          [disabled]="isProcessing()"
+        />
+        <p-button
+          label="Guardar Rutina"
+          icon="pi pi-check"
+          [loading]="isProcessing()"
+          [rounded]="true"
+          (onClick)="save()"
+        />
+      </div>
+    </form>
+  </p-card>
+</div>

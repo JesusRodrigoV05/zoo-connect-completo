@@ -1,0 +1,65 @@
+<div class="planificador-container">
+  <div class="header-section">
+    <div class="title-block">
+      <h1>Planificador de Rutinas</h1>
+      <p>Configura las tareas que se repiten automáticamente</p>
+    </div>
+
+    <p-button
+      label="Nueva Rutina"
+      icon="pi pi-plus"
+      [rounded]="true"
+      routerLink="/admin/tareas/planificador/crear"
+    />
+  </div>
+
+  <div class="table-card">
+    <p-table
+      [value]="store.items()"
+      [loading]="store.loading()"
+      [paginator]="true"
+      [rows]="store.size()"
+      [totalRecords]="store.total()"
+      [lazy]="true"
+      (onLazyLoad)="onPageChange($event)"
+      responsiveLayout="scroll"
+      dataKey="id"
+      styleClass="p-datatable-sm zoo-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Título</th>
+          <th>Tipo</th>
+          <th>Lugar</th>
+          <th>Frecuencia</th>
+          <th>Estado</th>
+          <th class="actions-header"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item>
+        <tr
+          zoo-rutina-item
+          [item]="item"
+          (onEdit)="navigateToEdit(item.id)"
+          (onDelete)="deleteItem($event)"
+          class="row-hover-effect"
+        ></tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <div class="empty-icon-wrapper">
+                <i class="pi pi-calendar-times"></i>
+              </div>
+              <h3>Sin rutinas activas</h3>
+              <p>Crea tu primera rutina para automatizar el cuidado.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

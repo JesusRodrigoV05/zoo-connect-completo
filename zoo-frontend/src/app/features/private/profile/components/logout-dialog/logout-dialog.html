@@ -1,0 +1,43 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  class="logout-dialog"
+>
+  <ng-template pTemplate="header">
+    <div classs="dialog-header">
+      <i class="pi pi-sign-out danger-icon"></i>
+      <span>Cerrar Sesión</span>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <div class="dialog-content">
+      <p>¿Estás seguro de que deseas cerrar sesión?</p>
+      <p class="text-muted">
+        Se cerrará tu sesión actual y serás redirigido al login.
+      </p>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-actions">
+      <p-button
+        label="Cancelar"
+        [rounded]="true"
+        [text]="true"
+        (onClick)="onCancel.emit()"
+        severity="secondary"
+      />
+      <p-button
+        label="Cerrar Sesión"
+        icon="pi pi-sign-out"
+        [rounded]="true"
+        (onClick)="onConfirm.emit()"
+        severity="danger"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

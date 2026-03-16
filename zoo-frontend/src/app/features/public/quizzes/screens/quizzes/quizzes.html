@@ -1,0 +1,90 @@
+<div class="quiz-page-wrapper">
+  @if (!generatedQuiz() && !isLoading()) {
+  <section class="intro-section">
+    <h1>Centro de Trivias</h1>
+    <p>
+      Configura tu reto y pon a prueba tus conocimientos sobre la naturaleza.
+    </p>
+  </section>
+
+  <p-card styleClass="config-card">
+    @if (authStore.isAuthenticated()) {
+    <div class="form-grid">
+      <div class="field-col">
+        <label>Dificultad</label>
+        <p-select
+          fluid
+          [options]="difficulties"
+          [(ngModel)]="config.difficulty"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="full-width-input"
+        />
+      </div>
+
+      <div class="field-col">
+        <label>Preguntas</label>
+        <p-inputNumber
+          fluid
+          [(ngModel)]="config.amount"
+          [min]="3"
+          [max]="10"
+          [showButtons]="true"
+          buttonLayout="horizontal"
+          inputStyleClass="center-text"
+        />
+      </div>
+
+      <div class="actions">
+        <p-button
+          label="Generar Desafío"
+          [rounded]="true"
+          icon="pi pi-bolt"
+          styleClass="full-width-btn"
+          (onClick)="createQuiz()"
+        />
+      </div>
+    </div>
+    } @else {
+    <div class="login-invite-state">
+      <div class="icon-decoration">
+        <i class="pi pi-compass"></i>
+      </div>
+      <h3>¡La aventura te espera!</h3>
+      <p>
+        Únete a nuestra comunidad para crear desafíos personalizados, guardar tu
+        progreso y convertirte en un experto de la naturaleza.
+      </p>
+
+      <div class="invite-actions">
+        <p-button
+          label="Comenzar Aventura"
+          [rounded]="true"
+          icon="pi pi-user"
+          routerLink="/login"
+          styleClass="full-width-btn"
+        />
+      </div>
+    </div>
+    }
+  </p-card>
+  } @if (isLoading()) {
+  <div class="loading-view">
+    <zoo-loader />
+    <p>Preparando tu desafío...</p>
+  </div>
+  } @if (generatedQuiz()) {
+  <div class="game-view">
+    <div class="back-action">
+      <p-button
+        label="Cancelar y Volver"
+        icon="pi pi-arrow-left"
+        [rounded]="true"
+        [text]="true"
+        (onClick)="reset()"
+      />
+    </div>
+    <app-quiz-detalle [quiz]="generatedQuiz()!" />
+  </div>
+  }
+</div>

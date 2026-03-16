@@ -1,0 +1,187 @@
+<div class="form-container">
+  <p-card styleClass="exit-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <h2>Registrar Salida</h2>
+        <p class="subtitle">Egreso de materiales o alimentos del almacén</p>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      <div class="form-section">
+        <h4>Datos Generales</h4>
+        <div class="form-grid">
+          <div class="field">
+            <p-floatlabel>
+              <p-select
+                inputId="tipo"
+                formControlName="tipoSalidaId"
+                [options]="tiposSalidaStore.items()"
+                optionLabel="nombre"
+                optionValue="id"
+                [loading]="tiposSalidaStore.loading()"
+                styleClass="w-full"
+                fluid
+              />
+              <label for="tipo">Motivo de Salida *</label>
+            </p-floatlabel>
+            @if(isInvalid('tipoSalidaId')) {
+            <p-message severity="error" variant="simple" size="small"
+              >Requerido</p-message
+            >
+            }
+          </div>
+
+          <div class="field full-width">
+            <p-floatlabel>
+              <textarea
+                pTextarea
+                id="obs"
+                formControlName="observacion"
+                rows="2"
+                class="w-full"
+                fluid
+                [autoResize]="true"
+              >
+              </textarea>
+              <label for="obs">Observaciones (Opcional)</label>
+            </p-floatlabel>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section mt-4">
+        <div class="flex justify-between align-items-center mb-3">
+          <h4>Detalle de Productos</h4>
+          <p-button
+            label="Agregar Item"
+            icon="pi pi-plus"
+            size="small"
+            [outlined]="true"
+            (onClick)="addProducto()"
+          />
+        </div>
+
+        <div formArrayName="detalles">
+          <p-table [value]="detalles.controls" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 25%">Producto *</th>
+                <th style="width: 15%">Cantidad *</th>
+                <th style="width: 20%">Tipo Destino</th>
+                <th style="width: 30%">Destino Específico</th>
+                <th style="width: 10%"></th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-group let-i="rowIndex">
+              <tr [formGroupName]="i">
+                <td>
+                  <p-select
+                    formControlName="productoId"
+                    [options]="productStore.products()"
+                    optionLabel="nombre"
+                    optionValue="id"
+                    [filter]="true"
+                    placeholder="Seleccionar..."
+                    appendTo="body"
+                    styleClass="w-full table-input"
+                    fluid
+                    [invalid]="isInvalid('productoId', i)"
+                  />
+                </td>
+
+                <td>
+                  <p-inputNumber
+                    formControlName="cantidad"
+                    [min]="0"
+                    [showButtons]="true"
+                    buttonLayout="horizontal"
+                    inputStyleClass="w-full text-center p-1"
+                    fluid
+                    class="compact-number"
+                    [invalid]="isInvalid('cantidad', i)"
+                  />
+                </td>
+
+                <td>
+                  <p-select
+                    formControlName="tipoDestino"
+                    [options]="destinosOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    appendTo="body"
+                    styleClass="w-full table-input"
+                    fluid
+                    (onChange)="onDestinoTypeChange(i)"
+                  />
+                </td>
+
+                <td>
+                  @switch (group.get('tipoDestino').value) { @case ('animal') {
+                  <p-select
+                    formControlName="destinoId"
+                    [options]="animalList()"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    placeholder="Buscar animal..."
+                    appendTo="body"
+                    styleClass="w-full table-input"
+                    fluid
+                  />
+                  } @case ('habitat') {
+                  <p-select
+                    formControlName="destinoId"
+                    [options]="habitatList()"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    placeholder="Buscar hábitat..."
+                    appendTo="body"
+                    styleClass="w-full table-input"
+                    fluid
+                  />
+                  } @default {
+                  <span class="text-muted-color text-sm pl-2"
+                    >Sin destino específico</span
+                  >
+                  } }
+                </td>
+
+                <td class="text-center">
+                  <button
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-text p-button-danger p-button-rounded p-button-sm"
+                    (click)="removeProducto(i)"
+                    pTooltip="Quitar"
+                  ></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <div class="form-actions mt-5">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isProcessing()"
+        />
+        <p-button
+          label="Confirmar Salida"
+          icon="pi pi-check"
+          type="submit"
+          [loading]="isProcessing()"
+          [rounded]="true"
+          severity="warn"
+        />
+      </div>
+    </form>
+  </p-card>
+</div>

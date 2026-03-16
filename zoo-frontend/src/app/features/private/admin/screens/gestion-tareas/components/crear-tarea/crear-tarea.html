@@ -1,0 +1,147 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event ? close() : null"
+  [modal]="true"
+  header="Crear Tarea Manual"
+  styleClass="task-dialog"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <form [formGroup]="form" class="task-form">
+    <div class="form-grid">
+      <div class="field full-width">
+        <label for="titulo"
+          >Título de la Tarea <span class="required">*</span></label
+        >
+        <input
+          pInputText
+          id="titulo"
+          formControlName="titulo"
+          class="w-full"
+          placeholder="Ej: Revisión general de recinto"
+        />
+      </div>
+
+      <div class="field full-width">
+        <label for="desc">Instrucciones <span class="required">*</span></label>
+        <textarea
+          pTextarea
+          id="desc"
+          formControlName="descripcion"
+          rows="3"
+          class="w-full"
+          [autoResize]="true"
+          placeholder="Describe los detalles de la tarea..."
+        ></textarea>
+      </div>
+
+      <div class="field">
+        <label for="tipo">Tipo de Tarea <span class="required">*</span></label>
+        <p-select
+          inputId="tipo"
+          formControlName="tipoTareaId"
+          [options]="tiposStore.items()"
+          optionLabel="nombre"
+          optionValue="id"
+          styleClass="w-full"
+          [loading]="tiposStore.loading()"
+          placeholder="Seleccionar tipo"
+          appendTo="body"
+        />
+      </div>
+
+      <div class="field">
+        <label for="fecha"
+          >Fecha de Ejecución <span class="required">*</span></label
+        >
+        <p-datepicker
+          inputId="fecha"
+          formControlName="fechaProgramada"
+          dateFormat="yy-mm-dd"
+          [minDate]="form.value.fechaProgramada"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          appendTo="body"
+          [showIcon]="true"
+        />
+      </div>
+
+      <div class="field full-width">
+        <label for="lugar">Lugar o Animal Afectado</label>
+
+        <p-select
+          inputId="lugar"
+          formControlName="lugarSeleccionado"
+          [options]="lugares()"
+          optionLabel="label"
+          [filter]="true"
+          filterBy="label"
+          styleClass="w-full"
+          placeholder="Seleccionar ubicación..."
+          [showClear]="true"
+          appendTo="body"
+        />
+      </div>
+
+      <div class="field full-width">
+        <label for="asignado">Asignar a (Opcional)</label>
+        <p-select
+          inputId="asignado"
+          formControlName="usuarioAsignadoId"
+          [options]="usuarios()"
+          optionLabel="username"
+          optionValue="id"
+          [filter]="true"
+          filterBy="username"
+          [loading]="loadingUsuarios()"
+          styleClass="w-full"
+          placeholder="Dejar en bandeja de entrada (Inbox)"
+          [showClear]="true"
+          appendTo="body"
+        >
+          <ng-template let-user pTemplate="item">
+            <div class="user-item">
+              <div
+                class="user-avatar"
+                [ngClass]="getUserRoleIconClass(user.rol.id)"
+              >
+                <i class="pi pi-user"></i>
+              </div>
+              <div class="user-info">
+                <span class="user-name">{{ user.username }}</span>
+                <span class="user-role">{{ user.rol.nombre }}</span>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template let-user pTemplate="selectedItem">
+            <div class="selected-user">
+              <i class="pi pi-user mr-2"></i>
+              {{ user.username }}
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="footer-actions">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        (onClick)="close()"
+      />
+      <p-button
+        label="Crear Tarea"
+        icon="pi pi-check"
+        [loading]="isProcessing()"
+        [rounded]="true"
+        (onClick)="save()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

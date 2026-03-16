@@ -1,0 +1,139 @@
+<div class="form-container">
+  <p-card styleClass="entry-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <h2>Registrar Entrada</h2>
+        <p class="subtitle">Ingreso de nuevos productos al almacén</p>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      <div class="form-section">
+        <h4>Datos del Proveedor</h4>
+        <div class="field">
+          <p-floatlabel>
+            <p-select
+              inputId="proveedor"
+              formControlName="proveedorId"
+              [options]="proveedoresStore.items()"
+              optionLabel="nombre"
+              optionValue="id"
+              [filter]="true"
+              filterPlaceholder="Buscar proveedor"
+              [loading]="proveedoresStore.loading()"
+              fluid
+            />
+            <label for="proveedor">Proveedor *</label>
+          </p-floatlabel>
+          @if(isInvalid('proveedorId')) {
+          <p-message severity="error" variant="simple" size="small"
+            >Selecciona un proveedor</p-message
+          >
+          }
+        </div>
+      </div>
+
+      <div class="form-section mt-4">
+        <div class="flex justify-between align-items-center mb-3">
+          <h4>Productos a Ingresar</h4>
+          <p-button
+            label="Agregar Fila"
+            icon="pi pi-plus"
+            size="small"
+            [outlined]="true"
+            (onClick)="addProducto()"
+          />
+        </div>
+
+        <div formArrayName="detalles">
+          <p-table [value]="detalles.controls" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 30%">Producto *</th>
+                <th style="width: 15%">Cantidad *</th>
+                <th style="width: 20%">Lote</th>
+                <th style="width: 20%">Vencimiento</th>
+                <th style="width: 5%"></th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-group let-i="rowIndex">
+              <tr [formGroupName]="i">
+                <td>
+                  <p-select
+                    formControlName="productoId"
+                    [options]="productStore.products()"
+                    optionLabel="nombre"
+                    optionValue="id"
+                    [filter]="true"
+                    placeholder="Seleccionar..."
+                    appendTo="body"
+                    fluid
+                    styleClass="w-full table-input"
+                  />
+                </td>
+                <td>
+                  <p-inputNumber
+                    formControlName="cantidad"
+                    [min]="0"
+                    [showButtons]="true"
+                    buttonLayout="horizontal"
+                    inputStyleClass="w-full text-center p-1"
+                    fluid
+                    class="compact-number"
+                  />
+                </td>
+                <td>
+                  <input
+                    pInputText
+                    formControlName="lote"
+                    placeholder="Opcional"
+                    class="w-full p-2"
+                    fluid
+                  />
+                </td>
+                <td>
+                  <p-datepicker
+                    formControlName="fechaCaducidad"
+                    appendTo="body"
+                    dateFormat="yy-mm-dd"
+                    placeholder="YYYY-MM-DD"
+                    styleClass="w-full table-date"
+                    fluid
+                  />
+                </td>
+                <td class="text-center">
+                  <button
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-text p-button-danger p-button-rounded p-button-sm"
+                    (click)="removeProducto(i)"
+                    pTooltip="Quitar fila"
+                  ></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <div class="form-actions mt-5">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isProcessing()"
+        />
+        <p-button
+          label="Registrar Entrada"
+          icon="pi pi-check"
+          type="submit"
+          [loading]="isProcessing()"
+          [rounded]="true"
+        />
+      </div>
+    </form>
+  </p-card>
+</div>

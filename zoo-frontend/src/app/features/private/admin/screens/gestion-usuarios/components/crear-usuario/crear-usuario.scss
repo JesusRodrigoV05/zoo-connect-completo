@@ -1,0 +1,119 @@
+:host {
+  display: block;
+}
+
+.crear-usuario-card {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 1rem;
+  box-shadow: var(--p-shadow-2);
+
+  --p-card-header-padding: 1.5rem 2rem;
+  --p-card-content-padding: 2rem;
+}
+
+.card-header {
+  h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    background: linear-gradient(
+      135deg,
+      var(--p-primary-500),
+      var(--p-primary-700)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--p-text-muted-color);
+    font-size: 1rem;
+  }
+}
+
+.usuario-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+:host ::ng-deep {
+  .p-floatlabel,
+  .p-inputtext,
+  .p-password,
+  .p-select {
+    width: 100%;
+  }
+
+  .p-password .p-inputtext {
+    width: 100%;
+  }
+
+  .p-message.p-message-error[data-pc-section="root"] {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+  }
+  .p-message-summary {
+    font-size: 0.875rem;
+  }
+}
+
+:host-context(.dark-mode) {
+  .card-header h2 {
+    background: linear-gradient(
+      135deg,
+      var(--p-primary-300),
+      var(--p-primary-500)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  :host {
+    padding: 1rem;
+  }
+
+  .crear-usuario-card {
+    --p-card-header-padding: 1rem;
+    --p-card-content-padding: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    .p-button {
+      width: 100%;
+    }
+  }
+}

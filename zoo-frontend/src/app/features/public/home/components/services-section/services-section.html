@@ -1,0 +1,66 @@
+<section class="services-section">
+  <div class="organic-shape-bg"></div>
+
+  <div class="services-container">
+    <header class="section-header">
+      <div class="badge-pill">
+        <i class="bx bxs-tree"></i>
+        <span>Nuestros Programas</span>
+      </div>
+      <h2 class="section-title">
+        Conecta con lo <span class="highlight">Salvaje</span>
+      </h2>
+      <p class="section-description">
+        Más que una visita, una experiencia de inmersión. Diseñamos cada
+        actividad para despertar tu instinto de conservación.
+      </p>
+    </header>
+
+    <div class="services-grid">
+      @for(card of serviceCards; track $index){
+      <article
+        class="service-card"
+        [class.highlighted]="card.isPrimary"
+        data-aos="fade-up"
+        [attr.data-aos-delay]="$index * 100"
+      >
+        <div class="card-icon-blob">
+          <i [class]="card.icon"></i>
+        </div>
+
+        <div class="card-content">
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.description }}</p>
+
+          <div class="divider"></div>
+
+          <ul class="features-list">
+            @for(feature of card.features; track $index){
+            <li>
+              <i class="bx bx-leaf"></i>
+              <span>{{ feature.text }}</span>
+            </li>
+            }
+          </ul>
+        </div>
+      </article>
+      }
+    </div>
+
+    <div class="nature-cta" data-aos="zoom-in" data-aos-delay="200">
+      <div class="cta-content">
+        <h3>Empieza tu Aventura</h3>
+        <p>
+          Cada entrada apoya directamente nuestros programas de rescate y
+          rehabilitación.
+        </p>
+      </div>
+      <p-button
+        routerLink="/servicios"
+        label="Planear Visita"
+        icon="bx bx-map"
+        styleClass="p-button-rounded p-button-lg nature-btn"
+      />
+    </div>
+  </div>
+</section>

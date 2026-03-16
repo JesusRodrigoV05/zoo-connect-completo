@@ -1,0 +1,30 @@
+.menu-botones-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+
+  padding: 0;
+  margin: 0;
+}
+
+:host ::ng-deep p-button.boton-menu-individual {
+  transition: all 0.2s ease-in-out;
+}
+
+:host ::ng-deep p-button.boton-menu-individual.p-button-outlined:hover {
+  background-color: var(--primary-color);
+  color: var(--primary-contrast-color);
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+}
+
+:host ::ng-deep p-button.boton-menu-individual.boton-activo {
+  background-color: var(--primary-color);
+  color: var(--primary-contrast-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+
+  border-color: var(--primary-color);
+}

@@ -1,0 +1,53 @@
+<p-card class="actions-card">
+  <div class="buttons-header">
+    <p-button
+      label="Editar"
+      icon="pi pi-pencil"
+      severity="primary"
+      [rounded]="true"
+      styleClass="w-full"
+      (click)="onEditProfile()"
+      [disabled]="disabledActions()?.edit"
+      [pTooltip]="tooltips()?.edit"
+      [tooltipDisabled]="!disabledActions()?.edit"
+      fluid
+    />
+    <p-button
+      label="Compartir"
+      icon="pi pi-share-alt"
+      severity="primary"
+      [rounded]="true"
+      styleClass="w-full"
+      (click)="onShareProfile()"
+      [disabled]="disabledActions()?.share"
+      [pTooltip]="tooltips()?.share"
+      [tooltipDisabled]="!disabledActions()?.share"
+      fluid
+    />
+  </div>
+
+  <p-divider />
+
+  <div class="menu-options">
+    <p-button
+      label="Mis Participaciones"
+      icon="pi pi-history"
+      styleClass="menu-option"
+      variant="text"
+      (click)="onViewParticipations()"
+      [rounded]="true"
+    />
+  </div>
+
+  <p-divider />
+
+  <p-button
+    label="Cerrar Sesión"
+    icon="pi pi-sign-out"
+    severity="danger"
+    [rounded]="true"
+    [text]="true"
+    styleClass="w-full logout-btn"
+    (click)="onLogout()"
+  />
+</p-card>

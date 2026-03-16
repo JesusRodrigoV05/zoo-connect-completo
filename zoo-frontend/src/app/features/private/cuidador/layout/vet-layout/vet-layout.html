@@ -1,0 +1,37 @@
+@defer (on viewport; prefetch on idle; hydrate on hover) {
+<div class="veterinario-layout">
+  <zoo-header>
+    <p-button
+      slot="nav-toggle"
+      icon="pi pi-bars"
+      [text]="true"
+      [rounded]="true"
+      (click)="toggleDrawer()"
+    />
+  </zoo-header>
+
+  <div class="main-content-area">
+    <router-outlet />
+  </div>
+
+  <p-drawer
+    [(visible)]="drawerVisible"
+    position="right"
+    styleClass="veterinario-drawer"
+  >
+    <ng-template pTemplate="header">
+      <div class="drawer-header-content">
+        <i class="pi pi-heart-pulse header-icon"></i>
+        <h3 class="drawer-header-title">Panel Médico</h3>
+      </div>
+    </ng-template>
+
+    <zoo-sidebar-vet-menu />
+  </p-drawer>
+</div>
+} @placeholder {
+<div class="loading-state">
+  <i class="pi pi-spin pi-spinner"></i>
+  <p>Cargando clínica...</p>
+</div>
+}

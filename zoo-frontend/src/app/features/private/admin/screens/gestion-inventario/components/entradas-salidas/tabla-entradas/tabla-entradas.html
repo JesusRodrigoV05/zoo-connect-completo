@@ -1,0 +1,145 @@
+<div class="table-container">
+  <p-table
+    [value]="entradas()"
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="20"
+    [totalRecords]="totalRecords()"
+    [lazy]="true"
+    (onLazyLoad)="onPage($event)"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    dataKey="id"
+    styleClass="p-datatable-sm"
+    [tableStyle]="{ 'min-width': '60rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem"></th>
+        <th>ID</th>
+        <th>Fecha</th>
+        <th>Proveedor</th>
+        <th>Registrado Por</th>
+        <th>Total Items</th>
+        <th class="text-right">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-entrada let-expanded="expanded">
+      <tr>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            [pRowToggler]="entrada"
+            class="p-button-text p-button-rounded p-button-plain"
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+          ></button>
+        </td>
+        <td><span class="font-bold">#{{ entrada.id }}</span></td>
+        <td>
+          <div class="flex flex-column">
+            <span class="font-medium"
+              >{{ entrada.fecha | date:'dd MMM yyyy' }}</span
+            >
+            <span class="text-xs text-500"
+              >{{ entrada.fecha | date:'HH:mm' }}</span
+            >
+          </div>
+        </td>
+        <td>
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-building text-primary-500"></i>
+            <span>{{ entrada.proveedor?.nombre || 'N/A' }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="user-badge">
+            <i class="pi pi-user"></i>
+            {{ entrada.usuario?.username || 'Sistema' }}
+          </div>
+        </td>
+        <td>
+          <p-tag
+            [value]="entrada.detalles?.length + ' Productos'"
+            severity="info"
+            [rounded]="true"
+          ></p-tag>
+        </td>
+        <td class="text-right">
+          <p-button
+            icon="pi pi-eye"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            pTooltip="Ver Detalle Completo"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="rowexpansion" let-entrada>
+      <tr>
+        <td colspan="7">
+          <div class="p-3 pl-6 detail-row">
+            <span class="detail-title">📦 Productos Recibidos</span>
+            <p-table
+              [value]="entrada.detalles"
+              dataKey="id"
+              styleClass="p-datatable-sm sub-table"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Producto</th>
+                  <th>Lote</th>
+                  <th>Vencimiento</th>
+                  <th class="text-right">Cant.</th>
+                  <th class="text-right">Costo U.</th>
+                  <th class="text-right">Subtotal</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-detalle>
+                <tr>
+                  <td>
+                    <span class="font-medium text-primary-700"
+                      >{{ detalle.producto?.nombre }}</span
+                    >
+                  </td>
+                  <td>{{ detalle.lote || '-' }}</td>
+                  <td>
+                    @if(detalle.fechaCaducidad) {
+                    <span [ngClass]="{'text-red-500 font-bold': false}"
+                      >{{ detalle.fechaCaducidad | date:'dd/MM/yy' }}</span
+                    >
+                    } @else { - }
+                  </td>
+                  <td class="text-right font-bold">
+                    {{ detalle.cantidad }} {{
+                    detalle.producto?.unidadMedida?.abreviatura }}
+                  </td>
+                  <td class="text-right">
+                    {{ detalle.costoUnitario | currency }}
+                  </td>
+                  <td class="text-right text-green-600 font-bold">
+                    {{ (detalle.cantidad * detalle.costoUnitario) | currency }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">
+          <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>No hay registros de entradas.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

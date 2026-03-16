@@ -1,0 +1,160 @@
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  i {
+    font-size: 1.5rem;
+    color: var(--p-primary-color);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.dialog-content {
+  padding: 1rem 0;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 0;
+
+  p {
+    color: var(--p-text-muted-color);
+    margin: 0;
+  }
+}
+
+.setup-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+
+  .step-number {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--p-primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .step-content {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0 0 1rem 0;
+      color: var(--p-text-muted-color);
+      font-size: 0.875rem;
+    }
+  }
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid var(--p-surface-border);
+
+  img {
+    max-width: 200px;
+    height: auto;
+  }
+}
+
+.secret-code {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--p-surface-100);
+  border-radius: 8px;
+  border: 1px solid var(--p-surface-border);
+
+  code {
+    flex: 1;
+    font-family: "Courier New", monospace;
+    font-size: 1rem;
+    color: var(--p-text-muted-color);
+    letter-spacing: 0.1em;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.backup-codes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.backup-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+.codes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.backup-code {
+  padding: 0.75rem 1rem;
+  background: var(--p-surface-100);
+  border: 1px solid var(--p-surface-border);
+  border-radius: 6px;
+  text-align: center;
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

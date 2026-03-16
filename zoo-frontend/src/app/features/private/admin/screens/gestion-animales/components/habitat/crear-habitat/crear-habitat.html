@@ -1,0 +1,245 @@
+<p-stepper [value]="activeStep()">
+  <p-step-list>
+    <p-step [value]="1">Datos del Hábitat</p-step>
+    <p-step [value]="2">Subir Imágenes</p-step>
+  </p-step-list>
+
+  <p-step-panels>
+    <p-step-panel [value]="1">
+      <ng-template #content let-activateCallback="activateCallback">
+        <p-card class="crear-form-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h2>{{ pageTitle() }}</h2>
+              <p class="subtitle">Paso 1: Ingresa los datos del hábitat</p>
+            </div>
+          </ng-template>
+
+          <form [formGroup]="habitatForm" class="form">
+            <div class="form-section">
+              <h4>Información del Hábitat</h4>
+              <div class="form-grid">
+                <div class="field">
+                  <p-floatlabel>
+                    <input
+                      id="nombre"
+                      pInputText
+                      type="text"
+                      formControlName="nombre"
+                      autocomplete="off"
+                    />
+                    <label for="nombre">Nombre del Hábitat</label>
+                  </p-floatlabel>
+                  @if (isInvalid('nombre')) {
+                  <ng-container
+                    [ngTemplateOutlet]="alerta"
+                    [ngTemplateOutletContext]="{ fieldName: 'nombre' }"
+                  />
+                  }
+                </div>
+
+                <div class="field">
+                  <p-floatlabel>
+                    <input
+                      id="tipo"
+                      pInputText
+                      type="text"
+                      formControlName="tipo"
+                      autocomplete="off"
+                    />
+                    <label for="tipo">Tipo de Hábitat</label>
+                  </p-floatlabel>
+                  @if (isInvalid('tipo')) {
+                  <ng-container
+                    [ngTemplateOutlet]="alerta"
+                    [ngTemplateOutletContext]="{ fieldName: 'tipo' }"
+                  />
+                  }
+                </div>
+
+                <div class="field form-grid-span-2">
+                  <p-floatlabel>
+                    <textarea
+                      pTextarea
+                      id="descripcion"
+                      rows="4"
+                      formControlName="descripcion"
+                      [autoResize]="true"
+                    ></textarea>
+                    <label for="descripcion">Descripción</label>
+                  </p-floatlabel>
+                  @if (isInvalid('descripcion')) {
+                  <ng-container
+                    [ngTemplateOutlet]="alerta"
+                    [ngTemplateOutletContext]="{ fieldName: 'descripcion' }"
+                  />
+                  }
+                </div>
+
+                <div class="field form-grid-span-2">
+                  <p-floatlabel>
+                    <textarea
+                      pTextarea
+                      id="condicionesClimaticas"
+                      rows="3"
+                      formControlName="condicionesClimaticas"
+                      [autoResize]="true"
+                    ></textarea>
+                    <label for="condicionesClimaticas"
+                      >Condiciones Climáticas</label
+                    >
+                  </p-floatlabel>
+                  @if (isInvalid('condicionesClimaticas')) {
+                  <ng-container
+                    [ngTemplateOutlet]="alerta"
+                    [ngTemplateOutletContext]="{
+                      fieldName: 'condicionesClimaticas'
+                    }"
+                  />
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <p-button
+                type="button"
+                [label]="submitLabel()"
+                [icon]="
+                  isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'
+                "
+                [disabled]="isProcessing()"
+                [rounded]="true"
+                (click)="onSubmit()"
+                iconPos="right"
+              />
+              <p-button
+                type="button"
+                label="Cancelar"
+                icon="pi pi-times"
+                severity="secondary"
+                [outlined]="true"
+                (click)="onCancel()"
+                [disabled]="isProcessing()"
+                [rounded]="true"
+              />
+            </div>
+          </form>
+        </p-card>
+      </ng-template>
+    </p-step-panel>
+
+    <p-step-panel [value]="2">
+      <ng-template #content let-activateCallback="activateCallback">
+        <p-card class="crear-form-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h2>Subir Imágenes</h2>
+              <p class="subtitle">
+                Paso 2: Añade imágenes para
+                <strong>{{ habitatForm.value.nombre }}</strong>
+              </p>
+            </div>
+          </ng-template>
+
+          @if (isEditMode() && existingMedia().length > 0) {
+          <div class="form-section">
+            <div class="section-header-row">
+              <h4>Galería del Hábitat</h4>
+              <span class="counter-badge"
+                >{{ existingMedia().length }} imágenes</span
+              >
+            </div>
+
+            <div class="media-grid">
+              @for (media of existingMedia(); track media.id_media_habitat) {
+              <div class="media-card">
+                <div class="image-container">
+                  <p-image
+                    [src]="media.url_habitat"
+                    [alt]="media.titulo_media_habitat"
+                    imageClass="gallery-img"
+                    styleClass="full-width-image"
+                    [preview]="true"
+                  />
+
+                  <div class="card-actions-overlay">
+                    <p-button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      [rounded]="true"
+                      (click)="onDeleteMedia(media.id_media_habitat)"
+                      [disabled]="isProcessing()"
+                      pTooltip="Eliminar imagen"
+                      tooltipPosition="left"
+                    />
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+          <hr class="form-separator" />
+          }
+
+          <div class="form-section">
+            <h4>
+              @if (isEditMode()) { Añadir Nuevas Imágenes } @else { Galería de
+              Imágenes }
+            </h4>
+            <p-fileupload
+              #fileUploader
+              mode="advanced"
+              [customUpload]="true"
+              [multiple]="true"
+              accept="image/*"
+              maxFileSize="2000000"
+              chooseLabel="Elegir"
+              name="files[]"
+              [showUploadButton]="false"
+              [showCancelButton]="false"
+              (onSelect)="updateSelectedFiles()"
+              (onRemove)="updateSelectedFiles()"
+              (onClear)="updateSelectedFiles()"
+              [disabled]="isProcessing()"
+            >
+              <ng-template #empty>
+                <div class="uploader-empty-state">
+                  <i class="pi pi-cloud-upload"></i>
+                  <p>Arrastra y suelta imágenes aquí</p>
+                </div>
+              </ng-template>
+            </p-fileupload>
+          </div>
+
+          <div class="form-actions">
+            <p-button
+              type="button"
+              label="Atrás"
+              icon="pi pi-arrow-left"
+              [rounded]="true"
+              severity="secondary"
+              (click)="activeStep.set(1)"
+              [disabled]="isProcessing()"
+            />
+            <p-button
+              type="button"
+              [rounded]="true"
+              (click)="finishCreation()"
+              iconPos="right"
+              [label]="finalizarLabel()"
+              [icon]="finalizarIcon()"
+              [disabled]="isProcessing()"
+            />
+          </div>
+        </p-card>
+      </ng-template>
+    </p-step-panel>
+  </p-step-panels>
+</p-stepper>
+
+<ng-template #alerta let-fieldName="fieldName">
+  <p-message severity="error" size="small" variant="simple">
+    {{ getErrorMessage(fieldName) }}
+  </p-message>
+</ng-template>

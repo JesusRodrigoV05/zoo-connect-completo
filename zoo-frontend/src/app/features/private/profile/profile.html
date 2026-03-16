@@ -1,0 +1,26 @@
+<zoo-main-container>
+  @if (currentUser(); as user) {
+    <div class="profile-container">
+      <zoo-user-info-card [user]="user" [stats]="userStats()" />
+
+      <zoo-profile-actions-card
+        (editProfile)="editProfile()"
+        (shareProfile)="shareProfile()"
+        (viewStats)="viewStats()"
+        (viewParticipations)="viewParticipations()"
+        (logout)="confirmLogout()"
+      />
+    </div>
+  } @else {
+    <div class="loading">
+      <zoo-loader [size]="40" />
+      <p>Cargando perfil...</p>
+    </div>
+  }
+</zoo-main-container>
+
+<zoo-logout-dialog
+  [visible]="showLogoutDialog()"
+  (onCancel)="onLogoutCancel()"
+  (onConfirm)="onLogoutConfirm()"
+/>

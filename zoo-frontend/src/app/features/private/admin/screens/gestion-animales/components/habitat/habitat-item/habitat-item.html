@@ -1,0 +1,33 @@
+<p-card class="habitat-card">
+  <div class="item-content">
+    <div class="item-info">
+      <div class="item-header">
+        <i class="pi pi-map-marker icon-marker"></i>
+        <h3>{{ habitat().nombre }}</h3>
+      </div>
+      <p class="tipo-habitat">{{ habitat().tipo }}</p>
+    </div>
+
+    <div class="item-actions">
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        severity="info"
+        [outlined]="true"
+        pTooltip="Editar hábitat"
+        tooltipPosition="top"
+        [routerLink]="['/admin/animales/habitat/editar', habitat().id]"
+      />
+
+      <p-button
+        [icon]="habitat().isActive ? 'pi pi-trash' : 'pi pi-undo'"
+        [rounded]="true"
+        [severity]="habitat().isActive ? 'danger' : 'success'"
+        [outlined]="true"
+        [pTooltip]="habitat().isActive ? 'Desactivar hábitat' : 'Reactivar hábitat'"
+        tooltipPosition="top"
+        (onClick)="deleteHabitat()"
+      />
+    </div>
+  </div>
+</p-card>

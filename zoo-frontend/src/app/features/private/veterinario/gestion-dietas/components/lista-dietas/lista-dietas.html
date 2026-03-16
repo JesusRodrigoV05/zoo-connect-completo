@@ -1,0 +1,151 @@
+@defer(on viewport; prefetch on idle; hydrate on viewport){
+<div class="list-page-container">
+  <p-confirmDialog />
+
+  <div class="header-actions">
+    <div class="title-container">
+      <h2>Gestión de Dietas</h2>
+      <p>Planificación nutricional clínica</p>
+    </div>
+
+    <div class="actions-container">
+      <div class="search-wrapper">
+        <p-iconfield iconPosition="left">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            type="text"
+            pInputText
+            placeholder="Buscar dieta..."
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+            (keydown.enter)="onSearch()"
+          />
+        </p-iconfield>
+
+        @if(searchTerm()) {
+        <p-button
+          icon="pi pi-times"
+          [text]="true"
+          [rounded]="true"
+          (onClick)="clearSearch()"
+          pTooltip="Limpiar"
+          class="clear-btn"
+        />
+        }
+      </div>
+
+      <div class="buttons-wrapper">
+        <p-button
+          variant="text"
+          (onClick)="loadDietas(currentPage(), pageSize())"
+          icon="pi pi-refresh"
+          severity="secondary"
+          [rounded]="true"
+          pTooltip="Recargar lista"
+        />
+        <p-button
+          icon="pi pi-plus"
+          label="Nueva Dieta"
+          [rounded]="true"
+          severity="success"
+          routerLink="../crear"
+        />
+      </div>
+    </div>
+  </div>
+
+  @if(loading() && !dietaData()){
+  <zoo-loader />
+  } @else if(error()) { } @else if (dietaData()) { @let response = dietaData()!;
+  <p-dataview
+    #dv
+    [value]="response.items"
+    [paginator]="true"
+    [rows]="response.size"
+    [totalRecords]="response.total"
+    [first]="(response.page - 1) * response.size"
+    paginatorPosition="bottom"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    [loading]="loading()"
+    [layout]="layout()"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ response.total }} dietas registradas</span>
+
+        <span>Página {{ response.page }} de {{ response.pages }}</span>
+
+        <p-selectButton
+          [ngModel]="layout()"
+          (ngModelChange)="layout.set($event)"
+          [options]="layoutOptions"
+          optionLabel="icon"
+          optionValue="value"
+          [allowEmpty]="false"
+        >
+          <ng-template let-item pTemplate="item">
+            <i [class]="item.icon"></i>
+          </ng-template>
+        </p-selectButton>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      <div class="flex flex-column gap-3">
+        @for(item of items; track item.id){
+
+        <zoo-dieta-item
+          [dieta]="item"
+          layout="list"
+          (onDelete)="confirmDelete(item.id)"
+          (onEdit)="editDieta(item.id)"
+          (onView)="viewDieta(item.id)"
+        />
+
+        }
+      </div>
+    </ng-template>
+
+    <ng-template #grid let-items>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      >
+        @for(item of items; track item.id){
+
+        <zoo-dieta-item
+          [dieta]="item"
+          layout="grid"
+          (onDelete)="confirmDelete(item.id)"
+          (onEdit)="editDieta(item.id)"
+          (onView)="viewDieta(item.id)"
+        />
+
+        }
+      </div>
+    </ng-template>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <i
+          class="pi pi-apple"
+          style="font-size: 3rem; color: var(--p-green-500)"
+        ></i>
+
+        <p>No se encontraron dietas.</p>
+
+        <p-button
+          icon="pi pi-plus"
+          label="Crear Primera Dieta"
+          [rounded]="true"
+          severity="success"
+          routerLink="../crear"
+        />
+      </div>
+    </ng-template>
+  </p-dataview>
+  }
+</div>
+} @placeholder {
+<div class="loading-placeholder"><p>Cargando módulo...</p></div>
+}

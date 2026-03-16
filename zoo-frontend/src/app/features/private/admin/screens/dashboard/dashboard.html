@@ -1,0 +1,130 @@
+<zoo-main-container>
+  <div class="dashboard-container">
+    <div class="header-section">
+      <div class="title-block">
+        <h1>Panel de Control</h1>
+        <p>Resumen general de operaciones del zoológico.</p>
+      </div>
+
+      <div class="quick-actions">
+        <p-button
+          icon="pi pi-file-pdf"
+          pTooltip="Descargar Reporte Hoy"
+          tooltipPosition="bottom"
+          severity="help"
+          [rounded]="true"
+          [outlined]="true"
+          [loading]="isDownloadingDiario()"
+          (onClick)="descargarReporteDiario()"
+        />
+        <p-button
+          label="Nuevo Usuario"
+          icon="pi pi-user-plus"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="/admin/usuarios/crear"
+          [rounded]="true"
+        />
+
+        <p-button
+          label="Registrar Animal"
+          icon="pi pi-plus"
+          severity="primary"
+          routerLink="/admin/animales/crear"
+          [rounded]="true"
+        />
+
+        <p-button
+          icon="pi pi-calendar-plus"
+          pTooltip="Nueva Tarea"
+          tooltipPosition="bottom"
+          severity="help"
+          [rounded]="true"
+          routerLink="/admin/tareas/operaciones"
+        />
+
+        <p-button
+          icon="pi pi-box"
+          pTooltip="Gestionar Inventario"
+          tooltipPosition="bottom"
+          severity="warn"
+          [rounded]="true"
+          routerLink="/admin/inventario"
+        />
+      </div>
+    </div>
+
+    @if (store.loading()) {
+    <div class="grid-kpis">
+      <p-skeleton height="150px" borderRadius="12px" />
+      <p-skeleton height="150px" borderRadius="12px" />
+      <p-skeleton height="150px" borderRadius="12px" />
+      <p-skeleton height="150px" borderRadius="12px" />
+    </div>
+    } @else {
+    <div class="grid-kpis">
+      @for(kpi of kpis(); track kpi.title) {
+      <app-kpi-card [item]="kpi" />
+      }
+    </div>
+
+    <div class="grid-charts">
+      <div class="chart-card card-surface">
+        <div class="card-header-flex">
+          <h3>Distribución de Fauna</h3>
+          <p-selectButton
+            [options]="groupByOptions"
+            [ngModel]="store.animalChartGroupBy()"
+            (ngModelChange)="onFilterChange($event)"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="tiny-select"
+          />
+        </div>
+        <div class="chart-wrapper">
+          @if(store.animalChartData().length > 0) {
+          <p-chart
+            type="doughnut"
+            [data]="animalsChartData()"
+            [options]="chartOptions"
+            height="250px"
+          />
+          } @else {
+          <div class="empty-chart">No hay datos disponibles</div>
+          }
+        </div>
+      </div>
+
+      <div class="chart-card card-surface">
+        <div class="card-header-flex">
+          <h3>Estado de Tareas (Hoy)</h3>
+          <div class="total-badge">
+            Total: {{ store.tasksChartData()?.total_hoy || 0 }}
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          @if(store.tasksChartData()) {
+          <p-chart
+            type="bar"
+            [data]="tasksChartData()"
+            [options]="chartOptions"
+            height="250px"
+          />
+          }
+        </div>
+      </div>
+    </div>
+    } @if (store.error()) {
+    <div class="error-container">
+      <zoo-icon name="error-circle" color="#ef4444" size="3rem" class="mb-3" />
+      <h3>Algo salió mal</h3>
+      <p>{{ store.error() }}</p>
+      <p-button
+        label="Reintentar"
+        (onClick)="store.loadDashboard()"
+        [text]="true"
+      />
+    </div>
+    }
+  </div>
+</zoo-main-container>

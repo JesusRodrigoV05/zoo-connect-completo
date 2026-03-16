@@ -1,0 +1,132 @@
+@defer(on viewport; prefetch on idle; hydrate on viewport){
+<div class="list-page-container">
+  <p-confirmDialog />
+
+  <div class="header-actions">
+    <h2>Gestión de Noticias</h2>
+    <div class="buttons">
+      <p-button
+        variant="text"
+        (onClick)="store.loadNoticias({ page: store.page(), size: store.pageSize() })"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Recargar"
+      />
+      <p-button
+        icon="pi pi-plus"
+        label="Nueva Noticia"
+        [rounded]="true"
+        severity="primary"
+        routerLink="/admin/noticias/crear"
+      />
+    </div>
+  </div>
+
+  @if(store.loading() && store.items().length === 0){
+  <zoo-loader />
+
+  } @else if(store.error()) { @let errorMsg = store.error();
+  <div class="error-state">
+    <i class="pi pi-times-circle"></i>
+    <p>Error al cargar noticias:</p>
+    <p>{{ errorMsg }}</p>
+    <p-button
+      label="Reintentar"
+      (onClick)="store.loadNoticias({ page: store.page(), size: store.pageSize() })"
+      icon="pi pi-refresh"
+      severity="danger"
+      [rounded]="true"
+    />
+  </div>
+
+  } @else {
+  <p-dataview
+    #dv
+    [value]="store.items()"
+    [paginator]="true"
+    [rows]="store.pageSize()"
+    [totalRecords]="store.total()"
+    [first]="(store.page() - 1) * store.pageSize()"
+    paginatorPosition="bottom"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    [loading]="store.loading()"
+    [layout]="layout()"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ store.total() }} noticias</span>
+        <span>Página {{ store.page() }}</span>
+
+        <p-selectbutton
+          [ngModel]="layout()"
+          (ngModelChange)="layout.set($event)"
+          [options]="options"
+          [allowEmpty]="false"
+        >
+          <ng-template #item let-item>
+            <i
+              class="pi"
+              [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"
+            ></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      @for(item of items; track item.id){
+      <zoo-noticia-item
+        [noticia]="item"
+        layout="list"
+        (onDetails)="viewDetails(item.id)"
+        (onDelete)="deleteNoticia(item.id)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #grid let-items>
+      @for(item of items; track item.id){
+      <zoo-noticia-item
+        [noticia]="item"
+        layout="grid"
+        (onDetails)="viewDetails(item.id)"
+        (onDelete)="deleteNoticia(item.id)"
+      />
+      }
+    </ng-template>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <p>No hay noticias publicadas.</p>
+        <p-button
+          icon="pi pi-plus"
+          label="Publicar Primera Noticia"
+          [rounded]="true"
+          severity="primary"
+          routerLink="/admin/noticia/crear"
+        />
+      </div>
+    </ng-template>
+  </p-dataview>
+  }
+
+  <p-drawer
+    header="Detalle de Noticia"
+    [visible]="detalleVisible()"
+    (visibleChange)="detalleVisible.set($event)"
+    position="right"
+    styleClass="drawer-detalle"
+  >
+    @if (detalleVisible() && store.selectedId(); as id) {
+    <zoo-noticia-detalle [noticiaId]="id" />
+    }
+  </p-drawer>
+</div>
+} @placeholder{
+<p>Cargando módulo de noticias...</p>
+} @loading {
+<zoo-loader />
+}

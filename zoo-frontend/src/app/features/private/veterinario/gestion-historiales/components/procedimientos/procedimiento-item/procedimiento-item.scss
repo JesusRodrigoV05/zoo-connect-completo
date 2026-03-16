@@ -1,0 +1,59 @@
+$text-primary: var(--p-text-color);
+$text-secondary: var(--p-text-color-secondary);
+$text-muted: var(--p-text-muted-color);
+$color-primary: var(--p-primary-color);
+
+:host {
+  td {
+    vertical-align: middle;
+    padding: 1rem 0.5rem;
+  }
+}
+
+.col-date {
+  .date-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .date-main {
+      font-weight: 700;
+      color: $text-primary;
+    }
+
+    .date-time {
+      font-size: 0.875rem;
+      color: $text-muted;
+    }
+  }
+}
+
+.col-name {
+  .procedure-name {
+    font-weight: 500;
+    color: $color-primary;
+  }
+}
+
+.col-description {
+  .description-text {
+    color: $text-secondary;
+    white-space: normal;
+    word-break: break-word;
+    display: block;
+    max-width: 300px;
+  }
+}
+
+.col-status {
+  text-align: center;
+}
+
+.col-actions {
+  text-align: center;
+
+  .actions-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}

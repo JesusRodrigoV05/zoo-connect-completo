@@ -1,0 +1,22 @@
+<ul class="vet-menu-list">
+  @for (item of navigationItems(); track item.route) {
+  <li
+    [routerLink]="!item.disabled ? item.route : null"
+    routerLinkActive="active"
+    class="nav-item"
+    [class.disabled]="item.disabled"
+    [pTooltip]="item.disabled ? (item.tooltip || (item.comingSoon ? 'Próximamente' : 'No disponible')) : item.tooltip"
+    tooltipPosition="right"
+    pRipple
+  >
+    <i [class]="item.icon"></i>
+    <span>{{ item.text }}</span>
+
+    @if (item.badge && !item.disabled) {
+    <p-badge [value]="item.badge" styleClass="nav-badge" />
+    } @if (item.comingSoon) {
+    <p-badge value="Pronto" styleClass="coming-soon-badge" />
+    }
+  </li>
+  }
+</ul>

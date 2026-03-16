@@ -1,0 +1,47 @@
+<td>
+  <strong>{{ item().titulo }}</strong>
+  <br />
+  <small class="description-text">{{ item().descripcion }}</small>
+</td>
+
+<td>{{ item().tipoTarea?.nombre || '-' }}</td>
+
+<td>
+  @if (item().animalId || item().habitatId) {
+  <div class="location-cell">
+    @if (item().habitatId) {
+    <zoo-icon name="home" class="location-icon" />
+    } @if (item().animalId) {
+    <zoo-icon name="dog" type="solid" class="location-icon" />
+    }
+  </div>
+  } @else {
+  <span class="general-text">General</span>
+  }
+</td>
+
+<td>
+  <div
+    class="cron-display"
+    [pTooltip]="item().frecuenciaCron"
+    tooltipPosition="top"
+  >
+    <i class="pi pi-clock cron-icon"></i>
+    <span>{{ cronLabel() }}</span>
+  </div>
+</td>
+
+<td>
+  <p-tag
+    [value]="item().isActive ? 'Activa' : 'Pausada'"
+    [severity]="item().isActive ? 'success' : 'secondary'"
+    [rounded]="true"
+  />
+</td>
+
+<td class="actions-cell">
+  <div class="action-buttons">
+    <zoo-item-action-button tipo="edit" (click)="onEdit.emit(item().id)" />
+    <zoo-item-action-button tipo="delete" (click)="onDelete.emit(item().id)" />
+  </div>
+</td>

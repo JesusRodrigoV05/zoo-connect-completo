@@ -1,0 +1,72 @@
+.veterinario-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--p-surface-ground);
+}
+
+.main-content-area {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  gap: 1rem;
+  color: var(--p-text-muted-color);
+
+  i {
+    font-size: 2rem;
+    color: var(--p-primary-500);
+  }
+}
+
+:host ::ng-deep {
+  .veterinario-drawer.p-drawer {
+    .p-drawer-header {
+      padding: 1.5rem 1rem 1rem;
+      border-bottom: 1px solid var(--p-surface-border);
+    }
+
+    .drawer-header-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .header-icon {
+        font-size: 1.5rem;
+        color: var(--p-red-500);
+      }
+    }
+
+    .drawer-header-title {
+      margin: 0;
+      color: var(--p-text-color);
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px;
+    }
+
+    .p-drawer-content {
+      padding: 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-area {
+    padding-top: 56px;
+  }
+
+  :host ::ng-deep {
+    .veterinario-drawer.p-drawer {
+      width: 280px;
+    }
+  }
+}

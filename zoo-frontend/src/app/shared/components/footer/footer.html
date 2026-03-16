@@ -1,0 +1,93 @@
+@defer(on viewport; prefetch on idle; hydrate on hover){
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section about">
+      <app-logo-image [size]="80"/>
+      <p class="footer-description">
+        Conectando personas con la naturaleza desde 1995.
+        Comprometidos con la conservación y educación ambiental.
+      </p>
+      <div class="social-links">
+        <a href="https://facebook.com/zooconnect" target="_blank" rel="noopener" aria-label="Facebook">
+          <p-button icon="pi pi-facebook" [rounded]="true" [text]="true" severity="secondary" />
+        </a>
+        <a href="https://twitter.com/zooconnect" target="_blank" rel="noopener" aria-label="Twitter">
+          <p-button icon="pi pi-twitter" [rounded]="true" [text]="true" severity="secondary" />
+        </a>
+        <a href="https://instagram.com/zooconnect" target="_blank" rel="noopener" aria-label="Instagram">
+          <p-button icon="pi pi-instagram" [rounded]="true" [text]="true" severity="secondary" />
+        </a>
+        <a href="https://youtube.com/zooconnect" target="_blank" rel="noopener" aria-label="YouTube">
+          <p-button icon="pi pi-youtube" [rounded]="true" [text]="true" severity="secondary" />
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-section links">
+      <h3>Enlaces Rápidos</h3>
+      <ul>
+        <li><a routerLink="/inicio">Inicio</a></li>
+        <li><a routerLink="/animales">Animales</a></li>
+        <li><a routerLink="/encuestas">Encuestas</a></li>
+        <li><a routerLink="/quizzes">Quizzes</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section contact">
+      <h3>Contacto</h3>
+      <div class="contact-item">
+        <i class="pi pi-map-marker"></i>
+        <div>
+          <p>Av. 14 de Septiembre #8180</p>
+          <p>Obrajes, La Paz - Bolivia</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <i class="pi pi-phone"></i>
+        <div>
+          <p>+591 2 2786169</p>
+          <a href="tel:+59122786169">Llamar</a>
+        </div>
+      </div>
+      <div class="contact-item">
+        <i class="pi pi-envelope"></i>
+        <div>
+          <p>contacto&#64;zooconnect.bo</p>
+          <a href="mailto:contacto@zooconnect.bo">Enviar Email</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-section hours">
+      <h3>Horarios</h3>
+      <div class="schedule">
+        <div class="schedule-item">
+          <i class="pi pi-clock"></i>
+          <div>
+            <strong>Lunes a Viernes</strong>
+            <p>8:00 AM - 6:00 PM</p>
+          </div>
+        </div>
+        <div class="schedule-item">
+          <i class="pi pi-calendar"></i>
+          <div>
+            <strong>Sábados y Domingos</strong>
+            <p>9:00 AM - 7:00 PM</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 Zoo Connect. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="#">Política de Privacidad</a>
+      <span>|</span>
+      <a href="#">Términos y Condiciones</a>
+    </div>
+  </div>
+</footer>
+}@placeholder {
+    <p>Footer placeholder</p>
+}

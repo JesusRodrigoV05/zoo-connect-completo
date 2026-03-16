@@ -1,0 +1,21 @@
+@if (user(); as user) {
+<div class="profile-button-container">
+  <p-button
+    [pTooltip]="user.username"
+    tooltipPosition="bottom"
+    (onClick)="menu.toggle($event)"
+    class="avatar-button"
+    [text]="true"
+    [rounded]="true"
+  >
+    <zoo-user-avatar [size]="36" cssClass="user-avatar" />
+  </p-button>
+</div>
+
+<p-menu #menu [model]="items()" [popup]="true">
+  <ng-template #end>
+    <zoo-user-info [user]="user" />
+  </ng-template>
+</p-menu>
+}
+

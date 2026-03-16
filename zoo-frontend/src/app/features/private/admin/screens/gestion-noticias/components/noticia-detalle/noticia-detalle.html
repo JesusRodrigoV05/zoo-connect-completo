@@ -1,0 +1,59 @@
+<div class="detalle-container">
+  @if (loading()) {
+  <div class="loading-state">
+    <p-skeleton width="100%" height="200px" styleClass="mb-4" />
+    <p-skeleton width="60%" height="2rem" styleClass="mb-2" />
+    <p-skeleton width="40%" height="1rem" styleClass="mb-4" />
+    <div class="flex gap-2 mb-4">
+      <p-skeleton width="4rem" height="1.5rem" />
+      <p-skeleton width="4rem" height="1.5rem" />
+    </div>
+    <p-skeleton width="100%" height="10rem" />
+  </div>
+  } @else if (error()) {
+  <div class="error-state">
+    <i class="pi pi-exclamation-circle text-2xl text-red-500"></i>
+    <p>{{ error() }}</p>
+  </div>
+  } @else if (noticia(); as item) {
+  <p-scrollPanel [style]="{ width: '100%', height: 'calc(100vh - 120px)' }">
+    <article class="noticia-content">
+      <header>
+        <div class="image-wrapper">
+          <p-image
+            [src]="item.imagen || 'assets/images/placeholder-news.jpg'"
+            [alt]="item.titulo"
+            [preview]="true"
+            width="100%"
+            styleClass="detalle-img"
+          />
+        </div>
+
+        <h1 class="titulo">{{ item.titulo }}</h1>
+
+        <div class="meta-info">
+          <p-tag
+            icon="pi pi-calendar"
+            severity="secondary"
+            [value]="(item.fechaPublicacion | date:'fullDate') || ''"
+          />
+        </div>
+      </header>
+
+      <div class="cuerpo mt-4">
+        <div [innerHTML]="item.contenido"></div>
+      </div>
+    </article>
+  </p-scrollPanel>
+
+  <div class="footer-actions">
+    <p-button
+      label="Editar"
+      icon="pi pi-pencil"
+      severity="info"
+      [outlined]="true"
+      [routerLink]="['/admin/noticia/editar', item.id]"
+    />
+  </div>
+  }
+</div>

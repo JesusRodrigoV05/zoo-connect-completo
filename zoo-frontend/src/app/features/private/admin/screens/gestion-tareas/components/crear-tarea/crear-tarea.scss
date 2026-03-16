@@ -1,0 +1,121 @@
+:host {
+  display: block;
+}
+
+// Layout del Formulario
+.task-form {
+  padding-top: 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 600;
+    color: var(--p-text-color);
+    font-size: 0.9rem;
+
+    .required {
+      color: var(--p-red-500);
+    }
+  }
+}
+
+// Estilos del Item de Usuario en el Dropdown
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--p-surface-100);
+    color: var(--p-text-muted-color);
+
+    &.user-role-icon-cuidador {
+      background: var(--p-green-100);
+      color: var(--p-green-700);
+    }
+
+    &.user-role-icon-veterinario {
+      background: var(--p-blue-100);
+      color: var(--p-blue-700);
+    }
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+
+    .user-name {
+      font-weight: 600;
+      color: var(--p-text-color);
+      font-size: 0.95rem;
+    }
+
+    .user-role {
+      font-size: 0.8rem;
+      color: var(--p-text-muted-color);
+    }
+  }
+}
+
+.selected-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+// Media Query
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Global overrides limitados para el Dialog
+:host ::ng-deep {
+  .task-dialog {
+    width: 90%;
+    max-width: 600px;
+
+    .p-dialog-content {
+      padding: 0 1.5rem 1.5rem 1.5rem;
+    }
+  }
+
+  // Utilidad width 100%
+  .w-full {
+    width: 100%;
+  }
+
+  // Ajuste específico para el input dentro del datepicker
+  .p-datepicker-input {
+    width: 100%;
+  }
+}

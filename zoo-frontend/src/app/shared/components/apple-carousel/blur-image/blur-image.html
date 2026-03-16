@@ -1,0 +1,8 @@
+<img
+  [ngSrc]="src()"
+  [alt]="alt()"
+  fill
+  decoding="async"
+  (load)="isLoading.set(false)"
+  [class]="imageClass()"
+/>

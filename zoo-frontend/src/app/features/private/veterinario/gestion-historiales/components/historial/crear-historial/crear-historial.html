@@ -1,0 +1,198 @@
+<div class="page-container">
+  <div class="card-form">
+    <div class="header">
+      <h2>Nuevo Historial Clínico</h2>
+      <button
+        pButton
+        pRipple
+        icon="pi pi-times"
+        class="p-button-rounded p-button-text p-button-secondary close-btn"
+        (click)="regresar()"
+      ></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-section">
+        <div class="field">
+          <label for="animal"
+            >Paciente (Animal) <span class="required">*</span></label
+          >
+          <p-select
+            id="animal"
+            [options]="animales()"
+            formControlName="animal_id"
+            optionLabel="nombre"
+            optionValue="id_animal"
+            [filter]="true"
+            filterBy="nombre"
+            [showClear]="true"
+            placeholder="Buscar por nombre..."
+            [loading]="loadingAnimales()"
+            appendTo="body"
+            styleClass="input-full"
+          >
+            <ng-template let-animal #item>
+              <div class="animal-item">
+                <span class="animal-name">{{animal.nombre}}</span>
+              </div>
+            </ng-template>
+          </p-select>
+
+          @if (form.get('animal_id')?.invalid && form.get('animal_id')?.touched)
+          {
+          <small class="error-msg">Debe seleccionar un paciente</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="tipo"
+            >Motivo de Consulta <span class="required">*</span></label
+          >
+          <p-select
+            id="tipo"
+            [options]="configStore.tiposAtencionActivos()"
+            formControlName="tipo_atencion_id"
+            optionLabel="nombre"
+            optionValue="id"
+            placeholder="Seleccione el tipo..."
+            appendTo="body"
+            styleClass="input-full"
+          >
+          </p-select>
+          @if (form.get('tipo_atencion_id')?.invalid &&
+          form.get('tipo_atencion_id')?.touched) {
+          <small class="error-msg">El tipo de atención es requerido</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="peso">Peso Actual</label>
+          <p-inputNumber
+            id="peso"
+            formControlName="peso_actual"
+            mode="decimal"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            suffix=" kg"
+            styleClass="input-full"
+          >
+          </p-inputNumber>
+        </div>
+
+        <div class="field">
+          <label for="temp">Temperatura</label>
+          <p-inputNumber
+            id="temp"
+            formControlName="temperatura"
+            mode="decimal"
+            [minFractionDigits]="1"
+            suffix=" °C"
+            styleClass="input-full"
+          >
+          </p-inputNumber>
+        </div>
+      </div>
+
+      <p-accordion [multiple]="true" class="accordion-container">
+        <p-accordion-panel value="0">
+          <p-accordion-header
+            >Constantes Vitales & Anamnesis</p-accordion-header
+          >
+          <p-accordion-content>
+            <div class="form-section">
+              <div class="field">
+                <label>Frecuencia Cardíaca</label>
+                <p-inputNumber
+                  formControlName="frecuencia_cardiaca"
+                  suffix=" lpm"
+                  styleClass="input-full"
+                ></p-inputNumber>
+              </div>
+              <div class="field">
+                <label>Frecuencia Respiratoria</label>
+                <p-inputNumber
+                  formControlName="frecuencia_respiratoria"
+                  suffix=" rpm"
+                  styleClass="input-full"
+                ></p-inputNumber>
+              </div>
+              <div class="field full-width">
+                <label>Anamnesis</label>
+                <textarea
+                  pTextarea
+                  formControlName="anamnesis"
+                  rows="3"
+                  class="input-full"
+                  placeholder="Historia clínica previa..."
+                ></textarea>
+              </div>
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="1">
+          <p-accordion-header>Examen Físico</p-accordion-header>
+          <p-accordion-content>
+            <div class="field">
+              <label>Observaciones</label>
+              <textarea
+                pTextarea
+                formControlName="examen_fisico_obs"
+                rows="5"
+                class="input-full"
+                placeholder="Hallazgos físicos..."
+              ></textarea>
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="2">
+          <p-accordion-header>Diagnósticos Iniciales</p-accordion-header>
+          <p-accordion-content>
+            <div class="form-section">
+              <div class="field full-width">
+                <label>Diagnóstico Presuntivo</label>
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="diagnostico_presuntivo"
+                  class="input-full"
+                />
+              </div>
+              <div class="field full-width">
+                <label>Diagnóstico Definitivo (Opcional)</label>
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="diagnostico_definitivo"
+                  class="input-full"
+                />
+              </div>
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+      </p-accordion>
+
+      <div class="form-actions">
+        <button
+          pButton
+          pRipple
+          label="Cancelar"
+          type="button"
+          class="p-button-text p-button-rounded p-button-secondary"
+          (click)="regresar()"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Guardar Historial"
+          icon="pi pi-check"
+          class="p-button-rounded p-button-primary"
+          type="submit"
+          [loading]="saving()"
+          [disabled]="form.invalid"
+        ></button>
+      </div>
+    </form>
+  </div>
+</div>

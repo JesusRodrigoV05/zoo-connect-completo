@@ -1,0 +1,181 @@
+<form [formGroup]="form" class="form-content">
+  <div class="field">
+    <label class="field-label">Producto <span class="required">*</span></label>
+    <p-select
+      [options]="productStore.products()"
+      optionLabel="nombre"
+      optionValue="id"
+      formControlName="productoId"
+      placeholder="Seleccione..."
+      [filter]="true"
+      filterBy="nombre"
+      appendTo="body"
+      class="full-width-select"
+    />
+  </div>
+
+  <div class="form-row">
+    <div class="field">
+      <label class="field-label">Dosis</label>
+      <p-inputNumber
+        formControlName="dosis"
+        [minFractionDigits]="1"
+        placeholder="0.0"
+        class="full-width-input"
+      />
+    </div>
+    <div class="field">
+      <label class="field-label">Unidad</label>
+      <p-select
+        [options]="unidadesStore.items()"
+        optionLabel="abreviatura"
+        optionValue="id"
+        formControlName="unidadMedidaId"
+        placeholder="Unidad"
+        appendTo="body"
+        class="full-width-select"
+      />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="field">
+      <label class="field-label">Indicación (Texto)</label>
+      <input
+        pInputText
+        formControlName="frecuencia"
+        placeholder="Ej: Cada 8hrs con comida"
+        class="full-width-input"
+        fluid
+      />
+    </div>
+    <div class="field">
+      <label class="field-label">Duración</label>
+      <p-inputNumber
+        formControlName="duracionDias"
+        suffix=" días"
+        [min]="1"
+        class="full-width-input"
+      />
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Instrucciones</label>
+    <textarea
+      pTextarea
+      formControlName="instrucciones"
+      rows="2"
+      class="full-width-textarea"
+    ></textarea>
+  </div>
+
+  <div class="automation-box">
+    <div class="automation-header">
+      <div class="automation-title-section">
+        <i class="pi pi-bell automation-icon"></i>
+        <div class="automation-texts">
+          <label class="automation-title">Programar Recordatorios</label>
+          <small class="automation-subtitle"
+            >Generar tareas automáticas en la agenda</small
+          >
+        </div>
+      </div>
+      <p-toggleswitch formControlName="generarTarea" />
+    </div>
+
+    @if(form.get('generarTarea')?.value) {
+    <div class="fade-in automation-options">
+      <div class="field automation-field">
+        <label class="automation-option-label">Patrón de Repetición</label>
+        <p-select
+          [options]="frecuenciaOptions"
+          [ngModel]="uiCronType()"
+          (ngModelChange)="setType($event)"
+          [ngModelOptions]="{standalone: true}"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          class="full-width-select"
+        />
+      </div>
+
+      <div class="automation-time-options">
+        @if(uiCronType() === 'hourly') {
+        <div class="field automation-field">
+          <label class="automation-option-label">Cada cuantas horas</label>
+          <p-inputNumber
+            [ngModel]="uiIntervaloHoras()"
+            (ngModelChange)="setInterval($event)"
+            [ngModelOptions]="{standalone: true}"
+            [min]="1"
+            [max]="24"
+            suffix=" horas"
+            showButtons
+            buttonLayout="horizontal"
+            class="full-width-input"
+          />
+        </div>
+        } @if(uiCronType() !== 'hourly') {
+        <div class="field automation-field">
+          <label class="automation-option-label">Hora de ejecución</label>
+          <p-datepicker
+            [ngModel]="uiHoraSeleccionada()"
+            (ngModelChange)="setTime($event)"
+            [ngModelOptions]="{standalone: true}"
+            [timeOnly]="true"
+            hourFormat="24"
+            [showSeconds]="false"
+            [stepMinute]="15"
+            appendTo="body"
+            class="full-width-datepicker"
+            inputId="timepicker"
+          />
+        </div>
+        }
+      </div>
+
+      @if(uiCronType() === 'weekly') {
+      <div class="field automation-field">
+        <label class="automation-option-label">Días de la semana</label>
+        <p-selectbutton
+          [options]="diasSemanaOptions"
+          [ngModel]="uiDiasSeleccionados()"
+          (ngModelChange)="setDays($event)"
+          [ngModelOptions]="{standalone: true}"
+          optionLabel="label"
+          optionValue="value"
+          [multiple]="true"
+          class="full-width-selectbutton"
+        />
+        @if(uiDiasSeleccionados().length === 0) {
+        <small class="validation-error">Seleccione al menos un día.</small>
+        }
+      </div>
+      }
+
+      <div class="cron-preview">
+        <i class="pi pi-info-circle cron-preview-icon"></i>
+        <span class="cron-preview-text">{{ cronPreview }}</span>
+      </div>
+
+      <input type="hidden" formControlName="frecuenciaCron" />
+    </div>
+    }
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      [text]="true"
+      (onClick)="cancelar()"
+    />
+    <p-button
+      label="Guardar"
+      icon="pi pi-check"
+      [disabled]="form.invalid"
+      (onClick)="guardar()"
+    />
+  </div>
+</form>

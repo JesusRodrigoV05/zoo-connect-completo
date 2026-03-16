@@ -1,0 +1,51 @@
+<div class="diet-card" [ngClass]="layout()">
+  <div class="visual-wrapper">
+    <div class="icon-circle">
+      <i class="pi pi-apple"></i>
+    </div>
+    @if(layout() === 'grid') {
+    <p-tag
+      [value]="ingredientesCount() + ' Ingredientes'"
+      severity="warn"
+      styleClass="ingredient-badge"
+      [rounded]="true"
+    />
+    }
+  </div>
+
+  <div class="content-wrapper">
+    <div class="header-info">
+      <div class="title-row">
+        <h3>{{ dieta().nombre }}</h3>
+        @if(layout() === 'list') {
+        <p-tag
+          [value]="ingredientesCount() + ' ítems'"
+          severity="warn"
+          [rounded]="true"
+        />
+        }
+      </div>
+
+      <div class="target-info">
+        <i [class]="targetInfo().icon"></i>
+        <span class="target-label">{{ targetInfo().type }}:</span>
+        <span class="target-name">{{ targetInfo().name }}</span>
+      </div>
+
+      @if(dieta().updatedAt) {
+      <span class="date-label"
+        >Actualizado: {{ dieta().updatedAt | date:'shortDate' }}</span
+      >
+      }
+    </div>
+
+    <div class="actions">
+      <zoo-item-action-button tipo="view" (click)="onView.emit(dieta().id)" />
+      <zoo-item-action-button tipo="edit" (click)="onEdit.emit(dieta().id)" />
+      <zoo-item-action-button
+        tipo="delete"
+        (click)="onDelete.emit(dieta().id)"
+      />
+    </div>
+  </div>
+</div>

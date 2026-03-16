@@ -1,0 +1,1 @@
+export { default as ListaAnimales } from "./lista-animales";

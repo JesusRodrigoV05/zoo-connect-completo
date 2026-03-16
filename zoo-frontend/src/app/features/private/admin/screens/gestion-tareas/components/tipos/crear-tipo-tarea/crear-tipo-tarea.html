@@ -1,0 +1,61 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event ? close() : null"
+  [modal]="true"
+  [header]="pageTitle()"
+  styleClass="tipo-tarea-dialog"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <form [formGroup]="form" class="tipo-form">
+    <div class="form-grid">
+      <div class="field">
+        <p-floatLabel>
+          <input
+            pInputText
+            id="nombre"
+            formControlName="nombre"
+            class="input-full"
+          />
+          <label for="nombre">Nombre (ej. Limpieza)</label>
+        </p-floatLabel>
+      </div>
+
+      <div class="field">
+        <p-floatLabel>
+          <textarea
+            pTextarea
+            id="desc"
+            formControlName="descripcion"
+            rows="4"
+            class="input-full"
+            [autoResize]="true"
+          ></textarea>
+          <label for="desc">Descripción</label>
+        </p-floatLabel>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-actions">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        (onClick)="close()"
+      />
+
+      <p-button
+        label="Guardar"
+        icon="pi pi-check"
+        [loading]="isProcessing()"
+        [rounded]="true"
+        severity="primary"
+        (onClick)="save()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

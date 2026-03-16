@@ -1,0 +1,55 @@
+.section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  .header-info {
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--p-text-color);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--p-text-muted-color);
+    }
+  }
+}
+
+// Estilos de la tabla (Anchos de columnas)
+// Definimos los anchos aquí para que el header coincida con las celdas del componente hijo
+::ng-deep {
+  .th-date {
+    width: 20%;
+  }
+  .th-proc {
+    width: 25%;
+  }
+  .th-desc {
+    width: 30%;
+  }
+  .th-status {
+    width: 15%;
+    text-align: center;
+  }
+  .th-actions {
+    width: 10%;
+    text-align: center;
+  }
+}
+
+.empty-message {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--p-text-muted-color);
+}

@@ -1,0 +1,1 @@
+export { default as CrearAnimal } from "./crear-animal";

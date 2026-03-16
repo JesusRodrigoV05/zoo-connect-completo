@@ -1,0 +1,46 @@
+<td class="col-info">
+  <div class="info-group">
+    <span class="type-name"> {{ item().tipoExamen.nombre }} </span>
+    <span class="creation-date">
+      {{ item().fechaCreacion | date:'dd MMM yyyy HH:mm' }}
+    </span>
+  </div>
+</td>
+
+<td class="col-instructions">
+  <span class="instruction-text"> {{ item().instrucciones }} </span>
+</td>
+
+<td class="col-status">
+  <p-tag
+    [value]="item().estado || 'Solicitado'"
+    [severity]="getStatusSeverity(item().estado!)"
+    [rounded]="true"
+  />
+</td>
+
+<td class="col-actions">
+  <div class="actions-wrapper">
+    @if (item().resultados && item().resultados!.length > 0) {
+    <p-button
+      label="Ver Informe"
+      icon="pi pi-eye"
+      [text]="true"
+      [rounded]="true"
+      severity="success"
+      (onClick)="onView()"
+    />
+    } @else { @if (!bloqueado()) {
+    <p-button
+      label="Subir Resultado"
+      icon="pi pi-upload"
+      [outlined]="true"
+      [rounded]="true"
+      size="small"
+      (onClick)="onUpload()"
+    />
+    } @else {
+    <span class="pending-label">Pendiente</span>
+    } }
+  </div>
+</td>

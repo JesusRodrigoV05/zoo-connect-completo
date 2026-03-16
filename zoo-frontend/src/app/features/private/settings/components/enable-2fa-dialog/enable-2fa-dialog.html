@@ -1,0 +1,157 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!showBackupCodes()"
+  [style]="{ width: '550px' }"
+  (onHide)="onCancel()"
+>
+  <ng-template #header>
+    <div class="dialog-header">
+      <i class="pi pi-shield"></i>
+      <h3>
+        {{ showBackupCodes() ? 'Códigos de Respaldo' : 'Habilitar Autenticación
+        2FA' }}
+      </h3>
+    </div>
+  </ng-template>
+
+  <div class="dialog-content">
+    @if (!showBackupCodes()) { @if (isLoading()) {
+    <div class="loading-container">
+      <zoo-loader [size]="40" />
+      <p>Generando código QR...</p>
+    </div>
+    } @else {
+    <div class="setup-steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Escanea el código QR</h4>
+          <p>
+            Usa una app de autenticación como Google Authenticator, Authy o
+            Microsoft Authenticator
+          </p>
+          @if (qrCodeDataUrl()) {
+          <div class="qr-container">
+            <img [src]="qrCodeDataUrl()" alt="QR Code" />
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>O ingresa este código manualmente</h4>
+          <div class="secret-code">
+            <code>{{ secret() }}</code>
+            <p-button
+              icon="pi pi-copy"
+              [rounded]="true"
+              [text]="true"
+              [cdkCopyToClipboard]="secret()"
+              (cdkCopyToClipboardCopied)="onSecretCopied()"
+              pTooltip="Copiar código"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Ingresa el código de 6 dígitos</h4>
+          <form [formGroup]="verifyForm">
+            <div class="field">
+              <p-floatlabel variant="on">
+                <input
+                  pInputText
+                  id="code"
+                  formControlName="code"
+                  maxlength="6"
+                  placeholder="000000"
+                  [style]="{'width': '100%', 'text-align': 'center', 'font-size': '1.5rem', 'letter-spacing': '0.5rem'}"
+                />
+                <label for="code">Código TOTP</label>
+              </p-floatlabel>
+              @if (isInvalid('code')) {
+              <p-message severity="error" variant="simple" size="small">
+                Ingresa un código de 6 dígitos
+              </p-message>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    } } @else {
+    <div class="backup-codes-container">
+      <p-message severity="warn" [closable]="false">
+        <div class="backup-warning">
+          <i class="pi pi-exclamation-triangle"></i>
+          <strong>¡Importante!</strong> Guarda estos códigos en un lugar seguro.
+          Cada código solo puede usarse una vez.
+        </div>
+      </p-message>
+
+      <div class="codes-grid">
+        @for (code of backupCodes(); track code) {
+        <div class="backup-code">{{ code }}</div>
+        }
+      </div>
+
+      <div class="actions">
+        <p-button
+          label="Copiar Códigos"
+          icon="pi pi-copy"
+          [rounded]="true"
+          severity="secondary"
+          [outlined]="true"
+          [cdkCopyToClipboard]="backupCodes().join('\n')"
+          (cdkCopyToClipboardCopied)="onBackupCodesCopied()"
+        />
+        <p-button
+          label="Descargar"
+          [rounded]="true"
+          icon="pi pi-download"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="downloadBackupCodes()"
+        />
+      </div>
+    </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      @if (!showBackupCodes()) {
+      <p-button
+        label="Cancelar"
+        [rounded]="true"
+        severity="secondary"
+        [text]="true"
+        (onClick)="onCancel()"
+        [disabled]="isVerifying() || isLoading()"
+      />
+      <p-button
+        severity="success"
+        [rounded]="true"
+        [disabled]="verifyForm.invalid || isVerifying() || isLoading()"
+        (onClick)="onVerify()"
+      >
+        @if (isVerifying()) {
+        <zoo-loader [size]="20" [color]="'white'" />
+        } @else { Verificar y Activar }
+      </p-button>
+      } @else {
+      <p-button
+        label="Entendido, Cerrar"
+        severity="success"
+        [rounded]="true"
+        (onClick)="onClose()"
+      />
+      }
+    </div>
+  </ng-template>
+</p-dialog>

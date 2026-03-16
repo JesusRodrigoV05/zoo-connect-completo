@@ -1,0 +1,38 @@
+@defer(on viewport; hydrate on hover; prefetch on idle) {
+<div class="form-field">
+  <p-floatlabel variant="on">
+    @if (type() === 'password') {
+    <p-password
+      [id]="label()"
+      [formControl]="control()"
+      [placeholder]="placeholder()"
+      [invalid]="isInvalid()"
+      [feedback]="false"
+      [toggleMask]="showPasswordToggle()"
+      autocomplete="off"
+      fluid
+    />
+    } @else {
+    <input
+      [id]="label()"
+      pInputText
+      [type]="type()"
+      [formControl]="control()"
+      [placeholder]="placeholder()"
+      [invalid]="isInvalid()"
+      autocomplete="off"
+      fluid
+    />
+    }
+    <label [for]="label()">{{ label() }}</label>
+  </p-floatlabel>
+
+  @if (errorMessage() && isInvalid()) {
+  <p-message severity="error" variant="simple"> {{errorMessage()}} </p-message>
+  }
+</div>
+} @placeholder {
+<div class="form-field-placeholder">
+  <p>Cargando campo...</p>
+</div>
+}

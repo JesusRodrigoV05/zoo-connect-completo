@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "framework": "angular",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/zoo-connect-web/browser",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "dist/zoo-connect-web/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api"
+    }
+  ]
+}

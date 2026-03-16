@@ -1,0 +1,32 @@
+@defer (on viewport; prefetch on idle; hydrate on hover) {
+<div class="admin-layout">
+  <zoo-header>
+    <p-button
+      slot="nav-toggle"
+      icon="pi pi-bars"
+      [text]="true"
+      [rounded]="true"
+      (click)="toggleDrawer()"
+    />
+  </zoo-header>
+
+  <div class="main-content-area">
+    <router-outlet />
+  </div>
+
+  <p-drawer
+    [(visible)]="drawerVisible"
+    position="right"
+    styleClass="admin-drawer"
+  >
+    <ng-template pTemplate="header">
+      <h3 class="drawer-header-title">Panel Admin</h3>
+    </ng-template>
+    <zoo-sidebar-admin-menu />
+  </p-drawer>
+
+  <!--   <zoo-footer /> -->
+</div>
+} @placeholder {
+<p>Hola, aqui espero</p>
+}

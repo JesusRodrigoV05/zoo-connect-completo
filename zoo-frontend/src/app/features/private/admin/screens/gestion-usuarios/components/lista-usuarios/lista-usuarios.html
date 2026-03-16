@@ -1,0 +1,90 @@
+@defer(on viewport; prefetch on idle; hydrate on viewport){
+<div class="list-page-container">
+  <div class="header-actions">
+    <h2>Gestión de Usuarios</h2>
+    <div class="buttons">
+      <p-button
+        variant="text"
+        (onClick)="loadUsers(currentPage(), pageSize())"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+      />
+      <p-button
+        icon="pi pi-plus"
+        label="Crear Usuario"
+        [rounded]="true"
+        severity="primary"
+        routerLink="/admin/usuarios/crear"
+      />
+    </div>
+  </div>
+  @if(loading() && !userData()){
+  <zoo-loader />
+  } @else if(error()) { @let errorMsg = error();
+  <div class="error-state">
+    <i class="pi pi-times-circle"></i>
+    <p>Error al cargar usuarios:</p>
+    <p>{{ errorMsg }}</p>
+    <p-button
+      label="Reintentar"
+      (onClick)="loadUsers(currentPage(), pageSize())"
+      icon="pi pi-refresh"
+      severity="danger"
+      [rounded]="true"
+    />
+  </div>
+
+  } @else if (userData()) { @let response = userData()!;
+  <p-dataview
+    #dv
+    [value]="response.items"
+    [paginator]="true"
+    [rows]="response.size"
+    [totalRecords]="response.total"
+    [first]="(response.page - 1) * response.size"
+    paginatorPosition="bottom"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    [loading]="loading()"
+  >
+    <ng-template #header>
+      <div class="dataview-header">
+        <span>Total: {{ response.total }} usuarios</span>
+        <span>Página {{ response.page }}</span>
+      </div>
+    </ng-template>
+
+    <ng-template #list let-items>
+      @for(usuario of items; track usuario.id){
+      <zoo-usuario-item
+        [usuario]="usuario"
+        [loggedInUserId]="loggedInUserId()"
+        [isAuthLoading]="isAuthLoading()"
+      />
+      } @empty {
+      <div class="empty-state">
+        <p>No hay usuarios disponibles.</p>
+        <p-button
+          icon="pi pi-plus"
+          label="Crear Primer Usuario"
+          [rounded]="true"
+          severity="primary"
+          routerLink="/admin/usuarios/crear"
+        />
+      </div>
+      }
+    </ng-template>
+  </p-dataview>
+  } @else {
+  <div class="loading-placeholder">
+    <p>Cargando usuarios...</p>
+  </div>
+  }
+</div>
+} @placeholder{
+<p>Cargando</p>
+} @loading {
+<zoo-loader />
+}

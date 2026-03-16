@@ -1,0 +1,44 @@
+<td class="col-date">
+  <div class="date-wrapper">
+    <span class="date-main">
+      {{ item().fechaProgramada | date:'dd MMM yyyy' }}
+    </span>
+    <span class="date-time">
+      {{ item().fechaProgramada | date:'shortTime' }}
+    </span>
+  </div>
+</td>
+
+<td class="col-name">
+  <span class="procedure-name">{{ item().nombre }}</span>
+</td>
+
+<td class="col-description">
+  <span class="description-text"
+    >{{ item().descripcion || 'Sin descripción' }}</span
+  >
+</td>
+
+<td class="col-status">
+  <p-tag
+    [value]="item().estado || 'Pendiente'"
+    [severity]="getStatusSeverity(item().estado!)"
+    [rounded]="true"
+  />
+</td>
+
+<td class="col-actions">
+  <div class="actions-wrapper">
+    <zoo-item-action-button
+      tipo="edit"
+      [disabled]="bloqueado()"
+      (click)="onEdit()"
+    />
+
+    <zoo-item-action-button
+      tipo="delete"
+      [disabled]="bloqueado()"
+      (click)="onDelete()"
+    />
+  </div>
+</td>

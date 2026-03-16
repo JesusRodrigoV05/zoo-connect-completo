@@ -1,0 +1,298 @@
+<p-stepper [value]="activeStep()">
+  <p-step-list>
+    <p-step [value]="1">Datos del Animal</p-step>
+    <p-step [value]="2">Subir Imágenes</p-step>
+  </p-step-list>
+
+  <p-step-panels>
+    <p-step-panel [value]="1">
+      <ng-template #content>
+        <p-card class="crear-form-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h2>{{ pageTitle() }}</h2>
+              <p class="subtitle">Paso 1: Ingresa los datos del animal</p>
+            </div>
+          </ng-template>
+
+          <form [formGroup]="animalForm" class="form">
+            <div class="form-section">
+              <h4>Información Básica</h4>
+              <div class="form-grid">
+                <div class="field">
+                  <p-floatlabel>
+                    <input
+                      id="nombre"
+                      type="text"
+                      pInputText
+                      formControlName="nombre"
+                    />
+                    <label for="nombre">Nombre del Animal *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('nombre')) {
+                  <ng-container
+                    [ngTemplateOutlet]="alerta"
+                    [ngTemplateOutletContext]="{ fieldName: 'nombre' }"
+                  />
+                  }
+                </div>
+
+                <div class="field field-switch">
+                  <p-checkbox
+                    formControlName="genero"
+                    [binary]="true"
+                    inputId="genero"
+                  />
+                  <label for="genero">Es Macho (desmarcar si es hembra)</label>
+                </div>
+
+                <div class="field">
+                  <p-floatlabel>
+                    <p-datepicker
+                      formControlName="fecha_nacimiento"
+                      inputId="fechaNac"
+                      dateFormat="yy-mm-dd"
+                      [showIcon]="true"
+                    />
+                    <label for="fechaNac">Fecha de Nacimiento *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('fecha_nacimiento')) { ... }
+                </div>
+                <div class="field">
+                  <p-floatlabel>
+                    <p-datepicker
+                      formControlName="fecha_ingreso"
+                      inputId="fechaIng"
+                      dateFormat="yy-mm-dd"
+                      [showIcon]="true"
+                    />
+                    <label for="fechaIng">Fecha de Ingreso *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('fecha_ingreso')) { ... }
+                </div>
+
+                <div class="field form-grid-span-2">
+                  <p-floatlabel>
+                    <input
+                      id="procedencia"
+                      type="text"
+                      pInputText
+                      formControlName="procedencia"
+                    />
+                    <label for="procedencia">Procedencia *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('procedencia')) { ... }
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>Estado y Clasificación</h4>
+              <div class="form-grid">
+                <div class="field">
+                  <p-floatlabel>
+                    <p-select
+                      formControlName="estado_operativo"
+                      [options]="estadosOperativos"
+                      optionLabel="label"
+                      optionValue="value"
+                      inputId="estado"
+                    />
+                    <label for="estado">Estado Operativo *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('estado_operativo')) { ... }
+                </div>
+
+                <div class="field field-switch">
+                  <p-checkbox
+                    formControlName="es_publico"
+                    [binary]="true"
+                    inputId="publico"
+                  />
+                  <label for="publico">Visible para el público</label>
+                </div>
+
+                <div class="field">
+                  <p-floatlabel>
+                    <p-select
+                      inputId="especieId"
+                      formControlName="especie_id"
+                      [options]="especies()"
+                      optionLabel="nombreComun"
+                      optionValue="idEspecie"
+                      [loading]="isLoadingDropdowns()"
+                      [filter]="true"
+                      filterPlaceholder="Buscar especie"
+                    />
+                    <label for="especieId">Especie *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('especie_id')) { ... }
+                </div>
+
+                <div class="field">
+                  <p-floatlabel>
+                    <p-select
+                      inputId="habitatId"
+                      formControlName="habitat_id"
+                      [options]="habitats()"
+                      optionLabel="nombre"
+                      optionValue="id"
+                      [loading]="isLoadingDropdowns()"
+                      [filter]="true"
+                      filterPlaceholder="Buscar hábitat"
+                    />
+                    <label for="habitatId">Hábitat *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('habitat_id')) { ... }
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>Descripción</h4>
+              <div class="form-grid">
+                <div class="field form-grid-span-2">
+                  <p-floatlabel>
+                    <textarea
+                      id="descripcion"
+                      pTextarea
+                      formControlName="descripcion"
+                      rows="4"
+                      [autoResize]="true"
+                    ></textarea>
+                    <label for="descripcion">Descripción del Animal *</label>
+                  </p-floatlabel>
+                  @if (isInvalid('descripcion')) { ... }
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <p-button
+                type="button"
+                [label]="submitLabel()"
+                [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
+                [disabled]="isProcessing()"
+                [rounded]="true"
+                (click)="onSubmit()"
+                iconPos="right"
+              />
+              <p-button
+                type="button"
+                label="Cancelar"
+                icon="pi pi-times"
+                severity="secondary"
+                [outlined]="true"
+                (click)="onCancel()"
+                [disabled]="isProcessing()"
+                [rounded]="true"
+              />
+            </div>
+          </form>
+        </p-card>
+      </ng-template>
+    </p-step-panel>
+
+    <p-step-panel [value]="2">
+      <ng-template #content>
+        <p-card class="crear-form-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h2>Subir Imágenes</h2>
+              <p class="subtitle">
+                Paso 2: Añade imágenes para
+                <strong>{{ animalForm.value.nombre }}</strong>
+              </p>
+            </div>
+          </ng-template>
+
+          @if (isEditMode() && existingMedia().length > 0) {
+          <div class="form-section">
+            <h4>Galería Actual</h4>
+            <div class="galeria-grid">
+              @for (media of existingMedia(); track media.id_media) {
+              <div class="galeria-item">
+                <p-image
+                  [src]="media.url"
+                  [alt]="media.titulo"
+                  width="100"
+                  [preview]="true"
+                />
+                <span class="galeria-titulo">{{ media.titulo }}</span>
+                <p-button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  [rounded]="true"
+                  [outlined]="true"
+                  (click)="onDeleteMedia(media.id_media)"
+                  [disabled]="isProcessing()"
+                  pTooltip="Eliminar imagen"
+                />
+              </div>
+              }
+            </div>
+          </div>
+          <hr class="form-separator" />
+          }
+
+          <div class="form-section">
+            <h4>
+              @if (isEditMode()) { Añadir Nuevas Imágenes } @else { Galería de
+              Imágenes }
+            </h4>
+            <p-fileupload
+              #fileUploader
+              mode="advanced"
+              [customUpload]="true"
+              [multiple]="true"
+              accept="image/*"
+              maxFileSize="2000000"
+              chooseLabel="Elegir"
+              name="files[]"
+              [showUploadButton]="false"
+              [showCancelButton]="false"
+              (onSelect)="updateSelectedFiles()"
+              (onRemove)="updateSelectedFiles()"
+              (onClear)="updateSelectedFiles()"
+              [disabled]="isProcessing()"
+            >
+              <ng-template #empty>
+                <div class="uploader-empty-state">
+                  <i class="pi pi-cloud-upload"></i>
+                  <p>Arrastra y suelta imágenes aquí</p>
+                </div>
+              </ng-template>
+            </p-fileupload>
+          </div>
+
+          <div class="form-actions">
+            <p-button
+              type="button"
+              label="Atrás"
+              icon="pi pi-arrow-left"
+              [rounded]="true"
+              severity="secondary"
+              (click)="activeStep.set(1)"
+              [disabled]="isProcessing()"
+            />
+            <p-button
+              type="button"
+              [rounded]="true"
+              (click)="finishCreation()"
+              iconPos="right"
+              [label]="finalizarLabel()"
+              [icon]="finalizarIcon()"
+              [disabled]="isProcessing()"
+            />
+          </div>
+        </p-card>
+      </ng-template>
+    </p-step-panel>
+  </p-step-panels>
+</p-stepper>
+
+<ng-template #alerta let-fieldName="fieldName">
+  <p-message severity="error" size="small" variant="simple">
+    {{ getErrorMessage(fieldName) }}
+  </p-message>
+</ng-template>

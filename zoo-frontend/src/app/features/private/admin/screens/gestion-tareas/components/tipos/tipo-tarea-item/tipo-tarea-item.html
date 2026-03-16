@@ -1,0 +1,23 @@
+<div class="type-card" [ngClass]="layout()">
+  <div class="visual-wrapper">
+    <div class="icon-circle">
+      <i class="pi pi-bookmark"></i>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="header-info">
+      <h3>{{ tipo().nombre }}</h3>
+      <p class="description">{{ tipo().descripcion }}</p>
+    </div>
+
+    <div class="actions">
+      <zoo-item-action-button tipo="edit" (click)="onEdit.emit(tipo().id)" />
+
+      <zoo-item-action-button
+        tipo="delete"
+        (click)="onDelete.emit(tipo().id)"
+      />
+    </div>
+  </div>
+</div>

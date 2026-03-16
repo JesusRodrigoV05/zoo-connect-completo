@@ -1,0 +1,295 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: var(--p-surface-card);
+  border-bottom: 1px solid var(--p-surface-200);
+  box-shadow: var(--p-surface-200) 0px 1px 4px;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  &.header-placeholder {
+    .placeholder-logo {
+      width: 60px;
+      height: 60px;
+      background: var(--p-surface-200);
+      border-radius: 8px;
+      animation: pulse 1.5s infinite;
+    }
+
+    .placeholder-actions {
+      width: 120px;
+      height: 40px;
+      background: var(--p-surface-200);
+      border-radius: 20px;
+      animation: pulse 1.5s infinite;
+    }
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    ::ng-deep [slot="nav-toggle"] {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .desktop-menu {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-right: 1rem;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+
+    .nav-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      color: var(--p-text-color);
+      position: relative;
+      text-decoration: none;
+      border-radius: var(--p-border-radius);
+      cursor: pointer;
+
+      i {
+        font-size: 1.25rem;
+        transition: transform 0.3s ease;
+      }
+
+      &:not(.disabled):hover {
+        background-color: var(--p-surface-100);
+        color: var(--p-text-color);
+
+        i {
+          transform: translateY(-1px);
+        }
+      }
+
+      &.disabled {
+        opacity: 0.6;
+        cursor: default;
+        position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
+
+        .coming-soon-badge {
+          font-size: 0.7rem;
+          padding: 0.2rem 0.4rem;
+          background: var(--p-primary-color);
+          color: var(--p-primary-contrast-color);
+          border-radius: 1rem;
+          position: absolute;
+          top: -0.5rem;
+          right: -0.5rem;
+          opacity: 0;
+          transform: scale(0.8);
+          transition: all 0.3s ease;
+        }
+
+        &:hover .coming-soon-badge {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      &.active-nav-button {
+        background-color: var(--p-primary-color);
+        color: var(--p-primary-contrast-color);
+        font-weight: 600;
+
+        i {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .menu-button {
+    display: none;
+    @media (max-width: 768px) {
+      display: flex;
+      margin-left: 1rem;
+    }
+  }
+
+  .auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .mobile-auth {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .desktop-auth {
+        display: none;
+      }
+      .mobile-auth {
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 1024px) {
+    padding: 0.5rem 1rem;
+
+    .navbar {
+      .nav-button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    .header-right {
+      gap: 0.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    height: 56px;
+    padding: 0.5rem 0.75rem;
+
+    .header-left {
+      app-logo-image {
+        transform: scale(0.9);
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+
+    .header-left {
+      app-logo-image {
+        transform: scale(0.8);
+      }
+    }
+
+    .header-right {
+      gap: 0.25rem;
+    }
+  }
+}
+
+::ng-deep .menu-drawer {
+  width: 100vw !important;
+  height: 100lvh !important;
+  background: var(--p-surface-card) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  @media (min-width: 768px) {
+    width: 400px !important;
+  }
+
+  .menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid var(--p-surface-200);
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--p-text-color);
+    }
+  }
+
+  .menu-items {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 1rem;
+      padding: 1rem;
+      font-size: 1.1rem;
+      color: var(--p-text-color);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+
+      i {
+        font-size: 1.5rem;
+      }
+
+      &:not(.disabled):hover {
+        background-color: var(--p-surface-100);
+      }
+
+      &.disabled {
+        opacity: 0.6;
+        cursor: default;
+        position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
+
+        .coming-soon-badge {
+          font-size: 0.75rem;
+          padding: 0.2rem 0.5rem;
+          background: var(--p-primary-color);
+          color: var(--p-primary-contrast-color);
+          border-radius: 1rem;
+          margin-left: auto;
+          opacity: 0.8;
+        }
+      }
+
+      &.active-nav-button {
+        background-color: var(--p-primary-color);
+        color: var(--p-primary-contrast-color);
+        font-weight: 500;
+
+        i {
+          color: var(--p-primary-contrast-color);
+        }
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}

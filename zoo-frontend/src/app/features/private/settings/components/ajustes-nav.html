@@ -1,0 +1,10 @@
+<nav class="ajustes-nav">
+  <h2 class="ajustes-title">Ajustes</h2>
+  <ul>
+    @for (item of navItems; track item) {
+    <li [routerLink]="item.route" routerLinkActive="active">
+      <i [class]="item.icon"></i> <span>{{ item.label }}</span>
+    </li>
+    }
+  </ul>
+</nav>

@@ -1,0 +1,33 @@
+<p-card class="tipo-card">
+  <div class="item-content">
+    <div class="item-info">
+      <div class="item-header">
+        <i class="pi pi-tag item-icon"></i>
+        <h3>{{ tipo().nombre }}</h3>
+      </div>
+      <p class="descripcion">{{ tipo().descripcion }}</p>
+    </div>
+
+    <div class="item-actions">
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        severity="info"
+        [outlined]="true"
+        pTooltip="Editar Tipo"
+        tooltipPosition="top"
+        (onClick)="editar()"
+      />
+
+      <p-button
+        [icon]="tipo().isActive ? 'pi pi-trash' : 'pi pi-undo'"
+        [rounded]="true"
+        [severity]="tipo().isActive ? 'danger' : 'success'"
+        [outlined]="true"
+        [pTooltip]="tipo().isActive ? 'Desactivar' : 'Reactivar'"
+        tooltipPosition="top"
+        (onClick)="toggleStatus()"
+      />
+    </div>
+  </div>
+</p-card>

@@ -1,0 +1,66 @@
+<div class="history-container">
+  <header class="history-header">
+    <div class="title-block">
+      <h2>Movimientos de Inventario</h2>
+      <p>Historial de entradas y salidas de almacén</p>
+    </div>
+
+    <div class="actions-block">
+      <div class="create-buttons">
+        <p-button
+          label="Nueva Entrada"
+          icon="pi pi-arrow-down"
+          severity="success"
+          [rounded]="true"
+          routerLink="../../transacciones/crear-entrada"
+        />
+        <p-button
+          label="Nueva Salida"
+          icon="pi pi-arrow-up"
+          severity="warn"
+          [rounded]="true"
+          routerLink="../../transacciones/crear-salida"
+        />
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs-wrapper">
+    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="entradas">
+          <span class="tab-item-content">
+            <i class="pi pi-box"></i>
+            <span>Entradas (Compras)</span>
+          </span>
+        </p-tab>
+        <p-tab value="salidas">
+          <span class="tab-item-content">
+            <i class="pi pi-sign-out"></i>
+            <span>Salidas (Consumo)</span>
+          </span>
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="entradas">
+          <zoo-tabla-entradas
+            [entradas]="transactionStore.entradas()"
+            [loading]="transactionStore.loading()"
+            [totalRecords]="transactionStore.total()"
+            (pageChange)="onPageChange($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="salidas">
+          <zoo-tabla-salidas
+            [salidas]="transactionStore.salidas()"
+            [loading]="transactionStore.loading()"
+            [totalRecords]="transactionStore.total()"
+            (pageChange)="onPageChange($event)"
+          />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</div>

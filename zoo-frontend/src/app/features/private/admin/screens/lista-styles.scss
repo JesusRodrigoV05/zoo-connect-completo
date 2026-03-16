@@ -1,0 +1,142 @@
+.list-page-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 1400px;
+  margin: 0;
+
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--p-surface-card);
+    border-radius: 0.75rem;
+    box-shadow: var(--p-shadow-1);
+
+    h2 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--p-text-color);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  .dataview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+
+    span {
+      font-weight: 500;
+      color: var(--p-text-muted-color);
+    }
+  }
+
+  .error-state,
+  .empty-state,
+  .loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 3rem 1rem;
+    text-align: center;
+    background: var(--p-surface-card);
+    border-radius: 0.75rem;
+    box-shadow: var(--p-shadow-1);
+
+    p {
+      margin: 0;
+      color: var(--p-text-muted-color);
+      font-size: 1.125rem;
+    }
+
+    i.pi-times-circle {
+      font-size: 2.5rem;
+      color: var(--p-red-500);
+    }
+  }
+
+  ::ng-deep {
+    .p-dataview {
+      background: transparent;
+      border: none;
+    }
+
+    .p-dataview.p-dataview-list .p-dataview-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: transparent;
+    }
+
+    .p-dataview.p-dataview-grid .p-dataview-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1rem;
+      background: transparent;
+    }
+
+    /*
+       * El .p-dataview-content suelto ya no es necesario
+       * porque sus estilos están en los bloques de arriba.
+       */
+
+    /*
+       * El resto de tus estilos (paginator, etc.) están perfectos
+       */
+    .p-paginator {
+      background: var(--p-surface-card);
+      border-top: 1px solid var(--p-surface-border);
+      border-radius: 0 0 0.75rem 0.75rem;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .p-paginator-page,
+    .p-paginator-next,
+    .p-paginator-prev,
+    .p-paginator-first,
+    .p-paginator-last {
+      color: var(--p-text-color);
+      &:not(.p-disabled):hover {
+        background: var(--p-surface-100);
+      }
+    }
+
+    .p-paginator-page.p-highlight {
+      background: var(--p-primary-color);
+      color: var(--p-primary-contrast-color);
+    }
+
+    .p-dropdown {
+      background: var(--p-surface-ground);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .list-page-container {
+    padding: 0.5rem;
+
+    .header-actions {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}

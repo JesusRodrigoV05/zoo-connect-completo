@@ -1,0 +1,37 @@
+<div class="mini-task-row" [class.completed]="task().isCompleted">
+  <div class="status-indicator">
+    <i [class]="getIconClass()"></i>
+  </div>
+
+  <div class="task-details">
+    <span class="task-title">{{ task().titulo }}</span>
+    <span class="task-location">
+      <i class="pi pi-map-marker location-icon"></i>
+      {{ task().habitat?.nombre || 'General' }}
+    </span>
+  </div>
+
+  <div class="task-actions">
+    @if (!task().isCompleted) {
+    <p-button
+      icon="pi pi-refresh"
+      [text]="true"
+      [rounded]="true"
+      severity="secondary"
+      pTooltip="Reasignar"
+      tooltipPosition="left"
+      (click)="reassign.emit(task().id)"
+    />
+    } @else {
+    <p-button
+      icon="pi pi-eye"
+      [text]="true"
+      [rounded]="true"
+      severity="success"
+      pTooltip="Ver Evidencia"
+      tooltipPosition="left"
+      (click)="view.emit(task().id)"
+    />
+    }
+  </div>
+</div>

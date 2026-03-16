@@ -1,0 +1,67 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+:host ::ng-deep .p-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+:host ::ng-deep .p-card-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  padding: 2rem 1.5rem;
+}
+
+.user-card {
+  text-align: center;
+  --p-card-content-padding: 0;
+}
+
+h2 {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.membership {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  color: var(--p-primary-color);
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: auto;
+
+  .stat {
+    text-align: center;
+
+    .number {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--p-primary-color);
+    }
+
+    .label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--p-text-muted-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+<div class="inbox-grid">
+  @for (task of tasks(); track task.id) {
+  <div class="task-card" [ngClass]="getPriorityClass(task)">
+    <div class="status-strip"></div>
+
+    <div class="card-body">
+      <div class="card-meta-top">
+        <span class="task-type">
+          <i [class]="getTaskIcon(task.tipoTarea?.nombre)"></i>
+          {{ task.tipoTarea?.nombre || 'General' }}
+        </span>
+        <span class="time-ago">Hace 2h</span>
+      </div>
+
+      <div class="main-content">
+        <h4 class="task-title">{{ task.titulo }}</h4>
+        <p class="task-desc">{{ task.descripcion }}</p>
+      </div>
+
+      <div class="card-footer">
+        <div class="location-badge">
+          <i class="pi pi-map-marker"></i>
+          <span>{{ task.habitat?.nombre || 'Sin ubicación' }}</span>
+        </div>
+
+        <p-button
+          label="Asignar"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          [rounded]="true"
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="onAssign.emit(task.id)"
+          styleClass="assign-btn"
+        />
+      </div>
+    </div>
+  </div>
+  } @empty {
+  <div class="empty-state">
+    <div class="empty-icon">
+      <i class="pi pi-check"></i>
+    </div>
+    <div class="empty-text">
+      <h6>Bandeja limpia</h6>
+      <p>No hay tareas pendientes de asignar.</p>
+    </div>
+  </div>
+  }
+</div>

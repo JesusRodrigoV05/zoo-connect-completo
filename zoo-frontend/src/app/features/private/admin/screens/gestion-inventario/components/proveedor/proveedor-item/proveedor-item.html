@@ -1,0 +1,42 @@
+<p-card class="proveedor-card">
+  <div class="item-content">
+    <div class="item-info">
+      <div class="item-header">
+        <h3>{{ proveedor().nombre }}</h3>
+      </div>
+
+      <div class="contact-details">
+        <div class="detail-row">
+          <i class="pi pi-envelope"></i>
+          <span>{{ proveedor().email }}</span>
+        </div>
+        <div class="detail-row">
+          <i class="pi pi-phone"></i>
+          <span>{{ proveedor().telefono }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-actions">
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        severity="info"
+        [outlined]="true"
+        pTooltip="Editar proveedor"
+        tooltipPosition="top"
+        (onClick)="editar()"
+      />
+
+      <p-button
+        [icon]="proveedor().isActive ? 'pi pi-trash' : 'pi pi-undo'"
+        [rounded]="true"
+        [severity]="proveedor().isActive ? 'danger' : 'success'"
+        [outlined]="true"
+        [pTooltip]="proveedor().isActive ? 'Desactivar proveedor' : 'Reactivar proveedor'"
+        tooltipPosition="top"
+        (onClick)="toggleStatus()"
+      />
+    </div>
+  </div>
+</p-card>

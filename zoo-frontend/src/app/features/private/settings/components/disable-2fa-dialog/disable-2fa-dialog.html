@@ -1,0 +1,66 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '450px' }"
+  (onHide)="onCancel()"
+>
+  <ng-template #header>
+    <div class="dialog-header">
+      <i class="pi pi-shield"></i>
+      <h3>Deshabilitar Autenticación 2FA</h3>
+    </div>
+  </ng-template>
+
+  <div class="dialog-content">
+    <p class="warning-text">
+      <i class="pi pi-exclamation-triangle"></i>
+      Tu cuenta será menos segura sin la autenticación de dos factores.
+    </p>
+
+    <form [formGroup]="disableForm">
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-password
+            id="password"
+            formControlName="password"
+            [feedback]="false"
+            [toggleMask]="true"
+            autocomplete="current-password"
+            [style]="{'width': '100%'}"
+            fluid
+          />
+          <label for="password">Contraseña Actual</label>
+        </p-floatlabel>
+        @if (isInvalid('password')) {
+        <p-message severity="error" variant="simple" size="small">
+          La contraseña es requerida
+        </p-message>
+        }
+      </div>
+    </form>
+  </div>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button
+        label="Cancelar"
+        [rounded]="true"
+        severity="secondary"
+        [text]="true"
+        (onClick)="onCancel()"
+        [disabled]="isDisabling()"
+      />
+      <p-button
+        severity="danger"
+        [rounded]="true"
+        [disabled]="disableForm.invalid || isDisabling()"
+        (onClick)="onConfirm()"
+      >
+        @if (isDisabling()) {
+        <zoo-loader [size]="20" [color]="'white'" />
+        } @else { Deshabilitar 2FA }
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

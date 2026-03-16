@@ -1,0 +1,60 @@
+<section class="contact-section">
+  <div class="section-header">
+    <i class="pi pi-envelope section-icon"></i>
+    <h2>Ponte en Contacto</h2>
+    <p class="subtitle">
+      ¿Tienes alguna pregunta? Llena el formulario y nuestro equipo se
+      comunicará contigo.
+    </p>
+  </div>
+
+  <div class="contact-content">
+    <div class="contact-form-card">
+      <h3>Envíanos un Mensaje</h3>
+      <form class="contact-form" (ngSubmit)="onSubmitContact()">
+        <p-floatlabel>
+          <input pInputText id="nombre" required />
+          <label for="nombre">Nombre Completo</label>
+        </p-floatlabel>
+
+        <p-floatlabel>
+          <input pInputText id="email" type="email" required />
+          <label for="email">Correo Electrónico</label>
+        </p-floatlabel>
+
+        <p-floatlabel>
+          <input pInputText id="asunto" required />
+          <label for="asunto">Asunto</label>
+        </p-floatlabel>
+
+        <p-floatlabel>
+          <textarea pTextarea id="mensaje" rows="4" required></textarea>
+          <label for="mensaje">Mensaje</label>
+        </p-floatlabel>
+
+        <p-button
+          type="submit"
+          label="Enviar Mensaje"
+          icon="pi pi-send"
+          styleClass="p-button-primary"
+          [rounded]="true"
+        />
+      </form>
+    </div>
+
+    <div class="map-container">
+      <h3>Encuéntranos</h3>
+      <p>También puedes visitarnos en nuestra ubicación principal.</p>
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.3707084020453!2d-68.11919492471034!3d-16.52013544169384!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915f206b991d9733%3A0x5c8f4d35cc155d0!2sUniversidad%20Cat%C3%B3lica%20Boliviana%20San%20Pablo!5e0!3m2!1ses!2sbo!4v1698765432100!5m2!1ses!2sbo"
+        width="100%"
+        height="400"
+        style="border: 0"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      >
+      </iframe>
+    </div>
+  </div>
+</section>
