@@ -19,14 +19,11 @@ import { CheckboxModule } from "primeng/checkbox";
 import { ShowToast } from "@app/shared/services";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AdminAnimales } from "@app/features/private/admin/services/admin-animales";
-import { AnimalMediaApiResponse } from "@adapters/animales";
 import { catchError, finalize } from "rxjs/operators";
-import { MainContainer } from "@app/shared/components/main-container";
 import { MessageModule } from "primeng/message";
 import { ImageModule } from "primeng/image";
 import { FileUpload, FileUploadModule } from "primeng/fileupload";
 import { StepperModule } from "primeng/stepper";
-import { Loader } from "@app/shared/components";
 import { NgTemplateOutlet } from "@angular/common";
 import {
   AdminAnimalesMultimedia,

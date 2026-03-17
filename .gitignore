@@ -13,7 +13,6 @@ Thumbs.db
 venv/
 __pycache__/
 *.pyc
-media/
 *.sqlite3
 
 dist/
