@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional
 from datetime import datetime, date
 from decimal import Decimal
+from uuid import UUID
 
 #tipoproducto
 class TipoProductoBase(BaseModel):
@@ -18,7 +19,7 @@ class TipoProductoUpdate(BaseModel):
 
 class TipoProductoOut(TipoProductoBase):
     model_config = ConfigDict(from_attributes=True)
-    id_tipo_producto: int
+    id_tipo_producto: UUID
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -39,7 +40,7 @@ class UnidadMedidaUpdate(BaseModel):
 class UnidadMedidaOut(UnidadMedidaBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_unidad: int
+    id_unidad: UUID
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -62,7 +63,7 @@ class ProveedorUpdate(BaseModel):
 class ProveedorOut(ProveedorBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_proveedor: int
+    id_proveedor: UUID
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -72,8 +73,8 @@ class ProductoBase(BaseModel):
     nombre_producto: str
     descripcion_producto: Optional[str] = None
     stock_minimo: Decimal = Decimal("0.0")
-    tipo_producto_id: int
-    unidad_medida_id: int
+    tipo_producto_id: UUID
+    unidad_medida_id: UUID
 
 class ProductoCreate(ProductoBase):
     pass
@@ -82,14 +83,14 @@ class ProductoUpdate(BaseModel):
     nombre_producto: Optional[str] = None
     descripcion_producto: Optional[str] = None
     stock_minimo: Optional[Decimal] = None
-    tipo_producto_id: Optional[int] = None
-    unidad_medida_id: Optional[int] = None
+    tipo_producto_id: Optional[UUID] = None
+    unidad_medida_id: Optional[UUID] = None
     is_active: Optional[bool] = None
 
 class ProductoOut(ProductoBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_producto: int
+    id_producto: UUID
     stock_actual: Decimal 
     is_active: bool
     photo_url: Optional[str] = None

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import List
+from uuid import UUID
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.db.session import get_db
@@ -36,7 +37,7 @@ def admin_list_users(
 
 
 @router.get("/users/{user_id}", response_model=UserOut)
-def admin_get_user(user_id: int, db: Session = Depends(get_db)):
+def admin_get_user(user_id: UUID, db: Session = Depends(get_db)):
     user = crud_user.get_user(db=db, user_id=user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
@@ -49,14 +50,14 @@ def admin_create_user(user_in: AdminUserCreate, db: Session = Depends(get_db)):
     return crud_user.create_user_by_admin(db=db, user_in=user_in)
 
 @router.put("/users/{user_id}", response_model=UserOut)
-def admin_update_user(user_id: int, user_in: AdminUserUpdate, db: Session = Depends(get_db)):
+def admin_update_user(user_id: UUID, user_in: AdminUserUpdate, db: Session = Depends(get_db)):
     user_db = crud_user.get_user(db, user_id)
     if not user_db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
     return crud_user.update_user_by_admin(db=db, db_user_to_update=user_db, user_in=user_in)
 
 @router.delete("/users/{user_id}", response_model=UserOut)
-def admin_delete_user(user_id: int, db: Session = Depends(get_db)):
+def admin_delete_user(user_id: UUID, db: Session = Depends(get_db)):
     user_db = crud_user.get_user(db, user_id)
     if not user_db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")

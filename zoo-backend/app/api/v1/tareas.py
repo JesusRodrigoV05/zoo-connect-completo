@@ -1,4 +1,5 @@
 from typing import Annotated, List
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from datetime import date
@@ -22,25 +23,25 @@ router = APIRouter()
 
 #HELPERS
 
-def _get_tipo_tarea_or_404(id: int, db: Session = Depends(get_db)) -> models_tarea.TipoTarea:
+def _get_tipo_tarea_or_404(id: UUID, db: Session = Depends(get_db)) -> models_tarea.TipoTarea:
     db_obj = crud_tarea.get_tipo_tarea(db, id)
     if not db_obj:
         raise HTTPException(status_code=404, detail="Tipo de tarea no encontrado")
     return db_obj
 
-def _get_tarea_recurrente_or_404(id: int, db: Session = Depends(get_db)) -> models_tarea.TareaRecurrente:
+def _get_tarea_recurrente_or_404(id: UUID, db: Session = Depends(get_db)) -> models_tarea.TareaRecurrente:
     db_obj = crud_tarea.get_tarea_recurrente(db, id)
     if not db_obj:
         raise HTTPException(status_code=404, detail="Plantilla de tarea recurrente no encontrada")
     return db_obj
 
-def _get_tarea_or_404(id_tarea: int, db: Session = Depends(get_db)) -> models_tarea.Tarea:
+def _get_tarea_or_404(id_tarea: UUID, db: Session = Depends(get_db)) -> models_tarea.Tarea:
     db_obj = crud_tarea.get_tarea(db, id_tarea)
     if not db_obj:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return db_obj
 
-def _get_cuidador_or_404(id_usuario: int, db: Session = Depends(get_db)) -> User:
+def _get_cuidador_or_404(id_usuario: UUID, db: Session = Depends(get_db)) -> User:
     db_user = crud_user.get_user(db, id_usuario)
     if not db_user:
         raise HTTPException(status_code=404, detail="Usuario a asignar no encontrado")
@@ -72,7 +73,7 @@ def list_tipos_tarea_all(
 
 @router.put("/tipos/{id}", response_model=schemas_tarea.TipoTareaOut, dependencies=[Depends(require_admin_user)])
 def update_tipo_tarea(
-    id: int,
+    id: UUID,
     tipo_tarea_in: schemas_tarea.TipoTareaUpdate,
     db_obj: models_tarea.TipoTarea = Depends(_get_tipo_tarea_or_404),
     db: Session = Depends(get_db),
@@ -112,7 +113,7 @@ def get_tarea_recurrente(
 
 @router.put("/recurrentes/{id}", response_model=schemas_tarea.TareaRecurrenteOut, dependencies=[Depends(require_admin_user)])
 def update_tarea_recurrente(
-    id: int,
+    id: UUID,
     tarea_in: schemas_tarea.TareaRecurrenteUpdate,
     db_obj: models_tarea.TareaRecurrente = Depends(_get_tarea_recurrente_or_404),
     db: Session = Depends(get_db),
@@ -215,7 +216,7 @@ def completar_tarea_alimentacion(
 
 @router.post("/{id_tarea}/completar-tratamiento", response_model=schemas_tarea.TareaOut)
 def complete_task_tratamiento(
-    id_tarea: int,
+    id_tarea: UUID,
     payload: schemas_tarea.TareaTratamientoCompletar,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)

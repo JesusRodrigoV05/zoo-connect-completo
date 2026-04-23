@@ -1,4 +1,5 @@
 from typing import Optional, List
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile, Form
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -38,7 +39,7 @@ def list_tipos_atencion(
 
 @router.put("/tipos-atencion/{id}", response_model=schemas_vet.TipoAtencionOut)
 def update_tipo_atencion(
-    id: int,
+    id: UUID,
     obj_in: schemas_vet.TipoAtencionUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
@@ -47,7 +48,7 @@ def update_tipo_atencion(
 
 @router.delete("/tipos-atencion/{id}", response_model=schemas_vet.TipoAtencionOut)
 def delete_tipo_atencion(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
 ):
@@ -73,7 +74,7 @@ def list_tipos_examen(
 
 @router.put("/tipos-examen/{id}", response_model=schemas_vet.TipoExamenOut)
 def update_tipo_examen(
-    id: int,
+    id: UUID,
     obj_in: schemas_vet.TipoExamenUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
@@ -82,7 +83,7 @@ def update_tipo_examen(
 
 @router.delete("/tipos-examen/{id}", response_model=schemas_vet.TipoExamenOut)
 def delete_tipo_examen(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
 ):
@@ -100,7 +101,7 @@ def create_historial(
 
 @router.get("/historiales", response_model=Page[schemas_vet.HistorialMedicoOut])
 def list_historiales(
-    animal_id: Optional[int] = None,
+    animal_id: Optional[UUID] = None,
     estado: Optional[bool] = None,
     solo_mis_registros: bool = False,
     db: Session = Depends(get_db),
@@ -112,7 +113,7 @@ def list_historiales(
 
 @router.get("/historiales/{id}", response_model=schemas_vet.HistorialMedicoOut)
 def get_historial(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -123,7 +124,7 @@ def get_historial(
 
 @router.put("/historiales/{id}", response_model=schemas_vet.HistorialMedicoOut)
 def update_historial(
-    id: int,
+    id: UUID,
     historial_in: schemas_vet.HistorialMedicoUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
@@ -142,7 +143,7 @@ def update_historial(
 
 @router.post("/historiales/{id_historial}/procedimientos", response_model=schemas_vet.ProcedimientoOut, status_code=201)
 def create_procedimiento(
-    id_historial: int,
+    id_historial: UUID,
     proc_in: schemas_vet.ProcedimientoCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
@@ -151,7 +152,7 @@ def create_procedimiento(
 
 @router.put("/procedimientos/{id}", response_model=schemas_vet.ProcedimientoOut)
 def update_procedimiento(
-    id: int,
+    id: UUID,
     proc_in: schemas_vet.ProcedimientoUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
@@ -160,7 +161,7 @@ def update_procedimiento(
 
 @router.delete("/procedimientos/{id}")
 def delete_procedimiento(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -169,7 +170,7 @@ def delete_procedimiento(
 @router.get("/procedimientos", response_model=Page[schemas_vet.ProcedimientoOut])
 def list_procedimientos(
     estado: Optional[str] = None,
-    animal_id: Optional[int] = None,
+    animal_id: Optional[UUID] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -188,9 +189,9 @@ def list_procedimientos(
 #RECETAS
 @router.get("/recetas", response_model=Page[schemas_vet.RecetaMedicaOut])
 def list_recetas(
-    animal_id: Optional[int] = None,
-    usuario_asignado_id: Optional[int] = None,
-    producto_id: Optional[int] = None,
+    animal_id: Optional[UUID] = None,
+    usuario_asignado_id: Optional[UUID] = None,
+    producto_id: Optional[UUID] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -210,7 +211,7 @@ def list_recetas(
 
 @router.get("/recetas/{id}", response_model=schemas_vet.RecetaMedicaOut)
 def get_receta(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -221,7 +222,7 @@ def get_receta(
 
 @router.post("/historiales/{id_historial}/recetas", response_model=schemas_vet.RecetaMedicaOut, status_code=201)
 def create_receta_medica(
-    id_historial: int,
+    id_historial: UUID,
     receta_in: schemas_vet.RecetaMedicaCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
@@ -230,7 +231,7 @@ def create_receta_medica(
 
 @router.delete("/recetas/{id}")
 def delete_receta_medica(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
 ):
@@ -241,8 +242,8 @@ def delete_receta_medica(
 @router.get("/ordenes-examen", response_model=Page[schemas_vet.OrdenExamenOut])
 def list_ordenes_examen(
     estado: Optional[str] = None,
-    animal_id: Optional[int] = None,
-    tipo_examen_id: Optional[int] = None,
+    animal_id: Optional[UUID] = None,
+    tipo_examen_id: Optional[UUID] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -263,7 +264,7 @@ def list_ordenes_examen(
 
 @router.get("/ordenes-examen/{id}", response_model=schemas_vet.OrdenExamenOut)
 def get_orden_examen(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -274,7 +275,7 @@ def get_orden_examen(
 
 @router.post("/historiales/{id_historial}/ordenes-examen", response_model=schemas_vet.OrdenExamenOut, status_code=201)
 def create_orden_examen(
-    id_historial: int,
+    id_historial: UUID,
     orden_in: schemas_vet.OrdenExamenCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
@@ -283,7 +284,7 @@ def create_orden_examen(
 
 @router.delete("/ordenes-examen/{id}")
 def delete_orden_examen(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
 ):
@@ -292,7 +293,7 @@ def delete_orden_examen(
 #RESULTADOS
 @router.get("/resultados-examen", response_model=Page[schemas_vet.ResultadoExamenOut])
 def list_resultados_examen(
-    orden_id: Optional[int] = None,
+    orden_id: Optional[UUID] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -307,7 +308,7 @@ def list_resultados_examen(
 
 @router.get("/resultados-examen/{id}", response_model=schemas_vet.ResultadoExamenOut)
 def get_resultado_examen(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -318,7 +319,7 @@ def get_resultado_examen(
 
 @router.post("/ordenes-examen/{id_orden}/resultados", response_model=schemas_vet.ResultadoExamenOut, status_code=201)
 def upload_resultado_examen(
-    id_orden: int,
+    id_orden: UUID,
     conclusiones: Optional[str] = Form(None), 
     file: UploadFile = File(..., description="Archivo de evidencia"),
     db: Session = Depends(get_db),
@@ -356,7 +357,7 @@ def upload_resultado_examen(
 
 @router.delete("/resultados-examen/{id}")
 def delete_resultado_examen(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_veterinario)
 ):

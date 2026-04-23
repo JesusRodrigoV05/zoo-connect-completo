@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from app.db.session import get_db
 from app.core.dependencies import get_current_active_user
@@ -22,7 +23,7 @@ def add_favorite(favorite_in: AnimalFavoritoCreate, db: Session = Depends(get_db
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 @router.delete("/favorites/{animal_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Usuario - Favoritos"])
-def remove_favorite(animal_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+def remove_favorite(animal_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     success = crud_animal.remove_animal_from_favorites(
         db, user_id=current_user.id, animal_id=animal_id
     )

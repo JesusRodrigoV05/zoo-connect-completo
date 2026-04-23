@@ -1,14 +1,16 @@
+import uuid
 from sqlalchemy import (
-    Column, Integer, String, Text, Boolean, DateTime, 
-    ForeignKey, Numeric, func, CheckConstraint
+    Column, String, Text, Boolean, DateTime, 
+    ForeignKey, Numeric, func, CheckConstraint, Integer
 )
 from sqlalchemy.orm import relationship, validates
+from sqlalchemy.dialects.postgresql import UUID
 from app.db.base import Base
 
 class TipoAtencion(Base):
     __tablename__ = "tipo_atencion"
 
-    id_tipo_atencion = Column(Integer, primary_key=True, index=True)
+    id_tipo_atencion = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_tipo_atencion = Column(String(100), nullable=False, unique=True)
     descripcion = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -18,7 +20,7 @@ class TipoAtencion(Base):
 class TipoExamen(Base):
     __tablename__ = "tipo_examen"
 
-    id_tipo_examen = Column(Integer, primary_key=True, index=True)
+    id_tipo_examen = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_tipo_examen = Column(String(100), nullable=False, unique=True)
     descripcion = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -29,11 +31,11 @@ class TipoExamen(Base):
 class HistorialMedico(Base):
     __tablename__ = "historial_medico"
 
-    id_historial = Column(Integer, primary_key=True, index=True)
+    id_historial = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     
-    animal_id = Column(Integer, ForeignKey("animals.id_animal"), nullable=False, index=True)
-    veterinario_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    tipo_atencion_id = Column(Integer, ForeignKey("tipo_atencion.id_tipo_atencion"), nullable=False)
+    animal_id = Column(UUID(as_uuid=True), ForeignKey("animals.id_animal"), nullable=False, index=True)
+    veterinario_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    tipo_atencion_id = Column(UUID(as_uuid=True), ForeignKey("tipo_atencion.id_tipo_atencion"), nullable=False)
 
     fecha_atencion = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
@@ -64,9 +66,9 @@ class HistorialMedico(Base):
 class OrdenExamen(Base):
     __tablename__ = "orden_examen"
 
-    id_orden = Column(Integer, primary_key=True, index=True)
-    historial_medico_id = Column(Integer, ForeignKey("historial_medico.id_historial"), nullable=False)
-    tipo_examen_id = Column(Integer, ForeignKey("tipo_examen.id_tipo_examen"), nullable=False)
+    id_orden = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    historial_medico_id = Column(UUID(as_uuid=True), ForeignKey("historial_medico.id_historial"), nullable=False)
+    tipo_examen_id = Column(UUID(as_uuid=True), ForeignKey("tipo_examen.id_tipo_examen"), nullable=False)
     
     instrucciones = Column(Text, nullable=True)
     estado = Column(String(20), default="Solicitado", nullable=False) #"Solicitado", "Completado", "Cancelado"
@@ -82,8 +84,8 @@ class OrdenExamen(Base):
 class ResultadoExamen(Base):
     __tablename__ = "resultado_examen"
 
-    id_resultado = Column(Integer, primary_key=True, index=True)
-    orden_examen_id = Column(Integer, ForeignKey("orden_examen.id_orden"), nullable=False)
+    id_resultado = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    orden_examen_id = Column(UUID(as_uuid=True), ForeignKey("orden_examen.id_orden"), nullable=False)
     
     fecha_resultado = Column(DateTime(timezone=True), server_default=func.now())
     conclusiones = Column(Text, nullable=True)
@@ -96,11 +98,11 @@ class ResultadoExamen(Base):
 class RecetaMedica(Base):
     __tablename__ = "receta_medica"
 
-    id_receta = Column(Integer, primary_key=True, index=True)
-    historial_medico_id = Column(Integer, ForeignKey("historial_medico.id_historial"), nullable=False)
+    id_receta = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    historial_medico_id = Column(UUID(as_uuid=True), ForeignKey("historial_medico.id_historial"), nullable=False)
     
-    producto_id = Column(Integer, ForeignKey("productos.id_producto"), nullable=False)
-    unidad_medida_id = Column(Integer, ForeignKey("unidad_medida.id_unidad"), nullable=True)
+    producto_id = Column(UUID(as_uuid=True), ForeignKey("productos.id_producto"), nullable=False)
+    unidad_medida_id = Column(UUID(as_uuid=True), ForeignKey("unidad_medida.id_unidad"), nullable=True)
     
     dosis = Column(Numeric(10, 2), nullable=False)
     frecuencia = Column(String(100), nullable=False)
@@ -111,7 +113,7 @@ class RecetaMedica(Base):
     generar_tarea_automatica = Column(Boolean, default=False, nullable=False)
     frecuencia_cron = Column(String(100), nullable=True)
     
-    usuario_asignado_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    usuario_asignado_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
@@ -137,8 +139,8 @@ class RecetaMedica(Base):
 class ProcedimientoMedico(Base):
     __tablename__ = "procedimiento_medico"
 
-    id_procedimiento = Column(Integer, primary_key=True, index=True)
-    historial_medico_id = Column(Integer, ForeignKey("historial_medico.id_historial"), nullable=False)
+    id_procedimiento = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    historial_medico_id = Column(UUID(as_uuid=True), ForeignKey("historial_medico.id_historial"), nullable=False)
     
     nombre = Column(String(150), nullable=False)
     descripcion = Column(Text, nullable=True)

@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Query
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -17,7 +18,7 @@ router = APIRouter()
 
 # helpers
 def _get_tipo_producto_or_404(
-    id: int, db: Session = Depends(get_db)
+    id: UUID, db: Session = Depends(get_db)
 ) -> models_inv.TipoProducto:
     db_obj = inventario.get_tipo_producto(db, id)
     if not db_obj:
@@ -26,7 +27,7 @@ def _get_tipo_producto_or_404(
 
 
 def _get_unidad_medida_or_404(
-    id: int, db: Session = Depends(get_db)
+    id: UUID, db: Session = Depends(get_db)
 ) -> models_inv.UnidadMedida:
     db_obj = inventario.get_unidad_medida(db, id)
     if not db_obj:
@@ -35,7 +36,7 @@ def _get_unidad_medida_or_404(
 
 
 def _get_proveedor_or_404(
-    id: int, db: Session = Depends(get_db)
+    id: UUID, db: Session = Depends(get_db)
 ) -> models_inv.Proveedor:
     db_obj = inventario.get_proveedor(db, id)
     if not db_obj:
@@ -43,7 +44,7 @@ def _get_proveedor_or_404(
     return db_obj
 
 
-def _get_producto_or_404(id: int, db: Session = Depends(get_db)) -> models_inv.Producto:
+def _get_producto_or_404(id: UUID, db: Session = Depends(get_db)) -> models_inv.Producto:
     db_obj = inventario.get_producto(db, id)
     if not db_obj:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
@@ -104,7 +105,7 @@ def get_tipo_producto(
     dependencies=[Depends(require_admin_user)],
 )
 def update_tipo_producto(
-    id: int,
+    id: UUID,
     tipo_producto_in: schemas_inv.TipoProductoUpdate,
     db_obj: models_inv.TipoProducto = Depends(_get_tipo_producto_or_404),
     db: Session = Depends(get_db),
@@ -170,7 +171,7 @@ def get_unidad_medida(
     dependencies=[Depends(require_admin_user)],
 )
 def update_unidad_medida(
-    id: int,
+    id: UUID,
     unidad_in: schemas_inv.UnidadMedidaUpdate,
     db_obj: models_inv.UnidadMedida = Depends(_get_unidad_medida_or_404),
     db: Session = Depends(get_db),
@@ -236,7 +237,7 @@ def get_proveedor(
     dependencies=[Depends(require_admin_user)],
 )
 def update_proveedor(
-    id: int,
+    id: UUID,
     proveedor_in: schemas_inv.ProveedorUpdate,
     db_obj: models_inv.Proveedor = Depends(_get_proveedor_or_404),
     db: Session = Depends(get_db),
@@ -315,7 +316,7 @@ def create_producto(
 @router.get("/productos", response_model=Page[schemas_inv.ProductoOut], dependencies=[Depends(require_inventory_read_permission)])
 def list_productos(
     include_inactive: bool = False,
-    tipo_producto_id: Optional[int] = Query(None, description="Filtrar por ID de tipo de producto"),
+    tipo_producto_id: Optional[UUID] = Query(None, description="Filtrar por ID de tipo de producto"),
     nombre: Optional[str] = Query(None, description="Buscar por nombre del producto"),
     db: Session = Depends(get_db),
 ):
@@ -344,7 +345,7 @@ def get_producto(
     dependencies=[Depends(require_admin_user)],
 )
 def update_producto(
-    id: int,
+    id: UUID,
     producto_in: schemas_inv.ProductoUpdate,
     db_obj: models_inv.Producto = Depends(_get_producto_or_404),
     db: Session = Depends(get_db),
@@ -358,7 +359,7 @@ def update_producto(
     dependencies=[Depends(require_admin_user)],
 )
 def update_producto_imagen(
-    id: int,
+    id: UUID,
     db_obj: models_inv.Producto = Depends(_get_producto_or_404),
     file: UploadFile = File(
         ..., description="La nueva imagen para reemplazar la anterior"
@@ -419,7 +420,7 @@ def soft_delete_producto(
     dependencies=[Depends(require_admin_user)],
 )
 def delete_producto_imagen(
-    id: int,
+    id: UUID,
     db_obj: models_inv.Producto = Depends(_get_producto_or_404),
     db: Session = Depends(get_db),
 ):

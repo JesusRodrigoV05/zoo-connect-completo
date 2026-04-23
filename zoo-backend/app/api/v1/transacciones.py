@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from uuid import UUID
 from sqlalchemy.orm import Session
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -68,7 +69,7 @@ def create_salida_inventario_endpoint(
 
 @router.get("/salidas/{id}", response_model=schemas_tra.SalidaOut)
 def get_salida_inventario_endpoint(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):
@@ -101,7 +102,7 @@ def list_productos_con_stock_bajo(
 
 #TIPOS SALIDAS
 def _get_tipo_salida_or_404(
-    id: int, db: Session = Depends(get_db)
+    id: UUID, db: Session = Depends(get_db)
 ) -> models_inv.TipoSalida:
     db_obj = crud_transacciones.get_tipo_salida(db, id)
     if not db_obj:
@@ -125,7 +126,7 @@ def list_tipos_salida(
 
 @router.put("/tipos-salida/{id}", response_model=schemas_tra.TipoSalidaOut, dependencies=[Depends(require_admin_user)])
 def update_tipo_salida(
-    id: int,
+    id: UUID,
     tipo_in: schemas_tra.TipoSalidaUpdate,
     db_obj: models_inv.TipoSalida = Depends(_get_tipo_salida_or_404),
     db: Session = Depends(get_db),

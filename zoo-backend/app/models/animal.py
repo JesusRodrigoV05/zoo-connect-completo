@@ -1,5 +1,7 @@
+import uuid
 from datetime import date
 from sqlalchemy import CheckConstraint, Column, Integer, String, Text, Boolean, Date, DateTime, ForeignKey, Enum as SQLAlchemyEnum, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 
@@ -11,7 +13,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 class Especie(Base):
     __tablename__ = "especies"
 
-    id_especie = Column(Integer, primary_key=True)
+    id_especie = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre_cientifico = Column(String(100), nullable=False, unique=True, index=True)
     nombre_especie = Column("nombre", String(100), nullable=False)
     filo = Column(String(100), nullable=False)
@@ -38,7 +40,7 @@ class Especie(Base):
 class Habitat(Base):
     __tablename__ = "habitats"
 
-    id_habitat = Column(Integer, primary_key=True, index=True)
+    id_habitat = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_habitat = Column(String(50), nullable=False)
     tipo_habitat = Column(String(80), nullable=False)
     descripcion_habitat = Column(Text, nullable=False)
@@ -64,15 +66,15 @@ class Habitat(Base):
 class Animal(Base):
     __tablename__ = "animals"
 
-    id_animal = Column(Integer, primary_key=True)
+    id_animal = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre_animal = Column(String(100), nullable=False, index=True)
-    especie_id = Column("especies_id_especie", Integer, ForeignKey("especies.id_especie"), nullable=False)
+    especie_id = Column("especies_id_especie", UUID(as_uuid=True), ForeignKey("especies.id_especie"), nullable=False)
     genero = Column(Boolean, nullable=False) # True: Macho, False: Hembra
     fecha_nacimiento = Column(Date, nullable=True)
     fecha_ingreso = Column(Date, nullable=True)
     procedencia_animal = Column(String(300), nullable=False)
     estado_operativo = Column("estado_operativo", SQLAlchemyEnum(AnimalState), nullable=False)
-    habitat_id = Column("habitats_id_habitat", Integer, ForeignKey("habitats.id_habitat"), nullable=False)
+    habitat_id = Column("habitats_id_habitat", UUID(as_uuid=True), ForeignKey("habitats.id_habitat"), nullable=False)
     es_publico = Column(Boolean, nullable=False, default=True)
     descripcion = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -118,8 +120,8 @@ class Animal(Base):
 class MediaAnimal(Base):
     __tablename__ = "media_animal"
 
-    id_media_animal = Column(Integer, primary_key=True, autoincrement=True)
-    animal_id = Column("animals_id_animal", Integer, ForeignKey("animals.id_animal"), nullable=False)
+    id_media_animal = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    animal_id = Column("animals_id_animal", UUID(as_uuid=True), ForeignKey("animals.id_animal"), nullable=False)
     tipo_medio = Column(Boolean, nullable=False)#1 imagen 0 video
     url_animal = Column(String(2048), nullable=False)
     public_id = Column(String(100), nullable=True)
@@ -131,8 +133,8 @@ class MediaAnimal(Base):
 class MediaHabitat(Base):
     __tablename__ = "media_habitats"
 
-    id_media_habitat = Column(Integer, primary_key=True, autoincrement=True)
-    habitat_id = Column("habitats_id_habitat", Integer, ForeignKey("habitats.id_habitat"), nullable=False)
+    id_media_habitat = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    habitat_id = Column("habitats_id_habitat", UUID(as_uuid=True), ForeignKey("habitats.id_habitat"), nullable=False)
     url_habitat = Column(String(2048), nullable=False)
     public_id = Column(String(100), nullable=True)
     titulo_media_habitat = Column(String(150), nullable=False)
@@ -143,11 +145,11 @@ class MediaHabitat(Base):
 class AnimalFavorito(Base):
     __tablename__ = "animalfavorito"
 
-    id_animal_favorito = Column("id_animal_favorito", Integer, primary_key=True, autoincrement=True)
+    id_animal_favorito = Column("id_animal_favorito", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     fecha_guardado = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     
-    animal_id = Column(Integer, ForeignKey("animals.id_animal"), nullable=False)
+    animal_id = Column(UUID(as_uuid=True), ForeignKey("animals.id_animal"), nullable=False)
 
     usuario = relationship("User", back_populates="favorited_by_users")
     animal = relationship("Animal", back_populates="favorited_by_users")

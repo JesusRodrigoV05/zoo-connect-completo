@@ -1,17 +1,33 @@
-from pydantic import BaseModel, Field, constr
-from typing import Annotated, List
+from pydantic import BaseModel
+from uuid import UUID
+from typing import List, Optional
+from datetime import datetime
+
+class TwoFactorBase(BaseModel):
+    user_id: UUID
+
+class TwoFactorOut(TwoFactorBase):
+    id: UUID
+    user_id: UUID
+    code: str
+    created_at: datetime
+    is_used: bool
+
+    class Config:
+        from_attributes = True
 
 class TOTPSetupResponse(BaseModel):
     secret: str
-    otpauth_uri: str
+    uri: str
 
-TOTPCode = Annotated[str, Field(strip_whitespace=True, pattern=r'^[0-9]{6}$', min_length=6, max_length=6)]
+class VerifyTOTP(BaseModel):
+    code: str
 
-class TOTPVerifyRequest(BaseModel):
-    totp_code: TOTPCode
-    
 class TOTPBackupCodesResponse(BaseModel):
     backup_codes: List[str]
 
 class TOTPDisableRequest(BaseModel):
-    password: str
+    code: str
+
+# Aliases para compatibilidad con el código existente
+TOTPVerifyRequest = VerifyTOTP

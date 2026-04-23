@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List
 from datetime import date, datetime
 from app.core.enums import AnimalState
+from uuid import UUID
 
 
 class MediaBaseAnimal(BaseModel):
@@ -14,7 +15,7 @@ class MediaCreateAnimal(MediaBaseAnimal):
     pass
 
 class MediaOutAnimal(MediaBaseAnimal):
-    id_media_animal: int
+    id_media_animal: UUID
     public_id: Optional[str] = None
     class Config:
         from_attributes = True
@@ -29,7 +30,7 @@ class MediaCreateHabitat(MediaBaseHabitat):
     pass
 
 class MediaOutHabitat(MediaBaseHabitat):
-    id_media_habitat: int
+    id_media_habitat: UUID
     public_id: Optional[str] = None
     class Config:
         from_attributes = True
@@ -58,7 +59,7 @@ class EspecieUpdate(BaseModel):
     is_active: bool
 
 class EspecieOut(EspecieBase):
-    id_especie: int
+    id_especie: UUID
     is_active: bool
 
     class Config:
@@ -82,7 +83,7 @@ class HabitatUpdate(BaseModel):
     is_active: bool
 
 class HabitatOut(HabitatBase):
-    id_habitat: int
+    id_habitat: UUID
     is_active: bool
 
     class Config:
@@ -100,8 +101,8 @@ class AnimalBase(BaseModel):
     descripcion: str
 
 class AnimalCreate(AnimalBase):
-    especie_id: int
-    habitat_id: int
+    especie_id: UUID
+    habitat_id: UUID
     #prueba
     @model_validator(mode='after')
     def check_dates(self) -> 'AnimalCreate':
@@ -119,11 +120,11 @@ class AnimalUpdate(BaseModel):
     estado_operativo: Optional[AnimalState] = None
     es_publico: Optional[bool] = None
     descripcion: Optional[str] = None
-    especie_id: Optional[int] = None
-    habitat_id: Optional[int] = None
+    especie_id: Optional[UUID] = None
+    habitat_id: Optional[UUID] = None
 
 class AnimalOut(AnimalBase):
-    id_animal: int
+    id_animal: UUID
     especie: EspecieOut
     habitat: HabitatOut
     media: List[MediaOutAnimal] = []
@@ -134,10 +135,10 @@ class AnimalOut(AnimalBase):
 
 
 class AnimalFavoritoCreate(BaseModel):
-    animal_id: int
+    animal_id: UUID
 
 class AnimalFavoritoOut(BaseModel):
-    id_animal_favorito: int
+    id_animal_favorito: UUID
     fecha_guardado: datetime
     animal: AnimalOut 
 

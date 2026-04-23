@@ -1,9 +1,10 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 class AuditLogUser(BaseModel):
-    id: int
+    id: UUID
     username: str
     email: EmailStr
 
@@ -11,7 +12,7 @@ class AuditLogUser(BaseModel):
         from_attributes = True
 
 class AuditLogOut(BaseModel):
-    id: int
+    id: UUID
     event: str
     timestamp: datetime
     attempted_email: Optional[str] = None

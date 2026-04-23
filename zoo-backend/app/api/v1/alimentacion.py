@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
+from uuid import UUID
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 
@@ -16,13 +17,13 @@ router = APIRouter()
 
 #HELPERS
 
-def _get_dieta_or_404(id: int, db: Session = Depends(get_db)) -> models_tarea.Dieta:
+def _get_dieta_or_404(id: UUID, db: Session = Depends(get_db)) -> models_tarea.Dieta:
     db_obj = crud_dieta.get_dieta(db, id)
     if not db_obj:
         raise HTTPException(status_code=404, detail="Dieta no encontrada")
     return db_obj
 
-def _get_tarea_local_or_404(id_tarea: int, db: Session = Depends(get_db)) -> models_tarea.Tarea:
+def _get_tarea_local_or_404(id_tarea: UUID, db: Session = Depends(get_db)) -> models_tarea.Tarea:
     db_obj = crud_tarea.get_tarea(db, id_tarea)
     if not db_obj:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
@@ -52,7 +53,7 @@ def get_dieta(
 
 @router.put("/dietas/{id}", response_model=schemas_dieta.DietaOut, dependencies=[Depends(require_admin_user := require_animal_management_permission)]) 
 def update_dieta(
-    id: int,
+    id: UUID,
     dieta_in: schemas_dieta.DietaUpdate,
     db_obj: models_tarea.Dieta = Depends(_get_dieta_or_404),
     db: Session = Depends(get_db),
@@ -71,7 +72,7 @@ def soft_delete_dieta(
 #SUGERENCIAS
 @router.get("/{id_tarea}/sugerencia-dieta", response_model=schemas_dieta.DietaOut)
 def get_sugerencia_dieta_para_tarea(
-    id_tarea: int,
+    id_tarea: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):

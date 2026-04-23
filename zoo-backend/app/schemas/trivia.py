@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
 class TriviaBase(BaseModel):
     fecha_trivia: datetime
@@ -11,21 +12,18 @@ class TriviaCreate(TriviaBase):
     pass
 
 class TriviaOut(TriviaBase):
-    id_trivia: int
-    usuario_id: int
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
+    id_trivia: UUID
+    usuario_id: UUID
 
 class ParticipacionTriviaCreate(BaseModel):
-    trivia_id: int
+    trivia_id: UUID
     aciertos: int
 
 class ParticipacionTriviaOut(BaseModel):
-    id_participacion_trivia: int
-    usuario_id: int
+    model_config = ConfigDict(from_attributes=True)
+    id_participacion_trivia: UUID
+    usuario_id: UUID
     aciertos: int
     fecha_trivia: datetime
-    trivia_id: int
-    class Config:
-        from_attributes = True
+    trivia_id: UUID

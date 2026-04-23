@@ -1,10 +1,12 @@
+import uuid
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, func, Text, Numeric, Date, CheckConstraint
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 class TipoProducto(Base):
     __tablename__ = "tipo_producto"
-    id_tipo_producto = Column(Integer, primary_key=True, index=True)
+    id_tipo_producto = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_tipo_producto = Column(String(100), nullable=False, unique=True)
     descripcion_tipo_producto = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -17,7 +19,7 @@ class TipoProducto(Base):
 
 class UnidadMedida(Base):
     __tablename__ = "unidad_medida"
-    id_unidad = Column(Integer, primary_key=True, index=True)
+    id_unidad = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_unidad = Column(String(100), nullable=False, unique=True)
     abreviatura = Column(String(20), nullable=False, unique=True)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -35,7 +37,7 @@ class UnidadMedida(Base):
 class Proveedor(Base):
     __tablename__ = "proveedores"
 
-    id_proveedor = Column(Integer, primary_key=True, index=True)
+    id_proveedor = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_proveedor = Column(String(100), nullable=False, unique=True)
     telefono_proveedor = Column(String(25), nullable=True)
     email_proveedor = Column(String(200), nullable=True, unique=True, index=True)
@@ -50,7 +52,7 @@ class Proveedor(Base):
 class Producto(Base):
     __tablename__ = "productos"
 
-    id_producto = Column(Integer, primary_key=True, index=True)
+    id_producto = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_producto = Column(String(200), nullable=False, unique=True)
     descripcion_producto = Column(Text, nullable=True)
 
@@ -61,8 +63,8 @@ class Producto(Base):
     stock_minimo = Column(Numeric(10, 2), default=0, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
 
-    tipo_producto_id = Column(Integer, ForeignKey("tipo_producto.id_tipo_producto"), nullable=False)
-    unidad_medida_id = Column(Integer, ForeignKey("unidad_medida.id_unidad"), nullable=False)
+    tipo_producto_id = Column(UUID(as_uuid=True), ForeignKey("tipo_producto.id_tipo_producto"), nullable=False)
+    unidad_medida_id = Column(UUID(as_uuid=True), ForeignKey("unidad_medida.id_unidad"), nullable=False)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -82,8 +84,8 @@ class Producto(Base):
 class StockLote(Base):
     __tablename__ = "stock_lote"
     
-    id_stocklote = Column(Integer, primary_key=True, index=True)
-    producto_id = Column(Integer, ForeignKey("productos.id_producto"), nullable=False, index=True)
+    id_stocklote = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    producto_id = Column(UUID(as_uuid=True), ForeignKey("productos.id_producto"), nullable=False, index=True)
     lote = Column(String(100), nullable=False, index=True)
     fecha_caducidad = Column(Date, nullable=False, index=True)
     cantidad_disponible = Column(Numeric(10, 2), nullable=False)
@@ -103,10 +105,10 @@ class EntradaInventario(Base):
 
     __tablename__ = "entradas_inventario"
 
-    id_entrada_inventario = Column(Integer, primary_key=True, index=True)
+    id_entrada_inventario = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     fecha_entrada = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    proveedor_id = Column(Integer, ForeignKey("proveedores.id_proveedor"), nullable=False)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    proveedor_id = Column(UUID(as_uuid=True), ForeignKey("proveedores.id_proveedor"), nullable=False)
 
     usuario = relationship("User", back_populates="entradas_inventario")
     proveedor = relationship("Proveedor", back_populates="entradas_inventario")
@@ -116,9 +118,9 @@ class EntradaInventario(Base):
 class DetalleEntrada(Base):
     __tablename__ = "detalle_entrada"
     
-    id_detalle_entrada = Column(Integer, primary_key=True, index=True)
-    entrada_id = Column(Integer, ForeignKey("entradas_inventario.id_entrada_inventario"), nullable=False)
-    producto_id = Column(Integer, ForeignKey("productos.id_producto"), nullable=False)
+    id_detalle_entrada = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    entrada_id = Column(UUID(as_uuid=True), ForeignKey("entradas_inventario.id_entrada_inventario"), nullable=False)
+    producto_id = Column(UUID(as_uuid=True), ForeignKey("productos.id_producto"), nullable=False)
     
     cantidad_entrada = Column(Numeric(10, 2), nullable=False)
     fecha_caducidad = Column(Date, nullable=False)
@@ -131,10 +133,10 @@ class DetalleEntrada(Base):
 class Salida(Base):
     __tablename__ = "salidas"
 
-    id_salida = Column(Integer, primary_key=True, index=True)
+    id_salida = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     fecha_salida = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    tipo_salida_id = Column(Integer, ForeignKey("tipo_salidas.id_tipo_salida"), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    tipo_salida_id = Column(UUID(as_uuid=True), ForeignKey("tipo_salidas.id_tipo_salida"), nullable=False)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
     usuario = relationship("User", back_populates="salidas_inventario")
     tipo_salida = relationship("TipoSalida", back_populates="salidas")
@@ -145,7 +147,7 @@ class TipoSalida(Base):
     __tablename__ = "tipo_salidas"
     #id 1 alimentacion
     #id 2 medicos
-    id_tipo_salida = Column(Integer, primary_key=True, index=True)
+    id_tipo_salida = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     nombre_tipo_salida = Column(String(100), nullable=False, unique=True)
     descripcion_tipo_salida = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -160,11 +162,11 @@ class TipoSalida(Base):
 class DetalleSalida(Base):
     __tablename__ = "detalle_salidas"
     
-    id_detalle_salida = Column(Integer, primary_key=True, index=True)
-    salida_id = Column(Integer, ForeignKey("salidas.id_salida"), nullable=False)
-    producto_id = Column(Integer, ForeignKey("productos.id_producto"), nullable=False)
-    animal_id = Column(Integer, ForeignKey("animals.id_animal"), nullable=True) 
-    habitat_id = Column(Integer, ForeignKey("habitats.id_habitat"), nullable=True)
+    id_detalle_salida = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    salida_id = Column(UUID(as_uuid=True), ForeignKey("salidas.id_salida"), nullable=False)
+    producto_id = Column(UUID(as_uuid=True), ForeignKey("productos.id_producto"), nullable=False)
+    animal_id = Column(UUID(as_uuid=True), ForeignKey("animals.id_animal"), nullable=True) 
+    habitat_id = Column(UUID(as_uuid=True), ForeignKey("habitats.id_habitat"), nullable=True)
 
     cantidad_salida = Column(Numeric(10, 2), nullable=False)
 

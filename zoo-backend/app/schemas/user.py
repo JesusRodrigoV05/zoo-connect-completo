@@ -1,10 +1,8 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from datetime import datetime
-#prueba validacion
-from pydantic import field_validator
+from uuid import UUID
 import re
-
 
 def validate_password_strength_func(v: str) -> str:
     if len(v) < 8:
@@ -14,7 +12,7 @@ def validate_password_strength_func(v: str) -> str:
     if not re.search(r"[0-9]", v):
         raise ValueError("La contraseña debe contener al menos un numero")
     return v
-#pydantic guardia seguridad de la api
+
 class UserBase(BaseModel):
     email: EmailStr
     username: str
@@ -27,7 +25,7 @@ class UserCreate(UserBase):
 
 class AdminUserCreate(UserBase):
     password: str
-    role_id: int
+    role_id: UUID
     is_active: Optional[bool] = True
     @field_validator('password')
     def validate_password_strength(cls, v: str) -> str:
@@ -36,7 +34,7 @@ class AdminUserCreate(UserBase):
 class AdminUserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     username: Optional[str] = None
-    role_id: Optional[int] = None
+    role_id: Optional[UUID] = None
     is_active: Optional[bool] = None
 
 class UserUpdateProfile(BaseModel):
@@ -45,26 +43,25 @@ class UserUpdateProfile(BaseModel):
     photo_url: Optional[str] = None
 
 class UserOut(BaseModel):
-    id: int
+    id: UUID
     email: EmailStr
     username: str
     is_active: bool
     is_admin: bool
-    role_id: int
+    role_id: UUID
     photo_url: Optional[str] = None 
     created_at: datetime 
 
     class Config:
         from_attributes = True
 
-#pagination
 class UserOutWithRole(BaseModel):
-    id: int
+    id: UUID
     email: EmailStr
     username: str
     is_active: bool
     is_admin: bool
-    role_id: int
+    role_id: UUID
     photo_url: Optional[str] = None 
     created_at: datetime 
 

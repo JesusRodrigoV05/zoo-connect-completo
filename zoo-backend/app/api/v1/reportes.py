@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query, Response, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import date
 from typing import Optional
+from uuid import UUID
 
 from app.db.session import get_db
 from app.models.user import User
@@ -38,7 +39,7 @@ def download_diario_operativo(
 
 @router.get("/fichas-clinicas/{historial_id}", response_class=Response)
 def download_ficha_clinica(
-    historial_id: int,
+    historial_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission)
 ):

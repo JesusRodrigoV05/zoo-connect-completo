@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing import List, Optional
 from datetime import datetime
 from decimal import Decimal
+from uuid import UUID
 
 from app.schemas.user import UserOut 
 from app.schemas.animal import AnimalOut
@@ -10,7 +11,7 @@ from app.schemas.inventario import ProductoOut, UnidadMedidaOut
 
 class CatalogoBase(BaseModel):
     descripcion: Optional[str] = None
-#TIPO ATENCION
+
 class TipoAtencionCreate(CatalogoBase):
     nombre_tipo_atencion: str
 
@@ -22,11 +23,10 @@ class TipoAtencionUpdate(BaseModel):
 class TipoAtencionOut(CatalogoBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_tipo_atencion: int
+    id_tipo_atencion: UUID
     nombre_tipo_atencion: str
     is_active: bool
 
-#TIPO EXAMEN
 class TipoExamenCreate(CatalogoBase):
     nombre_tipo_examen: str
 
@@ -38,11 +38,10 @@ class TipoExamenUpdate(BaseModel):
 class TipoExamenOut(CatalogoBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_tipo_examen: int
+    id_tipo_examen: UUID
     nombre_tipo_examen: str
     is_active: bool
 
-#RECETAS
 class RecetaMedicaBase(BaseModel):
     dosis: Decimal
     frecuencia: str
@@ -52,39 +51,33 @@ class RecetaMedicaBase(BaseModel):
     generar_tarea_automatica: bool = False
     frecuencia_cron: Optional[str] = None 
     
-    usuario_asignado_id: Optional[int] = None
-
-    @model_validator(mode='after')
-    def check_cron_logic(self):
-        return self
+    usuario_asignado_id: Optional[UUID] = None
 
 class RecetaMedicaCreate(RecetaMedicaBase):
-    producto_id: int
-    unidad_medida_id: Optional[int] = None
+    producto_id: UUID
+    unidad_medida_id: Optional[UUID] = None
 
 class RecetaMedicaUpdate(BaseModel):
-    producto_id: Optional[int] = None
-    unidad_medida_id: Optional[int] = None
+    producto_id: Optional[UUID] = None
+    unidad_medida_id: Optional[UUID] = None
     dosis: Optional[Decimal] = None
     frecuencia: Optional[str] = None
     duracion_dias: Optional[int] = None
     instrucciones_administracion: Optional[str] = None
     generar_tarea_automatica: Optional[bool] = None
     frecuencia_cron: Optional[str] = None
-    usuario_asignado_id: Optional[int] = None
+    usuario_asignado_id: Optional[UUID] = None
 
 class RecetaMedicaOut(RecetaMedicaBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_receta: int
+    id_receta: UUID
     created_at: datetime
     
     producto: ProductoOut
     unidad_medida: Optional[UnidadMedidaOut] = None
     usuario_asignado: Optional[UserOut] = None
 
-
-#PROCEDIMIENTO
 class ProcedimientoBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
@@ -102,11 +95,9 @@ class ProcedimientoUpdate(BaseModel):
 class ProcedimientoOut(ProcedimientoBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_procedimiento: int
+    id_procedimiento: UUID
     estado: str
 
-
-#EXAMENES
 class ResultadoExamenCreate(BaseModel):
     conclusiones: Optional[str] = None
 
@@ -116,33 +107,31 @@ class ResultadoExamenUpdate(BaseModel):
 class ResultadoExamenOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
-    id_resultado: int
+    id_resultado: UUID
     fecha_resultado: datetime
     conclusiones: Optional[str]
     archivo_url: str
-
 
 class OrdenExamenBase(BaseModel):
     instrucciones: Optional[str] = None
 
 class OrdenExamenCreate(OrdenExamenBase):
-    tipo_examen_id: int
+    tipo_examen_id: UUID
 
 class OrdenExamenUpdate(BaseModel):
     instrucciones: Optional[str] = None
-    estado: Optional[str] = None # Solicitado, Completado
+    estado: Optional[str] = None
 
 class OrdenExamenOut(OrdenExamenBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_orden: int
+    id_orden: UUID
     estado: str
     created_at: datetime
     
     tipo_examen: TipoExamenOut
     resultados: List[ResultadoExamenOut] = []
 
-#HISTORIAL MEDICO
 class HistorialMedicoBase(BaseModel):
     anamnesis: Optional[str] = None
     peso_actual: Optional[Decimal] = None
@@ -154,17 +143,17 @@ class HistorialMedicoBase(BaseModel):
     diagnostico_definitivo: Optional[str] = None
 
 class HistorialMedicoCreate(HistorialMedicoBase):
-    animal_id: int
-    tipo_atencion_id: int
+    animal_id: UUID
+    tipo_atencion_id: UUID
 
 class HistorialMedicoUpdate(HistorialMedicoBase):
-    estado: Optional[bool] = None # 1 Abierto, 0 Cerrado
-    tipo_atencion_id: Optional[int] = None
+    estado: Optional[bool] = None
+    tipo_atencion_id: Optional[UUID] = None
 
 class HistorialMedicoOut(HistorialMedicoBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id_historial: int
+    id_historial: UUID
     fecha_atencion: datetime
     estado: bool 
     

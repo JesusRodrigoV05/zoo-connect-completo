@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from uuid import UUID
 
 from fastapi import File, Form, UploadFile
 from app.core.uploader import upload_to_cloudinary, delete_from_cloudinary
@@ -36,21 +37,21 @@ def list_especies(db: Session = Depends(get_db)):
     return paginate(crud_animal.list_especies(db=db))
 
 @router.get("/species/{especie_id}", response_model=EspecieOut, tags=["Especies"])
-def get_especie(especie_id: int, db: Session = Depends(get_db)):
+def get_especie(especie_id: UUID, db: Session = Depends(get_db)):
     db_especie = crud_animal.get_especie(db, especie_id)
     if not db_especie:
         raise HTTPException(status_code=404, detail="Especie no encontrada")
     return db_especie
 
 @router.put("/species/{especie_id}", response_model=EspecieOut, tags=["Especies"], dependencies=[Depends(require_admin_user)])
-def update_especie(especie_id: int, especie_in: EspecieUpdate, db: Session = Depends(get_db)):
+def update_especie(especie_id: UUID, especie_in: EspecieUpdate, db: Session = Depends(get_db)):
     db_especie = crud_animal.get_especie(db, especie_id)
     if not db_especie:
         raise HTTPException(status_code=404, detail="Especie no encontrada")
     return crud_animal.update_especie(db, especie=db_especie, especie_in=especie_in)
 
 @router.delete("/species/{especie_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Especies"], dependencies=[Depends(require_admin_user)])
-def delete_especie(especie_id: int, db: Session = Depends(get_db)):
+def delete_especie(especie_id: UUID, db: Session = Depends(get_db)):
     deleted_especie = crud_animal.delete_especie(db, especie_id)
     if not deleted_especie:
         raise HTTPException(status_code=404, detail="Especie no encontrada")
@@ -70,21 +71,21 @@ def list_habitats(db: Session = Depends(get_db)):
     return paginate(crud_animal.list_habitats(db))
 
 @router.get("/habitats/{habitat_id}", response_model=HabitatOut, tags=["Habitats"])
-def get_habitat(habitat_id: int, db: Session = Depends(get_db)):
+def get_habitat(habitat_id: UUID, db: Session = Depends(get_db)):
     db_habitat = crud_animal.get_habitat(db, habitat_id)
     if not db_habitat:
         raise HTTPException(status_code=404, detail="Habitat no encontrado")
     return db_habitat
 
 @router.put("/habitats/{habitat_id}", response_model=HabitatOut, tags=["Habitats"], dependencies=[Depends(require_admin_user)])
-def update_habitat(habitat_id: int, habitat_in: HabitatUpdate, db: Session = Depends(get_db)):
+def update_habitat(habitat_id: UUID, habitat_in: HabitatUpdate, db: Session = Depends(get_db)):
     db_habitat = crud_animal.get_habitat(db, habitat_id)
     if not db_habitat:
         raise HTTPException(status_code=404, detail="Habitat no encontrado")
     return crud_animal.update_habitat(db, habitat=db_habitat, habitat_in=habitat_in)
 
 @router.delete("/habitats/{habitat_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Habitats"], dependencies=[Depends(require_admin_user)])
-def delete_habitat(habitat_id: int, db: Session = Depends(get_db)):
+def delete_habitat(habitat_id: UUID, db: Session = Depends(get_db)):
     deleted_habitat = crud_animal.delete_habitat(db, habitat_id)
     if not deleted_habitat:
         raise HTTPException(status_code=404, detail="Habitat no encontrado")
@@ -109,7 +110,7 @@ def list_animals(db: Session = Depends(get_db), current_user: Optional[User] = D
         return paginate(crud_animal.list_animals(db, es_publico=True))
 
 @router.get("/animals/{animal_id}", response_model=AnimalOut, tags=["Animales"])
-def get_animal(animal_id: int, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_active_user)):
+def get_animal(animal_id: UUID, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_active_user)):
     db_animal = crud_animal.get_animal(db, animal_id)
     if not db_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
@@ -123,7 +124,7 @@ def get_animal(animal_id: int, db: Session = Depends(get_db), current_user: Opti
     return db_animal
 
 @router.put("/animals/{animal_id}", response_model=AnimalOut, tags=["Animales"], dependencies=[Depends(require_animal_management_permission)])
-def update_animal(animal_id: int, animal_in: AnimalUpdate, db: Session = Depends(get_db)):
+def update_animal(animal_id: UUID, animal_in: AnimalUpdate, db: Session = Depends(get_db)):
     db_animal = crud_animal.get_animal(db, animal_id)
     if not db_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
@@ -133,7 +134,7 @@ def update_animal(animal_id: int, animal_in: AnimalUpdate, db: Session = Depends
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/animals/{animal_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Animales"], dependencies=[Depends(require_animal_management_permission)])
-def delete_animal(animal_id: int, db: Session = Depends(get_db)):
+def delete_animal(animal_id: UUID, db: Session = Depends(get_db)):
     deleted_animal = crud_animal.delete_animal(db, animal_id)
     if not deleted_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
@@ -143,7 +144,7 @@ def delete_animal(animal_id: int, db: Session = Depends(get_db)):
 
 @router.post("/animals/{animal_id}/media", response_model=MediaOutAnimal, tags=["Media"], status_code=status.HTTP_201_CREATED)
 def upload_animal_media(
-    animal_id: int,
+    animal_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_animal_management_permission),
     file: UploadFile = File(...),
@@ -179,7 +180,7 @@ def upload_animal_media(
     )
 
 @router.delete("/media/animal/{media_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Media"])
-def delete_animal_media_file(media_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_animal_management_permission)):
+def delete_animal_media_file(media_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(require_animal_management_permission)):
     db_media = crud_animal.get_media_animal(db, media_id) 
     if not db_media:
         raise HTTPException(status_code=404, detail="Archivo multimedia no encontrado")
@@ -192,7 +193,7 @@ def delete_animal_media_file(media_id: int, db: Session = Depends(get_db), curre
     return None
 
 @router.get("/animals/{animal_id}/media", response_model=Page[MediaOutAnimal], tags=["Media"])
-def get_all_media_for_animal(animal_id: int, db: Session = Depends(get_db)):
+def get_all_media_for_animal(animal_id: UUID, db: Session = Depends(get_db)):
     db_animal = crud_animal.get_animal(db, animal_id)
     if not db_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
@@ -206,7 +207,7 @@ def get_all_animal_media_files(db: Session = Depends(get_db), current_user: User
 #Media habitat
 @router.post("/habitats/{habitat_id}/media", response_model=MediaOutHabitat, tags=["Habitats", "Media"], status_code=status.HTTP_201_CREATED)
 def upload_habitat_media(
-    habitat_id: int,
+    habitat_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin_user),
     file: UploadFile = File(...),
@@ -238,7 +239,7 @@ def upload_habitat_media(
     )
 
 @router.delete("/media/habitat/{media_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Media"])
-def delete_habitat_media_file(media_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_admin_user)):
+def delete_habitat_media_file(media_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(require_admin_user)):
     db_media = crud_animal.get_media_habitat(db, media_id)
     if not db_media:
         raise HTTPException(status_code=404, detail="Archivo multimedia no encontrado")
@@ -250,7 +251,7 @@ def delete_habitat_media_file(media_id: int, db: Session = Depends(get_db), curr
     return None
 
 @router.get("/habitats/{habitat_id}/media", response_model=Page[MediaOutHabitat], tags=["Habitats", "Media"])
-def get_all_media_for_habitat(habitat_id: int, db: Session = Depends(get_db)):
+def get_all_media_for_habitat(habitat_id: UUID, db: Session = Depends(get_db)):
     db_habitat = crud_animal.get_habitat(db, habitat_id)
     if not db_habitat:
         raise HTTPException(status_code=404, detail="Habitat no encontrado")

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, model_validator
 from typing import Optional, List
 from datetime import datetime
+from uuid import UUID
 
 class OpcionEncuestaBase(BaseModel):
     texto_opcion: str
@@ -14,7 +15,7 @@ class OpcionEncuestaUpdate(BaseModel):
     orden: Optional[int] = None
 
 class OpcionEncuestaOut(OpcionEncuestaBase):
-    id_opcion: int
+    id_opcion: UUID
 
     class Config:
         from_attributes = True
@@ -34,7 +35,7 @@ class PreguntaEncuestaUpdate(BaseModel):
     orden: Optional[int] = None
 
 class PreguntaEncuestaOut(PreguntaEncuestaBase):
-    id_pregunta: int
+    id_pregunta: UUID
     opciones: List[OpcionEncuestaOut] = []
 
     class Config:
@@ -58,7 +59,7 @@ class EncuestaUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 class EncuestaOut(EncuestaBase):
-    id_encuesta: int
+    id_encuesta: UUID
     preguntas: List[PreguntaEncuestaOut] = []
 
     class Config:
@@ -67,12 +68,12 @@ class EncuestaOut(EncuestaBase):
 
 
 class RespuestaBase(BaseModel):
-    pregunta_id: int
-    opcion_id: Optional[int] = None
+    pregunta_id: UUID
+    opcion_id: Optional[UUID] = None
     respuesta_texto: Optional[str] = None
 
 class RespuestaCreate(RespuestaBase):
-    participacion_id: int
+    participacion_id: UUID
 
     @model_validator(mode='before')
     @classmethod
@@ -88,7 +89,7 @@ class RespuestaCreate(RespuestaBase):
         return data
 
 class RespuestaUpdate(BaseModel):
-    opcion_id: Optional[int] = None
+    opcion_id: Optional[UUID] = None
     respuesta_texto: Optional[str] = None
 
     @model_validator(mode='before')
@@ -101,15 +102,15 @@ class RespuestaUpdate(BaseModel):
         return data
 
 class RespuestaOut(RespuestaBase):
-    id_respuesta: int
-    participacion_id: int
+    id_respuesta: UUID
+    participacion_id: UUID
 
     class Config:
         from_attributes = True
 
 
 class ParticipacionBase(BaseModel):
-    encuesta_id: int
+    encuesta_id: UUID
 
 class ParticipacionCreate(ParticipacionBase):
     pass
@@ -118,8 +119,8 @@ class ParticipacionUpdate(BaseModel):
     completada: Optional[bool] = None
 
 class ParticipacionOut(ParticipacionBase):
-    id_participacion: int
-    usuario_id: int
+    id_participacion: UUID
+    usuario_id: UUID
     fecha_participacion: datetime
     completada: bool
     respuestas: List[RespuestaOut] = []

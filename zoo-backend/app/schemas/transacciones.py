@@ -1,26 +1,27 @@
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 from typing import List, Optional
 from datetime import datetime, date
 from decimal import Decimal
+from uuid import UUID
 from app.schemas.user import UserOut 
 from app.schemas.inventario import ProductoOut, ProveedorOut
 from app.schemas.animal import AnimalOut, HabitatOut
 
-#Schemas creacion
+# Schemas creacion
 class DetalleEntradaCreate(BaseModel):
-    producto_id: int
+    producto_id: UUID
     cantidad_entrada: Decimal
     fecha_caducidad: date
     lote: str
 
 class EntradaInventarioCreate(BaseModel):
-    proveedor_id: int
+    proveedor_id: UUID
     detalles: List[DetalleEntradaCreate] 
 
 class DetalleEntradaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id_detalle_entrada: int
-    producto_id: int
+    id_detalle_entrada: UUID
+    producto_id: UUID
     cantidad_entrada: Decimal
     fecha_caducidad: date
     lote: str
@@ -29,17 +30,17 @@ class DetalleEntradaOut(BaseModel):
 
 class EntradaInventarioOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id_entrada_inventario: int
+    id_entrada_inventario: UUID
     fecha_entrada: datetime
-    usuario_id: int
-    proveedor_id: int
+    usuario_id: UUID
+    proveedor_id: UUID
 
     usuario: UserOut
     proveedor: ProveedorOut
     detalles: List[DetalleEntradaOut]
 
 
-#tipo salidas
+# tipo salidas
 class TipoSalidaBase(BaseModel):
     nombre_tipo_salida: str
     descripcion_tipo_salida: Optional[str] = None
@@ -54,16 +55,16 @@ class TipoSalidaUpdate(BaseModel):
 
 class TipoSalidaOut(TipoSalidaBase):
     model_config = ConfigDict(from_attributes=True)
-    id_tipo_salida: int
+    id_tipo_salida: UUID
     nombre_tipo_salida: str
     is_active: bool
 
-#SALIDAS
+# SALIDAS
 class DetalleSalidaCreate(BaseModel):
-    producto_id: int
+    producto_id: UUID
     cantidad_salida: Decimal
-    animal_id: Optional[int] = None
-    habitat_id: Optional[int] = None
+    animal_id: Optional[UUID] = None
+    habitat_id: Optional[UUID] = None
 
     @model_validator(mode='after')
     def check_destiny(self):
@@ -74,14 +75,14 @@ class DetalleSalidaCreate(BaseModel):
         return self
 
 class SalidaInventarioCreate(BaseModel):
-    tipo_salida: int
+    tipo_salida: UUID
     detalles: List[DetalleSalidaCreate]
 
 
 class DetalleSalidaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
-    id_detalle_salida: int
+    id_detalle_salida: UUID
     cantidad_salida: Decimal
     producto: ProductoOut 
     animal: Optional[AnimalOut] = None
@@ -89,7 +90,7 @@ class DetalleSalidaOut(BaseModel):
 
 class SalidaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id_salida: int
+    id_salida: UUID
     fecha_salida: datetime
     
     tipo_salida: TipoSalidaOut
