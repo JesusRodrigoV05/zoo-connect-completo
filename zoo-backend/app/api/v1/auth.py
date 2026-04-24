@@ -4,6 +4,7 @@ from jose import jwt, JWTError
 
 from app.db.session import get_db
 from app.schemas.user import UserCreate, UserOut, UserUpdateProfile
+from app.schemas.user import UserCreate, UserOut, UserUpdateProfile, UserProfileOut
 from app.crud import user as crud_user
 from app.crud import token as crud_token
 from app.crud.auth import authenticate_user
@@ -37,6 +38,7 @@ from app.crud import audit as crud_audit
 from app.core import policia
 from app.core.enums import AuditEvent
 from app.core.security import verify_password
+from app.crud import permission as crud_permission
 router = APIRouter()
 
 
@@ -300,8 +302,22 @@ def logout(response: Response, db: Session = Depends(get_db), refresh_token: Opt
 
 
 @router.get("/me", response_model=UserOut)
-def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
+@router.get("/me", response_model=UserProfileOut)
+def read_users_me(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "username": current_user.username,
+        "is_active": current_user.is_active,
+        "is_admin": current_user.is_admin,
+        "role_id": current_user.role_id,
+        "photo_url": current_user.photo_url,
+        "created_at": current_user.created_at,
+        "permissions": crud_permission.get_effective_permission_codes(db, current_user.id),
+    }
 
 #endpoints reset password
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
@@ -345,6 +361,7 @@ def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
 
 #put user
 @router.put("/update-profile", response_model=UserOut)
+@router.put("/update-profile", response_model=UserProfileOut)
 async def update_users_me(
     user_in: UserUpdateProfile,
     db: Session = Depends(get_db),
@@ -360,4 +377,14 @@ async def update_users_me(
             )
     
     updated_user = crud_user.update_own_profile(db=db, db_user_to_update=current_user, user_in=user_in)
-    return updated_user
+    return {
+        "id": updated_user.id,
+        "email": updated_user.email,
+        "username": updated_user.username,
+        "is_active": updated_user.is_active,
+        "is_admin": updated_user.is_admin,
+        "role_id": updated_user.role_id,
+        "photo_url": updated_user.photo_url,
+        "created_at": updated_user.created_at,
+        "permissions": crud_permission.get_effective_permission_codes(db, updated_user.id),
+    }

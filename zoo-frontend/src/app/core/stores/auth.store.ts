@@ -54,7 +54,9 @@ export const AuthStore = signalStore(
     isAdmin: computed(() => usuario()?.rol.id === RolId.ADMIN),
     isVeterinario: computed(() => usuario()?.rol.id === RolId.VETERINARIO),
     isCuidador: computed(() => usuario()?.rol.id === RolId.CUIDADOR),
+    isOsi: computed(() => usuario()?.rol.id === RolId.OSI),
     isVisitante: computed(() => usuario()?.rol.id === RolId.VISITANTE),
+    permissions: computed(() => usuario()?.permisos ?? []),
     userId: computed(() => parseInt(usuario()?.id ?? "0")),
   })),
   withMethods(
@@ -336,6 +338,10 @@ export const AuthStore = signalStore(
         setTokens(accessToken: string) {
           setTokenInStorage(ACCESS_TOKEN_KEY, accessToken);
           patchState(store, { accessToken, error: null });
+        },
+
+        hasPermission(permission: string): boolean {
+          return store.usuario()?.permisos?.includes(permission) ?? false;
         },
 
         async initializeAuth() {

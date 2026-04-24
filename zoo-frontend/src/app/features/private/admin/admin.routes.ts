@@ -4,6 +4,7 @@ export default [
   {
     path: "usuarios",
     title: "Gestión de Usuarios",
+    data: { requiredPermissions: ["manage_users"] },
     loadComponent: () => import("./screens/gestion-usuarios/gestion-usuarios"),
     children: [
       {
@@ -34,6 +35,7 @@ export default [
   {
     path: "animales",
     title: "Gestión de Animales",
+    data: { requiredPermissions: ["manage_animal_catalog"] },
     loadComponent: () => import("./screens/gestion-animales/gestion-animales"),
     children: [
       {
@@ -120,11 +122,13 @@ export default [
   {
     path: "dashboard",
     title: "Dashboard",
+    data: { requiredPermissions: ["view_admin_dashboard"] },
     loadComponent: () => import("./screens/dashboard/dashboard"),
   },
   {
     path: "encuestas",
     title: "Encuestas",
+    data: { requiredPermissions: ["manage_surveys"] },
     loadComponent: () =>
       import("./screens/gestion-encuestas/gestion-encuestas"),
     children: [
@@ -158,15 +162,24 @@ export default [
   {
     path: "reportes",
     title: "Gestión de Reportes",
+    data: { requiredPermissions: ["view_inventory"] },
     loadComponent: () => import("./screens/gestion-reportes/gestion-reportes"),
   },
   {
     path: "audit",
     title: "Auditoría",
+    data: { requiredPermissions: ["view_audit_logs"] },
     loadComponent: () => import("./screens/auditoria/auditoria"),
   },
   {
+    path: "permisos",
+    title: "Permisos OSI",
+    data: { requiredPermissions: ["manage_permissions"] },
+    loadComponent: () => import("./screens/gestion-permisos/gestion-permisos"),
+  },
+  {
     path: "inventario",
+    data: { requiredPermissions: ["manage_inventory"] },
     loadComponent: () =>
       import("./screens/gestion-inventario/gestion-inventario"),
     children: [

@@ -87,6 +87,7 @@ export default class CrearUsuario implements OnInit {
 
   protected readonly roleOptions: RoleOption[] = [
     { label: "Administrador", value: RolId.ADMIN },
+    { label: "OSI", value: RolId.OSI },
     { label: "Veterinario", value: RolId.VETERINARIO },
     { label: "Cuidador", value: RolId.CUIDADOR },
     { label: "Visitante", value: RolId.VISITANTE },

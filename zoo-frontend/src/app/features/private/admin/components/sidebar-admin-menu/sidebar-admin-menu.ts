@@ -55,6 +55,11 @@ export class SidebarAdminMenu {
       route: "/admin/usuarios",
     },
     {
+      text: "Permisos OSI",
+      icon: "pi pi-shield",
+      route: "/admin/permisos",
+    },
+    {
       text: "Gestión de Encuestas",
       icon: "pi pi-chart-line",
       route: "/admin/encuestas",

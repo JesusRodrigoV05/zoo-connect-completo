@@ -5,7 +5,8 @@ from typing import Optional
 from app.db.session import get_db
 from app.crud import user as crud_user
 from app.schemas.user import UserOut, AdminUserCreate, AdminUserUpdate
-from app.core.dependencies import require_admin_user
+from app.core.dependencies import require_permission
+from app.core.enums import PermissionCode
 
 #pagination
 from fastapi_pagination import Page
@@ -17,10 +18,10 @@ from app.schemas.audit import AuditLogOut
 from app.crud import audit as crud_audit
 
 router = APIRouter(
-    dependencies=[Depends(require_admin_user)]  
+    dependencies=[Depends(require_permission(PermissionCode.MANAGE_USERS))]  
 )
 
-@router.get("/users", response_model=Page[UserOutWithRole], dependencies=[Depends(require_admin_user)])
+@router.get("/users", response_model=Page[UserOutWithRole], dependencies=[Depends(require_permission(PermissionCode.MANAGE_USERS))])
 def admin_list_users(
     role_id: Optional[int] = Query(None, description="Filtrar por ID de Rol (1:Admin, 3:Cuidador, 4:Vet)"),
     is_active: Optional[bool] = Query(None, description="Filtrar por estado activo/inactivo"),
@@ -62,8 +63,7 @@ def admin_delete_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
     return crud_user.delete_user_by_admin(db=db, user_id_to_delete=user_id)
 
-
-@router.get("/audit-logs", response_model=Page[AuditLogOut], dependencies=[Depends(require_admin_user)],
+@router.get("/audit-logs", response_model=Page[AuditLogOut], dependencies=[Depends(require_permission(PermissionCode.VIEW_AUDIT_LOGS))],
     summary="Obtener logs de auditoria de autenticacion"
 )
 def get_audit_logs(db: Session = Depends(get_db)):

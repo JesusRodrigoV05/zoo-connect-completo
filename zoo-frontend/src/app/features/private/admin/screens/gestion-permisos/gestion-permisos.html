@@ -1,0 +1,96 @@
+<zoo-main-container>
+  <section class="permissions-page">
+    <header class="permissions-header">
+      <div>
+        <p class="eyebrow">OSI</p>
+        <h1>Gestión de permisos por usuario</h1>
+        <p>
+          Define qué módulos puede usar cada usuario. Los cambios se aplican en el backend y quedan auditados.
+        </p>
+      </div>
+
+      <div class="actions">
+        <input
+          pInputText
+          type="text"
+          [value]="search()"
+          (input)="onSearchChange(($any($event.target)).value)"
+          placeholder="Buscar por usuario, correo o rol"
+        />
+        <button pButton type="button" label="Recargar" icon="pi pi-refresh" (click)="loadMatrix()"></button>
+      </div>
+    </header>
+
+    @if (loading()) {
+      <div class="loading-state">
+        <p>Preparando matriz de permisos...</p>
+      </div>
+    } @else {
+      <div class="table-shell">
+        <table class="permissions-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Rol</th>
+              @for (permission of permissions(); track permission.id) {
+                <th>
+                  <span>{{ permission.name }}</span>
+                  <small>{{ permission.module }}</small>
+                </th>
+              }
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (user of filteredUsers(); track user.id) {
+              <tr>
+                <td class="user-cell">
+                  <img
+                    class="avatar"
+                    [src]="user.photo_url || '/assets/images/profile-icons/1.png'"
+                    [alt]="user.username"
+                  />
+                  <div>
+                    <strong>{{ user.username }}</strong>
+                    <span>{{ user.email }}</span>
+                  </div>
+                </td>
+                <td>
+                  <p-tag [value]="user.role_name" severity="info"></p-tag>
+                </td>
+                @for (permission of permissions(); track permission.id) {
+                  <td class="permission-cell">
+                    <label>
+                      <input
+                        type="checkbox"
+                        [checked]="isPermissionAllowed(user, permission.id)"
+                        (change)="togglePermission(user.id, permission.id, ($any($event.target)).checked)"
+                      />
+                    </label>
+                  </td>
+                }
+                <td class="actions-cell">
+                  <button
+                    pButton
+                    type="button"
+                    label="Guardar"
+                    icon="pi pi-save"
+                    [disabled]="!dirtyUsers()[user.id] || savingUserId() === user.id"
+                    (click)="saveUserPermissions(user)"
+                  ></button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td [attr.colspan]="permissions().length + 3">
+                  No hay usuarios para mostrar.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</zoo-main-container>

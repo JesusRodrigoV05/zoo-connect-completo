@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
 #prueba validacion
@@ -49,7 +49,7 @@ class UserOut(BaseModel):
     email: EmailStr
     username: str
     is_active: bool
-    is_admin: bool
+    is_admin: bool = False
     role_id: int
     photo_url: Optional[str] = None 
     created_at: datetime 
@@ -70,3 +70,6 @@ class UserOutWithRole(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UserProfileOut(UserOutWithRole):
+    permissions: list[str] = Field(default_factory=list)

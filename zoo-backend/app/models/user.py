@@ -35,6 +35,7 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     role = relationship("Role", back_populates="users")
+    user_permissions = relationship("UserPermission", back_populates="user", cascade="all, delete-orphan")
     encuestas_creadas = relationship("Encuesta", back_populates="usuario_creador")
     participaciones_encuestas = relationship("ParticipacionEncuesta", back_populates="usuario")
     trivias_creadas = relationship("Trivia", back_populates="usuario")

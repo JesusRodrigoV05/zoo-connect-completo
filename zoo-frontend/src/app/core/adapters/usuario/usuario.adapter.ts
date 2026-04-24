@@ -9,6 +9,7 @@ export interface UsuarioBackendResponse {
   is_active: boolean;
   role_id: number;
   created_at: string;
+  permissions?: string[];
 }
 
 export interface CreateUsuarioRequest {
@@ -45,6 +46,7 @@ export class UsuarioAdapter {
         nombre: this.getRoleNameById(backendUser.role_id),
       },
       creadoEn: backendUser.created_at,
+      permisos: backendUser.permissions ?? [],
     };
   }
 
@@ -58,6 +60,7 @@ export class UsuarioAdapter {
       2: "Visitante",
       3: "Cuidador",
       4: "Veterinario",
+      5: "OSI",
     };
     return roleNames[roleId] || "Desconocido";
   }
@@ -179,6 +182,7 @@ export class UsuarioAdapter {
       obj.rol &&
       typeof obj.rol.id === "number" &&
       typeof obj.rol.nombre === "string" &&
+      (obj.permisos === undefined || Array.isArray(obj.permisos)) &&
       typeof obj.creadoEn === "string"
     );
   }
