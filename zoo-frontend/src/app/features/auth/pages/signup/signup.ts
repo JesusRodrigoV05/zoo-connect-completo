@@ -36,7 +36,7 @@ import { UpdateProfileRequest } from "@models/usuario";
     MessageModule,
   ],
   templateUrl: "./signup.html",
-  styleUrl: "./signup.scss",
+  styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Signup {
@@ -51,7 +51,7 @@ export default class Signup {
     {
       email: ["", [Validators.required, Validators.email]],
       username: ["", [Validators.required, Validators.minLength(3)]],
-      password: ["", [Validators.required, Validators.minLength(6)]],
+      password: ["", [Validators.required, Validators.minLength(12)]],
       confirmPassword: ["", [Validators.required]],
     },
     { validators: this.passwordMatchValidator },

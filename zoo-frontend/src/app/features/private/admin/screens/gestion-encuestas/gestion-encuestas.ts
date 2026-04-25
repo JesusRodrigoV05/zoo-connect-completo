@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { SplitterModule } from "primeng/splitter";
-import { SplitterLayout } from "../../components/splitter-layout/splitter-layout";
 import { RouterOutlet } from "@angular/router";
 import { ScrollPanelModule } from "primeng/scrollpanel";
 import { MainContainer } from "@app/shared/components/main-container";
 import { NavMenuGestion } from "../../components/nav-menu-gestion";
 import { MenuButton } from "../../models";
+import { SplitterLayout } from "@core/layout/splitter-layout";
 
 interface TabOption {
   readonly label: string;

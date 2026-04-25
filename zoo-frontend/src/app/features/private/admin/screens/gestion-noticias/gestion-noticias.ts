@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { ScrollPanelModule } from "primeng/scrollpanel";
 import { SplitterModule } from "primeng/splitter";
-import { SplitterLayout } from "../../components/splitter-layout";
 import { MainContainer } from "@app/shared/components/main-container";
 import { ButtonModule } from "primeng/button";
 import { NavMenuGestion } from "../../components/nav-menu-gestion";
 import { MenuButton } from "@models/common/menu-button.mode";
+import { SplitterLayout } from "@core/layout/splitter-layout";
 
 @Component({
   selector: "app-gestion-noticias",

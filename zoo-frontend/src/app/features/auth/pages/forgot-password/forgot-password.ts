@@ -33,7 +33,7 @@ import { LogoImage } from "@app/shared/components";
     LogoImage,
   ],
   templateUrl: "./forgot-password.html",
-  styleUrl: "./forgot-password.scss",
+  styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ForgotPassword {

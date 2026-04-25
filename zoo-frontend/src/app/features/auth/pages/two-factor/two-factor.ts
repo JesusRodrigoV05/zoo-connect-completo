@@ -31,7 +31,7 @@ import { Loader } from "@app/shared/components";
     Loader,
   ],
   templateUrl: "./two-factor.html",
-  styleUrl: "./two-factor.scss",
+  styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class TwoFactor {

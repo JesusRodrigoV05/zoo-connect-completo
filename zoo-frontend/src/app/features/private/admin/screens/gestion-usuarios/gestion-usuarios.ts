@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { SplitterLayout } from '../../components/splitter-layout';
 import { MenuButton } from '../../models';
 import { MainContainer } from '@app/shared/components/main-container';
 import { NavMenuGestion } from '../../components/nav-menu-gestion';
+import { SplitterLayout } from '@core/layout/splitter-layout';
 
 @Component({
   selector: 'app-gestion-usuarios',

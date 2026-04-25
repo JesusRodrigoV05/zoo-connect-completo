@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { SplitterLayout } from '../../components/splitter-layout';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component  } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { MenuButton } from '../../models';
 import { ButtonModule } from 'primeng/button';
 import { MainContainer } from '@app/shared/components/main-container';
 import { NavMenuGestion } from '../../components/nav-menu-gestion';
+import { SplitterLayout } from '@core/layout/splitter-layout';
 
 @Component({
   selector: 'app-gestion-animales',

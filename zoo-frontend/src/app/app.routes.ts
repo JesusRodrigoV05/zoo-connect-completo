@@ -112,14 +112,14 @@ export const routes: Routes = [
   {
     path: "admin",
     loadComponent: () =>
-      import("./features/private/admin/layout/admin-layout/admin-layout"),
+      import("./core/layout/layout"),
     canActivate: [authGuard],
     loadChildren: () => import("./features/private/admin/admin.routes"),
   },
   {
     path: "vet",
     loadComponent: () =>
-      import("./features/private/veterinario/layout/vet-layout/vet-layout"),
+      import("./core/layout/layout"),
     canActivate: [veterinaryGuard],
     loadChildren: () =>
       import("./features/private/veterinario/veterinario.routes"),
@@ -127,7 +127,7 @@ export const routes: Routes = [
   {
     path: "cuidador",
     loadComponent: () =>
-      import("./features/private/cuidador/layout/vet-layout/vet-layout"),
+      import("./core/layout/layout"),
     canActivate: [cuidadorGuard],
     loadChildren: () => import("./features/private/cuidador/cuidador.routes"),
   },

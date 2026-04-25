@@ -1,23 +1,23 @@
-import { computed, inject, PLATFORM_ID } from "@angular/core";
+import { computed, inject, PLATFORM_ID } from '@angular/core';
 import {
   signalStore,
   withComputed,
   withMethods,
   withState,
   patchState,
-} from "@ngrx/signals";
-import { Router } from "@angular/router";
-import { firstValueFrom } from "rxjs";
-import { RolId, Usuario } from "@models/usuario/usuario.model";
-import { Auth } from "@app/features/auth/services";
+} from '@ngrx/signals';
+import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { RolId, Usuario } from '@models/usuario/usuario.model';
+import { Auth } from '@app/features/auth/services';
 import {
   LoginResponse,
   UpdateProfileRequest,
-} from "@models/usuario/request_response.model";
-import { isPlatformBrowser } from "@angular/common";
-import { ShowToast } from "@app/shared/services";
-import { Theme } from "@app/features/private/settings/services/theme-service";
-import { environment } from "@env";
+} from '@models/usuario/request_response.model';
+import { isPlatformBrowser } from '@angular/common';
+import { ShowToast } from '@app/shared/services';
+import { Theme } from '@app/features/private/settings/services/theme-service';
+import { environment } from '@env';
 
 interface AuthState {
   usuario: Usuario | null;
@@ -39,23 +39,26 @@ function getInitialState(): AuthState {
   };
 }
 
-const ACCESS_TOKEN_KEY = "access_token";
+const ACCESS_TOKEN_KEY = 'access_token';
 
 export const AuthStore = signalStore(
-  { providedIn: "root" },
+  { providedIn: 'root' },
   withState(getInitialState()),
   withComputed(({ usuario, accessToken, twoFA }) => ({
-    suggest2FA: computed(
-      () => usuario()?.rol.id !== RolId.VISITANTE && !twoFA() && !!usuario(),
-    ),
+    suggest2FA: computed(() => {
+      const u = usuario();
+      return !!u && Number(u.rol?.id) !== RolId.VISITANTE && !twoFA();
+    }),
     twoFAenabled: computed(() => twoFA()),
     isAuthenticated: computed(() => !!usuario() && !!accessToken()),
     userRole: computed(() => usuario()?.rol),
-    isAdmin: computed(() => usuario()?.rol.id === RolId.ADMIN),
-    isVeterinario: computed(() => usuario()?.rol.id === RolId.VETERINARIO),
-    isCuidador: computed(() => usuario()?.rol.id === RolId.CUIDADOR),
-    isVisitante: computed(() => usuario()?.rol.id === RolId.VISITANTE),
-    userId: computed(() => parseInt(usuario()?.id ?? "0")),
+    isAdmin: computed(() => Number(usuario()?.rol?.id) === RolId.ADMIN),
+    isVeterinario: computed(
+      () => Number(usuario()?.rol?.id) === RolId.VETERINARIO,
+    ),
+    isCuidador: computed(() => Number(usuario()?.rol?.id) === RolId.CUIDADOR),
+    isVisitante: computed(() => Number(usuario()?.rol?.id) === RolId.VISITANTE),
+    userId: computed(() => parseInt(usuario()?.id ?? '0', 10)),
   })),
   withMethods(
     (
@@ -97,13 +100,13 @@ export const AuthStore = signalStore(
       ): boolean => {
         if (!token) return false;
         try {
-          const payload = JSON.parse(atob(token.split(".")[1]));
+          const payload = JSON.parse(atob(token.split('.')[1]));
           const exp = payload.exp * 1000;
           const now = Date.now();
           const buffer = bufferSeconds * 1000;
           return exp > now + buffer;
         } catch (error) {
-          console.error("Error decoding token:", error);
+          console.error('Error decoding token:', error);
           return false;
         }
       };
@@ -111,32 +114,32 @@ export const AuthStore = signalStore(
       const handleError = (error: any, context: string): string => {
         console.error(`Error en ${context}:`, error);
         let errorMessage = `Error en ${context}`;
-        if (typeof error === "string") {
+        if (typeof error === 'string') {
           errorMessage = error;
         } else if (error?.status === 401) {
           errorMessage =
-            context === "login"
-              ? "Email o contraseña incorrectos"
-              : "Sesión expirada o no autorizado";
-        } else if (error?.status === 400 && context === "login") {
-          errorMessage = "Usuario inactivo. Contacte al administrador";
-        } else if (error?.status === 403 && context === "login") {
+            context === 'login'
+              ? 'Email o contraseña incorrectos'
+              : 'Sesión expirada o no autorizado';
+        } else if (error?.status === 400 && context === 'login') {
+          errorMessage = 'Usuario inactivo. Contacte al administrador';
+        } else if (error?.status === 403 && context === 'login') {
           errorMessage =
-            "Cuenta bloqueada temporalmente, intente dentro de 30 minutos";
-        } else if (error?.status === 400 && context === "register") {
-          errorMessage = error.error?.message?.includes("email")
-            ? "Este email ya está registrado. Intente con otro email"
-            : "Datos de registro inválidos";
-        } else if (error?.status === 422 && context === "register") {
-          errorMessage = "Formato de email inválido o contraseña muy débil";
+            'Cuenta bloqueada temporalmente, intente dentro de 30 minutos';
+        } else if (error?.status === 400 && context === 'register') {
+          errorMessage = error.error?.message?.includes('email')
+            ? 'Este email ya está registrado. Intente con otro email'
+            : 'Datos de registro inválidos';
+        } else if (error?.status === 422 && context === 'register') {
+          errorMessage = 'Formato de email inválido o contraseña muy débil';
         } else if (error?.status === 429) {
-          errorMessage = "Demasiados intentos. Intenta de nuevo más tarde";
+          errorMessage = 'Demasiados intentos. Intenta de nuevo más tarde';
         } else if (
-          error?.message?.includes("NetworkError") ||
+          error?.message?.includes('NetworkError') ||
           error?.status === 0
         ) {
           errorMessage =
-            "No se pudo conectar con el servidor. Verifique su conexión";
+            'No se pudo conectar con el servidor. Verifique su conexión';
         } else if (error?.error?.detail) {
           errorMessage = Array.isArray(error.error.detail)
             ? error.error.detail[0].msg
@@ -149,9 +152,9 @@ export const AuthStore = signalStore(
         toastService.showError(`Error en ${context}`, errorMessage);
 
         if (error?.status === 401 || error?.status === 403) {
-          if (context !== "login" && context !== "register") {
+          if (context !== 'login' && context !== 'register') {
             methods.logoutSilently();
-          } else if (context === "login") {
+          } else if (context === 'login') {
             clearAuthStateAndStorage();
           }
         }
@@ -171,7 +174,7 @@ export const AuthStore = signalStore(
             );
 
             if (
-              "session_token" in loginResponse &&
+              'session_token' in loginResponse &&
               loginResponse.session_token
             ) {
               patchState(store, {
@@ -179,7 +182,7 @@ export const AuthStore = signalStore(
                 loading: false,
               });
 
-              await router.navigate(["/verify-2fa"], {
+              await router.navigate(['/verify-2fa'], {
                 queryParams: { session_token: loginResponse.session_token },
               });
               return;
@@ -204,17 +207,19 @@ export const AuthStore = signalStore(
               } catch (updateError) {}
             }
 
-            toastService.showSuccess("Inicio de sesión exitoso", "Éxito");
+            console.log(currentUser);
+
+            toastService.showSuccess('Inicio de sesión exitoso', 'Éxito');
 
             if (store.suggest2FA()) {
               toastService.showWarning(
-                "Habilitación de Verificacion en dos pasos",
-                "Tu cuenta puede ser más segura si habilitas la verificación en dos pasos.",
+                'Habilitación de Verificacion en dos pasos',
+                'Tu cuenta puede ser más segura si habilitas la verificación en dos pasos.',
               );
             }
-            await router.navigate(["/inicio"]);
+            await router.navigate(['/inicio']);
           } catch (error: any) {
-            handleError(error, "login");
+            handleError(error, 'login');
           }
         },
 
@@ -232,12 +237,12 @@ export const AuthStore = signalStore(
             );
             patchState(store, { loading: false });
             toastService.showSuccess(
-              "Éxito",
-              "Registro exitoso. Por favor, inicie sesión.",
+              'Éxito',
+              'Registro exitoso. Por favor, inicie sesión.',
             );
-            await router.navigate(["/login"]);
+            await router.navigate(['/login']);
           } catch (error: any) {
-            handleError(error, "register");
+            handleError(error, 'register');
             throw error;
           }
         },
@@ -255,10 +260,10 @@ export const AuthStore = signalStore(
             patchState(store, { usuario: updatedUser, loading: false });
 
             if (!silent) {
-              toastService.showSuccess("¡Avatar actualizado!", "Éxito");
+              toastService.showSuccess('¡Avatar actualizado!', 'Éxito');
             }
           } catch (error: any) {
-            handleError(error, "actualizar foto de perfil");
+            handleError(error, 'actualizar foto de perfil');
           }
         },
 
@@ -268,21 +273,21 @@ export const AuthStore = signalStore(
             await firstValueFrom(authService.logout());
           } catch (error: any) {
             console.warn(
-              "Error al cerrar sesión en el servidor (ignorado):",
+              'Error al cerrar sesión en el servidor (ignorado):',
               error,
             );
           } finally {
             clearAuthStateAndStorage();
-            themeService.setTheme("light");
-            toastService.showSuccess("Sesión cerrada exitosamente", "Éxito");
-            await router.navigate(["/login"]);
+            themeService.setTheme('light');
+            toastService.showSuccess('Sesión cerrada exitosamente', 'Éxito');
+            await router.navigate(['/login']);
           }
         },
 
         logoutSilently() {
           clearAuthStateAndStorage();
-          themeService.setTheme("light");
-          router.navigate(["/login"], {
+          themeService.setTheme('light');
+          router.navigate(['/login'], {
             queryParams: { sessionExpired: true },
           });
         },
@@ -294,7 +299,7 @@ export const AuthStore = signalStore(
               await methods.refreshTokens();
             } catch (e) {
               patchState(store, { usuario: null, twoFA: false });
-              handleError(e, "cargar perfil (refresh fallido)");
+              handleError(e, 'cargar perfil (refresh fallido)');
               return;
             }
           }
@@ -308,7 +313,7 @@ export const AuthStore = signalStore(
               error: null,
             });
           } catch (error: any) {
-            handleError(error, "cargar perfil");
+            handleError(error, 'cargar perfil');
           } finally {
             patchState(store, { loading: false });
           }
@@ -324,7 +329,7 @@ export const AuthStore = signalStore(
             patchState(store, { loading: false });
             return response;
           } catch (error: any) {
-            handleError(error, "refrescar token");
+            handleError(error, 'refrescar token');
             throw error;
           }
         },
@@ -369,7 +374,7 @@ export const AuthStore = signalStore(
               }
             }
           } catch (error) {
-            console.error("Error durante inicialización:", error);
+            console.error('Error durante inicialización:', error);
             clearAuthStateAndStorage();
           } finally {
             patchState(store, { loading: false });

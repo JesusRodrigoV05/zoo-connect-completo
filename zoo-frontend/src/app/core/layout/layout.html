@@ -1,5 +1,42 @@
-<zoo-header />
-<main>
-  <router-outlet />
-</main>
-<zoo-footer />
+<div class="base-layout-container">
+  <zoo-header>
+    @defer (when puedo()) {
+    <p-button
+      slot="nav-toggle"
+      icon="pi pi-bars"
+      [text]="true"
+      [rounded]="true"
+      (click)="toggleDrawer()"
+    />
+    }
+  </zoo-header>
+
+  <main class="main-content-area">
+    <router-outlet />
+  </main>
+
+  <zoo-footer />
+
+  @defer (when drawerVisible()) {
+  <p-drawer
+    [(visible)]="drawerVisible"
+    position="right"
+    styleClass="admin-drawer"
+  >
+    <ng-template pTemplate="header">
+      <div class="drawer-header-content">
+        @if (authStore.isAdmin()) {
+        <h3 class="drawer-header-title">Panel Admin</h3>
+        } @else if (authStore.isVeterinario()) {
+        <i class="pi pi-heart-pulse header-icon"></i>
+        <h3 class="drawer-header-title">Panel Médico</h3>
+        } @else if (authStore.isCuidador()) {
+        <h3 class="drawer-header-title">Panel Cuidador</h3>
+        }
+      </div>
+    </ng-template>
+
+    <zoo-sidebar-menu [navigationItems]="menuItems()" />
+  </p-drawer>
+  }
+</div>

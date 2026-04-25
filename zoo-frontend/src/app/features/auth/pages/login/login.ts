@@ -29,7 +29,7 @@ import { environment } from "@env";
     LogoImage,
   ],
   templateUrl: "./login.html",
-  styleUrl: "./login.scss",
+  styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Login {

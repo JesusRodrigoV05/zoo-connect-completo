@@ -1,4 +1,4 @@
-.vet-menu-list {
+.zoo-menu-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -35,16 +35,16 @@
 
   &.active,
   &:not(.disabled):hover {
-    background: var(--p-primary-50);
-    color: var(--p-primary-700);
+    background: var(--p-primary-color);
+    color: var(--p-primary-contrast-color);
 
     i {
-      color: var(--p-primary-600);
+      color: var(--p-primary-contrast-color);
     }
   }
 
   &.disabled {
-    opacity: 0.5;
+    opacity: var(--p-disabled-opacity, 0.5);
     cursor: default;
     pointer-events: none;
   }

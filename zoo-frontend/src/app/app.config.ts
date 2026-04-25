@@ -12,7 +12,6 @@ import {
   withInMemoryScrolling,
   withViewTransitions,
 } from "@angular/router";
-
 import { routes } from "./app.routes";
 import {
   provideClientHydration,
@@ -30,9 +29,7 @@ import { provideAnimationsAsync } from "@angular/platform-browser/animations/asy
 import { ConfirmationService, MessageService } from "primeng/api";
 import ZooPreset from "../theme/zoo-preset";
 import { AuthStore } from "@stores/auth.store";
-import { ShowToast } from "./shared/services";
 import { CustomTitleStrategy } from "./core/services/custom-title-strategy";
-import { provideCloudinaryLoader } from "@angular/common";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -60,7 +57,6 @@ export const appConfig: ApplicationConfig = {
     ConfirmationService,
     provideAppInitializer(async () => {
       const authStore = inject(AuthStore);
-      const toastService = inject(ShowToast);
 
       return authStore.initializeAuth().then(() => {});
     }),

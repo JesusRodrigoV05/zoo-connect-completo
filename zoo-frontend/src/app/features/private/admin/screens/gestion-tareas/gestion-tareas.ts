@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
-import { SplitterLayout } from "../../components/splitter-layout";
 import { MainContainer } from "@app/shared/components/main-container";
 import { NavMenuGestion } from "../../components/nav-menu-gestion";
 import { RouterOutlet } from "@angular/router";
 import { MenuButton } from "../../models";
+import { SplitterLayout } from "@core/layout/splitter-layout";
 
 @Component({
   selector: "app-gestion-tareas",

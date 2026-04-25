@@ -18,6 +18,7 @@
     "module": "preserve",
     "baseUrl": "./",
     "paths": {
+      "@core/*": ["src/app/core/*"],
       "@models/*": ["src/app/core/models/*"],
       "@guards/*": ["src/app/core/guards/*"],
       "@adapters/*": ["src/app/core/adapters/*"],

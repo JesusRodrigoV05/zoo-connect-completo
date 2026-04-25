@@ -11,7 +11,6 @@ import { ProfileButton } from "./components/profile-button";
 import { LogoImage } from "../logo-image";
 import { ButtonModule } from "primeng/button";
 import { OverlayBadgeModule } from "primeng/overlaybadge";
-import { NotificationButton } from "./components/notification-button";
 import { DrawerModule } from "primeng/drawer";
 import { TooltipModule } from "primeng/tooltip";
 import { NgClass } from "@angular/common";
@@ -34,7 +33,6 @@ export interface NavButton {
     LogoImage,
     ButtonModule,
     OverlayBadgeModule,
-    NotificationButton,
     DrawerModule,
     TooltipModule,
     NgClass,

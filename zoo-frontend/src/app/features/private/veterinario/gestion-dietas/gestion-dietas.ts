@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { ButtonModule } from "primeng/button";
-import { SplitterLayout } from "../layout/splitter-layout";
 import { MainContainer } from "@app/shared/components/main-container";
 import { NavMenuVet } from "../components/nav-menu-vet/nav-menu-vet";
 import { MenuButton } from "@models/common/menu-button.mode";
+import { SplitterLayout } from "@core/layout/splitter-layout";
 
 @Component({
   selector: "app-gestion-dietas",

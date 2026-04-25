@@ -41,7 +41,7 @@ import { LogoImage } from "@app/shared/components";
     LogoImage,
   ],
   templateUrl: "./reset-password.html",
-  styleUrl: "./reset-password.scss",
+  styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ResetPassword {

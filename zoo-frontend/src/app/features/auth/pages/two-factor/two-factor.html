@@ -1,8 +1,8 @@
-<div class="verify-2fa-page-container">
-  <p-card class="verify-2fa-card">
-    <div class="card-content">
-      <div class="verify-2fa-form-container">
-        <div class="verify-2fa-header">
+<div class="auth-page-container">
+  <p-card styleClass="auth-card">
+    <div class="auth-card-content">
+      <div class="auth-form-container">
+        <div class="auth-header">
           <i class="pi pi-shield header-icon"></i>
           <h1>Verificación de Dos Factores</h1>
           <p class="subtitle">
@@ -10,7 +10,7 @@
           </p>
         </div>
 
-        <div class="verify-2fa-content">
+        <div class="auth-content">
           <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
             <div class="field">
               <p-floatlabel variant="on">
@@ -30,7 +30,6 @@
                   }"
                   fluid
                 />
-
                 <label for="code">Código de Verificación</label>
               </p-floatlabel>
 
@@ -42,19 +41,20 @@
               }
             </div>
 
-            <div class="info-box">
+            <div class="auth-info-box">
               <i class="pi pi-info-circle"></i>
               <p>
                 Abre tu app de autenticación (Google Authenticator, Authy, etc.)
-                y ingresa el código de 6 dígitos que aparece.
+                e ingresa el código de 6 dígitos que aparece.
               </p>
             </div>
 
-            <div class="button-container">
+            <div class="auth-button-container">
               <p-button
                 type="submit"
                 [rounded]="true"
                 [disabled]="verifyForm.invalid || isVerifying()"
+                styleClass="auth-button"
                 fluid
               >
                 @if (isVerifying()) {
@@ -66,9 +66,11 @@
             </div>
           </form>
 
-          <div class="help-link">
-            ¿Problemas para verificar?
-            <a routerLink="/login">Volver al inicio de sesión</a>
+          <div class="auth-link-container">
+            <p>
+              ¿Problemas para verificar?
+              <a routerLink="/login">Volver al inicio de sesión</a>
+            </p>
           </div>
         </div>
       </div>
