@@ -13,6 +13,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^21.2.10",
     "@angular/cdk": "20.2.10",
     "@angular/common": "^21.0.3",
     "@angular/compiler": "^21.0.3",
@@ -30,6 +31,7 @@
     "aos": "^2.3.4",
     "chart.js": "^4.5.1",
     "dotenv": "^17.2.3",
+    "driver.js": "^1.4.0",
     "express": "^5.2.1",
     "gsap": "^3.13.0",
     "primeicons": "^7.0.0",

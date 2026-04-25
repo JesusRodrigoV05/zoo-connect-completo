@@ -54,6 +54,7 @@ class User(Base):
     #veterinario
     historiales_creados = relationship("HistorialMedico", back_populates="veterinario")
     recetas_asignadas = relationship("RecetaMedica", back_populates="usuario_asignado")
+    onboarding_tours = relationship("OnboardingTourProgress", back_populates="user", cascade="all, delete-orphan")
     #Pruebas
     #propeidades hibridas
     @hybrid_property

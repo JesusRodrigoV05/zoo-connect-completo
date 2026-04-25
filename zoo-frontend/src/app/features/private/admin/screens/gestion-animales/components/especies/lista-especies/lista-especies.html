@@ -2,9 +2,16 @@
 <div class="list-page-container">
   <p-confirmDialog />
 
-  <div class="header-actions">
+  <div class="header-actions tour-especies-header">
     <h2>Gestión de Especies</h2>
     <div class="buttons">
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
       <p-button
         variant="text"
         (onClick)="loadEspecies(currentPage(), pageSize())"
@@ -12,6 +19,7 @@
         severity="danger"
         [rounded]="true"
         pTooltip="Recargar"
+        styleClass="tour-especies-reload-btn"
       />
       <p-button
         icon="pi pi-plus"
@@ -19,6 +27,7 @@
         [rounded]="true"
         severity="primary"
         (onClick)="navigateToCreate()"
+        styleClass="tour-especies-register-btn"
       />
     </div>
   </div>
@@ -42,6 +51,7 @@
 
   } @else if (especieData()) { @let response = especieData()!;
   <p-dataview
+    styleClass="tour-especies-table"
     #dv
     [value]="response.items"
     [paginator]="true"
@@ -53,11 +63,30 @@
     (onPage)="onPageChange($event)"
     [lazy]="true"
     [loading]="loading()"
+    [layout]="layout()"
   >
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ response.total }} especies</span>
-        <span>Página {{ response.page }} de {{ response.pages }}</span>
+        <span class="tour-especies-column-name"
+          >Total: {{ response.total }} especies</span
+        >
+        <span class="tour-especies-column-actions"
+          >Página {{ response.page }} de {{ response.pages }}</span
+        >
+        <p-selectbutton
+          styleClass="tour-especies-view-type"
+          [ngModel]="layout()"
+          (ngModelChange)="layout.set($event)"
+          [options]="options"
+          [allowEmpty]="false"
+        >
+          <ng-template #item let-item>
+            <i
+              class="pi"
+              [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"
+            ></i>
+          </ng-template>
+        </p-selectbutton>
       </div>
     </ng-template>
 
@@ -82,6 +111,17 @@
       </div>
       }
     </ng-template>
+
+    <ng-template #grid let-items>
+      @for(item of items; track item.idEspecie){
+      <zoo-especie-item
+        [especie]="item"
+        (verDetalles)="viewDetails(item.idEspecie)"
+        (editar)="navigateToEdit(item.idEspecie)"
+        (eliminar)="deleteEspecie(item.idEspecie)"
+      />
+      }
+    </ng-template>
   </p-dataview>
   } @else {
   <div class="loading-placeholder">
@@ -99,6 +139,7 @@
     <zoo-especie-detalle [especieId]="id" />
     }
   </p-drawer>
+
 </div>
 } @placeholder{
 <p>Cargando...</p>

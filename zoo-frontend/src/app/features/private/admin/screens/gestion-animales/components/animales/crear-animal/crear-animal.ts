@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -36,6 +37,7 @@ import { CreateAnimal, EstadoOperativo, MediaAnimal } from "@models/animales";
 import { forkJoin, Observable, of } from "rxjs";
 import { EspecieStore } from "@stores/especies.store";
 import { HabitatStore } from "@stores/habitat.store";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "zoo-crear-animal",
@@ -68,6 +70,7 @@ export default class CrearAnimal implements OnInit {
   private readonly adminAnimalesMedia = inject(AdminAnimalesMultimedia);
   protected readonly especieStore = inject(EspecieStore);
   protected readonly habitatStore = inject(HabitatStore);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly formSubmitted = signal(false);
   protected readonly isProcessing = signal(false);
@@ -118,6 +121,10 @@ export default class CrearAnimal implements OnInit {
   });
 
   ngOnInit(): void {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-animales-crear");
+    });
+
     this.especieStore.loadEspecies();
     this.habitatStore.loadHabitats();
     const id = this.route.snapshot.paramMap.get("id");
@@ -128,6 +135,10 @@ export default class CrearAnimal implements OnInit {
       this.loadAnimalData(animalId);
       this.loadAnimalMedia(animalId);
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-animales-crear");
   }
 
   private loadAnimalData(id: number): void {

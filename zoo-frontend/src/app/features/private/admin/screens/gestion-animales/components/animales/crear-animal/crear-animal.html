@@ -9,14 +9,22 @@
       <ng-template #content>
         <p-card class="crear-form-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
+            <div class="card-header tour-animal-step1-header">
               <h2>{{ pageTitle() }}</h2>
               <p class="subtitle">Paso 1: Ingresa los datos del animal</p>
+              <p-button
+                type="button"
+                label="Tour guiado"
+                icon="pi pi-question-circle"
+                severity="contrast"
+                [rounded]="true"
+                (click)="startGuidedTour()"
+              />
             </div>
           </ng-template>
 
           <form [formGroup]="animalForm" class="form">
-            <div class="form-section">
+            <div class="form-section tour-animal-section-basica">
               <h4>Información Básica</h4>
               <div class="form-grid">
                 <div class="field">
@@ -86,7 +94,7 @@
               </div>
             </div>
 
-            <div class="form-section">
+            <div class="form-section tour-animal-section-clasificacion">
               <h4>Estado y Clasificación</h4>
               <div class="form-grid">
                 <div class="field">
@@ -148,7 +156,7 @@
               </div>
             </div>
 
-            <div class="form-section">
+            <div class="form-section tour-animal-section-descripcion">
               <h4>Descripción</h4>
               <div class="form-grid">
                 <div class="field form-grid-span-2">
@@ -197,12 +205,20 @@
       <ng-template #content>
         <p-card class="crear-form-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
+            <div class="card-header tour-animal-step2-header">
               <h2>Subir Imágenes</h2>
               <p class="subtitle">
                 Paso 2: Añade imágenes para
                 <strong>{{ animalForm.value.nombre }}</strong>
               </p>
+              <p-button
+                type="button"
+                label="Tour guiado"
+                icon="pi pi-question-circle"
+                severity="contrast"
+                [rounded]="true"
+                (click)="startGuidedTour()"
+              />
             </div>
           </ng-template>
 
@@ -235,7 +251,7 @@
           <hr class="form-separator" />
           }
 
-          <div class="form-section">
+          <div class="form-section tour-animal-step2-section">
             <h4>
               @if (isEditMode()) { Añadir Nuevas Imágenes } @else { Galería de
               Imágenes }

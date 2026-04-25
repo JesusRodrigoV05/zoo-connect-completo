@@ -1,15 +1,23 @@
 @defer (on viewport; prefetch on idle; hydrate on hover) {
 <p-card class="crear-usuario-card">
   <ng-template pTemplate="header">
-    <div class="card-header">
+    <div class="card-header tour-especie-page-header">
       <h2>{{ pageTitle() }}</h2>
       <p class="subtitle">{{pageSubtitle()}}</p>
+      <p-button
+        type="button"
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (click)="startGuidedTour()"
+      />
     </div>
   </ng-template>
 
   <form [formGroup]="especieForm" (ngSubmit)="onSubmit()" class="usuario-form">
     <div class="form-grid">
-      <div class="field">
+      <div class="field tour-especie-field-nombre-cientifico">
         <p-floatlabel variant="on">
           <input
             id="nombreCientifico"
@@ -28,7 +36,7 @@
         }
       </div>
 
-      <div class="field">
+      <div class="field tour-especie-field-nombre-comun">
         <p-floatlabel variant="on">
           <input
             id="nombreComun"
@@ -47,7 +55,7 @@
         }
       </div>
 
-      <div class="field">
+      <div class="field tour-especie-field-filo">
         <p-floatlabel variant="on">
           <input
             id="filo"
@@ -66,7 +74,7 @@
         }
       </div>
 
-      <div class="field">
+      <div class="field tour-especie-field-clase">
         <p-floatlabel variant="on">
           <input
             id="clase"
@@ -85,7 +93,7 @@
         }
       </div>
 
-      <div class="field">
+      <div class="field tour-especie-field-orden">
         <p-floatlabel variant="on">
           <input
             id="orden"
@@ -104,7 +112,7 @@
         }
       </div>
 
-      <div class="field">
+      <div class="field tour-especie-field-familia">
         <p-floatlabel variant="on">
           <input
             id="familia"
@@ -123,7 +131,7 @@
         }
       </div>
 
-      <div class="field full-width">
+      <div class="field full-width tour-especie-field-descripcion">
         <p-floatlabel variant="on">
           <textarea
             pTextarea

@@ -1,4 +1,6 @@
 @use "primeicons/primeicons.css" as *;
+@use "./app/shared/styles/driverjs-theme-green";
+@import "driver.js/dist/driver.css";
 
 html {
   color-scheme: light;
