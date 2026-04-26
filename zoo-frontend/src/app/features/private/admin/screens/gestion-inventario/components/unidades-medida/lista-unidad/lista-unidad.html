@@ -2,8 +2,17 @@
 <div class="list-page-container">
   <p-confirmDialog />
 
-  <div class="header-actions">
-    <h2>Unidades de Medida</h2>
+  <div class="header-actions tour-unit-list-header">
+    <div class="title-row flex align-items-center gap-2">
+      <h2>Unidades de Medida</h2>
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
+    </div>
     <div class="buttons">
       <p-button
         variant="text"
@@ -12,12 +21,14 @@
         severity="danger"
         [rounded]="true"
         pTooltip="Recargar"
+        styleClass="tour-unit-refresh-btn"
       />
       <p-button
         icon="pi pi-plus"
         label="Nueva Unidad"
         [rounded]="true"
         severity="primary"
+        styleClass="tour-unit-new-btn"
         routerLink="../crear"
       />
     </div>
@@ -39,6 +50,7 @@
   </div>
   } @else {
   <p-dataview
+    styleClass="tour-unit-dataview"
     #dv
     [value]="store.items()"
     [paginator]="true"
@@ -53,9 +65,10 @@
   >
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ store.total() }} unidades</span>
+        <span class="tour-unit-total">Total: {{ store.total() }} unidades</span>
 
         <p-selectButton
+          styleClass="tour-unit-layout"
           [options]="layoutOptions"
           [(ngModel)]="layout"
           optionLabel="icon"

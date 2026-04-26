@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   signal,
+  afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { TabsModule } from "primeng/tabs";
@@ -18,6 +19,7 @@ import { TransaccionesStore } from "@app/features/private/admin/stores/admin-tra
 import { TiposSalidaStore } from "@app/features/private/admin/stores/admin-tipo-salidas.store";
 import { DatePicker } from "primeng/datepicker";
 import { RouterLink } from "@angular/router";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-historial",
@@ -39,6 +41,7 @@ import { RouterLink } from "@angular/router";
 })
 export default class Historial implements OnInit {
   readonly transactionStore = inject(TransaccionesStore);
+  private readonly onboarding = inject(OnboardingService);
 
   protected dateRange = signal<Date[] | null>(null);
   protected searchTerm = signal("");
@@ -46,7 +49,15 @@ export default class Historial implements OnInit {
   protected activeTab = signal<"entradas" | "salidas">("entradas");
 
   ngOnInit() {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-inventario-historial");
+    });
+
     this.loadData();
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-historial");
   }
 
   loadData() {

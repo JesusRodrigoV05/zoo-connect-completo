@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -26,6 +27,7 @@ import { TiposProductoStore } from "@app/features/private/admin/stores/admin-tip
 import { UnidadesMedidaStore } from "@app/features/private/admin/stores/admin-unidades-medida.store";
 import { AdminInventario } from "@app/features/private/admin/services/admin-inventario";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import {
   CreateProducto,
   UpdateProducto,
@@ -62,6 +64,7 @@ export default class CrearProducto implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly inventoryService = inject(AdminInventario);
   private readonly toast = inject(ShowToast);
+  private readonly onboarding = inject(OnboardingService);
 
   fileUploader = viewChild<FileUpload>("fileUploader");
 
@@ -101,7 +104,15 @@ export default class CrearProducto implements OnInit {
       this.isEditMode.set(true);
       this.productId.set(+id);
       this.loadProductData(+id);
+    } else {
+      afterNextRender(() => {
+        this.onboarding.startTourIfFirstVisit("admin-inventario-producto-crear");
+      });
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-producto-crear");
   }
 
   private loadProductData(id: number) {

@@ -19,7 +19,17 @@ export type AdminTourKey =
   | "admin-tareas-configuracion"
   | "admin-tareas-crear-manual"
   | "admin-tareas-rutina-crear"
-  | "admin-tareas-tipo-crear";
+  | "admin-tareas-tipo-crear"
+  | "admin-inventario-producto-crear"
+  | "admin-inventario-producto-lista"
+  | "admin-inventario-proveedor-crear"
+  | "admin-inventario-proveedor-lista"
+  | "admin-inventario-tipo-lista"
+  | "admin-inventario-unidad-lista"
+  | "admin-inventario-unidad-crear"
+  | "admin-inventario-historial"
+  | "admin-inventario-entrada-crear"
+  | "admin-inventario-salida-crear";
 
 interface TourStatusResponse {
   tour_key: string;
@@ -249,6 +259,36 @@ export class OnboardingService {
     }
     if (url.startsWith("/admin/animales/crear")) {
       return "admin-animales-crear";
+    }
+    if (url.startsWith("/admin/inventario/crear")) {
+      return "admin-inventario-producto-crear";
+    }
+    if (url.startsWith("/admin/inventario/lista") || url === "/admin/inventario") {
+      return "admin-inventario-producto-lista";
+    }
+    if (url.startsWith("/admin/inventario/proveedor/crear")) {
+      return "admin-inventario-proveedor-crear";
+    }
+    if (url.startsWith("/admin/inventario/proveedor/lista") || url.startsWith("/admin/inventario/proveedor")) {
+      return "admin-inventario-proveedor-lista";
+    }
+    if (url.startsWith("/admin/inventario/tipo/lista") || url.startsWith("/admin/inventario/tipo")) {
+      return "admin-inventario-tipo-lista";
+    }
+    if (url.startsWith("/admin/inventario/unidades/crear")) {
+      return "admin-inventario-unidad-crear";
+    }
+    if (url.startsWith("/admin/inventario/unidades/lista") || url.startsWith("/admin/inventario/unidades")) {
+      return "admin-inventario-unidad-lista";
+    }
+    if (url.startsWith("/admin/inventario/transacciones/crear-entrada")) {
+      return "admin-inventario-entrada-crear";
+    }
+    if (url.startsWith("/admin/inventario/transacciones/crear-salida")) {
+      return "admin-inventario-salida-crear";
+    }
+    if (url.startsWith("/admin/inventario/transacciones/lista") || url.startsWith("/admin/inventario/transacciones")) {
+      return "admin-inventario-historial";
     }
     if (url.startsWith("/admin/tareas/operaciones")) {
       return "admin-tareas-operaciones";
@@ -1096,6 +1136,801 @@ export class OnboardingService {
               title: "Descripción",
               description:
                 "Describe cuándo y cómo se debe usar este tipo en operaciones. <br><strong>Ejemplo:</strong> Actividades de verificación clínica y seguimiento de signos vitales.",
+            },
+          },
+        ];
+
+      case "admin-inventario-producto-crear":
+        return [
+          {
+            element: ".tour-product-step1-header",
+            popover: {
+              title: "Registrar Nuevo Producto",
+              description:
+                "Completa la información básica del producto antes de pasar a la imagen. <br><strong>Ejemplo:</strong> Concentrado premium 20 kg.",
+            },
+          },
+          {
+            element: "#nombre",
+            popover: {
+              title: "Nombre del Producto",
+              description:
+                "Identifica el producto con un nombre claro y único. <br><strong>Ejemplo:</strong> Vitaminas para felinos.",
+            },
+          },
+          {
+            element: "#desc",
+            popover: {
+              title: "Descripción",
+              description:
+                "Agrega detalles útiles sobre presentación, uso o composición. <br><strong>Ejemplo:</strong> Bolsa de 20 kg para alimentación diaria.",
+            },
+          },
+          {
+            element: "#tipo",
+            popover: {
+              title: "Tipo Producto",
+              description:
+                "Clasifica el producto dentro del catálogo de inventario. <br><strong>Ejemplo:</strong> Alimentos.",
+            },
+          },
+          {
+            element: "#unidad",
+            popover: {
+              title: "Unidad de Medida",
+              description:
+                "Selecciona la unidad con la que se controla el stock. <br><strong>Ejemplo:</strong> Kilogramo.",
+            },
+          },
+          {
+            element: "#stockMin",
+            popover: {
+              title: "Stock Mínimo (Alerta)",
+              description:
+                "Define el umbral mínimo para activar alertas de reposición. <br><strong>Ejemplo:</strong> 5 unidades.",
+            },
+          },
+          {
+            element: ".tour-product-step2-header",
+            popover: {
+              title: "Imagen del Producto",
+              description:
+                "Sube una imagen para identificar visualmente el producto en el inventario. <br><strong>Ejemplo:</strong> Foto del empaque frontal.",
+            },
+          },
+          {
+            element: ".tour-product-file-upload .p-fileupload-content",
+            popover: {
+              title: "Área para arrastrar imagen",
+              description:
+                "Arrastra y suelta aquí el archivo que quieras cargar. <br><strong>Ejemplo:</strong> arrastrar imagen PNG desde el escritorio.",
+            },
+          },
+          {
+            element: ".tour-product-file-upload .p-fileupload-choose-button",
+            popover: {
+              title: "Seleccionar Imagen",
+              description:
+                "Abre el explorador de archivos para elegir una imagen desde tu equipo. <br><strong>Ejemplo:</strong> seleccionar foto del producto.",
+            },
+          },
+          {
+            element: ".tour-product-file-upload .p-fileupload-cancel-button",
+            popover: {
+              title: "Cancelar",
+              description:
+                "Cancela la selección de imagen actual y limpia la cola de carga. <br><strong>Ejemplo:</strong> quitar un archivo equivocado.",
+            },
+          },
+          {
+            element: ".tour-product-back-btn",
+            popover: {
+              title: "Atrás",
+              description:
+                "Vuelve al paso anterior para corregir los datos del formulario. <br><strong>Ejemplo:</strong> regresar a la información básica.",
+            },
+          },
+          {
+            element: ".tour-product-save-btn",
+            popover: {
+              title: "Crear Producto",
+              description:
+                "Guarda el producto en el inventario una vez completada la información. <br><strong>Ejemplo:</strong> registrar un nuevo alimento.",
+            },
+          },
+        ];
+
+      case "admin-inventario-producto-lista":
+        return [
+          {
+            element: ".tour-product-list-header",
+            popover: {
+              title: "Inventario General",
+              description:
+                "Vista general para administrar los productos del almacén.",
+            },
+          },
+          {
+            element: ".tour-product-report-btn",
+            popover: {
+              title: "Generar Reporte",
+              description:
+                "Descarga el reporte kardex o consolidado del inventario. <br><strong>Ejemplo:</strong> exportar resumen mensual.",
+            },
+          },
+          {
+            element: ".tour-product-alerts-btn",
+            popover: {
+              title: "Alertas",
+              description:
+                "Muestra productos con stock bajo o en estado de alerta. <br><strong>Ejemplo:</strong> identificar artículos críticos.",
+            },
+          },
+          {
+            element: ".tour-product-refresh-btn",
+            popover: {
+              title: "Actualizar / Refrescar",
+              description:
+                "Recarga la lista para reflejar los datos más recientes. <br><strong>Ejemplo:</strong> volver a consultar el stock.",
+            },
+          },
+          {
+            element: ".tour-product-new-btn",
+            popover: {
+              title: "Nuevo Producto",
+              description:
+                "Abre el formulario para registrar un nuevo producto. <br><strong>Ejemplo:</strong> crear un insumo faltante.",
+            },
+          },
+          {
+            element: ".tour-product-dataview",
+            popover: {
+              title: "Lista de productos",
+              description:
+                "Listado principal con tarjetas o lista de productos registrados.",
+            },
+          },
+          {
+            element: ".tour-product-layout",
+            popover: {
+              title: "Cambio de vista",
+              description:
+                "Alterna entre vista de lista y de tarjetas. <br><strong>Ejemplo:</strong> cambiar a cuadrícula para revisión visual.",
+            },
+          },
+          {
+            element: ".tour-product-dataview .p-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Navega entre páginas para consultar más productos.",
+            },
+          },
+        ];
+
+      case "admin-inventario-proveedor-crear":
+        return [
+          {
+            element: ".tour-provider-create-header",
+            popover: {
+              title: "Registrar Nuevo Proveedor",
+              description:
+                "Completa los datos de contacto del nuevo proveedor. <br><strong>Ejemplo:</strong> Distribuidora Andina S.A.",
+            },
+          },
+          {
+            element: "#nombre",
+            popover: {
+              title: "Nombre de la Empresa o Proveedor",
+              description:
+                "Nombre comercial o razón social del proveedor. <br><strong>Ejemplo:</strong> Agroinsumos del Sur.",
+            },
+          },
+          {
+            element: "#email",
+            popover: {
+              title: "Correo electrónico",
+              description:
+                "Dirección de correo para contacto y pedidos. <br><strong>Ejemplo:</strong> ventas@agroinsumos.com.",
+            },
+          },
+          {
+            element: "#telefono",
+            popover: {
+              title: "Teléfono de contacto",
+              description:
+                "Número principal para comunicación comercial. <br><strong>Ejemplo:</strong> +593 99 123 4567.",
+            },
+          },
+          {
+            element: ".tour-provider-cancel-btn",
+            popover: {
+              title: "Botón Cancelar",
+              description:
+                "Descarta los cambios y regresa a la lista de proveedores.",
+            },
+          },
+          {
+            element: ".tour-provider-save-btn",
+            popover: {
+              title: "Guardar",
+              description:
+                "Registra el proveedor en el sistema. <br><strong>Ejemplo:</strong> guardar el nuevo distribuidor.",
+            },
+          },
+        ];
+
+      case "admin-inventario-proveedor-lista":
+        return [
+          {
+            element: ".tour-provider-list-header",
+            popover: {
+              title: "Gestión de Proveedores",
+              description:
+                "Lista central para administrar los proveedores del inventario.",
+            },
+          },
+          {
+            element: ".tour-provider-total",
+            popover: {
+              title: "Total de proveedores",
+              description:
+                "Indica cuántos proveedores están registrados actualmente.",
+            },
+          },
+          {
+            element: ".tour-provider-dataview",
+            popover: {
+              title: "Lista de los proveedores",
+              description:
+                "Visualiza el detalle y acciones disponibles de cada proveedor.",
+            },
+          },
+          {
+            element: ".tour-provider-layout",
+            popover: {
+              title: "Cambio de vista",
+              description:
+                "Alterna entre vista de lista y tarjetas para revisar proveedores.",
+            },
+          },
+          {
+            element: ".tour-provider-dataview .p-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Permite navegar por páginas de resultados.",
+            },
+          },
+          {
+            element: ".tour-provider-refresh-btn",
+            popover: {
+              title: "Botón Actualizar",
+              description:
+                "Recarga la lista de proveedores. <br><strong>Ejemplo:</strong> ver nuevos registros.",
+            },
+          },
+          {
+            element: ".tour-provider-new-btn",
+            popover: {
+              title: "Nuevo proveedor",
+              description:
+                "Abre el formulario para crear un nuevo proveedor.",
+            },
+          },
+        ];
+
+      case "admin-inventario-tipo-lista":
+        return [
+          {
+            element: ".tour-type-list-header",
+            popover: {
+              title: "Tipos de Producto",
+              description:
+                "Catálogo para administrar los tipos/categorías de productos.",
+            },
+          },
+          {
+            element: ".tour-type-total",
+            popover: {
+              title: "Total de tipos",
+              description:
+                "Cantidad total de tipos disponibles en el catálogo.",
+            },
+          },
+          {
+            element: ".tour-type-dataview",
+            popover: {
+              title: "Lista de los tipos",
+              description:
+                "Muestra todos los tipos con acciones de edición y eliminación.",
+            },
+          },
+          {
+            element: ".tour-type-layout",
+            popover: {
+              title: "Parte para cambiar la vista",
+              description:
+                "Permite alternar entre lista y tarjetas para revisar los tipos.",
+            },
+          },
+          {
+            element: ".tour-type-dataview .p-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Navega entre páginas del catálogo.",
+            },
+          },
+          {
+            element: ".tour-type-refresh-btn",
+            popover: {
+              title: "Botón Actualizar",
+              description:
+                "Recarga la lista para ver cambios recientes.",
+            },
+          },
+          {
+            element: ".tour-type-new-btn",
+            popover: {
+              title: "Nuevo tipo",
+              description:
+                "Abre el formulario para crear un nuevo tipo de producto.",
+            },
+          },
+        ];
+
+      case "admin-inventario-unidad-lista":
+        return [
+          {
+            element: ".tour-unit-list-header",
+            popover: {
+              title: "Unidades de Medida",
+              description:
+                "Catálogo de unidades utilizadas para controlar inventario y stock.",
+            },
+          },
+          {
+            element: ".tour-unit-total",
+            popover: {
+              title: "Total de unidades",
+              description:
+                "Número total de unidades registradas.",
+            },
+          },
+          {
+            element: ".tour-unit-dataview",
+            popover: {
+              title: "Lista de las unidades",
+              description:
+                "Muestra nombre, abreviatura y acciones de cada unidad.",
+            },
+          },
+          {
+            element: ".tour-unit-layout",
+            popover: {
+              title: "Parte para cambiar la vista",
+              description:
+                "Alterna el formato visual de la lista.",
+            },
+          },
+          {
+            element: ".tour-unit-dataview .p-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Permite recorrer páginas de unidades.",
+            },
+          },
+          {
+            element: ".tour-unit-refresh-btn",
+            popover: {
+              title: "Botón Actualizar",
+              description:
+                "Recarga la información mostrada.",
+            },
+          },
+          {
+            element: ".tour-unit-new-btn",
+            popover: {
+              title: "Nueva unidad",
+              description:
+                "Abre el formulario para crear una nueva unidad de medida.",
+            },
+          },
+        ];
+
+      case "admin-inventario-unidad-crear":
+        return [
+          {
+            element: ".tour-unit-create-header",
+            popover: {
+              title: "Nueva Unidad de Medida",
+              description:
+                "Formulario para registrar una unidad nueva. <br><strong>Ejemplo:</strong> Kilogramo.",
+            },
+          },
+          {
+            element: "#nombre",
+            popover: {
+              title: "Nombre completo",
+              description:
+                "Nombre formal de la unidad. <br><strong>Ejemplo:</strong> Litro.",
+            },
+          },
+          {
+            element: "#abreviatura",
+            popover: {
+              title: "Símbolo/Abreviatura",
+              description:
+                "Abreviatura usada en reportes y stock. <br><strong>Ejemplo:</strong> Kg.",
+            },
+          },
+          {
+            element: ".tour-unit-cancel-btn",
+            popover: {
+              title: "Botón Cancelar",
+              description:
+                "Descarta la edición y vuelve a la lista.",
+            },
+          },
+          {
+            element: ".tour-unit-save-btn",
+            popover: {
+              title: "Botón Guardar",
+              description:
+                "Guarda la nueva unidad de medida en el catálogo.",
+            },
+          },
+        ];
+
+      case "admin-inventario-historial":
+        return [
+          {
+            element: ".tour-historial-header",
+            popover: {
+              title: "Movimientos de Inventario",
+              description:
+                "Consulta los movimientos de entrada y salida del almacén.",
+            },
+          },
+          {
+            element: ".tour-historial-new-entry-btn",
+            popover: {
+              title: "Nueva entrada",
+              description:
+                "Abre el formulario para registrar compras o ingresos al inventario.",
+            },
+          },
+          {
+            element: ".tour-historial-new-exit-btn",
+            popover: {
+              title: "Nueva salida",
+              description:
+                "Abre el formulario para registrar consumos o egresos.",
+            },
+          },
+          {
+            element: ".tour-historial-tabs",
+            popover: {
+              title: "Entradas y Salidas",
+              description:
+                "Cambia entre movimientos de compras y de consumo.",
+            },
+          },
+          {
+            element: ".tour-historial-page",
+            popover: {
+              title: "Vista completa de la página",
+              description:
+                "Contenido principal del historial con sus tablas y filtros.",
+            },
+          },
+          {
+            element: ".tour-historial-entradas-table",
+            popover: {
+              title: "Tabla de Entradas",
+              description:
+                "Listado de compras/ingresos del inventario.",
+            },
+          },
+          {
+            element: ".tour-historial-entradas-id",
+            popover: {
+              title: "Columna: Id",
+              description: "Identificador único del movimiento.",
+            },
+          },
+          {
+            element: ".tour-historial-entradas-fecha",
+            popover: {
+              title: "Columna: Fecha",
+              description: "Fecha y hora del registro.",
+            },
+          },
+          {
+            element: ".tour-historial-entradas-proveedor",
+            popover: {
+              title: "Columna: Proveedor",
+              description: "Proveedor asociado a la entrada.",
+            },
+          },
+          {
+            element: ".tour-historial-entradas-registrado",
+            popover: {
+              title: "Columna: Registrado por",
+              description: "Usuario que hizo el registro.",
+            },
+          },
+          {
+            element: ".tour-historial-entradas-total",
+            popover: {
+              title: "Columna: Total Items",
+              description: "Cantidad total de productos en la entrada.",
+            },
+          },
+          {
+            element: ".tour-historial-entradas-acciones",
+            popover: {
+              title: "Columna: Acciones",
+              description: "Acciones disponibles sobre cada movimiento.",
+            },
+          },
+          {
+            element: ".tour-historial-tab-salidas",
+            popover: {
+              title: "Salidas (Consumo)",
+              description:
+                "Selecciona esta pestaña para ver los egresos de inventario.",
+              onNextClick: () => {
+                const el = document.querySelector(
+                  ".tour-historial-tab-salidas button, .tour-historial-tab-salidas",
+                ) as HTMLElement | null;
+                el?.click();
+                setTimeout(() => this.driverRef?.moveNext(), 250);
+              },
+            },
+          },
+          {
+            element: ".tour-historial-salidas-table",
+            popover: {
+              title: "Tabla de Salidas",
+              description:
+                "Listado de consumos o egresos del almacén.",
+            },
+          },
+          {
+            element: ".tour-historial-salidas-id",
+            popover: {
+              title: "Columna: Id",
+              description: "Identificador único del movimiento.",
+            },
+          },
+          {
+            element: ".tour-historial-salidas-fecha",
+            popover: {
+              title: "Columna: Fecha",
+              description: "Fecha y hora del registro.",
+            },
+          },
+          {
+            element: ".tour-historial-salidas-motivo",
+            popover: {
+              title: "Columna: Motivo",
+              description: "Tipo o razón de la salida.",
+            },
+          },
+          {
+            element: ".tour-historial-salidas-registrado",
+            popover: {
+              title: "Columna: Registrado por",
+              description: "Usuario que realizó la salida.",
+            },
+          },
+          {
+            element: ".tour-historial-salidas-total",
+            popover: {
+              title: "Columna: Total Items",
+              description: "Cantidad total de artículos egresados.",
+            },
+          },
+          {
+            element: ".tour-historial-salidas-acciones",
+            popover: {
+              title: "Columna: Acciones",
+              description: "Acciones disponibles sobre la salida.",
+            },
+          },
+        ];
+
+      case "admin-inventario-entrada-crear":
+        return [
+          {
+            element: ".tour-entrada-header",
+            popover: {
+              title: "Registrar Entrada",
+              description:
+                "Formulario para ingresar productos al almacén. <br><strong>Ejemplo:</strong> compra de alimento para animales.",
+            },
+          },
+          {
+            element: ".tour-entrada-proveedor-section",
+            popover: {
+              title: "Datos del Proveedor",
+              description:
+                "Selecciona el proveedor responsable del ingreso. <br><strong>Ejemplo:</strong> Agroinsumos del Sur.",
+            },
+          },
+          {
+            element: "p-select[inputid='proveedor']",
+            popover: {
+              title: "Proveedor",
+              description:
+                "Asocia la entrada con el proveedor correcto. <br><strong>Ejemplo:</strong> Distribuidora Andina.",
+            },
+          },
+          {
+            element: ".tour-entrada-products-section",
+            popover: {
+              title: "Productos a Ingresar",
+              description:
+                "Tabla con las filas que componen la entrada.",
+            },
+          },
+          {
+            element: ".tour-entrada-add-row-btn",
+            popover: {
+              title: "Agregar fila",
+              description:
+                "Añade otra línea de producto a la entrada. <br><strong>Ejemplo:</strong> registrar dos productos distintos.",
+            },
+          },
+          {
+            element: "p-select[formcontrolname='productoId']",
+            popover: {
+              title: "Producto",
+              description:
+                "Selecciona el producto que ingresará al inventario. <br><strong>Ejemplo:</strong> alimento balanceado.",
+            },
+          },
+          {
+            element: "p-inputnumber[formcontrolname='cantidad']",
+            popover: {
+              title: "Cantidad",
+              description:
+                "Indica cuántas unidades o kilos ingresan. <br><strong>Ejemplo:</strong> 25.",
+            },
+          },
+          {
+            element: "input[formcontrolname='lote']",
+            popover: {
+              title: "Lote",
+              description:
+                "Referencia de trazabilidad del lote recibido. <br><strong>Ejemplo:</strong> LOTE-2026-04.",
+            },
+          },
+          {
+            element: "p-datepicker[formcontrolname='fechaCaducidad']",
+            popover: {
+              title: "Vencimiento",
+              description:
+                "Fecha de caducidad del producto recibido. <br><strong>Ejemplo:</strong> 2026-12-31.",
+            },
+          },
+          {
+            element: ".tour-entrada-cancel-btn",
+            popover: {
+              title: "Cancelar",
+              description:
+                "Cancela la operación y vuelve al historial.",
+            },
+          },
+          {
+            element: ".tour-entrada-submit-btn",
+            popover: {
+              title: "Registrar Entrada",
+              description:
+                "Guarda la entrada y actualiza el inventario.",
+            },
+          },
+        ];
+
+      case "admin-inventario-salida-crear":
+        return [
+          {
+            element: ".tour-salida-header",
+            popover: {
+              title: "Registrar Salida",
+              description:
+                "Formulario para registrar consumos o egresos del almacén. <br><strong>Ejemplo:</strong> entrega de insumos al área de nutrición.",
+            },
+          },
+          {
+            element: ".tour-salida-general-section",
+            popover: {
+              title: "Datos Generales",
+              description:
+                "Selecciona el motivo o tipo de la salida y añade observaciones si aplica.",
+            },
+          },
+          {
+            element: "p-select[inputid='tipo']",
+            popover: {
+              title: "Motivo de Salida",
+              description:
+                "Define por qué se realiza el egreso. <br><strong>Ejemplo:</strong> Consumo interno.",
+            },
+          },
+          {
+            element: "textarea[id='obs']",
+            popover: {
+              title: "Observaciones (opcional)",
+              description:
+                "Agrega notas adicionales sobre la salida. <br><strong>Ejemplo:</strong> entrega parcial al área de alimentación.",
+            },
+          },
+          {
+            element: ".tour-salida-products-section",
+            popover: {
+              title: "Detalle de Productos",
+              description:
+                "Tabla con los productos y su destino específico.",
+            },
+          },
+          {
+            element: ".tour-salida-add-item-btn",
+            popover: {
+              title: "Agregar Item",
+              description:
+                "Añade otra fila al detalle de salida. <br><strong>Ejemplo:</strong> incluir otro producto.",
+            },
+          },
+          {
+            element: "p-select[formcontrolname='productoId']",
+            popover: {
+              title: "Producto",
+              description:
+                "Selecciona el producto que saldrá del inventario. <br><strong>Ejemplo:</strong> desinfectante.",
+            },
+          },
+          {
+            element: "p-inputnumber[formcontrolname='cantidad']",
+            popover: {
+              title: "Cantidad",
+              description:
+                "Indica la cantidad a descontar del stock. <br><strong>Ejemplo:</strong> 3 unidades.",
+            },
+          },
+          {
+            element: "p-select[formcontrolname='tipoDestino']",
+            popover: {
+              title: "Tipo destino",
+              description:
+                "Define si el consumo corresponde a un animal, un hábitat o uso general.",
+            },
+          },
+          {
+            element: "p-select[formcontrolname='destinoId']",
+            popover: {
+              title: "Destino Específico",
+              description:
+                "Selecciona el animal o hábitat afectado cuando aplique. <br><strong>Ejemplo:</strong> hábitat Sabana Africana.",
+            },
+          },
+          {
+            element: ".tour-salida-cancel-btn",
+            popover: {
+              title: "Cancelar",
+              description:
+                "Cancela la salida y regresa al historial.",
+            },
+          },
+          {
+            element: ".tour-salida-submit-btn",
+            popover: {
+              title: "Confirmar salida",
+              description:
+                "Guarda la salida y descuenta el inventario.",
             },
           },
         ];
