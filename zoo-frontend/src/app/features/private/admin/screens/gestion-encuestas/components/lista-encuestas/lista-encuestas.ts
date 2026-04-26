@@ -1,5 +1,10 @@
 import { AsyncPipe } from "@angular/common";
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  afterNextRender,
+  inject,
+} from "@angular/core";
 import { AdminEncuestas } from "@app/features/private/admin/services/admin-encuestas";
 import { Loader } from "@app/shared/components";
 import { DataView } from "primeng/dataview";
@@ -11,6 +16,7 @@ import { ConfirmationService } from "primeng/api";
 import { ConfirmPopupModule } from "primeng/confirmpopup";
 import { ShowToast } from "@app/shared/services";
 import { Observable } from "rxjs";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "zoo-lista-encuestas",
@@ -32,6 +38,8 @@ export default class ListaEncuestas {
   private surveyService = inject(AdminEncuestas);
   router = inject(Router);
   private confirmationService = inject(ConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
+  private tourPrompted = false;
   protected surveys$!: Observable<Encuesta[]>;
 
   ngOnInit(): void {
@@ -40,6 +48,12 @@ export default class ListaEncuestas {
 
   private loadSurveys(): void {
     this.surveys$ = this.surveyService.getAllSurveys();
+    if (!this.tourPrompted) {
+      this.tourPrompted = true;
+      afterNextRender(() => {
+        this.onboarding.startTourIfFirstVisit("admin-encuestas-lista");
+      });
+    }
   }
   private zooToast = inject(ShowToast);
 
@@ -73,5 +87,9 @@ export default class ListaEncuestas {
         });
       },
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-encuestas-lista");
   }
 }

@@ -33,7 +33,10 @@ export type AdminTourKey =
   | "admin-inventario-unidad-crear"
   | "admin-inventario-historial"
   | "admin-inventario-entrada-crear"
-  | "admin-inventario-salida-crear";
+  | "admin-inventario-salida-crear"
+  | "admin-encuestas-lista"
+  | "admin-encuestas-crear"
+  | "admin-auditoria-lista";
 
 interface TourStatusResponse {
   tour_key: string;
@@ -305,6 +308,15 @@ export class OnboardingService {
     }
     if (url.startsWith("/admin/inventario/transacciones/lista") || url.startsWith("/admin/inventario/transacciones")) {
       return "admin-inventario-historial";
+    }
+    if (url.startsWith("/admin/encuestas/crear")) {
+      return "admin-encuestas-crear";
+    }
+    if (url.startsWith("/admin/encuestas/lista") || url === "/admin/encuestas" || url.startsWith("/admin/encuestas")) {
+      return "admin-encuestas-lista";
+    }
+    if (url.startsWith("/admin/audit") || url.startsWith("/admin/auditoria")) {
+      return "admin-auditoria-lista";
     }
     if (url.startsWith("/admin/tareas/operaciones")) {
       return "admin-tareas-operaciones";
@@ -2142,6 +2154,179 @@ export class OnboardingService {
               title: "Confirmar salida",
               description:
                 "Guarda la salida y descuenta el inventario.",
+            },
+          },
+        ];
+
+      case "admin-encuestas-lista":
+        return [
+          {
+            element: ".tour-encuestas-header",
+            popover: {
+              title: "Gestión de Encuestas",
+              description:
+                "Sección principal para administrar todas las encuestas creadas. <br><strong>Ejemplo:</strong> revisar encuestas activas del mes.",
+            },
+          },
+          {
+            element: ".tour-encuestas-main-create-btn",
+            popover: {
+              title: "Botón Crear Encuesta",
+              description:
+                "Abre el formulario para registrar una nueva encuesta. <br><strong>Ejemplo:</strong> crear encuesta de satisfacción para visitantes.",
+            },
+          },
+          {
+            element: ".tour-encuestas-total",
+            popover: {
+              title: "Total de encuestas",
+              description:
+                "Muestra cuántas encuestas hay en el listado actual. <br><strong>Ejemplo:</strong> Total: 12 encuestas.",
+            },
+          },
+          {
+            element: ".tour-encuestas-dataview",
+            popover: {
+              title: "Lista de encuestas",
+              description:
+                "Aquí se visualizan las encuestas con sus acciones disponibles. <br><strong>Ejemplo:</strong> ver, editar o desactivar una encuesta.",
+            },
+          },
+          {
+            element:
+              ".tour-encuestas-empty-create-btn, .tour-encuestas-main-create-btn",
+            popover: {
+              title: "Crear primera encuesta",
+              description:
+                "Este botón aparece cuando no hay registros para iniciar la primera encuesta. <br><strong>Ejemplo:</strong> crear encuesta inicial del sistema.",
+            },
+          },
+          {
+            element: ".tour-encuestas-item-edit-btn",
+            popover: {
+              title: "Editar encuesta",
+              description:
+                "Permite modificar una encuesta existente desde la lista. <br><strong>Ejemplo:</strong> cambiar fechas o preguntas de una encuesta activa.",
+            },
+          },
+        ];
+
+      case "admin-encuestas-crear":
+        return [
+          {
+            element: ".tour-encuesta-create-header",
+            popover: {
+              title: "Crear Nueva Encuesta",
+              description:
+                "Encabezado del formulario de creación de encuesta. <br><strong>Ejemplo:</strong> alta de encuesta para control de calidad.",
+            },
+          },
+          {
+            element: ".tour-encuesta-campo-titulo",
+            popover: {
+              title: "Título (campo)",
+              description:
+                "Define el nombre principal de la encuesta para identificarla rápidamente. <br><strong>Ejemplo:</strong> Encuesta de bienestar animal.",
+            },
+          },
+          {
+            element: ".tour-encuesta-campo-descripcion",
+            popover: {
+              title: "Descripción (campo)",
+              description:
+                "Explica el objetivo o alcance de la encuesta. <br><strong>Ejemplo:</strong> Evaluar percepción de limpieza y orden en recintos.",
+            },
+          },
+          {
+            element: ".tour-encuesta-campo-fecha-inicio",
+            popover: {
+              title: "Fecha inicio (campo)",
+              description:
+                "Indica desde cuándo estará disponible la encuesta. <br><strong>Ejemplo:</strong> 01-05-2026.",
+            },
+          },
+          {
+            element: ".tour-encuesta-campo-fecha-fin",
+            popover: {
+              title: "Fecha fin (campo)",
+              description:
+                "Define la fecha límite para responder la encuesta. <br><strong>Ejemplo:</strong> 31-05-2026.",
+            },
+          },
+          {
+            element: ".tour-encuesta-seccion-preguntas",
+            popover: {
+              title: "Preguntas",
+              description:
+                "Bloque donde se administran las preguntas de la encuesta. <br><strong>Ejemplo:</strong> agregar 5 preguntas de opción única.",
+            },
+          },
+          {
+            element: ".tour-encuesta-add-question-btn",
+            popover: {
+              title: "Botón para agregar pregunta",
+              description:
+                "Añade una nueva pregunta al cuestionario. <br><strong>Ejemplo:</strong> ¿Cómo califica el servicio de guía?.",
+            },
+          },
+          {
+            element: ".tour-encuesta-cancel-btn",
+            popover: {
+              title: "Botón cancelar",
+              description:
+                "Cancela la operación y regresa al listado sin guardar cambios. <br><strong>Ejemplo:</strong> salir del formulario por datos incompletos.",
+            },
+          },
+          {
+            element: ".tour-encuesta-submit-btn",
+            popover: {
+              title: "Botón crear encuesta",
+              description:
+                "Guarda la encuesta con sus preguntas y fechas configuradas. <br><strong>Ejemplo:</strong> publicar nueva encuesta institucional.",
+            },
+          },
+        ];
+
+      case "admin-auditoria-lista":
+        return [
+          {
+            element: ".tour-audit-first-row",
+            popover: {
+              title: "Primera fila de auditoría",
+              description:
+                "Registro más reciente donde puedes ver evento, usuario y fecha. <br><strong>Ejemplo:</strong> LOGIN_SUCCESS del administrador.",
+            },
+          },
+          {
+            element: ".tour-audit-user",
+            popover: {
+              title: "Usuario",
+              description:
+                "Identifica qué usuario ejecutó la acción registrada. <br><strong>Ejemplo:</strong> admin@zooconnect.com.",
+            },
+          },
+          {
+            element: ".tour-audit-description",
+            popover: {
+              title: "Descripción",
+              description:
+                "Muestra el tipo de evento auditado. <br><strong>Ejemplo:</strong> LOGIN_SUCCESS, LOGIN_FAILED o CREATE_USER.",
+            },
+          },
+          {
+            element: ".tour-audit-date",
+            popover: {
+              title: "Fecha",
+              description:
+                "Fecha y hora en que ocurrió el evento. <br><strong>Ejemplo:</strong> 26 abr 2026, 09:45.",
+            },
+          },
+          {
+            element: ".tour-audit-dataview .p-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Permite navegar entre páginas del historial de auditoría. <br><strong>Ejemplo:</strong> pasar de página 1 a página 2.",
             },
           },
         ];
