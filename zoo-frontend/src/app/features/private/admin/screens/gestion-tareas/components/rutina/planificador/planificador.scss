@@ -19,8 +19,15 @@
   align-items: flex-end;
 
   .title-block {
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
     h1 {
-      margin: 0 0 0.5rem 0;
+      margin: 0;
       font-size: 2rem;
       font-weight: 800;
       color: var(--p-text-color);

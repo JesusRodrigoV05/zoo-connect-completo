@@ -1,7 +1,16 @@
-<div class="planificador-container">
+<div class="planificador-container tour-planificador-page">
   <div class="header-section">
     <div class="title-block">
-      <h1>Planificador de Rutinas</h1>
+      <div class="title-row">
+        <h1>Planificador de Rutinas</h1>
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          (onClick)="startGuidedTour()"
+        />
+      </div>
       <p>Configura las tareas que se repiten automáticamente</p>
     </div>
 
@@ -9,6 +18,7 @@
       label="Nueva Rutina"
       icon="pi pi-plus"
       [rounded]="true"
+      styleClass="tour-planificador-new-btn"
       routerLink="/admin/tareas/planificador/crear"
     />
   </div>
@@ -24,15 +34,15 @@
       (onLazyLoad)="onPageChange($event)"
       responsiveLayout="scroll"
       dataKey="id"
-      styleClass="p-datatable-sm zoo-table"
+      styleClass="p-datatable-sm zoo-table tour-planificador-table"
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Título</th>
-          <th>Tipo</th>
-          <th>Lugar</th>
-          <th>Frecuencia</th>
-          <th>Estado</th>
+          <th class="tour-planificador-col-titulo">Título</th>
+          <th class="tour-planificador-col-tipo">Tipo</th>
+          <th class="tour-planificador-col-lugar">Lugar</th>
+          <th class="tour-planificador-col-frecuencia">Frecuencia</th>
+          <th class="tour-planificador-col-estado">Estado</th>
           <th class="actions-header"></th>
         </tr>
       </ng-template>

@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   inject,
@@ -13,6 +14,7 @@ import { DialogModule } from "primeng/dialog";
 import { SplitterModule } from "primeng/splitter";
 import { TareasPendientesStore } from "@app/features/private/admin/stores/tareas/admin-operaciones.store";
 import { CrearTarea } from "../crear-tarea/crear-tarea";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "zoo-tablero",
@@ -32,13 +34,24 @@ import { CrearTarea } from "../crear-tarea/crear-tarea";
 })
 export default class Tablero {
   readonly store = inject(TareasPendientesStore);
+  private readonly onboarding = inject(OnboardingService);
 
   isAssignModalOpen = signal(false);
   selectedTaskId = signal<number | null>(null);
   isCreateModalOpen = signal(false);
 
+  constructor() {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-tareas-operaciones");
+    });
+  }
+
   ngOnInit() {
     this.store.loadDashboard();
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-tareas-operaciones");
   }
 
   onRequestAssign(taskId: number) {

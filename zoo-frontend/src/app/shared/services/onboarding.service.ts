@@ -13,7 +13,13 @@ export type AdminTourKey =
   | "admin-especies-crear"
   | "admin-habitat-lista"
   | "admin-habitat-crear"
-  | "admin-animales-crear";
+  | "admin-animales-crear"
+  | "admin-tareas-operaciones"
+  | "admin-tareas-planificador"
+  | "admin-tareas-configuracion"
+  | "admin-tareas-crear-manual"
+  | "admin-tareas-rutina-crear"
+  | "admin-tareas-tipo-crear";
 
 interface TourStatusResponse {
   tour_key: string;
@@ -243,6 +249,18 @@ export class OnboardingService {
     }
     if (url.startsWith("/admin/animales/crear")) {
       return "admin-animales-crear";
+    }
+    if (url.startsWith("/admin/tareas/operaciones")) {
+      return "admin-tareas-operaciones";
+    }
+    if (url.startsWith("/admin/tareas/planificador/crear")) {
+      return "admin-tareas-rutina-crear";
+    }
+    if (url.startsWith("/admin/tareas/planificador")) {
+      return "admin-tareas-planificador";
+    }
+    if (url.startsWith("/admin/tareas/configuracion")) {
+      return "admin-tareas-configuracion";
     }
 
     return null;
@@ -774,6 +792,310 @@ export class OnboardingService {
               title: "Carga de imágenes",
               description:
                 "Sube fotos del animal para ficha y seguimiento.",
+            },
+          },
+        ];
+
+      case "admin-tareas-operaciones":
+        return [
+          {
+            element: ".tour-operaciones-header",
+            popover: {
+              title: "Tablero de Operaciones",
+              description:
+                "Vista principal para coordinar tareas operativas en tiempo real.",
+            },
+          },
+          {
+            element: ".tour-operaciones-inbox",
+            popover: {
+              title: "Bandeja de Entrada",
+              description:
+                "Aquí llegan tareas sin responsable para ser asignadas al equipo.",
+            },
+          },
+          {
+            element: ".tour-operaciones-assigned",
+            popover: {
+              title: "Asignadas Hoy",
+              description:
+                "Muestra las tareas ya asignadas para el día y su distribución por cuidador.",
+            },
+          },
+          {
+            element: ".tour-operaciones-refresh-btn",
+            popover: {
+              title: "Actualizar",
+              description:
+                "Recarga el tablero para obtener el estado más reciente de tareas y asignaciones.",
+            },
+          },
+          {
+            element: ".tour-operaciones-create-btn",
+            popover: {
+              title: "Crear Tarea Manual",
+              description:
+                "Abre el formulario para registrar una tarea puntual sin depender de una rutina.",
+            },
+          },
+        ];
+
+      case "admin-tareas-planificador":
+        return [
+          {
+            element: ".tour-planificador-page",
+            popover: {
+              title: "Vista completa de la página",
+              description:
+                "Desde aquí administras las rutinas automáticas que generan tareas recurrentes.",
+            },
+          },
+          {
+            element: ".tour-planificador-table",
+            popover: {
+              title: "Tabla",
+              description:
+                "Listado de rutinas configuradas con su frecuencia, estado y acciones.",
+            },
+          },
+          {
+            element: ".tour-planificador-col-titulo",
+            popover: {
+              title: "Columna: Título",
+              description:
+                "Identifica rápidamente el nombre de cada rutina programada.",
+            },
+          },
+          {
+            element: ".tour-planificador-col-tipo",
+            popover: {
+              title: "Columna: Tipo",
+              description:
+                "Indica la categoría de actividad que ejecutará la rutina.",
+            },
+          },
+          {
+            element: ".tour-planificador-col-lugar",
+            popover: {
+              title: "Columna: Lugar",
+              description:
+                "Muestra si la rutina aplica a un hábitat, un animal o a nivel general.",
+            },
+          },
+          {
+            element: ".tour-planificador-col-frecuencia",
+            popover: {
+              title: "Columna: Frecuencia",
+              description:
+                "Resume la periodicidad con la que se ejecutará la rutina.",
+            },
+          },
+          {
+            element: ".tour-planificador-col-estado",
+            popover: {
+              title: "Columna: Estado",
+              description:
+                "Permite verificar si la rutina está activa o pausada.",
+            },
+          },
+          {
+            element: ".tour-planificador-new-btn",
+            popover: {
+              title: "Nueva Rutina",
+              description:
+                "Accede al formulario para crear una rutina recurrente nueva.",
+            },
+          },
+        ];
+
+      case "admin-tareas-configuracion":
+        return [
+          {
+            element: ".tour-config-tipos-header",
+            popover: {
+              title: "Diccionario de actividades",
+              description:
+                "Define y administra los tipos de tarea que se reutilizan en operaciones y rutinas.",
+            },
+          },
+          {
+            element: ".tour-config-tipos-list",
+            popover: {
+              title: "Lista de tipos",
+              description:
+                "Muestra todos los tipos registrados con su descripción y acciones disponibles.",
+            },
+          },
+          {
+            element: ".tour-config-tipos-delete-btn",
+            popover: {
+              title: "Botón Eliminar",
+              description:
+                "Cambia el estado del tipo seleccionado cuando ya no debe utilizarse.",
+            },
+          },
+          {
+            element: ".tour-config-tipos-new-btn",
+            popover: {
+              title: "Nuevo Tipo",
+              description:
+                "Abre el modal para crear un nuevo tipo de tarea.",
+            },
+          },
+          {
+            element: ".tour-config-tipos-refresh-btn",
+            popover: {
+              title: "Actualizar",
+              description:
+                "Recarga el catálogo para reflejar los cambios más recientes.",
+            },
+          },
+        ];
+
+      case "admin-tareas-crear-manual":
+        return [
+          {
+            element: ".tour-crear-tarea-header",
+            popover: {
+              title: "Crear Tarea Manual",
+              description:
+                "Formulario para registrar una tarea operativa puntual. <br><strong>Ejemplo:</strong> Revisión de cerraduras del recinto felino.",
+            },
+          },
+          {
+            element: "#titulo",
+            popover: {
+              title: "Título de la Tarea",
+              description:
+                "Define un nombre corto y claro para identificar la tarea. <br><strong>Ejemplo:</strong> Limpieza profunda de zona de aves.",
+            },
+          },
+          {
+            element: "#desc",
+            popover: {
+              title: "Instrucciones",
+              description:
+                "Describe el procedimiento o alcance esperado de la actividad. <br><strong>Ejemplo:</strong> Retirar desechos, desinfectar perchas y cambiar agua.",
+            },
+          },
+          {
+            element: "#tipo",
+            popover: {
+              title: "Tipo de Tarea",
+              description:
+                "Selecciona la categoría operativa para clasificar correctamente la tarea. <br><strong>Ejemplo:</strong> Limpieza y Mantenimiento.",
+            },
+          },
+          {
+            element: "#fecha",
+            popover: {
+              title: "Fecha de Ejecución",
+              description:
+                "Indica el día en que la tarea debe completarse. <br><strong>Ejemplo:</strong> 2026-04-28.",
+            },
+          },
+          {
+            element: "#lugar",
+            popover: {
+              title: "Lugar o Animal Afectado",
+              description:
+                "Asocia la tarea a una ubicación o animal para dar contexto operativo. <br><strong>Ejemplo:</strong> Hábitat: Sabana Africana.",
+            },
+          },
+          {
+            element: "#asignado",
+            popover: {
+              title: "Asignar a (Opcional)",
+              description:
+                "Puedes asignar un responsable ahora o dejar la tarea en bandeja de entrada. <br><strong>Ejemplo:</strong> Juan Perez (Cuidador).",
+            },
+          },
+        ];
+
+      case "admin-tareas-rutina-crear":
+        return [
+          {
+            element: ".tour-rutina-crear-header",
+            popover: {
+              title: "Nueva Rutina",
+              description:
+                "Aquí configuras una rutina para generar tareas automáticamente. <br><strong>Ejemplo:</strong> Alimentación matutina de primates.",
+            },
+          },
+          {
+            element: "#titulo",
+            popover: {
+              title: "Título de la Rutina",
+              description:
+                "Nombre identificador de la rutina recurrente. <br><strong>Ejemplo:</strong> Limpieza diaria de estanque central.",
+            },
+          },
+          {
+            element: "#tipo",
+            popover: {
+              title: "Tipo de Actividad",
+              description:
+                "Define la categoría de tarea que se generará en cada ejecución. <br><strong>Ejemplo:</strong> Alimentación.",
+            },
+          },
+          {
+            element: "#lugar",
+            popover: {
+              title: "Ubicación/Animal (Opcional)",
+              description:
+                "Delimita el alcance de la rutina a una zona o animal específico. <br><strong>Ejemplo:</strong> Animal: Kira.",
+            },
+          },
+          {
+            element: "#freqType",
+            popover: {
+              title: "Frecuencia de Repetición",
+              description:
+                "Selecciona cada cuánto se ejecutará la rutina. <br><strong>Ejemplo:</strong> Semanalmente.",
+            },
+          },
+          {
+            element: "#timepicker",
+            popover: {
+              title: "Hora de ejecución",
+              description:
+                "Especifica la hora exacta para generar la tarea automática. <br><strong>Ejemplo:</strong> 07:30.",
+            },
+          },
+          {
+            element: "#desc",
+            popover: {
+              title: "Instrucciones",
+              description:
+                "Detalla las acciones que debe realizar el responsable al ejecutar la tarea. <br><strong>Ejemplo:</strong> Verificar ración, registrar observaciones y confirmar cierre.",
+            },
+          },
+        ];
+
+      case "admin-tareas-tipo-crear":
+        return [
+          {
+            element: ".tour-tipo-crear-header",
+            popover: {
+              title: "Nuevo Tipo de Tarea",
+              description:
+                "Modal para definir una nueva categoría reutilizable de tareas. <br><strong>Ejemplo:</strong> Inspección Preventiva.",
+            },
+          },
+          {
+            element: "#nombre",
+            popover: {
+              title: "Nombre",
+              description:
+                "Campo para registrar el nombre del tipo de tarea. <br><strong>Ejemplo:</strong> Control Sanitario.",
+            },
+          },
+          {
+            element: "#desc",
+            popover: {
+              title: "Descripción",
+              description:
+                "Describe cuándo y cómo se debe usar este tipo en operaciones. <br><strong>Ejemplo:</strong> Actividades de verificación clínica y seguimiento de signos vitales.",
             },
           },
         ];
