@@ -1,23 +1,40 @@
 <zoo-main-container>
   <section class="permissions-page">
     <header class="permissions-header">
-      <div>
-        <p class="eyebrow">OSI</p>
+      <div class="permissions-title-block">
+        <div class="permissions-osi-row">
+          <p class="eyebrow">Permisos OSI</p>
+          <p-button
+            label="Tour guiado"
+            icon="pi pi-question-circle"
+            severity="contrast"
+            [rounded]="true"
+            (onClick)="startGuidedTour()"
+          />
+        </div>
         <h1>Gestión de permisos por usuario</h1>
         <p>
           Define qué módulos puede usar cada usuario. Los cambios se aplican en el backend y quedan auditados.
         </p>
       </div>
 
-      <div class="actions">
+      <div class="actions tour-permissions-actions">
         <input
+          class="tour-permissions-search"
           pInputText
           type="text"
           [value]="search()"
           (input)="onSearchChange(($any($event.target)).value)"
           placeholder="Buscar por usuario, correo o rol"
         />
-        <button pButton type="button" label="Recargar" icon="pi pi-refresh" (click)="loadMatrix()"></button>
+        <button
+          class="tour-permissions-refresh-btn"
+          pButton
+          type="button"
+          label="Recargar"
+          icon="pi pi-refresh"
+          (click)="loadMatrix()"
+        ></button>
       </div>
     </header>
 
@@ -26,26 +43,26 @@
         <p>Preparando matriz de permisos...</p>
       </div>
     } @else {
-      <div class="table-shell">
-        <table class="permissions-table">
+      <div class="table-shell tour-permissions-table-shell">
+        <table class="permissions-table tour-permissions-table">
           <thead>
             <tr>
-              <th>Usuario</th>
-              <th>Rol</th>
+              <th class="tour-permissions-col-user">Usuario</th>
+              <th class="tour-permissions-col-role">Rol</th>
               @for (permission of permissions(); track permission.id) {
-                <th>
+                <th class="tour-permissions-col-permission">
                   <span>{{ permission.name }}</span>
                   <small>{{ permission.module }}</small>
                 </th>
               }
-              <th>Acciones</th>
+              <th class="tour-permissions-col-actions">Acciones</th>
             </tr>
           </thead>
 
           <tbody>
             @for (user of filteredUsers(); track user.id) {
               <tr>
-                <td class="user-cell">
+                <td class="user-cell tour-permissions-col-user">
                   <img
                     class="avatar"
                     [src]="user.photo_url || '/assets/images/profile-icons/1.png'"
@@ -56,11 +73,11 @@
                     <span>{{ user.email }}</span>
                   </div>
                 </td>
-                <td>
+                <td class="tour-permissions-col-role">
                   <p-tag [value]="user.role_name" severity="info"></p-tag>
                 </td>
                 @for (permission of permissions(); track permission.id) {
-                  <td class="permission-cell">
+                  <td class="permission-cell tour-permissions-col-permission">
                     <label>
                       <input
                         type="checkbox"
@@ -70,8 +87,9 @@
                     </label>
                   </td>
                 }
-                <td class="actions-cell">
+                <td class="actions-cell tour-permissions-col-actions">
                   <button
+                    class="tour-permissions-save-btn"
                     pButton
                     type="button"
                     label="Guardar"

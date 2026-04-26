@@ -20,6 +20,10 @@ export type AdminTourKey =
   | "admin-tareas-crear-manual"
   | "admin-tareas-rutina-crear"
   | "admin-tareas-tipo-crear"
+  | "admin-usuarios-lista"
+  | "admin-usuarios-crear"
+  | "admin-usuarios-editar"
+  | "admin-permisos-osi"
   | "admin-inventario-producto-crear"
   | "admin-inventario-producto-lista"
   | "admin-inventario-proveedor-crear"
@@ -259,6 +263,18 @@ export class OnboardingService {
     }
     if (url.startsWith("/admin/animales/crear")) {
       return "admin-animales-crear";
+    }
+    if (url.startsWith("/admin/usuarios/editar")) {
+      return "admin-usuarios-editar";
+    }
+    if (url.startsWith("/admin/usuarios/crear")) {
+      return "admin-usuarios-crear";
+    }
+    if (url.startsWith("/admin/usuarios/lista") || url === "/admin/usuarios") {
+      return "admin-usuarios-lista";
+    }
+    if (url.startsWith("/admin/permisos")) {
+      return "admin-permisos-osi";
     }
     if (url.startsWith("/admin/inventario/crear")) {
       return "admin-inventario-producto-crear";
@@ -1136,6 +1152,201 @@ export class OnboardingService {
               title: "Descripción",
               description:
                 "Describe cuándo y cómo se debe usar este tipo en operaciones. <br><strong>Ejemplo:</strong> Actividades de verificación clínica y seguimiento de signos vitales.",
+            },
+          },
+        ];
+
+      case "admin-usuarios-lista":
+        return [
+          {
+            element: ".tour-users-header",
+            popover: {
+              title: "Gestión de Usuarios",
+              description:
+                "Sección principal para administrar la cuenta y el estado de los usuarios del sistema.",
+            },
+          },
+          {
+            element: ".tour-users-dataview",
+            popover: {
+              title: "Lista de los Usuarios",
+              description:
+                "Muestra el listado paginado de usuarios registrados con sus acciones disponibles.",
+            },
+          },
+          {
+            element: ".tour-users-total",
+            popover: {
+              title: "Total de usuarios",
+              description:
+                "Indica cuántos usuarios están cargados en la consulta actual.",
+            },
+          },
+          {
+            element: ".tour-users-dataview .p-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Permite navegar entre páginas y ajustar la cantidad de usuarios visibles.",
+            },
+          },
+          {
+            element: ".tour-users-refresh-btn",
+            popover: {
+              title: "Refrescar / Actualizar",
+              description:
+                "Vuelve a consultar la lista para traer los datos más recientes. <br><strong>Ejemplo:</strong> ver usuarios creados hace unos segundos.",
+            },
+          },
+          {
+            element: ".tour-users-create-btn",
+            popover: {
+              title: "Crear Usuario",
+              description:
+                "Abre el formulario para registrar una nueva cuenta. <br><strong>Ejemplo:</strong> crear un usuario para un nuevo colaborador.",
+            },
+          },
+          {
+            element: ".tour-users-edit-btn",
+            popover: {
+              title: "Botón de editar usuario",
+              description:
+                "Permite modificar los datos principales del usuario seleccionado. <br><strong>Ejemplo:</strong> cambiar su nombre de usuario.",
+            },
+          },
+          {
+            element: ".tour-users-disable-btn",
+            popover: {
+              title: "Botón de desactivar usuario",
+              description:
+                "Cambia el estado del usuario para impedir su acceso temporalmente. <br><strong>Ejemplo:</strong> desactivar una cuenta inactiva.",
+            },
+          },
+        ];
+
+      case "admin-usuarios-crear":
+      case "admin-usuarios-editar":
+        return [
+          {
+            element: ".tour-user-form-header",
+            popover: {
+              title:
+                tourKey === "admin-usuarios-editar"
+                  ? "Crear Actualizar Usuario"
+                  : "Crear Nuevo Usuario",
+              description:
+                "Encabezado del formulario para registrar o modificar una cuenta de usuario.",
+            },
+          },
+          {
+            element: "#email",
+            popover: {
+              title: "Email",
+              description:
+                "Dirección de correo que identifica al usuario y se usa para acceso o notificaciones. <br><strong>Ejemplo:</strong> usuario@zoo.com.",
+            },
+          },
+          {
+            element: "#username",
+            popover: {
+              title: "Nombre de usuario",
+              description:
+                "Nombre corto con el que el usuario iniciará sesión o será reconocido en el sistema. <br><strong>Ejemplo:</strong> jlopez.",
+            },
+          },
+          {
+            element: "#rol",
+            popover: {
+              title: "Rol",
+              description:
+                "Define los permisos y el alcance de acciones del usuario dentro de la plataforma. <br><strong>Ejemplo:</strong> Veterinario.",
+            },
+          },
+          {
+            element: ".tour-user-cancel-btn",
+            popover: {
+              title: "Botón de cancelar",
+              description:
+                "Descarta los cambios y vuelve a la lista de usuarios. <br><strong>Ejemplo:</strong> salir sin guardar un registro incompleto.",
+            },
+          },
+          {
+            element: ".tour-user-submit-btn",
+            popover: {
+              title:
+                tourKey === "admin-usuarios-editar"
+                  ? "Crear Actualizar Usuario"
+                  : "Crear Usuario",
+              description:
+                "Guarda los datos ingresados en el sistema. <br><strong>Ejemplo:</strong> registrar una nueva cuenta o actualizar una existente.",
+            },
+          },
+        ];
+
+      case "admin-permisos-osi":
+        return [
+          {
+            element: ".tour-permissions-title",
+            popover: {
+              title: "Gestión de permisos por usuario",
+              description:
+                "Vista para revisar y ajustar los permisos asignados a cada usuario.",
+            },
+          },
+          {
+            element: ".tour-permissions-search",
+            popover: {
+              title: "Buscar por usuario correo",
+              description:
+                "Filtra la matriz por nombre de usuario, correo o rol. <br><strong>Ejemplo:</strong> escribir admin@zoo.com para ubicar una cuenta.",
+            },
+          },
+          {
+            element: ".tour-permissions-refresh-btn",
+            popover: {
+              title: "Botón de recargar",
+              description:
+                "Vuelve a cargar la matriz completa para ver cambios recientes. <br><strong>Ejemplo:</strong> refrescar después de modificar un permiso.",
+            },
+          },
+          {
+            element: ".tour-permissions-table",
+            popover: {
+              title: "Tabla",
+              description:
+                "Muestra los usuarios y sus permisos asociados en columnas comparables.",
+            },
+          },
+          {
+            element: ".tour-permissions-col-user",
+            popover: {
+              title: "Usuario",
+              description:
+                "Identifica a la persona a la que se le asignan o revisan permisos. <br><strong>Ejemplo:</strong> jlopez / usuario@zoo.com.",
+            },
+          },
+          {
+            element: ".tour-permissions-col-role",
+            popover: {
+              title: "Rol",
+              description:
+                "Muestra el rol base del usuario para entender su nivel de acceso. <br><strong>Ejemplo:</strong> OSI.",
+            },
+          },
+          {
+            element: ".tour-permissions-col-permission",
+            popover: {
+              title: "Columnas de permisos",
+              description:
+                "Cada columna representa un permiso del catálogo y permite activarlo o desactivarlo. <br><strong>Ejemplo:</strong> acceso a inventario, auditoría o usuarios.",
+            },
+          },
+          {
+            element: ".tour-permissions-col-actions",
+            popover: {
+              title: "Acciones",
+              description:
+                "Botón para guardar los cambios realizados en la fila. <br><strong>Ejemplo:</strong> confirmar permisos después de marcar casillas.",
             },
           },
         ];

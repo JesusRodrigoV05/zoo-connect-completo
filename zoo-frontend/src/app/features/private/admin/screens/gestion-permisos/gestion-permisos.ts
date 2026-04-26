@@ -8,6 +8,8 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MainContainer } from "@app/shared/components/main-container";
 import { AdminPermissionsService, PermissionCatalogItem, PermissionMatrixUser, UpdatePermissionPayload } from "../../services/permissions";
 import { ShowToast } from "@app/shared/services";
+import { afterNextRender } from "@angular/core";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-gestion-permisos",
@@ -21,6 +23,8 @@ export default class GestionPermisos {
   private readonly service = inject(AdminPermissionsService);
   private readonly toast = inject(ShowToast);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly onboarding = inject(OnboardingService);
+  private tourPrompted = false;
 
   protected readonly loading = signal(true);
   protected readonly savingUserId = signal<number | null>(null);
@@ -65,6 +69,12 @@ export default class GestionPermisos {
           this.permissions.set(response.permissions);
           this.matrix.set(response.items);
           this.dirtyUsers.set({});
+          if (!this.tourPrompted) {
+            this.tourPrompted = true;
+            afterNextRender(() => {
+              this.onboarding.startTourIfFirstVisit("admin-permisos-osi");
+            });
+          }
         },
         error: () => {
           this.toast.showError(
@@ -73,6 +83,10 @@ export default class GestionPermisos {
           );
         },
       });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-permisos-osi");
   }
 
   protected onSearchChange(value: string): void {

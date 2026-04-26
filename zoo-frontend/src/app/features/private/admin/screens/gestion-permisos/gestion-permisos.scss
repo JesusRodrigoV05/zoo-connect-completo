@@ -3,6 +3,19 @@
   gap: 1.25rem;
 }
 
+.permissions-title-block {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.permissions-osi-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .permissions-header {
   display: flex;
   justify-content: space-between;
@@ -22,6 +35,10 @@
   max-width: 56rem;
 }
 
+.permissions-header h1 {
+  line-height: 1.1;
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -35,6 +52,10 @@
   gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.actions input {
+  min-width: 18rem;
 }
 
 .table-shell {
@@ -73,6 +94,11 @@
 .permissions-table thead th small {
   opacity: 0.6;
   font-size: 0.72rem;
+}
+
+.tour-permissions-col-permission span {
+  display: block;
+  max-width: 10rem;
 }
 
 .user-cell {
