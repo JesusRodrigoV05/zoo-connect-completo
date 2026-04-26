@@ -38,7 +38,7 @@ export default class Login {
 
   loginForm: FormGroup = this.fb.group({
     email: ["", [Validators.required, Validators.email]],
-    password: ["", [Validators.required, Validators.minLength(6)]],
+    password: ["", [Validators.required, Validators.minLength(12)]],
   });
 
   loading = this.authStore.loading;
@@ -86,7 +86,7 @@ export default class Login {
       if (passwordControl.errors["required"])
         return "La contraseña es requerida";
       if (passwordControl.errors["minlength"])
-        return "La contraseña debe tener al menos 6 caracteres";
+        return "La contraseña debe tener al menos 12 caracteres";
     }
     return null;
   }

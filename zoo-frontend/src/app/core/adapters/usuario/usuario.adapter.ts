@@ -141,8 +141,8 @@ export class UsuarioAdapter {
       frontendUser.password !== undefined &&
       frontendUser.password.trim().length > 0
     ) {
-      if (frontendUser.password.trim().length < 6) {
-        throw new Error("La contraseña debe tener al menos 6 caracteres");
+      if (frontendUser.password.trim().length < 12) {
+        throw new Error("La contraseña debe tener al menos 12 caracteres");
       }
       request.password = frontendUser.password.trim();
     }

@@ -142,7 +142,7 @@ export default class CrearUsuario implements OnInit {
       this.isLoading.set(true);
 
       if (!this.isEditMode) {
-        const generatedPassword = this.usuarioForm.value.username! + "ABC123!";
+        const generatedPassword = this.usuarioForm.value.username! + "ZooAdmin2026!";
         const usuarioData = {
           email: this.usuarioForm.value.email!,
           username: this.usuarioForm.value.username!,

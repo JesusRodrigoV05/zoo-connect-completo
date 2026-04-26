@@ -35,8 +35,8 @@ def has_sequential_chars(s: str, seq_len: int = 4) -> bool:
 
 def validate_password_strength_func(v: str) -> str:
     """Validate password and raise ValueError with message when invalid."""
-    if len(v) < 8:
-        raise ValueError('La contraseña debe tener 8 caracteres como minimo')
+    if len(v) < 12:
+        raise ValueError('La contraseña debe tener 12 caracteres como minimo')
     if not re.search(r"[A-Z]", v):
         raise ValueError("La contraseña debe contener al menos una mayuscula")
     if not re.search(r"[a-z]", v):

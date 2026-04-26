@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, OnInit } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -25,9 +25,11 @@ import { Router } from "@angular/router";
 import { ToggleButtonModule } from "primeng/togglebutton";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
+import { ShowToast } from "@app/shared/services";
 
 @Component({
   selector: "app-signup",
+  standalone: true,
   imports: [
     ReactiveFormsModule,
     FormsModule,
@@ -50,11 +52,12 @@ import { MessageService } from "primeng/api";
   styleUrl: "./signup.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Signup {
+export default class Signup implements OnInit {
   protected readonly authStore = inject(AuthStore);
   authService = inject(Auth);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly toastService = inject(ShowToast);
 
   protected readonly isLoading = this.authStore.loading;
   protected readonly error = this.authStore.error;
@@ -63,7 +66,7 @@ export default class Signup {
     {
       email: ["", [Validators.required, Validators.email]],
       username: ["", [Validators.required, Validators.minLength(3)]],
-      password: ["", [Validators.minLength(8)]],
+      password: ["", [Validators.minLength(12)]],
       confirmPassword: ["", [Validators.required]],
     },
     { validators: this.passwordMatchValidator },
@@ -85,24 +88,35 @@ export default class Signup {
   protected generatedPassword: string | null = null;
   protected generatePassword = false;
 
+  protected isPasswordStrong(): boolean {
+    if (this.generatePassword) return true;
+    return Object.values(this.rules).every(rule => rule === true);
+  }
+
   protected onSubmit(): void {
     this.submitForm();
   }
 
   protected async submitForm(): Promise<void> {
-    if (!this.generatePassword && !this.signupForm.valid) {
-      this.markFormGroupTouched();
-      return;
+    if (!this.generatePassword) {
+      if (!this.signupForm.valid) {
+        this.markFormGroupTouched();
+        this.toastService.showWarning("Formulario Incompleto", "Por favor, revisa los campos marcados en rojo.");
+        return;
+      }
+      if (!this.isPasswordStrong()) {
+        this.toastService.showError("Contraseña Insegura", "La contraseña debe cumplir con todos los requisitos mostrados.");
+        return;
+      }
     }
 
     const { email, username } = this.signupForm.value;
-    const password = this.generatePassword ? undefined : this.signupForm.value.password;
+    const password = this.signupForm.value.password;
 
     try {
-      const res = await this.authStore.register(email, username, password, this.generatePassword);
+      const res = await this.authStore.register(email, username, password, false);
       if (res && res.generated_password) {
         this.generatedPassword = res.generated_password as string;
-        // do not navigate; show password to user and ask to change it later
       } else {
         await this.router.navigate(['/login']);
       }
@@ -165,11 +179,10 @@ export default class Signup {
     const score = Object.values(this.rules).filter(Boolean).length;
     this.strengthPercent = Math.round((score / Object.keys(this.rules).length) * 100);
 
-    // Castigo por repeticiones o secuencias
     if (!this.rules.noRepeats || !this.rules.noSequence) {
       this.strengthLabel = 'Insegura';
       this.strengthClass = 'weak';
-      this.strengthPercent = Math.min(this.strengthPercent, 20); // Baja la barra drásticamente
+      this.strengthPercent = Math.min(this.strengthPercent, 20);
     } else if (score <= 3) {
       this.strengthLabel = 'Débil';
       this.strengthClass = 'weak';
@@ -221,7 +234,6 @@ export default class Signup {
     const all = uppercase + lowercase + digits + symbols;
 
     let pass = "";
-    // Asegurar requisitos mínimos
     pass += uppercase[Math.floor(Math.random() * uppercase.length)];
     pass += lowercase[Math.floor(Math.random() * lowercase.length)];
     pass += digits[Math.floor(Math.random() * digits.length)];
@@ -231,16 +243,13 @@ export default class Signup {
       pass += all[Math.floor(Math.random() * all.length)];
     }
 
-    // Mezclar
     pass = pass.split('').sort(() => Math.random() - 0.5).join('');
 
-    // Validar para asegurar que cumple (evitar mala suerte aleatoria)
     if (this.isValidSuggestion(pass)) {
       this.signupForm.patchValue({
         password: pass,
         confirmPassword: pass
       });
-      // Marcar como tocados para que se activen las validaciones visuales
       this.signupForm.get('password')?.markAsDirty();
       this.signupForm.get('confirmPassword')?.markAsDirty();
       this.onPasswordChange(pass);
@@ -288,7 +297,7 @@ export default class Signup {
     if (control?.errors && control?.touched) {
       if (control.errors["required"]) return "La contraseña es requerida";
       if (control.errors["minlength"])
-        return "La contraseña debe tener al menos 8 caracteres";
+        return "La contraseña debe tener al menos 12 caracteres";
     }
     return null;
   }
@@ -305,3 +314,4 @@ export default class Signup {
     return null;
   }
 }
+

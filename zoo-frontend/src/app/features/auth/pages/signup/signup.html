@@ -81,7 +81,7 @@
               </p-floatlabel>
             </div>
 
-            <div class="field generate-toggle">
+            <!-- <div class="field generate-toggle">
               <p-toggleButton 
                 [(ngModel)]="generatePassword" 
                 [ngModelOptions]="{standalone: true}"
@@ -92,7 +92,7 @@
                 (onChange)="toggleGeneratePassword()"
                 styleClass="w-full"
               />
-            </div>
+            </div> -->
 
             <div class="field suggestion-action" *ngIf="!generatePassword">
               <p-button 
@@ -116,7 +116,7 @@
               <div class="rules-grid">
                 <div class="rule-item" [class.valid]="rules.length">
                   <i [class]="rules.length ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
-                  <span>8+ caracteres</span>
+                  <span>12+ caracteres</span>
                 </div>
                 <div class="rule-item" [class.valid]="rules.uppercase">
                   <i [class]="rules.uppercase ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
@@ -167,7 +167,7 @@
                 type="submit"
                 severity="primary"
                 [rounded]="true"
-                [disabled]="isLoading()"
+                [disabled]="isLoading() || (!generatePassword && !isPasswordStrong())"
                 styleClass="login-button w-full"
                 fluid
               >
