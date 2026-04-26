@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 
 from app.db.session import get_db
-from app.schemas.user import UserCreate, UserOut, UserUpdateProfile
-from app.schemas.user import UserCreate, UserOut, UserUpdateProfile, UserProfileOut
+from app.schemas.user import UserCreate, UserOut, UserUpdateProfile, UserProfileOut, UserCreateResponse
 from app.crud import user as crud_user
 from app.crud import token as crud_token
 from app.crud.auth import authenticate_user
@@ -14,6 +13,7 @@ from app.models.user import User
 #reset token
 from app.schemas.auth import ForgotPasswordRequest, ResetPasswordRequest
 from app.core import email_service
+from app.core.password_utils import generate_strong_password
 from app.crud import token as crud_token
 #
 #2fa
@@ -36,10 +36,19 @@ from redis.asyncio import Redis
 from app.db.cache import get_cache_client
 from app.crud import audit as crud_audit
 from app.core import policia
+from app.core.rsa_manager import RSAManager
 from app.core.enums import AuditEvent
 from app.core.security import verify_password
 from app.crud import permission as crud_permission
 router = APIRouter()
+
+@router.get("/public-key")
+def get_public_key():
+    """
+    Retorna la llave pública RSA del día para cifrar datos sensibles en el cliente.
+    """
+    _, public_key_pem = RSAManager.get_keys()
+    return {"public_key": public_key_pem}
 
 
 
@@ -59,11 +68,49 @@ def _issue_tokens_for_user(user, db: Session):
 
     return access_token, rt["token"]
 #crud_user.create_public_user ya maneja IntegrityError y lanza un HTTPException 409
-@router.post("/register", response_model=UserOut, status_code=201)
+@router.post("/register", response_model=UserCreateResponse, status_code=201)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    #if crud_user.get_user_by_email(db, user_in.email):
-    #    raise HTTPException(status_code=400, detail="Email ya registrado")
-    return crud_user.create_public_user(db=db, user_in=user_in)
+    # 1. Intentar descifrar la contraseña si viene cifrada (RSA)
+    if user_in.password and not user_in.generate_password:
+        try:
+            decrypted_password = RSAManager.decrypt_password(user_in.password)
+            user_in.password = decrypted_password
+        except Exception as e:
+            # Forzamos el cifrado según requerimiento
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Error de seguridad: La contraseña debe estar cifrada con la llave del día."
+            )
+
+    # Si el cliente solicita generación, creamos una segura.
+    data = user_in.model_dump()
+    generate_flag = data.get("generate_password", False)
+    generated_password = None
+
+    if generate_flag:
+        generated_password = generate_strong_password()
+        data["password"] = generated_password
+
+    # Reconstruir el modelo para que corran validadores de fuerza sobre la contraseña ya descifrada
+    try:
+        user_in_with_password = UserCreate(**data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    user = crud_user.create_public_user(db=db, user_in=user_in_with_password)
+
+    # Devolver la información del usuario y, si se generó, la contraseña temporal
+    return {
+        "id": user.id,
+        "email": user.email,
+        "username": user.username,
+        "is_active": user.is_active,
+        "is_admin": user.is_admin,
+        "role_id": user.role_id,
+        "photo_url": user.photo_url,
+        "created_at": user.created_at,
+        "generated_password": generated_password,
+    }
 
 
 #rate limiting
@@ -80,6 +127,17 @@ async def login(
     db: Session = Depends(get_db),
 
     cache: Redis = Depends(get_cache_client)):
+
+    # 1. Descifrar contraseña RSA
+    try:
+        decrypted_password = RSAManager.decrypt_password(payload.password)
+        payload.password = decrypted_password
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error de seguridad: Credenciales no cifradas correctamente."
+        )
+
     #paso 1
     user = crud_user.get_user_by_email(db, payload.email)
     #paso 2 manejar el usuario no encontrado

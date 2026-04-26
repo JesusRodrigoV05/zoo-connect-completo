@@ -32,6 +32,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "gsap": "^3.13.0",
+    "jsencrypt": "^3.3.2",
     "primeicons": "^7.0.0",
     "primeng": "^20.4.0",
     "qrcode": "^1.5.4",

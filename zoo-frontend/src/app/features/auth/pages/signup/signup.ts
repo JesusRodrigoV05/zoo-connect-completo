@@ -3,6 +3,7 @@ import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  FormsModule,
   Validators,
   FormControl,
 } from "@angular/forms";
@@ -11,7 +12,7 @@ import { AuthStore } from "@app/core/stores/auth.store";
 import { Loader } from "@app/shared/components/loader";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
-import { NgOptimizedImage } from "@angular/common";
+import { NgOptimizedImage, CommonModule } from "@angular/common";
 import { LogoImage } from "@app/shared/components";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { InputTextModule } from "primeng/inputtext";
@@ -19,11 +20,17 @@ import { PasswordModule } from "primeng/password";
 import { MessageModule } from "primeng/message";
 import { Auth } from "../../services";
 import { UpdateProfileRequest } from "@models/usuario";
+import { Router } from "@angular/router";
+
+import { ToggleButtonModule } from "primeng/togglebutton";
+import { ToastModule } from "primeng/toast";
+import { MessageService } from "primeng/api";
 
 @Component({
   selector: "app-signup",
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     RouterLink,
     Loader,
     ButtonModule,
@@ -34,7 +41,11 @@ import { UpdateProfileRequest } from "@models/usuario";
     InputTextModule,
     PasswordModule,
     MessageModule,
+    CommonModule,
+    ToggleButtonModule,
+    ToastModule,
   ],
+  providers: [MessageService],
   templateUrl: "./signup.html",
   styleUrl: "./signup.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +54,7 @@ export default class Signup {
   protected readonly authStore = inject(AuthStore);
   authService = inject(Auth);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   protected readonly isLoading = this.authStore.loading;
   protected readonly error = this.authStore.error;
@@ -51,18 +63,51 @@ export default class Signup {
     {
       email: ["", [Validators.required, Validators.email]],
       username: ["", [Validators.required, Validators.minLength(3)]],
-      password: ["", [Validators.required, Validators.minLength(6)]],
+      password: ["", [Validators.minLength(8)]],
       confirmPassword: ["", [Validators.required]],
     },
     { validators: this.passwordMatchValidator },
   );
 
+  // Password rules + strength
+  protected rules = {
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    digit: false,
+    special: false,
+    noRepeats: false,
+    noSequence: false,
+  };
+  protected strengthPercent = 0;
+  protected strengthLabel = "Débil";
+  protected strengthClass = "weak";
+  protected generatedPassword: string | null = null;
+  protected generatePassword = false;
+
   protected onSubmit(): void {
-    if (this.signupForm.valid) {
-      const { email, username, password } = this.signupForm.value;
-      this.authStore.register(email, username, password);
-    } else {
+    this.submitForm();
+  }
+
+  protected async submitForm(): Promise<void> {
+    if (!this.generatePassword && !this.signupForm.valid) {
       this.markFormGroupTouched();
+      return;
+    }
+
+    const { email, username } = this.signupForm.value;
+    const password = this.generatePassword ? undefined : this.signupForm.value.password;
+
+    try {
+      const res = await this.authStore.register(email, username, password, this.generatePassword);
+      if (res && res.generated_password) {
+        this.generatedPassword = res.generated_password as string;
+        // do not navigate; show password to user and ask to change it later
+      } else {
+        await this.router.navigate(['/login']);
+      }
+    } catch (e) {
+      // errors are handled in store
     }
   }
 
@@ -100,6 +145,125 @@ export default class Signup {
     return this.signupForm.get("confirmPassword") as FormControl;
   }
 
+  ngOnInit(): void {
+    const pwControl = this.signupForm.get('password');
+    if (pwControl) {
+      pwControl.valueChanges.subscribe((v: string) => this.onPasswordChange(v || ''));
+    }
+  }
+
+  protected onPasswordChange(p: string) {
+    const v = p || '';
+    this.rules.length = v.length >= 8;
+    this.rules.uppercase = /[A-Z]/.test(v);
+    this.rules.lowercase = /[a-z]/.test(v);
+    this.rules.digit = /[0-9]/.test(v);
+    this.rules.special = /[!@#$%^&*()\-=_+\[\]{}|;:,.<>?]/.test(v);
+    this.rules.noRepeats = !/(.)\1\1/.test(v);
+    this.rules.noSequence = !this.hasSequentialChars(v, 3);
+
+    const score = Object.values(this.rules).filter(Boolean).length;
+    this.strengthPercent = Math.round((score / Object.keys(this.rules).length) * 100);
+
+    // Castigo por repeticiones o secuencias
+    if (!this.rules.noRepeats || !this.rules.noSequence) {
+      this.strengthLabel = 'Insegura';
+      this.strengthClass = 'weak';
+      this.strengthPercent = Math.min(this.strengthPercent, 20); // Baja la barra drásticamente
+    } else if (score <= 3) {
+      this.strengthLabel = 'Débil';
+      this.strengthClass = 'weak';
+    } else if (score <= 5) {
+      this.strengthLabel = 'Media';
+      this.strengthClass = 'medium';
+    } else {
+      this.strengthLabel = 'Fuerte';
+      this.strengthClass = 'strong';
+    }
+  }
+
+  protected hasSequentialChars(s: string, seqLen = 4): boolean {
+    const t = s.toLowerCase();
+    for (let i = 0; i <= t.length - seqLen; i++) {
+      const chunk = t.slice(i, i + seqLen);
+      if (/^[a-z]+$/.test(chunk) || /^[0-9]+$/.test(chunk)) {
+        const codes = Array.from(chunk).map(c => c.charCodeAt(0));
+        const inc = codes.every((c, idx) => idx === 0 || c - codes[idx - 1] === 1);
+        const dec = codes.every((c, idx) => idx === 0 || codes[idx - 1] - c === 1);
+        if (inc || dec) return true;
+      }
+    }
+    return false;
+  }
+
+  protected toggleGeneratePassword() {
+    this.generatePassword = !this.generatePassword;
+    const pw = this.signupForm.get('password');
+    const cpw = this.signupForm.get('confirmPassword');
+    if (this.generatePassword) {
+      pw?.clearValidators();
+      cpw?.clearValidators();
+      cpw?.updateValueAndValidity();
+      pw?.updateValueAndValidity();
+    } else {
+      pw?.setValidators([Validators.minLength(8)]);
+      cpw?.setValidators([Validators.required]);
+      cpw?.updateValueAndValidity();
+      pw?.updateValueAndValidity();
+    }
+  }
+
+  protected generateSuggestion() {
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const digits = "0123456789";
+    const symbols = "!@#$%^&*()-_";
+    const all = uppercase + lowercase + digits + symbols;
+
+    let pass = "";
+    // Asegurar requisitos mínimos
+    pass += uppercase[Math.floor(Math.random() * uppercase.length)];
+    pass += lowercase[Math.floor(Math.random() * lowercase.length)];
+    pass += digits[Math.floor(Math.random() * digits.length)];
+    pass += symbols[Math.floor(Math.random() * symbols.length)];
+
+    for (let i = 0; i < 8; i++) {
+      pass += all[Math.floor(Math.random() * all.length)];
+    }
+
+    // Mezclar
+    pass = pass.split('').sort(() => Math.random() - 0.5).join('');
+
+    // Validar para asegurar que cumple (evitar mala suerte aleatoria)
+    if (this.isValidSuggestion(pass)) {
+      this.signupForm.patchValue({
+        password: pass,
+        confirmPassword: pass
+      });
+      // Marcar como tocados para que se activen las validaciones visuales
+      this.signupForm.get('password')?.markAsDirty();
+      this.signupForm.get('confirmPassword')?.markAsDirty();
+      this.onPasswordChange(pass);
+    } else {
+      this.generateSuggestion();
+    }
+  }
+
+  private isValidSuggestion(v: string): boolean {
+    return v.length >= 8 &&
+           /[A-Z]/.test(v) &&
+           /[a-z]/.test(v) &&
+           /[0-9]/.test(v) &&
+           /[!@#$%^&*()\-=_+\[\]{}|;:,.<>?]/.test(v) &&
+           !/(.)\1\1/.test(v) &&
+           !this.hasSequentialChars(v, 3);
+  }
+
+  protected copyGenerated() {
+    if (!this.generatedPassword) return;
+    navigator.clipboard?.writeText(this.generatedPassword);
+  }
+
   protected getEmailError(): string | null {
     const control = this.email;
     if (control?.errors && control?.touched) {
@@ -124,7 +288,7 @@ export default class Signup {
     if (control?.errors && control?.touched) {
       if (control.errors["required"]) return "La contraseña es requerida";
       if (control.errors["minlength"])
-        return "La contraseña debe tener al menos 6 caracteres";
+        return "La contraseña debe tener al menos 8 caracteres";
     }
     return null;
   }

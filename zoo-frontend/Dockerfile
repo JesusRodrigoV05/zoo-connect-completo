@@ -2,9 +2,9 @@ FROM node:24-slim AS build
 WORKDIR /app
 RUN npm install -g bun
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install
 COPY . .
-RUN npm run build
+RUN node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build --configuration production
 FROM oven/bun:1.2-slim AS runtime
 EXPOSE 4200
 WORKDIR /app

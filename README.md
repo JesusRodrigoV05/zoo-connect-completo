@@ -72,3 +72,18 @@ docker-compose down
 ```bash
 docker-compose restart
 ```
+
+---
+
+## 🛡️ Seguridad Avanzada (RSA Daily Encryption)
+
+Este proyecto implementa una capa extra de seguridad denominada **"Cifrado a Nivel de Aplicación"** mediante algoritmos asimétricos (RSA). Este mecanismo protege las credenciales de los usuarios incluso si el túnel HTTPS fuera comprometido.
+
+### Flujo de Cifrado
+1. **Rotación Diaria:** El backend genera un nuevo par de llaves RSA (Pública y Privada) automáticamente cada 24 horas.
+2. **Entrega de Llave:** El frontend solicita la llave pública del día antes de enviar formularios sensibles (Login/Registro).
+3. **Cifrado en el Cliente:** La contraseña se cifra en el navegador del usuario usando la llave pública, convirtiéndola en un bloque ilegible.
+4. **Descifrado Seguro:** El backend recibe el bloque cifrado y lo descifra utilizando la llave privada que reside únicamente en la memoria/disco temporal del servidor.
+5. **Doble Validación:** Tras el descifrado, el servidor vuelve a validar la fuerza de la contraseña antes de proceder al almacenamiento (hashing) final.
+
+Este flujo garantiza que las contraseñas nunca viajen ni se registren en texto plano en ninguna capa intermedia de la infraestructura.

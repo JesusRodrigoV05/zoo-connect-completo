@@ -19,7 +19,8 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-RUN useradd -m appuser && chown -R appuser /app
+RUN addgroup --system appuser && adduser --system --ingroup appuser appuser
+RUN mkdir -p /app/temp_keys && chown -R appuser:appuser /app && chmod 777 /app/temp_keys
 USER appuser
 EXPOSE 8000
 CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

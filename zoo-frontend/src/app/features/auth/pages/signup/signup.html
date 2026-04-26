@@ -64,27 +64,84 @@
               }
             </div>
 
-            <div class="field">
+            <div class="field password-field">
               <p-floatlabel variant="on">
                 <p-password
                   id="password"
                   formControlName="password"
                   placeholder="Ingresa tu contraseña"
-                  [feedback]="true"
+                  [feedback]="false"
                   [toggleMask]="true"
+                  [disabled]="generatePassword"
                   autocomplete="new-password"
                   [style]="{ width: '100%' }"
-                  promptLabel="Al menos 6 caracteres, una letra mayúscula, una letra minúscula y un número"
-                  weakLabel="Contraseña débil"
-                  mediumLabel="Contraseña media"
-                  strongLabel="Contraseña fuerte"
                   fluid
                 />
                 <label for="password">Contraseña</label>
               </p-floatlabel>
             </div>
 
-            <div class="field">
+            <div class="field generate-toggle">
+              <p-toggleButton 
+                [(ngModel)]="generatePassword" 
+                [ngModelOptions]="{standalone: true}"
+                onLabel="Cierre automático activado" 
+                offLabel="Generar automáticamente" 
+                onIcon="pi pi-magic" 
+                offIcon="pi pi-pencil"
+                (onChange)="toggleGeneratePassword()"
+                styleClass="w-full"
+              />
+            </div>
+
+            <div class="field suggestion-action" *ngIf="!generatePassword">
+              <p-button 
+                type="button" 
+                label="¿No se te ocurre ninguna? Sugerir una segura" 
+                icon="pi pi-lightbulb" 
+                [text]="true" 
+                size="small" 
+                (onClick)="generateSuggestion()"
+              />
+            </div>
+
+            <div class="password-strength-container" *ngIf="!generatePassword">
+              <div class="strength-info">
+                <span class="label">Seguridad: <strong>{{ strengthLabel }}</strong></span>
+                <div class="strength-bar-bg">
+                  <div class="strength-bar-fill" [ngClass]="strengthClass" [style.width.%]="strengthPercent"></div>
+                </div>
+              </div>
+              
+              <div class="rules-grid">
+                <div class="rule-item" [class.valid]="rules.length">
+                  <i [class]="rules.length ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+                  <span>8+ caracteres</span>
+                </div>
+                <div class="rule-item" [class.valid]="rules.uppercase">
+                  <i [class]="rules.uppercase ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+                  <span>Mayúscula</span>
+                </div>
+                <div class="rule-item" [class.valid]="rules.lowercase">
+                  <i [class]="rules.lowercase ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+                  <span>Minúscula</span>
+                </div>
+                <div class="rule-item" [class.valid]="rules.digit">
+                  <i [class]="rules.digit ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+                  <span>Número</span>
+                </div>
+                <div class="rule-item" [class.valid]="rules.special">
+                  <i [class]="rules.special ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+                  <span>Especial</span>
+                </div>
+                <div class="rule-item" [class.valid]="rules.noRepeats && rules.noSequence">
+                  <i [class]="rules.noRepeats && rules.noSequence ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+                  <span>Patrón seguro</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="field" *ngIf="!generatePassword">
               <p-floatlabel variant="on">
                 <p-password
                   id="confirmPassword"
@@ -121,6 +178,28 @@
                 />
                 } @else { Crear Cuenta }
               </p-button>
+            </div>
+
+            <div class="generated-password-alert" *ngIf="generatedPassword">
+              <div class="alert-header">
+                <i class="pi pi-shield"></i>
+                <span>Contraseña Generada con Éxito</span>
+              </div>
+              <p class="alert-desc">Usa esta clave para tu primer inicio de sesión:</p>
+              <div class="password-copy-box">
+                <span class="password-text">{{ generatedPassword }}</span>
+                <p-button 
+                  icon="pi pi-copy" 
+                  [text]="true" 
+                  size="large" 
+                  (onClick)="copyGenerated()"
+                  pTooltip="Copiar al portapapeles"
+                />
+              </div>
+              <div class="alert-footer">
+                <i class="pi pi-info-circle"></i>
+                <span>Por seguridad, cámbiala tras entrar.</span>
+              </div>
             </div>
           </form>
 
