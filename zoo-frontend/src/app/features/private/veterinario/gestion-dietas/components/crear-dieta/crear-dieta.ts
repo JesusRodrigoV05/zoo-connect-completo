@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -31,6 +32,7 @@ import { EspecieStore } from "@stores/especies.store";
 import { AdminAnimales } from "@app/features/private/admin/services/admin-animales";
 import { AlimentacionService } from "../../../services/alimentacion-service";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import {
   CreateDietaRequest,
   UpdateDietaRequest,
@@ -61,6 +63,7 @@ export default class CrearDieta implements OnInit {
   readonly productStore = inject(ProductStore);
   readonly unidadesStore = inject(UnidadesMedidaStore);
   readonly especieStore = inject(EspecieStore);
+  private readonly onboarding = inject(OnboardingService);
 
   private adminAnimales = inject(AdminAnimales);
   private alimentacionService = inject(AlimentacionService);
@@ -68,6 +71,7 @@ export default class CrearDieta implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toast = inject(ShowToast);
+  private tourPrompted = false;
 
   protected isEditMode = signal(false);
   protected dietaId = signal<number | null>(null);
@@ -121,7 +125,16 @@ export default class CrearDieta implements OnInit {
       this.loadDietaData(+id);
     } else {
       this.addDetalle();
+      afterNextRender(() => {
+        if (this.tourPrompted) return;
+        this.tourPrompted = true;
+        this.onboarding.startTourIfFirstVisit("vet-dietas-crear");
+      });
     }
+  }
+
+  startGuidedTour() {
+    this.onboarding.startTour("vet-dietas-crear");
   }
 
   private loadDietaData(id: number) {

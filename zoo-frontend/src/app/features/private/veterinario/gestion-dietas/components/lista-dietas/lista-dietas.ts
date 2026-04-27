@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   inject,
@@ -21,6 +22,7 @@ import { ConfirmationService } from "primeng/api";
 import { DietaItem } from "../dieta-item";
 import { AlimentacionStore } from "../../../stores/alimentacion.store";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-dietas",
@@ -45,8 +47,10 @@ import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-se
 })
 export default class ListaDietas {
   readonly store = inject(AlimentacionStore);
+  private readonly onboarding = inject(OnboardingService);
   private readonly router = inject(Router);
   private readonly confirmation = inject(ZooConfirmationService);
+  private tourPrompted = false;
 
   protected readonly layout = signal<"list" | "grid">("list");
   protected readonly searchTerm = signal("");
@@ -79,6 +83,15 @@ export default class ListaDietas {
 
   ngOnInit() {
     this.store.loadDietas();
+    afterNextRender(() => {
+      if (this.tourPrompted) return;
+      this.tourPrompted = true;
+      this.onboarding.startTourIfFirstVisit("vet-dietas-lista");
+    });
+  }
+
+  startGuidedTour() {
+    this.onboarding.startTour("vet-dietas-lista");
   }
 
   onSearch() {

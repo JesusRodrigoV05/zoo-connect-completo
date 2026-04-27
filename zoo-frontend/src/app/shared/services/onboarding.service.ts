@@ -36,7 +36,16 @@ export type AdminTourKey =
   | "admin-inventario-salida-crear"
   | "admin-encuestas-lista"
   | "admin-encuestas-crear"
-  | "admin-auditoria-lista";
+  | "admin-auditoria-lista"
+  | "vet-historiales-lista"
+  | "vet-historiales-crear"
+  | "vet-tipos-atencion-lista"
+  | "vet-tipos-atencion-crear"
+  | "vet-tipos-examen-lista"
+  | "vet-tipos-examen-crear"
+  | "vet-dietas-lista"
+  | "vet-dietas-crear"
+  | "vet-mis-tareas";
 
 interface TourStatusResponse {
   tour_key: string;
@@ -317,6 +326,27 @@ export class OnboardingService {
     }
     if (url.startsWith("/admin/audit") || url.startsWith("/admin/auditoria")) {
       return "admin-auditoria-lista";
+    }
+    if (url.startsWith("/vet/historiales/crear")) {
+      return "vet-historiales-crear";
+    }
+    if (url.startsWith("/vet/historiales/configuracion/tipos-atencion")) {
+      return "vet-tipos-atencion-lista";
+    }
+    if (url.startsWith("/vet/historiales/configuracion/tipos-examen")) {
+      return "vet-tipos-examen-lista";
+    }
+    if (url.startsWith("/vet/historiales/lista") || url.startsWith("/vet/historiales")) {
+      return "vet-historiales-lista";
+    }
+    if (url.startsWith("/vet/dietas/crear")) {
+      return "vet-dietas-crear";
+    }
+    if (url.startsWith("/vet/dietas/lista") || url.startsWith("/vet/dietas")) {
+      return "vet-dietas-lista";
+    }
+    if (url.startsWith("/vet/mis-tareas")) {
+      return "vet-mis-tareas";
     }
     if (url.startsWith("/admin/tareas/operaciones")) {
       return "admin-tareas-operaciones";
@@ -2327,6 +2357,698 @@ export class OnboardingService {
               title: "Paginación",
               description:
                 "Permite navegar entre páginas del historial de auditoría. <br><strong>Ejemplo:</strong> pasar de página 1 a página 2.",
+            },
+          },
+        ];
+
+      case "vet-historiales-lista":
+        return [
+          {
+            element: ".tour-vet-historiales-header",
+            popover: {
+              title: "Historiales Clínicos",
+              description:
+                "Vista principal para consultar el historial clínico de los pacientes. <br><strong>Ejemplo:</strong> revisar el historial abierto de un animal.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-estado-select",
+            popover: {
+              title: "Estados",
+              description:
+                "Filtra los historiales por estado clínico. <br><strong>Ejemplo:</strong> mostrar solo historiales en curso.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-refresh-btn",
+            popover: {
+              title: "Actualizar",
+              description:
+                "Recarga la información de la lista. <br><strong>Ejemplo:</strong> refrescar los historiales recién creados.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-new-btn",
+            popover: {
+              title: "Nuevo Historial",
+              description:
+                "Abre el formulario para iniciar un nuevo historial clínico. <br><strong>Ejemplo:</strong> registrar una consulta de urgencia.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-table",
+            popover: {
+              title: "Tabla de historiales",
+              description:
+                "Agrupa los registros clínicos con sus columnas principales.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-col-paciente",
+            popover: {
+              title: "Paciente",
+              description:
+                "Identifica al animal atendido. <br><strong>Ejemplo:</strong> Kira, leona adulta.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-col-fecha-tipo",
+            popover: {
+              title: "Fecha / Tipo",
+              description:
+                "Muestra cuándo se registró la atención y qué tipo de atención fue. <br><strong>Ejemplo:</strong> 26 abr 2026 • consulta general.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-col-motivo",
+            popover: {
+              title: "Motivo (Anamnesis)",
+              description:
+                "Resume el motivo clínico o la anamnesis registrada. <br><strong>Ejemplo:</strong> falta de apetito y letargo.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-col-estado",
+            popover: {
+              title: "Estado",
+              description:
+                "Indica si el historial continúa abierto o ya fue cerrado. <br><strong>Ejemplo:</strong> En Curso.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-col-acciones",
+            popover: {
+              title: "Acciones",
+              description:
+                "Permite abrir el expediente o descargar la ficha clínica. <br><strong>Ejemplo:</strong> ver detalle completo.",
+            },
+          },
+          {
+            element: ".tour-vet-historiales-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Navega entre páginas del listado. <br><strong>Ejemplo:</strong> pasar de página 1 a página 2.",
+            },
+          },
+        ];
+
+      case "vet-historiales-crear":
+        return [
+          {
+            element: ".tour-vet-historial-create-header",
+            popover: {
+              title: "Nuevo Historial Clínico",
+              description:
+                "Formulario para registrar una consulta clínica nueva. <br><strong>Ejemplo:</strong> apertura de un caso por revisión general.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-paciente",
+            popover: {
+              title: "Paciente (animal)",
+              description:
+                "Selecciona el animal atendido. <br><strong>Ejemplo:</strong> Kira.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-motivo-consulta",
+            popover: {
+              title: "Motivo de Consulta",
+              description:
+                "Define el motivo principal de la atención. <br><strong>Ejemplo:</strong> control por pérdida de peso.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-peso-actual",
+            popover: {
+              title: "Peso Actual",
+              description:
+                "Registra el peso actual del paciente. <br><strong>Ejemplo:</strong> 85.3 kg.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-temperatura",
+            popover: {
+              title: "Temperatura",
+              description:
+                "Registra la temperatura corporal. <br><strong>Ejemplo:</strong> 38.4 °C.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-vitales-section",
+            popover: {
+              title: "Constantes Vitales",
+              description:
+                "Sección para registrar signos vitales y anamnesis. <br><strong>Ejemplo:</strong> frecuencia cardíaca y respiratoria.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-frecuencia-cardiaca",
+            popover: {
+              title: "Frecuencia Cardíaca",
+              description:
+                "Cantidad de latidos por minuto. <br><strong>Ejemplo:</strong> 72 lpm.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-frecuencia-respiratoria",
+            popover: {
+              title: "Frecuencia Respiratoria",
+              description:
+                "Cantidad de respiraciones por minuto. <br><strong>Ejemplo:</strong> 18 rpm.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-anamnesis",
+            popover: {
+              title: "Anamnesis",
+              description:
+                "Describe antecedentes y síntomas referidos. <br><strong>Ejemplo:</strong> tos leve desde hace dos días.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-examen-section",
+            popover: {
+              title: "Examen Físico",
+              description:
+                "Sección para observaciones físicas del paciente. <br><strong>Ejemplo:</strong> mucosas rosadas y buena hidratación.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-observaciones",
+            popover: {
+              title: "Observaciones",
+              description:
+                "Registra hallazgos del examen físico. <br><strong>Ejemplo:</strong> abdomen blando, sin dolor a la palpación.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-diagnosticos-section",
+            popover: {
+              title: "Diagnósticos Iniciales",
+              description:
+                "Bloque para registrar hipótesis diagnósticas iniciales. <br><strong>Ejemplo:</strong> gastroenteritis leve.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-diagnostico-presuntivo",
+            popover: {
+              title: "Diagnóstico Presuntivo",
+              description:
+                "Primer diagnóstico basado en la evaluación inicial. <br><strong>Ejemplo:</strong> infección respiratoria.",
+            },
+          },
+          {
+            element: ".tour-vet-historial-diagnostico-definitivo",
+            popover: {
+              title: "Diagnóstico Definitivo (opcional)",
+              description:
+                "Resultado final confirmado tras pruebas o evolución clínica. <br><strong>Ejemplo:</strong> bronquitis leve confirmada.",
+            },
+          },
+        ];
+
+      case "vet-tipos-atencion-lista":
+        return [
+          {
+            element: ".tour-vet-tipos-atencion-header",
+            popover: {
+              title: "Tipos de Atención",
+              description:
+                "Catálogo para administrar los tipos de atención clínica. <br><strong>Ejemplo:</strong> consulta general o urgencia.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-refresh-btn",
+            popover: {
+              title: "Actualizar",
+              description:
+                "Recarga la lista de tipos de atención. <br><strong>Ejemplo:</strong> ver un nuevo tipo recién creado.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-new-btn",
+            popover: {
+              title: "Nuevo",
+              description:
+                "Abre el modal para crear un nuevo tipo de atención. <br><strong>Ejemplo:</strong> consulta preventiva.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-table",
+            popover: {
+              title: "Tabla de tipos de atención",
+              description:
+                "Agrupa los registros del catálogo con sus acciones disponibles.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-col-nombre",
+            popover: {
+              title: "Nombre",
+              description:
+                "Nombre breve del tipo de atención. <br><strong>Ejemplo:</strong> Consulta General.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-col-descripcion",
+            popover: {
+              title: "Descripción",
+              description:
+                "Explicación detallada del uso del tipo. <br><strong>Ejemplo:</strong> atención rutinaria sin urgencia.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-col-acciones",
+            popover: {
+              title: "Acciones",
+              description:
+                "Permite editar o eliminar el registro seleccionado. <br><strong>Ejemplo:</strong> corregir un nombre incorrecto.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Navega entre páginas del catálogo. <br><strong>Ejemplo:</strong> pasar a la segunda página.",
+            },
+          },
+        ];
+
+      case "vet-tipos-atencion-crear":
+        return [
+          {
+            element: ".tour-vet-tipos-atencion-dialog-header",
+            popover: {
+              title: "Nuevo Tipo de Atención",
+              description:
+                "Modal para registrar o editar un tipo de atención. <br><strong>Ejemplo:</strong> nuevo tipo para chequeo general.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-campo-nombre",
+            popover: {
+              title: "Nombre",
+              description:
+                "Nombre del tipo de atención. <br><strong>Ejemplo:</strong> Vacunación.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-campo-descripcion",
+            popover: {
+              title: "Descripción",
+              description:
+                "Detalle del tipo de atención. <br><strong>Ejemplo:</strong> Atención preventiva con revisión completa.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-cancel-btn",
+            popover: {
+              title: "Cancelar",
+              description:
+                "Cierra el modal sin guardar cambios. <br><strong>Ejemplo:</strong> descartar un formulario incompleto.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-atencion-save-btn",
+            popover: {
+              title: "Guardar",
+              description:
+                "Guarda el tipo de atención. <br><strong>Ejemplo:</strong> registrar una nueva consulta especializada.",
+            },
+          },
+        ];
+
+      case "vet-tipos-examen-lista":
+        return [
+          {
+            element: ".tour-vet-tipos-examen-header",
+            popover: {
+              title: "Tipos de Examen",
+              description:
+                "Catálogo para administrar los tipos de exámenes clínicos. <br><strong>Ejemplo:</strong> hemograma o coproanálisis.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-refresh-btn",
+            popover: {
+              title: "Actualizar",
+              description:
+                "Recarga la lista de tipos de examen. <br><strong>Ejemplo:</strong> ver cambios recientes del catálogo.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-new-btn",
+            popover: {
+              title: "Nuevo",
+              description:
+                "Abre el modal para crear un nuevo tipo de examen. <br><strong>Ejemplo:</strong> radiografía torácica.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-table",
+            popover: {
+              title: "Tabla de tipos de examen",
+              description:
+                "Agrupa los registros del catálogo y sus acciones.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-col-nombre",
+            popover: {
+              title: "Nombre",
+              description:
+                "Nombre corto del examen. <br><strong>Ejemplo:</strong> Hemograma completo.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-col-descripcion",
+            popover: {
+              title: "Descripción",
+              description:
+                "Explicación del examen. <br><strong>Ejemplo:</strong> estudio de glóbulos rojos y blancos.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-col-acciones",
+            popover: {
+              title: "Acciones",
+              description:
+                "Permite editar o eliminar el registro. <br><strong>Ejemplo:</strong> corregir un nombre duplicado.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Navega entre páginas del catálogo. <br><strong>Ejemplo:</strong> avanzar a la siguiente página.",
+            },
+          },
+        ];
+
+      case "vet-tipos-examen-crear":
+        return [
+          {
+            element: ".tour-vet-tipos-examen-dialog-header",
+            popover: {
+              title: "Nuevo Tipo de Examen",
+              description:
+                "Modal para registrar o editar un tipo de examen. <br><strong>Ejemplo:</strong> nuevo examen de laboratorio.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-campo-nombre",
+            popover: {
+              title: "Nombre",
+              description:
+                "Nombre del tipo de examen. <br><strong>Ejemplo:</strong> Uroanálisis.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-campo-descripcion",
+            popover: {
+              title: "Descripción",
+              description:
+                "Detalle del examen. <br><strong>Ejemplo:</strong> evaluación de sedimento urinario.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-cancel-btn",
+            popover: {
+              title: "Cancelar",
+              description:
+                "Cierra el modal sin guardar cambios. <br><strong>Ejemplo:</strong> abandonar un formulario incompleto.",
+            },
+          },
+          {
+            element: ".tour-vet-tipos-examen-save-btn",
+            popover: {
+              title: "Guardar",
+              description:
+                "Guarda el tipo de examen. <br><strong>Ejemplo:</strong> registrar análisis de sangre.",
+            },
+          },
+        ];
+
+      case "vet-dietas-lista":
+        return [
+          {
+            element: ".tour-vet-dietas-header",
+            popover: {
+              title: "Gestión de Dietas",
+              description:
+                "Vista principal para administrar las dietas nutricionales. <br><strong>Ejemplo:</strong> revisar dietas activas por especie.",
+            },
+          },
+          {
+            element: ".tour-vet-dietas-search",
+            popover: {
+              title: "Buscador de Dieta",
+              description:
+                "Permite filtrar dietas por nombre. <br><strong>Ejemplo:</strong> escribir dieta felinos.",
+            },
+          },
+          {
+            element: ".tour-vet-dietas-refresh-btn",
+            popover: {
+              title: "Recargar",
+              description:
+                "Actualiza el listado. <br><strong>Ejemplo:</strong> ver una dieta recién creada.",
+            },
+          },
+          {
+            element: ".tour-vet-dietas-new-btn",
+            popover: {
+              title: "Nueva Dieta",
+              description:
+                "Abre el formulario para crear una dieta. <br><strong>Ejemplo:</strong> diseñar una dieta para primates.",
+            },
+          },
+          {
+            element: ".tour-vet-dietas-total",
+            popover: {
+              title: "Total Dietas",
+              description:
+                "Muestra la cantidad de dietas registradas. <br><strong>Ejemplo:</strong> Total: 8 dietas registradas.",
+            },
+          },
+          {
+            element: ".tour-vet-dietas-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Navega entre páginas del listado. <br><strong>Ejemplo:</strong> pasar de página 1 a 2.",
+            },
+          },
+          {
+            element: ".tour-vet-dietas-layout",
+            popover: {
+              title: "Cambiar la vista",
+              description:
+                "Alterna entre vista de lista y tarjetas. <br><strong>Ejemplo:</strong> pasar a vista de tarjetas.",
+            },
+          },
+        ];
+
+      case "vet-dietas-crear":
+        return [
+          {
+            element: ".tour-vet-dietas-create-header",
+            popover: {
+              title: "Nueva Dieta",
+              description:
+                "Formulario para crear una dieta nutricional. <br><strong>Ejemplo:</strong> dieta balanceada para felinos.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-datos-generales",
+            popover: {
+              title: "Datos Generales",
+              description:
+                "Sección con el nombre y asignación principal de la dieta. <br><strong>Ejemplo:</strong> dieta para especie o animal específico.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-nombre",
+            popover: {
+              title: "Nombre",
+              description:
+                "Nombre de la dieta. <br><strong>Ejemplo:</strong> Dieta Felinos Standard.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-asignar-a",
+            popover: {
+              title: "Asignar a",
+              description:
+                "Define si la dieta será para una especie o un animal. <br><strong>Ejemplo:</strong> asignar a especie.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-especie",
+            popover: {
+              title: "Seleccionar especie",
+              description:
+                "Elige la especie objetivo si la dieta es general. <br><strong>Ejemplo:</strong> León africano.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-animal",
+            popover: {
+              title: "Seleccionar animal",
+              description:
+                "Elige el animal si la dieta es específica. <br><strong>Ejemplo:</strong> Kira.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-ingredientes-section",
+            popover: {
+              title: "Ingredientes y Raciones",
+              description:
+                "Sección para construir la composición de la dieta. <br><strong>Ejemplo:</strong> 3 ingredientes con raciones definidas.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-add-ingredient-btn",
+            popover: {
+              title: "Agregar Ingrediente",
+              description:
+                "Añade una nueva fila de ingrediente. <br><strong>Ejemplo:</strong> sumar una segunda proteína.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-producto",
+            popover: {
+              title: "Producto (Alimento)",
+              description:
+                "Selecciona el alimento que componen la dieta. <br><strong>Ejemplo:</strong> concentrado premium.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-cantidad",
+            popover: {
+              title: "Cantidad",
+              description:
+                "Define la cantidad del ingrediente. <br><strong>Ejemplo:</strong> 2.5 kg.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-unidad",
+            popover: {
+              title: "Unidad",
+              description:
+                "Selecciona la unidad de medida del ingrediente. <br><strong>Ejemplo:</strong> kg.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-frecuencia",
+            popover: {
+              title: "Frecuencia/Notas",
+              description:
+                "Especifica la frecuencia o notas de entrega. <br><strong>Ejemplo:</strong> diario en la mañana.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-remove-btn",
+            popover: {
+              title: "Quitar",
+              description:
+                "Elimina un ingrediente de la tabla. <br><strong>Ejemplo:</strong> quitar una fila duplicada.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-cancel-btn",
+            popover: {
+              title: "Cancelar",
+              description:
+                "Descarta los cambios y vuelve a la lista. <br><strong>Ejemplo:</strong> salir sin guardar la dieta.",
+            },
+          },
+          {
+            element: ".tour-vet-dieta-save-btn",
+            popover: {
+              title: "Guardar Dieta",
+              description:
+                "Guarda la dieta nutricional. <br><strong>Ejemplo:</strong> registrar una nueva dieta para primates.",
+            },
+          },
+        ];
+
+      case "vet-mis-tareas":
+        return [
+          {
+            element: ".tour-vet-mis-tareas-header",
+            popover: {
+              title: "Gestión de Tareas",
+              description:
+                "Vista principal para revisar tus tareas asignadas. <br><strong>Ejemplo:</strong> completar un control de alimentación.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-filtro",
+            popover: {
+              title: "Pendientes / Historial",
+              description:
+                "Permite alternar entre tareas pendientes y tareas completadas. <br><strong>Ejemplo:</strong> revisar el historial de acciones terminadas.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-table",
+            popover: {
+              title: "Tabla de tareas",
+              description:
+                "Listado con columnas relevantes para ejecutar y revisar tareas.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-col-numero",
+            popover: {
+              title: "#",
+              description:
+                "Número de fila para ubicar rápidamente la tarea. <br><strong>Ejemplo:</strong> 1, 2, 3.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-col-tarea",
+            popover: {
+              title: "Tarea / Actividad",
+              description:
+                "Nombre de la actividad clínica u operativa. <br><strong>Ejemplo:</strong> cambio de vendaje.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-col-descripcion",
+            popover: {
+              title: "Descripción",
+              description:
+                "Detalle adicional para ejecutar la tarea. <br><strong>Ejemplo:</strong> aplicar antisepsia previa.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-col-fecha",
+            popover: {
+              title: "Fecha Límite",
+              description:
+                "Fecha máxima para realizar la tarea. <br><strong>Ejemplo:</strong> 26 abr 2026.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-col-estado",
+            popover: {
+              title: "Estado",
+              description:
+                "Indica si la tarea está pendiente o completada. <br><strong>Ejemplo:</strong> Pendiente.",
+            },
+          },
+          {
+            element: ".tour-vet-mis-tareas-col-acciones",
+            popover: {
+              title: "Acciones",
+              description:
+                "Botones para ejecutar o revisar la tarea. <br><strong>Ejemplo:</strong> abrir el formulario de confirmación.",
             },
           },
         ];
