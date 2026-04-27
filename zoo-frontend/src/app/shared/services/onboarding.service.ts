@@ -45,7 +45,8 @@ export type AdminTourKey =
   | "vet-tipos-examen-crear"
   | "vet-dietas-lista"
   | "vet-dietas-crear"
-  | "vet-mis-tareas";
+  | "vet-mis-tareas"
+  | "cuidador-mis-tareas";
 
 interface TourStatusResponse {
   tour_key: string;
@@ -344,6 +345,9 @@ export class OnboardingService {
     }
     if (url.startsWith("/vet/dietas/lista") || url.startsWith("/vet/dietas")) {
       return "vet-dietas-lista";
+    }
+    if (url.startsWith("/cuidador/mis-tareas")) {
+      return "cuidador-mis-tareas";
     }
     if (url.startsWith("/vet/mis-tareas")) {
       return "vet-mis-tareas";
@@ -2978,9 +2982,10 @@ export class OnboardingService {
         ];
 
       case "vet-mis-tareas":
+      case "cuidador-mis-tareas":
         return [
           {
-            element: ".tour-vet-mis-tareas-header",
+            element: ".tour-cuidador-mis-tareas-title-row",
             popover: {
               title: "Gestión de Tareas",
               description:
@@ -2988,7 +2993,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-filtro",
+            element: ".tour-cuidador-mis-tareas-filtro",
             popover: {
               title: "Pendientes / Historial",
               description:
@@ -2996,7 +3001,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-table",
+            element: ".tour-cuidador-mis-tareas-table",
             popover: {
               title: "Tabla de tareas",
               description:
@@ -3004,7 +3009,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-col-numero",
+            element: ".tour-cuidador-mis-tareas-col-numero",
             popover: {
               title: "#",
               description:
@@ -3012,7 +3017,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-col-tarea",
+            element: ".tour-cuidador-mis-tareas-col-tarea",
             popover: {
               title: "Tarea / Actividad",
               description:
@@ -3020,7 +3025,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-col-descripcion",
+            element: ".tour-cuidador-mis-tareas-col-descripcion",
             popover: {
               title: "Descripción",
               description:
@@ -3028,7 +3033,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-col-fecha",
+            element: ".tour-cuidador-mis-tareas-col-fecha",
             popover: {
               title: "Fecha Límite",
               description:
@@ -3036,7 +3041,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-col-estado",
+            element: ".tour-cuidador-mis-tareas-col-estado",
             popover: {
               title: "Estado",
               description:
@@ -3044,7 +3049,7 @@ export class OnboardingService {
             },
           },
           {
-            element: ".tour-vet-mis-tareas-col-acciones",
+            element: ".tour-cuidador-mis-tareas-col-acciones",
             popover: {
               title: "Acciones",
               description:
