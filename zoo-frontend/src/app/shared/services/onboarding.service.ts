@@ -7,6 +7,11 @@ import { DriveStep, driver } from "driver.js";
 import { take } from "rxjs";
 
 export type AdminTourKey =
+  | "public-inicio"
+  | "public-animales"
+  | "public-quizzes"
+  | "public-encuestas"
+  | "public-acerca-de"
   | "admin-dashboard"
   | "admin-animales-lista"
   | "admin-especies-lista"
@@ -256,6 +261,22 @@ export class OnboardingService {
 
     const url = this.router.url;
 
+    if (url === "/inicio" || url === "/") {
+      return "public-inicio";
+    }
+    if (url.startsWith("/animales")) {
+      return "public-animales";
+    }
+    if (url.startsWith("/quizzes")) {
+      return "public-quizzes";
+    }
+    if (url.startsWith("/encuestas")) {
+      return "public-encuestas";
+    }
+    if (url.startsWith("/acerca-de")) {
+      return "public-acerca-de";
+    }
+
     if (url.startsWith("/admin/dashboard")) {
       return "admin-dashboard";
     }
@@ -370,6 +391,298 @@ export class OnboardingService {
 
   private getTourSteps(tourKey: AdminTourKey): DriveStep[] {
     switch (tourKey) {
+      case "public-inicio":
+        return [
+          {
+            element: ".tour-public-home-badge-row",
+            popover: {
+              title: "Inicio del recorrido",
+              description:
+                "Desde aqui puedes iniciar el tour cuando quieras para conocer cada bloque de la pagina principal.",
+            },
+          },
+          {
+            element: ".tour-public-home-hero-title",
+            popover: {
+              title: "Presentacion principal",
+              description:
+                "Este mensaje introduce la propuesta del refugio y su enfoque de conservacion.",
+            },
+          },
+          {
+            element: ".tour-public-home-gallery",
+            popover: {
+              title: "Galeria visual",
+              description:
+                "Muestra imagenes destacadas para explorar el entorno y especies del zoologico.",
+            },
+          },
+          {
+            element: ".tour-public-home-about-title",
+            popover: {
+              title: "Sobre nosotros",
+              description:
+                "Seccion para conocer la identidad del refugio y su historia de conservacion.",
+            },
+          },
+          {
+            element: ".tour-public-home-programs",
+            popover: {
+              title: "Programas",
+              description:
+                "Aqui se detallan los bloques de actividades, educacion y conservacion disponibles.",
+            },
+          },
+          {
+            element: ".tour-public-home-cta",
+            popover: {
+              title: "Llamado a la accion",
+              description:
+                "Acceso rapido para planificar una visita y apoyar los programas del refugio.",
+            },
+          },
+          {
+            element: ".tour-public-home-news",
+            popover: {
+              title: "Noticias",
+              description:
+                "Panel de actualizaciones sobre rescates, eventos y novedades institucionales.",
+            },
+          },
+          {
+            element: ".tour-public-home-weather",
+            popover: {
+              title: "Clima",
+              description:
+                "Resumen meteorologico para planificar una visita con mejores condiciones.",
+            },
+          },
+          {
+            element: ".tour-public-home-contact",
+            popover: {
+              title: "Contacto",
+              description:
+                "Bloque para enviar consultas directas al equipo del zoologico.",
+            },
+          },
+          {
+            element: ".tour-public-home-contact-name",
+            popover: {
+              title: "Campo Nombre Completo",
+              description:
+                "Escribe el nombre de quien realiza la consulta. <br><strong>Ejemplo:</strong> Maria Perez.",
+            },
+          },
+          {
+            element: ".tour-public-home-contact-email",
+            popover: {
+              title: "Campo Correo Electronico",
+              description:
+                "Ingresa un correo valido para recibir respuesta. <br><strong>Ejemplo:</strong> maria.perez@gmail.com.",
+            },
+          },
+          {
+            element: ".tour-public-home-contact-subject",
+            popover: {
+              title: "Campo Asunto",
+              description:
+                "Resume el motivo del mensaje. <br><strong>Ejemplo:</strong> Consulta sobre horarios de visita.",
+            },
+          },
+          {
+            element: ".tour-public-home-contact-message",
+            popover: {
+              title: "Campo Mensaje",
+              description:
+                "Describe tu solicitud con detalle. <br><strong>Ejemplo:</strong> Deseo agendar una visita guiada para 20 estudiantes.",
+            },
+          },
+          {
+            element: ".tour-public-home-social",
+            popover: {
+              title: "Redes sociales",
+              description:
+                "Accesos a nuestros canales oficiales para seguir noticias y contenido educativo.",
+            },
+          },
+        ];
+
+      case "public-animales":
+        return [
+          {
+            element: ".tour-public-animales-header",
+            popover: {
+              title: "Conoce a nuestros Amigos",
+              description:
+                "Encabezado principal con acceso al tour y resumen de la experiencia.",
+            },
+          },
+          {
+            element: ".tour-public-animales-grid",
+            popover: {
+              title: "Catalogo de animales",
+              description:
+                "Aqui se muestran las fichas con informacion de cada especie y ejemplar disponible.",
+            },
+          },
+          {
+            element: ".tour-public-animales-infinite",
+            popover: {
+              title: "Carga progresiva",
+              description:
+                "Al desplazarte, se cargan mas animales automaticamente para explorar sin interrupciones.",
+            },
+          },
+          {
+            element: ".tour-public-animales-end-message",
+            popover: {
+              title: "Fin del listado",
+              description:
+                "Mensaje que confirma que ya conociste todos los animales disponibles por ahora.",
+            },
+          },
+        ];
+
+      case "public-quizzes":
+        return [
+          {
+            element: ".tour-public-quizzes-header",
+            popover: {
+              title: "Centro de Trivias",
+              description:
+                "Desde este encabezado puedes iniciar el tour y entender como armar tu desafio.",
+            },
+          },
+          {
+            element: ".tour-public-quizzes-difficulty",
+            popover: {
+              title: "Dificultad",
+              description:
+                "Selecciona el nivel del reto. <br><strong>Ejemplo:</strong> Facil para principiantes.",
+            },
+          },
+          {
+            element: ".tour-public-quizzes-questions",
+            popover: {
+              title: "Preguntas",
+              description:
+                "Define la cantidad de preguntas del juego. <br><strong>Ejemplo:</strong> 5 preguntas para una ronda rapida.",
+            },
+          },
+          {
+            element: ".tour-public-quizzes-generate",
+            popover: {
+              title: "Generar desafio",
+              description:
+                "Crea una trivia personalizada segun la configuracion seleccionada.",
+            },
+          },
+        ];
+
+      case "public-encuestas":
+        return [
+          {
+            element: ".tour-public-encuestas-header",
+            popover: {
+              title: "Centro de Encuestas",
+              description:
+                "Aqui puedes iniciar el tour y descubrir las encuestas activas del refugio.",
+            },
+          },
+          {
+            element: ".tour-public-encuestas-grid",
+            popover: {
+              title: "Listado de encuestas",
+              description:
+                "Seccion donde se muestran todas las encuestas disponibles para responder.",
+            },
+          },
+          {
+            element: ".tour-public-encuestas-card",
+            popover: {
+              title: "Tarjeta de encuesta",
+              description:
+                "Cada tarjeta incluye titulo, descripcion, estado y vigencia de la encuesta.",
+            },
+          },
+          {
+            element: ".tour-public-encuestas-action",
+            popover: {
+              title: "Boton de accion",
+              description:
+                "Permite iniciar o revisar una encuesta segun su disponibilidad actual.",
+            },
+          },
+        ];
+
+      case "public-acerca-de":
+        return [
+          {
+            element: ".tour-public-about-legacy-row",
+            popover: {
+              title: "El Legado de Elias Thorne",
+              description:
+                "Desde este encabezado puedes iniciar el tour y conocer la historia fundacional.",
+            },
+          },
+          {
+            element: ".tour-public-about-refugio",
+            popover: {
+              title: "Mas que un zoologico, un Refugio",
+              description:
+                "Bloque principal que resume el proposito etico y de conservacion del proyecto.",
+            },
+          },
+          {
+            element: ".tour-public-about-origen",
+            popover: {
+              title: "Nuestro Origen",
+              description:
+                "Relata el inicio de la iniciativa y su evolucion como santuario.",
+            },
+          },
+          {
+            element: ".tour-public-about-mision",
+            popover: {
+              title: "Nuestra Mision",
+              description:
+                "Describe como se combina innovacion y bienestar animal en el trabajo diario.",
+            },
+          },
+          {
+            element: ".tour-public-about-vision",
+            popover: {
+              title: "Nuestra Vision",
+              description:
+                "Explica el objetivo de conectar sociedad y naturaleza a largo plazo.",
+            },
+          },
+          {
+            element: ".tour-public-about-features",
+            popover: {
+              title: "Features Strip",
+              description:
+                "Indicadores clave de la filosofia del refugio: bienestar, transparencia, educacion e innovacion.",
+            },
+          },
+          {
+            element: ".tour-public-about-story",
+            popover: {
+              title: "El Hombre que Escuchaba la Selva",
+              description:
+                "Introduccion narrativa del legado de Elias y el contexto historico.",
+            },
+          },
+          {
+            element: ".tour-public-about-timeline",
+            popover: {
+              title: "Linea de tiempo",
+              description:
+                "Recorrido cronologico de hitos desde los origenes hasta la era ZooConnect.",
+            },
+          },
+        ];
+
       case "admin-dashboard":
         return [
           {

@@ -10,6 +10,7 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { AuthStore } from "@app/core/stores/auth.store";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { ButtonModule } from "primeng/button";
 import { GalleriaModule } from "primeng/galleria";
 import AOS from "aos";
@@ -28,6 +29,7 @@ export class HeroSection {
   animation: any;
   heroTitleRef = viewChild<ElementRef>("heroTitle");
   private readonly authStore = inject(AuthStore);
+  private readonly onboarding = inject(OnboardingService);
   protected readonly autenticado = computed(() => !!this.authStore.usuario());
 
   constructor() {
@@ -93,6 +95,10 @@ export class HeroSection {
       stagger: 0.05,
       ease: "power4",
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("public-inicio");
   }
 
   ngOnDestroy() {
