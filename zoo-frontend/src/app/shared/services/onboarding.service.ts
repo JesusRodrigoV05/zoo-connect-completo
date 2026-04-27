@@ -12,6 +12,10 @@ export type AdminTourKey =
   | "public-quizzes"
   | "public-encuestas"
   | "public-acerca-de"
+  | "profile"
+  | "settings-perfil"
+  | "settings-seguridad"
+  | "settings-notificaciones"
   | "admin-dashboard"
   | "admin-animales-lista"
   | "admin-especies-lista"
@@ -275,6 +279,18 @@ export class OnboardingService {
     }
     if (url.startsWith("/acerca-de")) {
       return "public-acerca-de";
+    }
+    if (url.startsWith("/perfil")) {
+      return "profile";
+    }
+    if (url.startsWith("/ajustes/perfil")) {
+      return "settings-perfil";
+    }
+    if (url.startsWith("/ajustes/seguridad")) {
+      return "settings-seguridad";
+    }
+    if (url.startsWith("/ajustes/notificaciones")) {
+      return "settings-notificaciones";
     }
 
     if (url.startsWith("/admin/dashboard")) {
@@ -679,6 +695,222 @@ export class OnboardingService {
               title: "Linea de tiempo",
               description:
                 "Recorrido cronologico de hitos desde los origenes hasta la era ZooConnect.",
+            },
+          },
+        ];
+
+      case "settings-perfil":
+        return [
+          {
+            element: ".tour-settings-perfil-header",
+            popover: {
+              title: "Perfil y Apariencia",
+              description:
+                "Sección principal para personalizar tu identidad visual y la estética de la aplicación.",
+            },
+          },
+          {
+            element: ".tour-settings-photo-section",
+            popover: {
+              title: "Foto de Perfil",
+              description:
+                "Configura la imagen que te representará en toda la plataforma. <br><strong>Ejemplo:</strong> Cambia tu avatar por uno que refleje tu personalidad.",
+            },
+          },
+          {
+            element: ".tour-settings-avatar-current",
+            popover: {
+              title: "Avatar Actual",
+              description:
+                "Visualiza la imagen que tienes seleccionada actualmente como perfil. <br><strong>Ejemplo:</strong> Tu icono actual de usuario.",
+            },
+          },
+          {
+            element: ".tour-settings-avatar-gallery",
+            popover: {
+              title: "Avatares Disponibles",
+              description:
+                "Explora y selecciona un nuevo diseño entre nuestra colección de iconos exclusivos. <br><strong>Ejemplo:</strong> Elige un animal diferente para tu perfil.",
+            },
+          },
+          {
+            element: ".tour-settings-appearance-section",
+            popover: {
+              title: "Apariencia",
+              description:
+                "Personaliza los ajustes visuales para mejorar tu comodidad al navegar.",
+            },
+          },
+          {
+            element: ".tour-settings-dark-mode",
+            popover: {
+              title: "Modo Oscuro",
+              description:
+                "Activa o desactiva el tema oscuro para reducir la fatiga visual en entornos de poca luz. <br><strong>Ejemplo:</strong> Actívalo por la noche para una mejor experiencia.",
+            },
+          },
+        ];
+
+      case "settings-seguridad":
+        return [
+          {
+            element: ".tour-settings-seguridad-header",
+            popover: {
+              title: "Seguridad de la Cuenta",
+              description:
+                "Administra las capas de protección y acceso de tu cuenta.",
+            },
+          },
+          {
+            element: ".tour-settings-auth-section",
+            popover: {
+              title: "Autenticación",
+              description:
+                "Configura los métodos de verificación para iniciar sesión de forma segura. <br><strong>Ejemplo:</strong> Gestión de contraseñas y doble factor.",
+            },
+          },
+          {
+            element: ".tour-settings-2fa",
+            popover: {
+              title: "Autenticación de Dos Factores (2FA)",
+              description:
+                "Protege tu cuenta exigiendo un código adicional al entrar. <br><strong>Ejemplo:</strong> Escanea el código QR con Google Authenticator.",
+            },
+          },
+        ];
+
+      case "settings-notificaciones":
+        return [
+          {
+            element: ".tour-settings-notifications-header",
+            popover: {
+              title: "Preferencias de Notificación",
+              description:
+                "Elige cómo y de qué temas deseas recibir alertas del zoológico.",
+            },
+          },
+          {
+            element: ".tour-settings-channels-section",
+            popover: {
+              title: "Canales de Notificación",
+              description:
+                "Configura las plataformas a través de las cuales te enviaremos mensajes. <br><strong>Ejemplo:</strong> Correo, Push o Mensajería instantánea.",
+            },
+          },
+          {
+            element: ".tour-settings-push",
+            popover: {
+              title: "Notificaciones Push",
+              description:
+                "Recibe alertas directas en tu navegador o dispositivo móvil al instante. <br><strong>Ejemplo:</strong> Un aviso flotante sobre un nuevo evento.",
+            },
+          },
+          {
+            element: ".tour-settings-email",
+            popover: {
+              title: "Notificaciones por Correo",
+              description:
+                "Recibe resúmenes y noticias importantes en tu bandeja de entrada. <br><strong>Ejemplo:</strong> Reporte semanal de tus participaciones.",
+            },
+          },
+          {
+            element: ".tour-settings-telegram",
+            popover: {
+              title: "Notificaciones por Telegram",
+              description:
+                "Conecta tu cuenta para recibir alertas rápidas vía bot de Telegram. <br><strong>Ejemplo:</strong> Un mensaje directo con noticias del Zoo.",
+            },
+          },
+          {
+            element: ".tour-settings-whatsapp",
+            popover: {
+              title: "Notificaciones por WhatsApp",
+              description:
+                "Alertas críticas y recordatorios directamente a tu WhatsApp personal. <br><strong>Ejemplo:</strong> Recordatorio de una encuesta pendiente.",
+            },
+          },
+          {
+            element: ".tour-settings-types-section",
+            popover: {
+              title: "Tipos de Notificación",
+              description:
+                "Filtra los contenidos de interés para no perderte lo que más te importa. <br><strong>Ejemplo:</strong> Eventos, noticias o animales.",
+            },
+          },
+          {
+            element: ".tour-settings-new-events",
+            popover: {
+              title: "Nuevos Eventos",
+              description:
+                "Infórmate sobre las próximas actividades y calendarios del refugio. <br><strong>Ejemplo:</strong> Apertura de nueva zona de hábitat.",
+            },
+          },
+          {
+            element: ".tour-settings-animal-updates",
+            popover: {
+              title: "Actualizaciones de Animales",
+              description:
+                "Sigue el estado y novedades de tus animales favoritos. <br><strong>Ejemplo:</strong> Nacimiento de un nuevo ejemplar.",
+            },
+          },
+          {
+            element: ".tour-settings-quiz-surveys",
+            popover: {
+              title: "Quizzes y Encuestas",
+              description:
+                "Entérate cuando haya nuevos desafíos o consultas para participar. <br><strong>Ejemplo:</strong> Trivia mensual sobre fauna silvestre.",
+            },
+          },
+          {
+            element: ".tour-settings-zoo-news",
+            popover: {
+              title: "Noticias del Zoo",
+              description:
+                "Mantente al día con el blog y las noticias institucionales. <br><strong>Ejemplo:</strong> Avances en proyectos de conservación.",
+            },
+          },
+        ];
+
+      case "profile":
+        return [
+          {
+            element: ".tour-profile-avatar-card",
+            popover: {
+              title: "Avatar y Nombre",
+              description:
+                "Aquí puedes ver tu foto de perfil actual y tu nombre de usuario identificador. <br><strong>Ejemplo:</strong> Maria Perez.",
+            },
+          },
+          {
+            element: ".tour-profile-edit-btn",
+            popover: {
+              title: "Botón Editar",
+              description:
+                "Accede directamente a los ajustes para modificar tu información o apariencia. <br><strong>Ejemplo:</strong> Pulsa para cambiar tu foto.",
+            },
+          },
+          {
+            element: ".tour-profile-share-btn",
+            popover: {
+              title: "Botón Compartir",
+              description:
+                "Permite generar un enlace para que otros vean tu progreso y perfil. <br><strong>Ejemplo:</strong> Copia el enlace para enviarlo por redes sociales.",
+            },
+          },
+          {
+            element: ".tour-profile-participations",
+            popover: {
+              title: "Mis Participaciones",
+              description:
+                "Revisa el historial de todas las encuestas y trivias en las que has colaborado. <br><strong>Ejemplo:</strong> Mira cuántos puntos has ganado en trivias.",
+            },
+          },
+          {
+            element: ".tour-profile-logout",
+            popover: {
+              title: "Cerrar Sesión",
+              description:
+                "Finaliza tu sesión de forma segura en este dispositivo. <br><strong>Ejemplo:</strong> Pulsa antes de salir de un ordenador público.",
             },
           },
         ];

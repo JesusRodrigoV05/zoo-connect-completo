@@ -1,12 +1,25 @@
 <p-card styleClass="ajustes-card">
-  <ng-template pTemplate="title"> Seguridad de la Cuenta </ng-template>
+  <ng-template pTemplate="title">
+    <div class="flex align-items-center gap-2">
+      <span class="tour-settings-seguridad-header">Seguridad de la Cuenta</span>
+      <p-button
+        icon="pi pi-question-circle"
+        severity="help"
+        [rounded]="true"
+        [text]="true"
+        (click)="startGuidedTour()"
+        pTooltip="Ver tour de seguridad"
+        size="small"
+      />
+    </div>
+  </ng-template>
   <ng-template pTemplate="subtitle">
     Gestiona la contraseña y la autenticación de dos factores.
   </ng-template>
 
   <div class="settings-section">
-    <h3 class="section-title">Autenticación</h3>
-    <div class="setting-item">
+    <h3 class="section-title tour-settings-auth-section">Autenticación</h3>
+    <div class="setting-item tour-settings-2fa">
       <div class="setting-info">
         <h4>Autenticación de Dos Factores (2FA)</h4>
         <p>Agrega una capa extra de seguridad a tu cuenta</p>

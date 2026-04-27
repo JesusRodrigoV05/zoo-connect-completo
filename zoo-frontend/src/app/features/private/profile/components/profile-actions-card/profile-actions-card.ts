@@ -36,6 +36,7 @@ export class ProfileActionsCardComponent {
   readonly viewStats = output<void>();
   readonly viewParticipations = output<void>();
   readonly logout = output<void>();
+  readonly startTour = output<void>();
 
   protected onEditProfile(): void {
     this.editProfile.emit();

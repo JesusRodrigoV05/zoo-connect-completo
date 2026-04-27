@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal, inject } from "@angular/core";
 import { ToggleSwitchModule } from "primeng/toggleswitch";
+import { ButtonModule } from "primeng/button";
+import { TooltipModule } from "primeng/tooltip";
 import { FormsModule } from "@angular/forms";
 import { CardModule } from "primeng/card";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 interface NotificationSettings {
   pushEnabled: boolean;
@@ -19,7 +22,7 @@ interface NotificationPreferences {
 
 @Component({
   selector: "notificaciones-ajustes",
-  imports: [ToggleSwitchModule, FormsModule, CardModule],
+  imports: [ToggleSwitchModule, ButtonModule, TooltipModule, FormsModule, CardModule],
   templateUrl: "./notificaciones-ajustes.html",
   styleUrls: ["./notificaciones-ajustes.scss", "../settings-content.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +41,8 @@ export default class NotificacionesAjustes {
     quizSurveys: true,
     zooNews: true,
   });
+
+  private readonly onboarding = inject(OnboardingService);
 
   protected updateNotificationSetting(
     key: keyof NotificationSettings,
@@ -64,5 +69,12 @@ export default class NotificacionesAjustes {
       "Notification preferences updated:",
       this.notificationPreferences(),
     );
+  }
+
+  /**
+   * Inicia el tour guiado de la página de Notificaciones.
+   */
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("settings-notificaciones");
   }
 }

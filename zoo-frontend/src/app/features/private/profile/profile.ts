@@ -7,6 +7,7 @@ import {
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { AuthStore } from "@app/core/stores/auth.store";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { Loader } from "@app/shared/components";
 import {
   LogoutDialogComponent,
@@ -35,6 +36,7 @@ export default class Profile {
   private readonly authStore = inject(AuthStore);
   encuestaService = inject(EncuestaService);
   private readonly router = inject(Router);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly currentUser = this.authStore.usuario;
   protected readonly showLogoutDialog = signal(false);
@@ -69,6 +71,13 @@ export default class Profile {
 
   protected confirmLogout(): void {
     this.showLogoutDialog.set(true);
+  }
+
+  /**
+   * Inicia el tour guiado del perfil.
+   */
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("profile");
   }
 
   protected onLogoutCancel(): void {
