@@ -119,7 +119,14 @@ export const authInterceptor: HttpInterceptorFn = (
 
   return next(reqWithAuth).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !isAuthRoute(reqWithAuth.url)) {
+      if (error.status === 401) {
+        if (isAuthRoute(reqWithAuth.url)) {
+          console.error("401 Error in auth route (possibly refresh):", reqWithAuth.url);
+          if (reqWithAuth.url.endsWith("/auth/refresh")) {
+            authStore.logoutSilently();
+          }
+          return throwError(() => error);
+        }
         return handle401Error(modifiedReq, next, authStore);
       }
       if (error.status === 403) {

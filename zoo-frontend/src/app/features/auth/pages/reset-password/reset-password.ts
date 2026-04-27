@@ -57,7 +57,7 @@ export default class ResetPassword {
 
   protected readonly resetForm = this.fb.group(
     {
-      password: ["", [Validators.required, Validators.minLength(6)]],
+      password: ["", [Validators.required, Validators.minLength(12)]],
       confirmPassword: ["", [Validators.required]],
     },
     {
