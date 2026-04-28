@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+} from "@angular/core";
 import { OurStory } from "./components/our-story";
-import { MainContainer } from "@app/shared/components/main-container";
 import { MisionVision } from "./components/mision-vision";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-about",
@@ -10,4 +15,12 @@ import { MisionVision } from "./components/mision-vision";
   styleUrl: "./about.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class About {}
+export default class About {
+  private readonly onboarding = inject(OnboardingService);
+
+  constructor() {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("public-acerca-de");
+    });
+  }
+}

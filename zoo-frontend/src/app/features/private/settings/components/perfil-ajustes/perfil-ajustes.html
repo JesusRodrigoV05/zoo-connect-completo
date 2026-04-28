@@ -1,13 +1,26 @@
 <p-card styleClass="ajustes-card">
-  <ng-template pTemplate="title"> Perfil y Apariencia </ng-template>
+  <ng-template pTemplate="title">
+    <div class="flex align-items-center gap-2">
+      <span class="tour-settings-perfil-header">Perfil y Apariencia</span>
+      <p-button
+        icon="pi pi-question-circle"
+        severity="help"
+        [rounded]="true"
+        [text]="true"
+        (click)="startGuidedTour()"
+        pTooltip="Ver tour de perfil y apariencia"
+        size="small"
+      />
+    </div>
+  </ng-template>
   <ng-template pTemplate="subtitle">
     Ajusta la apariencia y tu información personal.
   </ng-template>
 
   <div class="settings-section">
-    <h3 class="section-title">Foto de Perfil</h3>
+    <h3 class="section-title tour-settings-photo-section">Foto de Perfil</h3>
 
-    <div class="current-avatar-display">
+    <div class="current-avatar-display tour-settings-avatar-current">
       <zoo-user-avatar [size]="100" [priority]="true" />
       <div class="current-avatar-info">
         <h4>Avatar Actual</h4>
@@ -16,7 +29,7 @@
     </div>
 
     <h4 class="gallery-title">Elige tu avatar</h4>
-    <div class="avatar-gallery">
+    <div class="avatar-gallery tour-settings-avatar-gallery">
       @for (avatarUrl of availableAvatars; track avatarUrl) {
       <button
         class="avatar-option"
@@ -32,8 +45,8 @@
   <hr class="section-divider" />
 
   <div class="settings-section">
-    <h3 class="section-title">Apariencia</h3>
-    <div class="setting-item">
+    <h3 class="section-title tour-settings-appearance-section">Apariencia</h3>
+    <div class="setting-item tour-settings-dark-mode">
       <div class="setting-info">
         <h4>Modo Oscuro</h4>
         <p>Cambia entre tema claro y oscuro</p>

@@ -1,7 +1,17 @@
 <div class="page-container">
   <div class="card-form">
-    <div class="header">
-      <h2>Nuevo Historial Clínico</h2>
+    <div class="header tour-vet-historial-create-header">
+      <div class="header-title-row">
+        <h2>Nuevo Historial Clínico</h2>
+        <button
+          pButton
+          pRipple
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          class="p-button-rounded p-button-contrast"
+          (click)="startGuidedTour()"
+        ></button>
+      </div>
       <button
         pButton
         pRipple
@@ -19,6 +29,7 @@
           >
           <p-select
             id="animal"
+            class="tour-vet-historial-paciente"
             [options]="animales()"
             formControlName="animal_id"
             optionLabel="nombre"
@@ -50,6 +61,7 @@
           >
           <p-select
             id="tipo"
+            class="tour-vet-historial-motivo-consulta"
             [options]="configStore.tiposAtencionActivos()"
             formControlName="tipo_atencion_id"
             optionLabel="nombre"
@@ -69,6 +81,7 @@
           <label for="peso">Peso Actual</label>
           <p-inputNumber
             id="peso"
+            class="tour-vet-historial-peso-actual"
             formControlName="peso_actual"
             mode="decimal"
             [minFractionDigits]="2"
@@ -83,6 +96,7 @@
           <label for="temp">Temperatura</label>
           <p-inputNumber
             id="temp"
+            class="tour-vet-historial-temperatura"
             formControlName="temperatura"
             mode="decimal"
             [minFractionDigits]="1"
@@ -95,7 +109,7 @@
 
       <p-accordion [multiple]="true" class="accordion-container">
         <p-accordion-panel value="0">
-          <p-accordion-header
+          <p-accordion-header class="tour-vet-historial-vitales-section"
             >Constantes Vitales & Anamnesis</p-accordion-header
           >
           <p-accordion-content>
@@ -103,6 +117,7 @@
               <div class="field">
                 <label>Frecuencia Cardíaca</label>
                 <p-inputNumber
+                  class="tour-vet-historial-frecuencia-cardiaca"
                   formControlName="frecuencia_cardiaca"
                   suffix=" lpm"
                   styleClass="input-full"
@@ -111,6 +126,7 @@
               <div class="field">
                 <label>Frecuencia Respiratoria</label>
                 <p-inputNumber
+                  class="tour-vet-historial-frecuencia-respiratoria"
                   formControlName="frecuencia_respiratoria"
                   suffix=" rpm"
                   styleClass="input-full"
@@ -120,9 +136,9 @@
                 <label>Anamnesis</label>
                 <textarea
                   pTextarea
+                  class="tour-vet-historial-anamnesis input-full"
                   formControlName="anamnesis"
                   rows="3"
-                  class="input-full"
                   placeholder="Historia clínica previa..."
                 ></textarea>
               </div>
@@ -131,7 +147,7 @@
         </p-accordion-panel>
 
         <p-accordion-panel value="1">
-          <p-accordion-header>Examen Físico</p-accordion-header>
+          <p-accordion-header class="tour-vet-historial-examen-section">Examen Físico</p-accordion-header>
           <p-accordion-content>
             <div class="field">
               <label>Observaciones</label>
@@ -139,15 +155,15 @@
                 pTextarea
                 formControlName="examen_fisico_obs"
                 rows="5"
-                class="input-full"
                 placeholder="Hallazgos físicos..."
+                class="tour-vet-historial-observaciones input-full"
               ></textarea>
             </div>
           </p-accordion-content>
         </p-accordion-panel>
 
         <p-accordion-panel value="2">
-          <p-accordion-header>Diagnósticos Iniciales</p-accordion-header>
+          <p-accordion-header class="tour-vet-historial-diagnosticos-section">Diagnósticos Iniciales</p-accordion-header>
           <p-accordion-content>
             <div class="form-section">
               <div class="field full-width">
@@ -156,7 +172,7 @@
                   pInputText
                   type="text"
                   formControlName="diagnostico_presuntivo"
-                  class="input-full"
+                  class="tour-vet-historial-diagnostico-presuntivo input-full"
                 />
               </div>
               <div class="field full-width">
@@ -165,7 +181,7 @@
                   pInputText
                   type="text"
                   formControlName="diagnostico_definitivo"
-                  class="input-full"
+                  class="tour-vet-historial-diagnostico-definitivo input-full"
                 />
               </div>
             </div>
@@ -187,7 +203,7 @@
           pRipple
           label="Guardar Historial"
           icon="pi pi-check"
-          class="p-button-rounded p-button-primary"
+            class="p-button-rounded p-button-primary tour-vet-historial-save-btn"
           type="submit"
           [loading]="saving()"
           [disabled]="form.invalid"

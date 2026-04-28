@@ -15,6 +15,7 @@ import { DrawerModule } from "primeng/drawer";
 import { TooltipModule } from "primeng/tooltip";
 import { NgClass } from "@angular/common";
 import { environment } from "@env";
+import { NotificationButton } from "./components/notification-button";
 
 export interface NavButton {
   readonly label: string;

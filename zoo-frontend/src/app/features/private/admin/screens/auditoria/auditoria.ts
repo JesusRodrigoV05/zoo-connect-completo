@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { AuditoriaService } from '../../services/auditoria';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { DataViewModule, DataViewLazyLoadEvent, DataViewPageEvent } from 'primeng/dataview';
@@ -8,6 +15,8 @@ import { PaginatedResponse } from '@models/common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { startWith, switchMap, tap } from 'rxjs';
 import { MainContainer } from '@app/shared/components/main-container';
+import { ButtonModule } from 'primeng/button';
+import { OnboardingService } from '@app/shared/services/onboarding.service';
 
 @Component({
   selector: 'app-auditoria',
@@ -16,7 +25,8 @@ import { MainContainer } from '@app/shared/components/main-container';
     SkeletonModule, 
     TagModule, 
     DatePipe,
-    MainContainer
+    MainContainer,
+    ButtonModule,
   ],
   templateUrl: './auditoria.html',
   styleUrl: './auditoria.scss',
@@ -24,6 +34,8 @@ import { MainContainer } from '@app/shared/components/main-container';
 })
 export default class Auditoria {
   protected auditService = inject(AuditoriaService);
+  private readonly onboarding = inject(OnboardingService);
+  private tourPrompted = false;
 
   protected isLoading = signal(true);
   protected paginationState = signal<DataViewPageEvent>({ first: 0, rows: 10 });
@@ -49,6 +61,15 @@ export default class Auditoria {
     initialValue: this.initialResponse,
   });
 
+  constructor() {
+    if (!this.tourPrompted) {
+      this.tourPrompted = true;
+      afterNextRender(() => {
+        this.onboarding.startTourIfFirstVisit('admin-auditoria-lista');
+      });
+    }
+  }
+
   protected auditorias = computed(() => this.auditoriaResponse().items);
   protected totalRecords = computed(() => this.auditoriaResponse().total);
   protected first = computed(() => this.paginationState().first);
@@ -64,5 +85,9 @@ export default class Auditoria {
     if (event.includes('CREATE')) return 'info';
     if (event.includes('DELETE')) return 'warn';
     return 'info';
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour('admin-auditoria-lista');
   }
 }

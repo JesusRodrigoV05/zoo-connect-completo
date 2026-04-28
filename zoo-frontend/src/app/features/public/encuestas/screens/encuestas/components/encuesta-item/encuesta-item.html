@@ -1,4 +1,4 @@
-<p-card class="survey-card">
+<p-card class="survey-card tour-public-encuestas-card">
   <div class="card-content">
     <p-tag [value]="status().value" [severity]="status().severity" />
 
@@ -25,6 +25,7 @@
 
   <ng-template pTemplate="footer">
     <p-button
+      styleClass="tour-public-encuestas-action"
       [label]="buttonConfig().label"
       [severity]="isAvailable() ? 'primary' : 'secondary'"
       [rounded]="true"

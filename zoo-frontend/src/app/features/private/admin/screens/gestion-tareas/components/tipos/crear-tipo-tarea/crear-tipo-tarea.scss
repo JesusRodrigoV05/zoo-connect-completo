@@ -51,3 +51,11 @@
   gap: 0.5rem;
   margin-top: 1rem;
 }
+
+.dialog-header-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}

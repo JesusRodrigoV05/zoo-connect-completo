@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -21,6 +22,7 @@ import { InputNumberModule } from "primeng/inputnumber";
 import { DatePipe } from "@angular/common";
 import { VetRecetas } from "../services/historiales/vet-recetas";
 import { Receta } from "../models/historiales/receta.model";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 interface DetalleFormulario {
   productoId: number;
@@ -52,6 +54,7 @@ interface DetalleFormulario {
 export default class MisTareas {
   readonly store = inject(MisTareasStore);
   readonly vetRecetasService = inject(VetRecetas);
+  private readonly onboarding = inject(OnboardingService);
 
   displayDialog = signal(false);
   tareaSeleccionada = signal<Tarea | null>(null);
@@ -62,6 +65,7 @@ export default class MisTareas {
   errorReceta = signal<string | null>(null);
 
   formDetalles = signal<DetalleFormulario[]>([]);
+  private tourPrompted = false;
 
   esTareaAlimentacion = computed(() => {
     const tarea = this.tareaSeleccionada();
@@ -95,6 +99,15 @@ export default class MisTareas {
 
   ngOnInit() {
     this.cargarTareas();
+    afterNextRender(() => {
+      if (this.tourPrompted) return;
+      this.tourPrompted = true;
+      this.onboarding.startTourIfFirstVisit("vet-mis-tareas");
+    });
+  }
+
+  startGuidedTour() {
+    this.onboarding.startTour("vet-mis-tareas");
   }
 
   cargarTareas() {

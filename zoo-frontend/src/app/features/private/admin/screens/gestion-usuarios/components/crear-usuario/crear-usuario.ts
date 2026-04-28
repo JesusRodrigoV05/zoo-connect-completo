@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  afterNextRender,
   inject,
   OnInit,
   signal,
@@ -20,6 +21,7 @@ import { finalize } from "rxjs/operators";
 import { Usuario, RolId } from "@app/core/models/usuario";
 import { AuthStore } from "@stores/auth.store";
 import { TooltipModule } from "primeng/tooltip";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 interface RoleOption {
   label: string;
@@ -50,6 +52,7 @@ export default class CrearUsuario implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly adminUsuarios = inject(AdminUsuarios);
   private readonly authStore = inject(AuthStore);
+  private readonly onboarding = inject(OnboardingService);
   private currentUserId = this.authStore.userId();
 
   protected readonly formSubmitted = signal(false);
@@ -57,13 +60,16 @@ export default class CrearUsuario implements OnInit {
   isEditMode = false;
   pageTitle = "";
   buttonText = "";
+  private tourKey: "admin-usuarios-crear" | "admin-usuarios-editar" =
+    "admin-usuarios-crear";
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get("id");
 
     if (id) {
       this.isEditMode = true;
-      this.pageTitle = "Actualizar Usuario";
+      this.tourKey = "admin-usuarios-editar";
+      this.pageTitle = "Crear Actualizar Usuario";
       this.buttonText = "Guardar Cambios";
 
       this.adminUsuarios.getUserById(parseInt(id)).subscribe((user) => {
@@ -80,13 +86,23 @@ export default class CrearUsuario implements OnInit {
       }
     } else {
       this.isEditMode = false;
+      this.tourKey = "admin-usuarios-crear";
       this.pageTitle = "Crear Nuevo Usuario";
       this.buttonText = "Crear";
     }
+
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit(this.tourKey);
+    });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour(this.tourKey);
   }
 
   protected readonly roleOptions: RoleOption[] = [
     { label: "Administrador", value: RolId.ADMIN },
+    { label: "OSI", value: RolId.OSI },
     { label: "Veterinario", value: RolId.VETERINARIO },
     { label: "Cuidador", value: RolId.CUIDADOR },
     { label: "Visitante", value: RolId.VISITANTE },
@@ -141,7 +157,7 @@ export default class CrearUsuario implements OnInit {
       this.isLoading.set(true);
 
       if (!this.isEditMode) {
-        const generatedPassword = this.usuarioForm.value.username! + "ABC123!";
+        const generatedPassword = this.usuarioForm.value.username! + "ZooAdmin2026!";
         const usuarioData = {
           email: this.usuarioForm.value.email!,
           username: this.usuarioForm.value.username!,

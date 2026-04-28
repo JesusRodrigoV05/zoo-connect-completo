@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -29,6 +30,7 @@ import {
 import { forkJoin, Observable, of } from "rxjs";
 import { HabitatMediaResponse } from "@adapters/habitat";
 import { ImageModule } from "primeng/image";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-crear-habitat",
@@ -56,6 +58,7 @@ export default class CrearHabitat {
   private readonly adminHabitat = inject(AdminHabitat);
   private readonly adminMedia = inject(AdminHabitatsMedia);
   private readonly route = inject(ActivatedRoute);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly formSubmitted = signal(false);
   protected readonly isProcessing = signal(false);
@@ -93,6 +96,10 @@ export default class CrearHabitat {
   });
 
   ngOnInit(): void {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-habitat-crear");
+    });
+
     const id = this.route.snapshot.paramMap.get("id");
     if (id) {
       const habitatId = +id;
@@ -101,6 +108,10 @@ export default class CrearHabitat {
       this.loadHabitatData(habitatId);
       this.loadHabitatMedia(habitatId);
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-habitat-crear");
   }
   private loadHabitatMedia(id: number): void {
     this.adminMedia

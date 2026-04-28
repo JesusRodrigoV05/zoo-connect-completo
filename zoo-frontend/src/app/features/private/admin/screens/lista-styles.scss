@@ -20,6 +20,16 @@
       color: var(--p-text-color);
     }
 
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      h2 {
+        margin: 0;
+      }
+    }
+
     .buttons {
       display: flex;
       gap: 0.5rem;

@@ -35,6 +35,8 @@ import { TiposSalidaStore } from "@app/features/private/admin/stores/admin-tipo-
 import { AdminAnimales } from "@app/features/private/admin/services/admin-animales";
 import { AdminHabitat } from "@app/features/private/admin/services/admin-habitat";
 import { TextareaModule } from "primeng/textarea";
+import { afterNextRender } from "@angular/core";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-crear-salida",
@@ -66,6 +68,7 @@ export default class CrearSalida implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private toast = inject(ShowToast);
+  private onboarding = inject(OnboardingService);
 
   isProcessing = computed(() => this.transaccionesStore.isSaving());
 
@@ -95,6 +98,14 @@ export default class CrearSalida implements OnInit {
     this.loadDestinos();
 
     this.addProducto();
+
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-inventario-salida-crear");
+    });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-salida-crear");
   }
 
   private loadDestinos() {

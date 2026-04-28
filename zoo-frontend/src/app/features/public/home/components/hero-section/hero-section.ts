@@ -10,6 +10,7 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { AuthStore } from "@app/core/stores/auth.store";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { ButtonModule } from "primeng/button";
 import { GalleriaModule } from "primeng/galleria";
 import AOS from "aos";
@@ -28,14 +29,26 @@ export class HeroSection {
   animation: any;
   heroTitleRef = viewChild<ElementRef>("heroTitle");
   private readonly authStore = inject(AuthStore);
+  private readonly onboarding = inject(OnboardingService);
   protected readonly autenticado = computed(() => !!this.authStore.usuario());
 
   constructor() {
     afterNextRender(() => {
-      gsap.registerPlugin(SplitText);
-      AOS.refresh();
-      this.setup();
-      this.splitText();
+      const target = this.heroTitleRef()?.nativeElement;
+      if (target && !this.split) {
+        try {
+          if (typeof SplitText !== "undefined") {
+            gsap.registerPlugin(SplitText);
+            this.setup();
+            this.splitText();
+          } else {
+            console.error("SplitText is not defined. Make sure GSAP Club plugins are installed.");
+          }
+          AOS.refresh();
+        } catch (e) {
+          console.error("Error initializing SplitText:", e);
+        }
+      }
     });
   }
 
@@ -72,27 +85,46 @@ export class HeroSection {
   ];
 
   setup() {
-    if (this.split) this.split.revert();
+    try {
+      if (this.split && typeof this.split.revert === "function") {
+        this.split.revert();
+      }
 
-    const target = this.heroTitleRef()?.nativeElement;
+      const target = this.heroTitleRef()?.nativeElement;
 
-    if (target) {
-      this.split = SplitText.create(target, {
-        type: "chars, words, lines",
-      });
+      if (target && typeof SplitText !== "undefined") {
+        this.split = SplitText.create(target, {
+          type: "chars, words, lines",
+        });
+      }
+    } catch (e) {
+      console.error("SplitText setup failed:", e);
     }
   }
 
   splitText() {
-    if (this.animation) this.animation.revert();
+    try {
+      if (this.animation && typeof this.animation.revert === "function") {
+        this.animation.revert();
+      }
+      
+      const currentSplit = this.split;
+      if (!currentSplit || !currentSplit.chars) return;
 
-    this.animation = gsap.from(this.split.chars, {
-      x: 150,
-      opacity: 0,
-      duration: 0.7,
-      stagger: 0.05,
-      ease: "power4",
-    });
+      this.animation = gsap.from(currentSplit.chars, {
+        x: 150,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.05,
+        ease: "power4",
+      });
+    } catch (e) {
+      console.error("SplitText animation failed:", e);
+    }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("public-inicio");
   }
 
   ngOnDestroy() {

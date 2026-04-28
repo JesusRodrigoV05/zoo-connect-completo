@@ -6,6 +6,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const authStore = inject(AuthStore);
   const requiredRoles = route.data["requiredRoles"] as string[];
+  const requiredPermissions = route.data["requiredPermissions"] as string[];
 
   if (!authStore.isAuthenticated()) {
     return router.createUrlTree(["/login"], {
@@ -18,7 +19,17 @@ export const authGuard: CanActivateFn = (route, state) => {
     const userRoleName = userRole?.nombre;
 
     if (!userRoleName || !requiredRoles.includes(userRoleName)) {
-      return router.parseUrl("/no-autorizado");
+      return router.parseUrl("/404");
+    }
+  }
+
+  if (requiredPermissions && requiredPermissions.length > 0) {
+    const missingPermission = requiredPermissions.some(
+      (permission) => !authStore.hasPermission(permission),
+    );
+
+    if (missingPermission) {
+      return router.parseUrl("/404");
     }
   }
 

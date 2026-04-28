@@ -1,0 +1,13 @@
+<ul class="osi-menu-list">
+  @for (item of navigationItems(); track item.route) {
+  <li
+    [routerLink]="item.route"
+    routerLinkActive="active"
+    class="nav-item"
+    pRipple
+  >
+    <i [class]="item.icon"></i>
+    <span>{{ item.text }}</span>
+  </li>
+  }
+</ul>

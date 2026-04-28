@@ -5,7 +5,7 @@
       icon="pi pi-pencil"
       severity="primary"
       [rounded]="true"
-      styleClass="w-full"
+      styleClass="w-full tour-profile-edit-btn"
       (click)="onEditProfile()"
       [disabled]="disabledActions()?.edit"
       [pTooltip]="tooltips()?.edit"
@@ -17,12 +17,21 @@
       icon="pi pi-share-alt"
       severity="primary"
       [rounded]="true"
-      styleClass="w-full"
+      styleClass="w-full tour-profile-share-btn"
       (click)="onShareProfile()"
       [disabled]="disabledActions()?.share"
       [pTooltip]="tooltips()?.share"
       [tooltipDisabled]="!disabledActions()?.share"
       fluid
+    />
+    <!-- Botón de tour al lado del de compartir -->
+    <p-button
+      icon="pi pi-question-circle"
+      severity="help"
+      [rounded]="true"
+      (click)="startTour.emit()"
+      pTooltip="Ver tour del perfil"
+      tooltipPosition="bottom"
     />
   </div>
 
@@ -32,7 +41,7 @@
     <p-button
       label="Mis Participaciones"
       icon="pi pi-history"
-      styleClass="menu-option"
+      styleClass="menu-option tour-profile-participations"
       variant="text"
       (click)="onViewParticipations()"
       [rounded]="true"
@@ -47,7 +56,7 @@
     severity="danger"
     [rounded]="true"
     [text]="true"
-    styleClass="w-full logout-btn"
+    styleClass="w-full logout-btn tour-profile-logout"
     (click)="onLogout()"
   />
 </p-card>

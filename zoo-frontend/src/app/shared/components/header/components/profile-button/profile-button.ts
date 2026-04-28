@@ -35,6 +35,7 @@ export class ProfileButton {
   readonly isAdmin = computed(() => this.authStore.isAdmin());
   readonly isVet = computed(() => this.authStore.isVeterinario());
   readonly isCuidador = computed(() => this.authStore.isCuidador());
+  readonly isOsi = computed(() => this.authStore.isOsi());
   readonly defaultAvatarUrl = '/assets/images/default-avatar.jpg';
   
   protected readonly items = computed(() => [
@@ -77,6 +78,14 @@ export class ProfileButton {
             this.router.navigate(['/cuidador']);
           },
           visible: this.isCuidador(),
+        },
+        {
+          label: 'Panel de OSI',
+          icon: 'pi pi-shield',
+          command: () => {
+            this.router.navigate(['/osi']);
+          },
+          visible: this.isOsi(),
         },
         {
           separator: true,

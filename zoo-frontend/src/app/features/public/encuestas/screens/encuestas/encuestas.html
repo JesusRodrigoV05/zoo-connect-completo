@@ -1,6 +1,19 @@
 <zoo-main-container>
+  <header class="tour-public-encuestas-header">
+    <div class="title-row">
+      <h1>Centro de Encuestas</h1>
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-compass"
+        styleClass="p-button-sm p-button-rounded p-button-outlined"
+        (onClick)="startGuidedTour()"
+      />
+    </div>
+    <p>Conoce las encuestas activas y participa con tu opinion.</p>
+  </header>
+
   @if (surveys$ | async; as surveys) {
-  <div class="surveys-grid">
+  <div class="surveys-grid tour-public-encuestas-grid">
     @for(survey of surveys; track $index){
     <app-encuesta-item [encuesta]="survey" />
     } @empty {
@@ -8,7 +21,7 @@
     }
   </div>
   } @else {
-  <div class="surveys-grid">
+  <div class="surveys-grid tour-public-encuestas-grid">
     @for(placeholder of [1,2,3,4]; track placeholder){
     <p-skeleton height="200px" styleClass="mb-2" borderRadius="16px" />
     }

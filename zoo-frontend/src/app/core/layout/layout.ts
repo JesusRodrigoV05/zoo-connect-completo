@@ -11,7 +11,10 @@ import { RouterOutlet } from '@angular/router';
 import { AuthStore } from '@stores/auth.store';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
-import { NavigationItem, SidebarMenu } from '@app/shared/components/sidebar-menu/sidebar-menu';
+import {
+  NavigationItem,
+  SidebarMenu,
+} from '@app/shared/components/sidebar-menu/sidebar-menu';
 
 @Component({
   selector: 'zoo-layout',
@@ -21,7 +24,7 @@ import { NavigationItem, SidebarMenu } from '@app/shared/components/sidebar-menu
     RouterOutlet,
     ButtonModule,
     DrawerModule,
-    SidebarMenu
+    SidebarMenu,
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
@@ -111,6 +114,21 @@ export default class Layout {
           icon: 'pi pi-check-square',
           route: `${this.rutaBaseCui}/mis-tareas`,
           tooltip: 'Consultas y procedimientos asignados',
+        },
+      ];
+    }
+
+    if (this.authStore.isOsi()) {
+      return [
+        {
+          text: 'Dashboard',
+          icon: 'pi pi-th-large',
+          route: '/osi/dashboard',
+        },
+        {
+          text: 'Roles y Accesos',
+          icon: 'pi pi-shield',
+          route: '/osi/roles-accesos',
         },
       ];
     }

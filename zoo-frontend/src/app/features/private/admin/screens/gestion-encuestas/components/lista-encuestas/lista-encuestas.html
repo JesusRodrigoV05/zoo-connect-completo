@@ -1,21 +1,31 @@
 @defer(on viewport; prefetch on idle; hydrate on viewport){
 <div class="lista-encuestas-container">
-  <div class="header-actions">
-    <h2>Gestión de Encuestas</h2>
+  <div class="header-actions tour-encuestas-header">
+    <div class="title-row flex align-items-center gap-2">
+      <h2>Gestión de Encuestas</h2>
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
+    </div>
     <p-button
       icon="pi pi-plus"
       label="Crear Encuesta"
       [rounded]="true"
       severity="primary"
+      styleClass="tour-encuestas-main-create-btn"
       routerLink="/admin/encuestas/crear"
     />
   </div>
 
   @let surveys = this.surveys$ | async; @if(surveys){
-  <p-dataview #dv [value]="surveys">
+  <p-dataview #dv [value]="surveys" styleClass="tour-encuestas-dataview">
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ surveys.length }} encuestas</span>
+        <span class="tour-encuestas-total">Total: {{ surveys.length }} encuestas</span>
       </div>
     </ng-template>
 
@@ -35,6 +45,7 @@
           label="Crear Primera Encuesta"
           [rounded]="true"
           severity="primary"
+          styleClass="tour-encuestas-empty-create-btn"
           routerLink="/admin/encuestas/crear"
         />
       </div>

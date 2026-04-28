@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  afterNextRender,
 } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -18,6 +19,7 @@ import { MessageModule } from "primeng/message";
 import { InputMaskModule } from "primeng/inputmask";
 import { AdminProveedores } from "@app/features/private/admin/services/admin-proveedores";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import {
   CreateProveedor,
   UpdateProveedor,
@@ -45,6 +47,7 @@ export default class CrearProveedor implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly providerService = inject(AdminProveedores);
   private readonly toast = inject(ShowToast);
+  private readonly onboarding = inject(OnboardingService);
 
   protected isEditMode = signal(false);
   protected isProcessing = signal(false);
@@ -75,7 +78,15 @@ export default class CrearProveedor implements OnInit {
       this.isEditMode.set(true);
       this.providerId.set(+id);
       this.loadProvider(+id);
+    } else {
+      afterNextRender(() => {
+        this.onboarding.startTourIfFirstVisit("admin-inventario-proveedor-crear");
+      });
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-proveedor-crear");
   }
 
   private loadProvider(id: number) {

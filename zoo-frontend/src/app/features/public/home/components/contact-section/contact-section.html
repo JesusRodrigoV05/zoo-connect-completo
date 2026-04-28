@@ -12,22 +12,22 @@
     <div class="contact-form-card">
       <h3>Envíanos un Mensaje</h3>
       <form class="contact-form" (ngSubmit)="onSubmitContact()">
-        <p-floatlabel>
+        <p-floatlabel class="tour-public-home-contact-name">
           <input pInputText id="nombre" required />
           <label for="nombre">Nombre Completo</label>
         </p-floatlabel>
 
-        <p-floatlabel>
+        <p-floatlabel class="tour-public-home-contact-email">
           <input pInputText id="email" type="email" required />
           <label for="email">Correo Electrónico</label>
         </p-floatlabel>
 
-        <p-floatlabel>
+        <p-floatlabel class="tour-public-home-contact-subject">
           <input pInputText id="asunto" required />
           <label for="asunto">Asunto</label>
         </p-floatlabel>
 
-        <p-floatlabel>
+        <p-floatlabel class="tour-public-home-contact-message">
           <textarea pTextarea id="mensaje" rows="4" required></textarea>
           <label for="mensaje">Mensaje</label>
         </p-floatlabel>

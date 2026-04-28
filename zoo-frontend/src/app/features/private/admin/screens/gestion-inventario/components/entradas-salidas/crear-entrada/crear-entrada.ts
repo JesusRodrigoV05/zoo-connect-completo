@@ -27,6 +27,8 @@ import { MessageModule } from "primeng/message";
 import { SelectModule } from "primeng/select";
 import { TableModule } from "primeng/table";
 import { TooltipModule } from "primeng/tooltip";
+import { afterNextRender } from "@angular/core";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-crear-entrada",
@@ -55,6 +57,7 @@ export default class CrearEntrada implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private toast = inject(ShowToast);
+  private onboarding = inject(OnboardingService);
 
   isProcessing = computed(() => this.transaccionesStore.isSaving());
 
@@ -72,6 +75,14 @@ export default class CrearEntrada implements OnInit {
     this.proveedoresStore.loadItems();
 
     this.addProducto();
+
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-inventario-entrada-crear");
+    });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-entrada-crear");
   }
 
   addProducto() {

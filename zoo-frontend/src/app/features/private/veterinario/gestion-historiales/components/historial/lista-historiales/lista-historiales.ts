@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  afterNextRender,
   inject,
   signal,
 } from "@angular/core";
@@ -17,6 +18,7 @@ import { HistorialItem } from "../historial-item/historial-item";
 import { HistorialesListaStore } from "@app/features/private/veterinario/stores/historiales/historiales.store";
 import { GenerarReportes } from "@app/shared/services/generar-reportes";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-historiales",
@@ -39,6 +41,8 @@ import { ShowToast } from "@app/shared/services";
 export default class ListaHistoriales {
   readonly store = inject(HistorialesListaStore);
   private router = inject(Router);
+  private onboarding = inject(OnboardingService);
+  private tourPrompted = false;
 
   private reportesService = inject(GenerarReportes);
   private toast = inject(ShowToast);
@@ -49,6 +53,17 @@ export default class ListaHistoriales {
     { label: "En Curso (Abierto)", value: true },
     { label: "Finalizado (Cerrado)", value: false },
   ];
+
+  ngOnInit(): void {
+    if (!this.tourPrompted) {
+      this.tourPrompted = true;
+      afterNextRender(() => {
+        setTimeout(() => {
+          this.onboarding.startTourIfFirstVisit("vet-historiales-lista");
+        }, 500);
+      });
+    }
+  }
 
   goToDetail(id: number) {
     this.router.navigate(["/vet/historiales/", id]);
@@ -86,5 +101,9 @@ export default class ListaHistoriales {
         this.toast.showError("Error", "No se pudo descargar la ficha.");
       },
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("vet-historiales-lista");
   }
 }

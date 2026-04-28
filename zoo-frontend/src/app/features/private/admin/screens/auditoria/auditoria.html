@@ -1,5 +1,6 @@
 <zoo-main-container>
   <p-dataview
+    styleClass="tour-audit-dataview"
     [value]="auditorias()"
     [rows]="rows()"
     [paginator]="true"
@@ -12,19 +13,29 @@
   >
     <ng-template #list let-items>
       <div class="audit-list-container">
-        @for (item of items; track item.id) {
-        <div class="audit-item">
+        @for (item of items; track item.id; let isFirst = $first) {
+        <div class="audit-item" [class.tour-audit-first-row]="isFirst">
           <div class="audit-header">
             <p-tag
+              styleClass="tour-audit-description"
               [value]="item.event"
               [severity]="getSeverity(item.event)"
             ></p-tag>
-            <span class="audit-timestamp"
+            @if(isFirst){
+            <p-button
+              label="Tour guiado"
+              icon="pi pi-question-circle"
+              severity="contrast"
+              [rounded]="true"
+              (onClick)="startGuidedTour()"
+            />
+            }
+            <span class="audit-timestamp tour-audit-date"
               >{{ item.timestamp | date : "medium" }}</span
             >
           </div>
           <div class="audit-body">
-            <div class="audit-detail">
+            <div class="audit-detail tour-audit-user">
               <strong>Usuario:</strong>
               <span>{{ item.user.username }} ({{ item.user.email }})</span>
             </div>

@@ -283,8 +283,8 @@ export class AdminUsuarios {
       throw new Error("El nombre de usuario debe tener al menos 2 caracteres");
     }
 
-    if (userData.password && userData.password.trim().length < 6) {
-      throw new Error("La contraseña debe tener al menos 6 caracteres");
+    if (userData.password && userData.password.trim().length < 12) {
+      throw new Error("La contraseña debe tener al menos 12 caracteres");
     }
 
     return true;
