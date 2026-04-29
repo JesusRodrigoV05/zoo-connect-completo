@@ -34,15 +34,20 @@ export class Auth {
     username: string,
     password?: string,
     generate_password: boolean = false,
+    recaptchaToken?: string,
   ): Observable<RegisterResponse> {
     const registerData: RegisterRequest = { email, username };
     if (password !== undefined) registerData.password = password;
     if (generate_password) registerData.generate_password = true;
+    if (recaptchaToken) registerData.recaptcha_token = recaptchaToken;
     return this.http.post<RegisterResponse>(`${this.authUrl}/register`, registerData);
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
+  login(email: string, password: string, recaptchaToken?: string): Observable<LoginResponse> {
     const loginData: LoginRequest = { email, password };
+    if (recaptchaToken) {
+      loginData.recaptcha_token = recaptchaToken;
+    }
     return this.http.post<LoginResponse>(`${this.authUrl}/login`, loginData);
   }
 
