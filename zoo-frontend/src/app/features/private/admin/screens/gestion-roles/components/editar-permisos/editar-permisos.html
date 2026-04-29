@@ -1,0 +1,51 @@
+<div class="permissions-page">
+  <div class="header">
+    <div class="header-title">
+      <h2>Permisos del Rol: {{ role()?.name }}</h2>
+      <p class="subtitle">Administra los permisos asociados a este rol</p>
+    </div>
+  </div>
+
+  <div class="permissions-container" *ngIf="!loading(); else loadingTpl">
+    @for (group of getPermissionsByModule(); track group.module) {
+      <div class="permission-group">
+        <h3 class="group-title">{{ group.module | titlecase }}</h3>
+        <div class="permissions-grid">
+          @for (perm of group.permissions; track perm.id) {
+            <div class="permission-item">
+              <input 
+                type="checkbox" 
+                [checked]="isPermissionAllowed(perm.id)"
+                (change)="togglePermission(perm.id, $any($event.target).checked)"
+                [id]="'perm-' + perm.id" />
+              <label [for]="'perm-' + perm.id">
+                <span class="perm-name">{{ perm.name }}</span>
+                <span class="perm-desc">{{ perm.description }}</span>
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Cargando...</div>
+  </ng-template>
+
+  <div class="actions">
+    <button 
+      pButton 
+      label="Cancelar" 
+      class="p-button-secondary"
+      (click)="cancel()"
+      [disabled]="saving()">
+    </button>
+    <button 
+      pButton 
+      label="Guardar Permisos" 
+      (click)="save()"
+      [disabled]="saving()">
+    </button>
+  </div>
+</div>

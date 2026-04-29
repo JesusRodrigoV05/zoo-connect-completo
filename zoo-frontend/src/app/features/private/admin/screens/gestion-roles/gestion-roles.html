@@ -1,0 +1,105 @@
+<div class="gestion-roles-page">
+  <div class="header">
+    <div class="header-title">
+      <h1>Gestión de Roles</h1>
+      <p class="subtitle">Administra los roles y permisos del sistema</p>
+    </div>
+    <div class="header-actions">
+      <button 
+        pButton 
+        label="Nuevo Rol" 
+        icon="pi pi-plus" 
+        (click)="createRole()">
+      </button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input 
+        pInputText 
+        type="text" 
+        placeholder="Buscar roles..." 
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (keyup.enter)="onSearch()" />
+    </span>
+  </div>
+
+  <p-table 
+    [value]="roles()" 
+    [loading]="loading()"
+    [paginator]="false"
+    [tableStyle]="{'min-width': '50rem'}"
+    styleClass="p-datatable-striped">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre</th>
+        <th>Usuarios</th>
+        <th>Permisos Personalizados</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-role>
+      <tr>
+        <td>{{ role.name }}</td>
+        <td>
+          <p-tag 
+            [value]="role.user_count + ' usuario(s)'" 
+            [severity]="role.user_count > 0 ? 'info' : 'secondary'">
+          </p-tag>
+        </td>
+        <td>
+          <p-tag 
+            [value]="role.has_custom_permissions ? 'Sí' : 'No'" 
+            [severity]="role.has_custom_permissions ? 'success' : 'secondary'">
+          </p-tag>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button 
+              pButton 
+              pTooltip="Editar permisos" 
+              tooltipPosition="top"
+              icon="pi pi-key" 
+              class="p-button-text"
+              (click)="goToPermissions(role.id)">
+            </button>
+            <button 
+              pButton 
+              pTooltip="Editar rol" 
+              tooltipPosition="top"
+              icon="pi pi-pencil" 
+              class="p-button-text"
+              (click)="goToEdit(role.id)">
+            </button>
+            <button 
+              pButton 
+              pTooltip="Eliminar" 
+              tooltipPosition="top"
+              icon="pi pi-trash" 
+              class="p-button-text p-button-danger"
+              [disabled]="role.user_count > 0 || deleting() === role.id"
+              (click)="deleteRole(role)">
+            </button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center">
+          No se encontraron roles
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator 
+    [rows]="pageSize()" 
+    [totalRecords]="totalRecords()" 
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPageChange)="onPageChange($event.first ? $event.first + 1 : 1)">
+  </p-paginator>
+</div>

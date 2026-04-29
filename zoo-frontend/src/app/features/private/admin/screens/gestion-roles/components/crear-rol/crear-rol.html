@@ -1,0 +1,34 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>{{ isEditMode() ? 'Editar' : 'Crear' }} Rol</h2>
+    <p>{{ isEditMode() ? 'Modifique los datos del rol' : 'Ingrese los datos del nuevo rol' }}</p>
+  </div>
+
+  <div class="form-field">
+    <label for="roleName">Nombre del Rol</label>
+    <input 
+      pInputText 
+      id="roleName" 
+      type="text" 
+      [ngModel]="roleName()"
+      (ngModelChange)="roleName.set($event)"
+      placeholder="Ingrese el nombre del rol"
+      [disabled]="loading()" />
+  </div>
+
+  <div class="form-actions">
+    <button 
+      pButton 
+      label="Cancelar" 
+      class="p-button-secondary"
+      (click)="cancel()"
+      [disabled]="saving()">
+    </button>
+    <button 
+      pButton 
+      [label]="isEditMode() ? 'Actualizar' : 'Crear'" 
+      (click)="save()"
+      [disabled]="saving() || !roleName()">
+    </button>
+  </div>
+</div>

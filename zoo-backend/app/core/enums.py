@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class UserRole(str, Enum):
     ADMINISTRADOR = "administrador"
     OSI = "osi"
@@ -21,6 +22,7 @@ class PermissionCode(str, Enum):
     MANAGE_INVENTORY = "manage_inventory"
     MANAGE_SURVEYS = "manage_surveys"
 
+
 class AnimalState(str, Enum):
     SALUDABLE = "Saludable"
     EN_TRATAMIENTO = "En tratamiento"
@@ -28,8 +30,13 @@ class AnimalState(str, Enum):
     TRASLADADO = "Trasladado"
     FALLECIDO = "Fallecido"
 
+
 class AuditEvent(str, Enum):
     LOGIN_SUCCESS = "login_exitoso"
     LOGIN_FAILURE = "login_fallido"
     V2P_SUCCESS = "login_2fa_exitoso"
     PERMISSION_UPDATE = "permission_update"
+    ROLE_CREATED = "role_created"
+    ROLE_UPDATED = "role_updated"
+    ROLE_DELETED = "role_deleted"
+    ROLE_PERMISSIONS_UPDATED = "role_permissions_updated"

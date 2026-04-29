@@ -178,6 +178,37 @@ export default [
     loadComponent: () => import("./screens/gestion-permisos/gestion-permisos"),
   },
   {
+    path: "roles",
+    title: "Gestión de Roles",
+    data: { requiredPermissions: ["manage_permissions"] },
+    loadComponent: () => import("./screens/gestion-roles/gestion-roles"),
+    children: [
+      {
+        path: "crear",
+        title: "Crear Rol",
+        loadComponent: () =>
+          import("./screens/gestion-roles/components/crear-rol/crear-rol"),
+      },
+      {
+        path: "editar/:id",
+        title: "Editar Rol",
+        loadComponent: () =>
+          import("./screens/gestion-roles/components/crear-rol/crear-rol"),
+      },
+      {
+        path: "permisos/:id",
+        title: "Permisos del Rol",
+        loadComponent: () =>
+          import("./screens/gestion-roles/components/editar-permisos/editar-permisos"),
+      },
+      {
+        path: "",
+        redirectTo: "lista",
+        pathMatch: "full",
+      },
+    ],
+  },
+  {
     path: "inventario",
     data: { requiredPermissions: ["manage_inventory"] },
     loadComponent: () =>
