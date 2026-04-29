@@ -165,7 +165,7 @@ export const AuthStore = signalStore(
       };
 
       const methods = {
-        async login(email: string, password: string) {
+        async login(email: string, password: string, recaptchaToken?: string) {
           patchState(store, {
             loading: true,
             error: null,
@@ -176,7 +176,7 @@ export const AuthStore = signalStore(
             const encryptedPassword = await encryptionService.encrypt(password);
             
             const loginResponse: LoginResponse = await firstValueFrom(
-              authService.login(email, encryptedPassword),
+              authService.login(email, encryptedPassword, recaptchaToken),
             );
 
             if (
@@ -240,6 +240,7 @@ export const AuthStore = signalStore(
           username: string,
           password?: string,
           generate_password: boolean = false,
+          recaptchaToken?: string,
         ): Promise<RegisterResponse | undefined> {
           patchState(store, { loading: true, twoFA: false, error: null });
           try {
@@ -249,7 +250,7 @@ export const AuthStore = signalStore(
             }
 
             const response: RegisterResponse = await firstValueFrom(
-              authService.register(email, username, finalPassword, generate_password),
+              authService.register(email, username, finalPassword, generate_password, recaptchaToken),
             );
             patchState(store, { loading: false });
             toastService.showSuccess(

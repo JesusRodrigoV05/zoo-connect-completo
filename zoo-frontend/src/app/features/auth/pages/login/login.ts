@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -14,27 +14,32 @@ import { CardModule } from "primeng/card";
 import { RouterLink } from "@angular/router";
 import { NgOptimizedImage } from "@angular/common";
 import { LogoImage } from "@app/shared/components";
+import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-captcha";
 import { environment } from "@env";
+import { RecaptchaService } from "@app/core/services/recaptcha.service";
 
 @Component({
   selector: "app-login",
-  imports: [
+  standalone: true,
+   imports: [
     ReactiveFormsModule,
+    RouterLink,
     Loader,
     FormField,
     ButtonModule,
     CardModule,
-    RouterLink,
     NgOptimizedImage,
     LogoImage,
+    CustomCaptcha,
   ],
   templateUrl: "./login.html",
   styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Login {
+export default class Login implements OnInit, OnDestroy {
   protected readonly authStore = inject(AuthStore);
   private readonly fb = inject(FormBuilder);
+  private readonly recaptchaService = inject(RecaptchaService);
 
   loginForm: FormGroup = this.fb.group({
     email: ["", [Validators.required, Validators.email]],
@@ -43,11 +48,55 @@ export default class Login {
 
   loading = this.authStore.loading;
   error = this.authStore.error;
+  recaptchaToken: string | null = null;
+  useCustomCaptcha = false;
+  customCaptchaToken: string | null = null;
+
+  async ngOnInit() {
+    this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
+
+    if (!this.useCustomCaptcha) {
+      try {
+        await this.recaptchaService.render('recaptcha-login', (token: string) => {
+          this.recaptchaToken = token;
+        });
+      } catch (err) {
+        console.error('Error rendering reCAPTCHA:', err);
+        this.useCustomCaptcha = true;
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    this.recaptchaService.reset();
+  }
+
+  onCustomCaptchaChange(verified: boolean): void {
+    // Handled by child component
+  }
+
+  onCustomTokenChange(token: string): void {
+    this.customCaptchaToken = token;
+  }
 
   async onSubmit() {
     if (this.loginForm.valid) {
+      const token = this.useCustomCaptcha ? this.customCaptchaToken : this.recaptchaToken;
+
+      if (!token) {
+        this.authStore.clearError();
+        this.loginForm.markAllAsTouched();
+        return;
+      }
+
       const { email, password } = this.loginForm.value;
-      await this.authStore.login(email, password);
+      await this.authStore.login(email, password, token);
+
+      if (!this.useCustomCaptcha) {
+        this.recaptchaService.reset();
+        this.recaptchaToken = null;
+        await this.ngOnInit();
+      }
     } else {
       this.markFormGroupTouched();
     }
@@ -89,5 +138,9 @@ export default class Login {
         return "La contraseña debe tener al menos 12 caracteres";
     }
     return null;
+  }
+
+  recaptchaError(): boolean {
+    return this.loginForm.touched && !this.recaptchaToken && !this.customCaptchaToken;
   }
 }
