@@ -3,6 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 from starlette import status
 from typing import List, Optional
+import secrets
+import string
 
 from app.models.user import User
 from app.models.role import Role
@@ -59,12 +61,17 @@ def get_users_query(
 def create_public_user(db: Session, user_in: UserCreate) -> User:
     hashed_password = get_password_hash(user_in.password)
     role_id = _get_visitante_role_id(db)
+    
+    # Generar código de 6 dígitos
+    verification_code = ''.join(secrets.choice(string.digits) for _ in range(6))
 
     user = User(
         email=user_in.email,
         username=user_in.username,
         hashed_password=hashed_password,
-        is_active=True,
+        is_active=False, # Inactivo hasta verificar
+        email_verified=False,
+        verification_code=verification_code,
         role_id=role_id
     )
     
@@ -153,3 +160,21 @@ def update_password(db: Session, db_user: User, new_password: str) -> User:
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def verify_user_email(db: Session, email: str, code: str) -> bool:
+    """
+    Verifica el código y activa al usuario.
+    """
+    user = get_user_by_email(db, email=email)
+    if not user:
+        return False
+    
+    if user.verification_code == code:
+        user.email_verified = True
+        user.is_active = True
+        user.verification_code = None # Limpiar código tras éxito
+        db.add(user)
+        db.commit()
+        return True
+    
+    return False

@@ -22,6 +22,7 @@ class User(Base):
     hashed_password = Column(String(200), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     email_verified = Column(Boolean, default=False, nullable=False)
+    verification_code = Column(String(10), nullable=True)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     photo_url = Column(String(2048), nullable=True) #estandar
 

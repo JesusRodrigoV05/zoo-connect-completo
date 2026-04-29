@@ -101,3 +101,45 @@ async def send_generated_password_email(email_to: EmailStr, password: str, usern
         print(f"Correo con contraseña generada enviado a {email_to}")
     except Exception as e:
         print(f"Error al enviar correo de contraseña generada: {e}")
+
+async def send_verification_email(email_to: EmailStr, code: str, username: str):
+    """Envía el código de verificación al usuario tras el registro."""
+    html_template = f"""
+    <html>
+    <head>
+        <style>
+            body {{ font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ width: 90%; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; }}
+            .header {{ background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ padding: 20px; }}
+            .code {{ font-size: 24px; font-weight: bold; color: #4CAF50; letter-spacing: 5px; text-align: center; margin: 20px 0; padding: 10px; background: #f9f9f9; border: 1px dashed #4CAF50; }}
+            .footer {{ font-size: 0.8em; color: #777; text-align: center; margin-top: 20px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>Bienvenido a ZooConnect</h2>
+            </div>
+            <div class="content">
+                <h3>Hola, {username}</h3>
+                <p>Gracias por registrarte. Para activar tu cuenta, por favor usa el siguiente código de verificación:</p>
+                <div class="code">{code}</div>
+                <p>Si no creaste esta cuenta, puedes ignorar este correo.</p>
+            </div>
+            <div class="footer">
+                &copy; 2024 ZooConnect - Gestión de Zoológicos
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    message = MessageSchema(
+        subject="Activa tu cuenta de ZooConnect",
+        recipients=[email_to],
+        body=html_template,
+        subtype=MessageType.html
+    )
+
+    await fm.send_message(message)
+    print(f"Correo de verificación enviado a {email_to}")

@@ -87,3 +87,61 @@ Este proyecto implementa una capa extra de seguridad denominada **"Cifrado a Niv
 5. **Doble Validación:** Tras el descifrado, el servidor vuelve a validar la fuerza de la contraseña antes de proceder al almacenamiento (hashing) final.
 
 Este flujo garantiza que las contraseñas nunca viajen ni se registren en texto plano en ninguna capa intermedia de la infraestructura.
+
+---
+
+## 📧 Verificación de Cuenta por Correo
+
+Para garantizar la autenticidad de los usuarios y evitar el registro de cuentas falsas, el sistema implementa un flujo de verificación obligatoria:
+
+1. **Registro:** Al crear una cuenta, el usuario queda en estado **inactivo**.
+2. **Envío de Código:** El sistema genera un código aleatorio de 6 dígitos y lo envía automáticamente al correo del usuario. 
+   - *Nota:* El sistema valida el envío en tiempo real; si el correo es inválido, el registro se cancela.
+3. **Pantalla de Verificación:** El usuario es redirigido a una interfaz para introducir el código recibido.
+4. **Activación:** Una vez validado el código, la cuenta se marca como **verificada** y se activa para permitir el inicio de sesión.
+
+### Configuración Completa del Entorno (zoo-backend/.env)
+
+Para que el sistema funcione correctamente, el archivo `.env` debe tener la siguiente estructura. Asegúrate de no compartir tus claves reales:
+
+```env
+# Base de Datos
+DATABASE_URL=postgresql+psycopg2://postgres:admin@db:5432/ZOOCONNECT
+
+# Seguridad (¡NO COMPARTIR!)
+SECRET_KEY=tu_clave_secreta_aqui
+TOTP_ENCRYPTION_KEY=tu_clave_de_encriptacion_totp
+
+# Configuración de Tokens
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=100
+REFRESH_TOKEN_EXPIRE_DAYS=5
+
+# Correo Electrónico (UCB / Gmail)
+MAIL_USERNAME=ramiro.quenta@ucb.edu.bo
+MAIL_PASSWORD=TU_CLAVE_DE_APLICACION_AQUI
+MAIL_FROM=ramiro.quenta@ucb.edu.bo
+MAIL_FROM_NAME="Soporte de ZooConnect"
+MAIL_PORT=587
+MAIL_SERVER=smtp.gmail.com
+MAIL_STARTTLS=True
+MAIL_SSL_TLS=False
+
+# Integraciones y Rutas
+FRONTEND_RESET_PASSWORD_URL=http://localhost:4200/reset-password
+CORS_ORIGINS=["http://localhost:4200", "http://127.0.0.1:3000"]
+MEDIA_DIR=./media
+
+# Caché (Redis)
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_DB=0
+```
+
+### Sincronización de Base de Datos para el Equipo
+
+Si eres parte del equipo de desarrollo y acabas de descargar estos cambios, debes actualizar tu base de datos local de Docker con el siguiente comando:
+
+```bash
+docker-compose exec backend alembic upgrade head
+```

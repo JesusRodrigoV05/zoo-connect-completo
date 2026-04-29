@@ -118,7 +118,7 @@ export default class Signup implements OnInit {
       if (res && res.generated_password) {
         this.generatedPassword = res.generated_password as string;
       } else {
-        await this.router.navigate(['/login']);
+        await this.router.navigate(['/verify-email'], { queryParams: { email } });
       }
     } catch (e) {
       // errors are handled in store

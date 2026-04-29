@@ -26,4 +26,9 @@ export default [
     title: "Verificacion en 2 pasos",
     loadComponent: () => import("./pages/two-factor/two-factor"),
   },
+  {
+    path: "verify-email",
+    title: "Verificar Correo",
+    loadComponent: () => import("./pages/verify-email/verify-email"),
+  },
 ] as Routes;
