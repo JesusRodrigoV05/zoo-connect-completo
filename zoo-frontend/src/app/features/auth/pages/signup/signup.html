@@ -97,12 +97,29 @@
             <div class="field suggestion-action" *ngIf="!generatePassword">
               <p-button 
                 type="button" 
-                label="¿No se te ocurre ninguna? Sugerir una segura" 
+                label="¿Necesitas ideas? Ver tips para recordar" 
                 icon="pi pi-lightbulb" 
                 [text]="true" 
                 size="small" 
-                (onClick)="generateSuggestion()"
+                (onClick)="showTips = !showTips"
               />
+            </div>
+
+            <div class="password-tips-container" *ngIf="showTips && !generatePassword">
+              <div class="tips-header">
+                <i class="pi pi-star"></i>
+                <span>Tips para crear una contraseña fácil de recordar</span>
+              </div>
+              <div class="tips-list">
+                @for (tip of passwordTips; track tip.title) {
+                <div class="tip-card">
+                  <div class="tip-title">{{ tip.title }}</div>
+                  <div class="tip-example">"{{ tip.example }}"</div>
+                  <div class="tip-result">{{ tip.result }}</div>
+                  <div class="tip-description">{{ tip.description }}</div>
+                </div>
+                }
+              </div>
             </div>
 
             <div class="password-strength-container" *ngIf="!generatePassword">

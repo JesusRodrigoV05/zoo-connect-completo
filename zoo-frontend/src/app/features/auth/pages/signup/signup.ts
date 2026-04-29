@@ -87,6 +87,7 @@ export default class Signup implements OnInit {
   protected strengthClass = "weak";
   protected generatedPassword: string | null = null;
   protected generatePassword = false;
+  protected showTips = false;
 
   protected isPasswordStrong(): boolean {
     if (this.generatePassword) return true;
@@ -226,46 +227,38 @@ export default class Signup implements OnInit {
     }
   }
 
-  protected generateSuggestion() {
-    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const lowercase = "abcdefghijklmnopqrstuvwxyz";
-    const digits = "0123456789";
-    const symbols = "!@#$%^&*()-_";
-    const all = uppercase + lowercase + digits + symbols;
-
-    let pass = "";
-    pass += uppercase[Math.floor(Math.random() * uppercase.length)];
-    pass += lowercase[Math.floor(Math.random() * lowercase.length)];
-    pass += digits[Math.floor(Math.random() * digits.length)];
-    pass += symbols[Math.floor(Math.random() * symbols.length)];
-
-    for (let i = 0; i < 8; i++) {
-      pass += all[Math.floor(Math.random() * all.length)];
+  // Password tips for memorable passwords
+  protected passwordTips = [
+    {
+      title: "Usa una canción favorita",
+      example: "Qué triste es mi ausencia",
+      result: "QmEma#24",
+      description: "Toma la primera letra de cada palabra + el año"
+    },
+    {
+      title: "Usa una fecha especial",
+      example: "18 de junio - Cumpleaños",
+      result: "18dJ#1806",
+      description: "Combina números con la inicial del mes"
+    },
+    {
+      title: "Usa un dicho popular",
+      example: "Al que madruga Dios le ayuda",
+      result: "aQmDlA#18",
+      description: "Iniciales en minúsculas + carácter especial + año"
+    },
+    {
+      title: "Usa una frase personal",
+      example: "Mi gato feliz salta alto",
+      result: "MgFsAl#23",
+      description: "Iniciales de tus palabras favoritas"
     }
+  ];
 
-    pass = pass.split('').sort(() => Math.random() - 0.5).join('');
-
-    if (this.isValidSuggestion(pass)) {
-      this.signupForm.patchValue({
-        password: pass,
-        confirmPassword: pass
-      });
-      this.signupForm.get('password')?.markAsDirty();
-      this.signupForm.get('confirmPassword')?.markAsDirty();
-      this.onPasswordChange(pass);
-    } else {
-      this.generateSuggestion();
-    }
-  }
-
-  private isValidSuggestion(v: string): boolean {
-    return v.length >= 8 &&
-           /[A-Z]/.test(v) &&
-           /[a-z]/.test(v) &&
-           /[0-9]/.test(v) &&
-           /[!@#$%^&*()\-=_+\[\]{}|;:,.<>?]/.test(v) &&
-           !/(.)\1\1/.test(v) &&
-           !this.hasSequentialChars(v, 3);
+  protected getPasswordHint(): string {
+    const tips = this.passwordTips;
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    return `Ejemplo: "${randomTip.example}" → "${randomTip.result}"`;
   }
 
   protected copyGenerated() {
