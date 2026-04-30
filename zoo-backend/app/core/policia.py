@@ -10,9 +10,9 @@ from fastapi import Depends
 
 MAX_FAILED_ATTEMPTS = 5
 # tiempo bloqueo
-LOCKOUT_DURATION_MINUTES = 30 
+LOCKOUT_DURATION_MINUTES = 5 
 # Cuanto va recordar redis el tiempo de bloqueo
-FAILED_ATTEMPTS_TTL_SECONDS = 3600
+FAILED_ATTEMPTS_TTL_SECONDS = 300
 
 FAILED_LOGIN_PREFIX = "failed_login:"
 
