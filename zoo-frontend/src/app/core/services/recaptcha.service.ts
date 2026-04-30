@@ -70,7 +70,6 @@ export class RecaptchaService {
   render(elementId: string, callback: (token: string) => void): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.shouldUseCustomFallback()) {
-        // No renderizar reCAPTCHA, se usará el widget propio
         resolve();
         return;
       }
@@ -82,28 +81,44 @@ export class RecaptchaService {
         }
 
         (window as any).grecaptcha.ready(() => {
-          if (this.widgetId !== null) {
-            (window as any).grecaptcha.reset(this.widgetId);
-          }
-          
-          const element = document.getElementById(elementId);
-          if (!element) {
-            reject(new Error(`Elemento con ID ${elementId} no encontrado`));
+          // Verificar si ya se renderizó en este elemento
+          const existingWidget = document.querySelector(`[data-recaptcha-widget="${elementId}"]`);
+          if (existingWidget) {
+            console.warn('reCAPTCHA ya renderizado en', elementId);
+            resolve();
             return;
           }
 
-          this.widgetId = (window as any).grecaptcha.render(elementId, {
-            sitekey: this.siteKey,
-            callback: (token: string) => {
-              callback(token);
-            },
-            'expired-callback': () => {
-              if (this.widgetId !== null) {
-                (window as any).grecaptcha.reset(this.widgetId);
+          const element = document.getElementById(elementId);
+          if (!element) {
+            resolve();
+            return;
+          }
+
+          // Marcar el elemento para evitar re-renderizados
+          element.setAttribute('data-recaptcha-widget', elementId);
+
+          try {
+            this.widgetId = (window as any).grecaptcha.render(elementId, {
+              sitekey: this.siteKey,
+              callback: (token: string) => {
+                callback(token);
+              },
+              'expired-callback': () => {
+                if (this.widgetId !== null) {
+                  (window as any).grecaptcha.reset(this.widgetId);
+                }
               }
+            });
+            resolve();
+          } catch (e: any) {
+            if (e?.message?.includes('already been rendered')) {
+              console.warn('reCAPTCHA ya estaba renderizado, continuando...');
+              resolve();
+            } else {
+              reject(e);
             }
-          });
-          resolve();
+          }
         });
       }).catch(() => {
         this.useCustomFallback = true;

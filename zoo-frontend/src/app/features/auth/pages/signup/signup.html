@@ -184,7 +184,7 @@
                 type="submit"
                 severity="primary"
                 [rounded]="true"
-                [disabled]="isLoading() || (!generatePassword && !isPasswordStrong()) || !recaptchaToken"
+                [disabled]="isLoading() || (!generatePassword && !isPasswordStrong()) || (!recaptchaToken && !customCaptchaToken)"
                 styleClass="login-button w-full"
                 fluid
               >

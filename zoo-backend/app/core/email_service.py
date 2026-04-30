@@ -12,6 +12,7 @@ conf = ConnectionConfig(
     MAIL_STARTTLS=settings.MAIL_STARTTLS,
     MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
     USE_CREDENTIALS=True,
+    TIMEOUT=60,
     VALIDATE_CERTS=True,
     MAIL_FROM_NAME=settings.MAIL_FROM_NAME
 )

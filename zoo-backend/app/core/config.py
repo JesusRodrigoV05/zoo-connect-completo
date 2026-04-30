@@ -8,9 +8,7 @@ from pydantic import EmailStr
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", 
-        case_sensitive=True,
-        extra="ignore"
+        env_file=".env", case_sensitive=True, extra="ignore"
     )
 
     # heredando de basesettings indicamos que no sea un basenormal y que lea automaticamente las varibles de entorno
@@ -21,7 +19,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     MEDIA_DIR: str = "./media"
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "https://vercel-zoo-connect.vercel.app",
+    ]
     DEFAULT_ADMIN_EMAIL: str
     DEFAULT_ADMIN_PASSWORD: str
     #
