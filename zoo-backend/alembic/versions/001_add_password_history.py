@@ -13,12 +13,15 @@ import sqlalchemy as sa
 # revision identifiers, used by Alembic.
 revision = "001_add_password_history"
 down_revision = (
-    'f7662acd6c58', # El merge anterior que ya tenías
-    '479ce702d0c4', # Rama de tareas 3
-    '53402791f007', # Rama de veterinario 2
-    '8e8efd8fcfaf', # Tareas definitivo 4
-    'bce8bc40f22b', # Inventario 3
-    '47b6d5f2e315'  # Veterinario 4
+    'f7662acd6c58', # Merge previo
+    '479ce702d0c4', # tareas3
+    '53402791f007', # veterinario2
+    '8e8efd8fcfaf', # tareasdefinitivo4
+    'bce8bc40f22b', # inventario3
+    '47b6d5f2e315', # veterinario4
+    '2f9a8d7b1cde', # permissions (NUEVO)
+    'c3f2a9b11e6d', # onboarding (NUEVO)
+    '7abfda0c2909'  # verification_code (NUEVO)
 )
 branch_labels = None
 depends_on = None
