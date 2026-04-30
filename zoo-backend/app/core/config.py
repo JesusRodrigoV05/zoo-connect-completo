@@ -7,7 +7,11 @@ from pydantic import EmailStr
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        case_sensitive=True,
+        extra="ignore"
+    )
 
     # heredando de basesettings indicamos que no sea un basenormal y que lea automaticamente las varibles de entorno
     # del .en
@@ -77,9 +81,5 @@ class Settings(BaseSettings):
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
-        extra = "ignore"  # Ignorar campos extra como RECAPTCHA
 
 settings = Settings()

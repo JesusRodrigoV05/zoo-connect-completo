@@ -4,6 +4,7 @@ import { TableModule } from "primeng/table";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";
 import { TooltipModule } from "primeng/tooltip";
+import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { Auth } from "@features/auth/services/auth";
 import { AuthStore } from "@stores/auth.store";
 import { PasswordHistoryEntry } from "@models/usuario/password-history.model";
@@ -18,6 +19,7 @@ import { DatePipe } from "@angular/common";
     CardModule,
     ButtonModule,
     TooltipModule,
+    ProgressSpinnerModule,
     DatePipe
   ],
   templateUrl: "./password-history.html",
@@ -39,7 +41,7 @@ export class PasswordHistoryComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     
-    const userId = this.authStore.user()?.id;
+    const userId = this.authStore.usuario()?.id;
     if (!userId) {
       this.error.set("No se pudo obtener la información del usuario");
       this.loading.set(false);
@@ -64,7 +66,7 @@ export class PasswordHistoryComponent implements OnInit {
       return;
     }
     
-    const userId = this.authStore.user()?.id;
+    const userId = this.authStore.usuario()?.id;
     if (!userId) return;
     
     this.authService.clearPasswordHistory(Number(userId)).subscribe({
