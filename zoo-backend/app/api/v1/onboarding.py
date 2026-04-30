@@ -2,8 +2,9 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import Optional
 
-from app.core.dependencies import get_current_active_user
+from app.core.dependencies import get_current_active_user, get_current_active_user_optional
 from app.db.session import get_db
 from app.models.onboarding_tour_progress import OnboardingTourProgress
 from app.models.user import User
@@ -16,8 +17,11 @@ router = APIRouter()
 def get_tour_status(
     tour_key: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: Optional[User] = Depends(get_current_active_user_optional),
 ):
+    if current_user is None:
+        return OnboardingTourStatusOut(tour_key=tour_key, completed=False, completed_at=None)
+
     progress = (
         db.query(OnboardingTourProgress)
         .filter(
