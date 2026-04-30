@@ -7,7 +7,7 @@ from app.models.user import User
 from app.core.security import get_password_hash
 from app.crud.permission import ensure_permissions_catalog, ensure_role_permissions
 
-def init_db():
+def create_default_admin():
     db = SessionLocal()
     try:
         print("--- Iniciando Semillas (Seeds) ---")
