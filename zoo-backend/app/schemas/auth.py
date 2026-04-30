@@ -1,12 +1,9 @@
 from pydantic import BaseModel, EmailStr, Field, constr, validator
-from typing import List, Optional
+from typing import List, Optional, Annotated, Union
 from datetime import datetime
 
 # ret token
 import re
-
-# 2fa
-from typing import Annotated, Union
 
 class LoginRequest(BaseModel):
     email: EmailStr

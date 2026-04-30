@@ -40,8 +40,15 @@ export class RecaptchaService {
       };
       
       script.onerror = () => {
-        this.useCustomFallback = true;
-        resolve(); // No rechazamos, usamos fallback
+        const devFallback = !this.siteKey || this.siteKey.includes('xxxxxxxxxx');
+        this.useCustomFallback = devFallback;
+
+        if (devFallback) {
+          resolve();
+          return;
+        }
+
+        reject(new Error('No se pudo cargar Google reCAPTCHA'));
       };
 
       document.head.appendChild(script);
@@ -54,7 +61,7 @@ export class RecaptchaService {
    * Verifica si debemos usar el widget propio.
    */
   shouldUseCustomFallback(): boolean {
-    return this.useCustomFallback || !this.siteKey || this.siteKey.includes('xxxxxxxxxx');
+    return this.useCustomFallback;
   }
 
   /**
@@ -98,9 +105,9 @@ export class RecaptchaService {
           });
           resolve();
         });
-      }).catch((err) => {
+      }).catch(() => {
         this.useCustomFallback = true;
-        resolve(); // Usar fallback
+        resolve();
       });
     });
   }

@@ -1,12 +1,14 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AnyHttpUrl, field_validator
 from typing import List, Union
 
 # correo
-from pydantic import validator, EmailStr
+from pydantic import EmailStr
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+
     # heredando de basesettings indicamos que no sea un basenormal y que lea automaticamente las varibles de entorno
     # del .en
     DATABASE_URL: str
@@ -79,7 +81,5 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
         extra = "ignore"  # Ignorar campos extra como RECAPTCHA
-
-
 
 settings = Settings()

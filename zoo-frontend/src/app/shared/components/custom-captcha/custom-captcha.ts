@@ -1,12 +1,13 @@
-import { Component, EventEmitter, Output, Input, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-custom-captcha',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule],
+  imports: [CommonModule, FormsModule, ButtonModule, InputTextModule],
   template: `
     <div class="custom-captcha-container" [class.verified]="verified">
       @if (!verified) {

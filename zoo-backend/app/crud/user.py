@@ -99,10 +99,10 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         email=user_in.email,
         username=user_in.username,
         hashed_password=hashed_password,
-        is_active=False, # Inactivo hasta verificar
+        is_active=False,  # Inactivo hasta verificar por email
         email_verified=False,
         verification_code=verification_code,
-        role_id=role_id
+        role_id=role_id,
     )
 
     db.add(user)
@@ -211,15 +211,15 @@ def verify_user_email(db: Session, email: str, code: str) -> bool:
     user = get_user_by_email(db, email=email)
     if not user:
         return False
-    
+
     if user.verification_code == code:
         user.email_verified = True
         user.is_active = True
-        user.verification_code = None # Limpiar código tras éxito
+        user.verification_code = None  # Limpiar código tras éxito
         db.add(user)
         db.commit()
         return True
-    
+
     return False
 
 def _save_password_to_history(db: Session, user: User, password_hash: str) -> None:

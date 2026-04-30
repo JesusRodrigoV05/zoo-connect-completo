@@ -25,9 +25,13 @@ from app.crud.auth import authenticate_user
 from app.core.dependencies import get_current_active_user
 from app.core.config import settings
 from app.models.user import User
+# reset token and email verification
+from app.schemas.auth import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    EmailVerificationRequest,
+)
 
-# reset token
-from app.schemas.auth import ForgotPasswordRequest, ResetPasswordRequest, EmailVerificationRequest
 from app.core import email_service
 from app.core.password_utils import generate_strong_password
 
@@ -44,7 +48,6 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     create_2fa_session_token,
-    settings,
 )
 from app.core.encryption import decrypt_data
 
@@ -103,9 +106,11 @@ def _issue_tokens_for_user(user, db: Session):
 # crud_user.create_public_user ya maneja IntegrityError y lanza un HTTPException 409
 @router.post("/register", response_model=UserCreateResponse, status_code=201)
 async def register(
-    user_in: UserCreate, request: Request, db: Session = Depends(get_db)
+    request: Request,
+    user_in: UserCreate,
+    db: Session = Depends(get_db),
 ):
-    # 0. Verificar reCAPTCHA v2 (server-side) para creación de usuarios
+    # 0. Verificar reCAPTCHA v2 (server-side) para creación de usuarios (si se envía token)
     if hasattr(user_in, "recaptcha_token") and user_in.recaptcha_token:
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(user_in.recaptcha_token, client_ip)
@@ -115,11 +120,11 @@ async def register(
                 detail="Verificación de seguridad fallida. Intenta nuevamente.",
             )
     elif settings.RECAPTCHA_SECRET_KEY != "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx":
+        # Si la app está configurada con clave distinta a la de ejemplo, exigir token
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Falta verificación de seguridad (reCAPTCHA).",
         )
-
     # 1. Intentar descifrar la contraseña si viene cifrada (RSA)
     if user_in.password and not user_in.generate_password:
         try:
