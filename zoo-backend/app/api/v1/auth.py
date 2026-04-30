@@ -151,11 +151,17 @@ async def register(
 
     user = crud_user.create_public_user(db=db, user_in=user_in_with_password)
 
-    # 2. Enviar correo de verificación de forma SÍNCRONA
+    # 2. Enviar correo de verificación (no bloqueante para registro)
     try:
         await email_service.send_verification_email(
             email_to=user.email, code=user.verification_code, username=user.username
         )
+    except Exception as e:
+        # Log del error pero no bloqueamos el registro
+        print(
+            f"ADVERTENCIA: No se pudo enviar correo de verificación a {user.email}: {str(e)}"
+        )
+        # El usuario queda registrado pero sin verificar (puede reenviar después)
     except Exception as e:
         # Si falla el envío de correo, eliminamos el usuario para que pueda re-intentar con un email válido
         crud_user.delete_user_by_admin(db, user.id)
