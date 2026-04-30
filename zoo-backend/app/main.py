@@ -62,7 +62,11 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=[
+        "http://localhost:4200",
+        "https://vercel-zoo-connect.vercel.app",
+        "https://vercel-zoo-connect-git-main-mfjm0265-7988s-projects.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
