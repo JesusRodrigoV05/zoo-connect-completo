@@ -1,7 +1,11 @@
 import httpx
 from pydantic import EmailStr
 from app.core.config import settings
+# Mantenemos las importaciones de fastapi_mail solo si planeas usar 'conf' en otro lado. 
+# Si todo tu sistema usará Postmark, podrías incluso borrar fastapi_mail por completo.
+from fastapi_mail import ConnectionConfig
 
+# Configuración SMTP (Opcional: Si solo vas a usar Postmark vía HTTP, esta parte no la necesitas realmente)
 conf = ConnectionConfig(
     MAIL_USERNAME=settings.MAIL_USERNAME,
     MAIL_PASSWORD=settings.MAIL_PASSWORD,
@@ -142,7 +146,5 @@ async def send_verification_email(email_to: EmailStr, code: str, username: str):
     await _send_email_via_postmark(
         email_to, "Activa tu cuenta de ZooConnect", html_template
     )
-
-
-    await fm.send_message(message)
+    # ELIMINAMOS "await fm.send_message(message)" AQUÍ
     print(f"Correo de verificación enviado a {email_to}")
