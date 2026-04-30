@@ -1,7 +1,7 @@
 import redis
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.core.config import settings
-from app.core.scheduler_jobs import generar_tareas_diarias
+from app.core.scheduler_jobs import generar_tareas_diarias, limpiar_usuarios_no_verificados
 
 SCHEDULER_LOCK_KEY = "scheduler:generar_tareas_diarias_lock"
 LOCK_TIMEOUT_SECONDS = 60 * 10
@@ -56,6 +56,15 @@ def setup_scheduler():
         minute=25,
         id="job_generar_tareas_diarias",
         name="Generar Tareas Recurrentes Diarias",
+        replace_existing=True
+    )
+
+    scheduler.add_job(
+        limpiar_usuarios_no_verificados,
+        trigger="interval",
+        hours=1,
+        id="job_limpiar_usuarios_no_verificados",
+        name="Limpiar usuarios no verificados",
         replace_existing=True
     )
 
