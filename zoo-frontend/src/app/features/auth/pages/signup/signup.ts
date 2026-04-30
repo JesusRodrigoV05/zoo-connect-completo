@@ -173,7 +173,6 @@ export default class Signup implements OnInit, OnDestroy {
       if (!this.useCustomCaptcha) {
         this.recaptchaService.reset();
         this.recaptchaToken = null;
-        await this.ngOnInit();
       }
     }
   }
