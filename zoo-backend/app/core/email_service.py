@@ -2,6 +2,20 @@ import httpx
 from pydantic import EmailStr
 from app.core.config import settings
 
+conf = ConnectionConfig(
+    MAIL_USERNAME=settings.MAIL_USERNAME,
+    MAIL_PASSWORD=settings.MAIL_PASSWORD,
+    MAIL_FROM=settings.MAIL_FROM,
+    MAIL_PORT=settings.MAIL_PORT,
+    MAIL_SERVER=settings.MAIL_SERVER,
+    MAIL_STARTTLS=settings.MAIL_STARTTLS,
+    MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
+    USE_CREDENTIALS=True,
+    TIMEOUT=60,
+    VALIDATE_CERTS=True,
+    MAIL_FROM_NAME=settings.MAIL_FROM_NAME
+)
+
 
 async def _send_email_via_postmark(email_to: str, subject: str, html_body: str) -> None:
     """Envía un email usando la API de Postmark (HTTPS - compatible con Render)."""
@@ -128,4 +142,7 @@ async def send_verification_email(email_to: EmailStr, code: str, username: str):
     await _send_email_via_postmark(
         email_to, "Activa tu cuenta de ZooConnect", html_template
     )
+
+
+    await fm.send_message(message)
     print(f"Correo de verificación enviado a {email_to}")
