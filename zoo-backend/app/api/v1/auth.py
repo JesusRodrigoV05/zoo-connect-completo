@@ -25,6 +25,7 @@ from app.crud.auth import authenticate_user
 from app.core.dependencies import get_current_active_user
 from app.core.config import settings
 from app.models.user import User
+
 # reset token and email verification
 from app.schemas.auth import (
     ForgotPasswordRequest,
@@ -69,6 +70,7 @@ from app.crud import permission as crud_permission
 
 # recaptcha
 from app.core.recaptcha import verify_recaptcha, is_valid_recaptcha
+
 router = APIRouter()
 
 
@@ -111,6 +113,7 @@ async def register(
     db: Session = Depends(get_db),
 ):
     # 0. Verificar reCAPTCHA v2 (server-side) para creación de usuarios (si se envía token)
+    # Nota: reCAPTCHA es opcional - solo se verifica si se envía el token
     if hasattr(user_in, "recaptcha_token") and user_in.recaptcha_token:
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(user_in.recaptcha_token, client_ip)
@@ -119,12 +122,6 @@ async def register(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Verificación de seguridad fallida. Intenta nuevamente.",
             )
-    elif settings.RECAPTCHA_SECRET_KEY != "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx":
-        # Si la app está configurada con clave distinta a la de ejemplo, exigir token
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Falta verificación de seguridad (reCAPTCHA).",
-        )
     # 1. Intentar descifrar la contraseña si viene cifrada (RSA)
     if user_in.password and not user_in.generate_password:
         try:
@@ -153,20 +150,18 @@ async def register(
         raise HTTPException(status_code=400, detail=str(e))
 
     user = crud_user.create_public_user(db=db, user_in=user_in_with_password)
-    
+
     # 2. Enviar correo de verificación de forma SÍNCRONA
     try:
         await email_service.send_verification_email(
-            email_to=user.email,
-            code=user.verification_code,
-            username=user.username
+            email_to=user.email, code=user.verification_code, username=user.username
         )
     except Exception as e:
         # Si falla el envío de correo, eliminamos el usuario para que pueda re-intentar con un email válido
         crud_user.delete_user_by_admin(db, user.id)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No se pudo enviar el correo de verificación. Verifique si el email es correcto o existe."
+            detail="No se pudo enviar el correo de verificación. Verifique si el email es correcto o existe.",
         )
 
     # Devolver la información del usuario y, si se generó, la contraseña temporal
@@ -182,15 +177,17 @@ async def register(
         "generated_password": generated_password,
     }
 
+
 @router.post("/verify-email", status_code=status.HTTP_200_OK)
 def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
     success = crud_user.verify_user_email(db, email=body.email, code=body.code)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Código de verificación inválido o usuario no encontrado."
+            detail="Código de verificación inválido o usuario no encontrado.",
         )
     return {"message": "Email verificado con éxito. Ya puedes iniciar sesión."}
+
 
 # rate limiting
 @router.post("/login", response_model=Union[TokenResponse, LoginStep2Response])
@@ -205,7 +202,7 @@ async def login(
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
-    # 0. Verificar reCAPTCHA v2 (server-side)
+    # 0. Verificar reCAPTCHA v2 (server-side) - solo si se envía token
     if payload.recaptcha_token:
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(payload.recaptcha_token, client_ip)
@@ -219,11 +216,6 @@ async def login(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Verificación de seguridad fallida. Intenta nuevamente.",
             )
-    elif settings.RECAPTCHA_SECRET_KEY != "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Falta verificación de seguridad (reCAPTCHA).",
-        )
     # 1. Descifrar contraseña RSA
     try:
         decrypted_password = RSAManager.decrypt_password(payload.password)
@@ -539,6 +531,7 @@ def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
     crud_token.delete_reset_token(db, token=body.token)
 
     return {"msg": "Contraseña actualizada exitosamente"}
+
 
 # put user
 @router.put("/update-profile", response_model=UserOut)
