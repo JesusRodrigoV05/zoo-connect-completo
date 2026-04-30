@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy } from "@angular/core";
+import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, NgZone, ChangeDetectorRef } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -40,6 +40,8 @@ export default class Login implements OnInit, OnDestroy {
   protected readonly authStore = inject(AuthStore);
   private readonly fb = inject(FormBuilder);
   private readonly recaptchaService = inject(RecaptchaService);
+  private readonly ngZone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   loginForm: FormGroup = this.fb.group({
     email: ["", [Validators.required, Validators.email]],
@@ -56,14 +58,43 @@ export default class Login implements OnInit, OnDestroy {
     this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
 
     if (!this.useCustomCaptcha) {
+      this.initRecaptchaWithRetry();
+    }
+  }
+
+  /**
+   * Intenta renderizar reCAPTCHA esperando a que el elemento esté en el DOM.
+   * Esto es necesario porque el formulario está dentro de un bloque @defer.
+   */
+  private async initRecaptchaWithRetry(attempts = 0) {
+    const elementId = 'recaptcha-login';
+    const element = document.getElementById(elementId);
+
+    if (element) {
       try {
-        await this.recaptchaService.render('recaptcha-login', (token: string) => {
-          this.recaptchaToken = token;
+        await this.recaptchaService.render(elementId, (token: string) => {
+          // Usamos ngZone.run para que Angular detecte el cambio inmediatamente
+          this.ngZone.run(() => {
+            this.recaptchaToken = token;
+            this.cdr.detectChanges(); // Forzamos la detección de cambios inmediata
+          });
         });
       } catch (err) {
         console.error('Error rendering reCAPTCHA:', err);
-        this.useCustomCaptcha = true;
+        this.ngZone.run(() => {
+          this.useCustomCaptcha = true;
+          this.cdr.markForCheck();
+        });
       }
+    } else if (attempts < 20) {
+      // Reintentar cada 200ms por un máximo de 4 segundos
+      setTimeout(() => this.initRecaptchaWithRetry(attempts + 1), 200);
+    } else {
+      console.warn('No se encontró el elemento reCAPTCHA tras varios intentos, usando fallback.');
+      this.ngZone.run(() => {
+        this.useCustomCaptcha = true;
+        this.cdr.markForCheck();
+      });
     }
   }
 

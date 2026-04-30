@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, NgZone, ChangeDetectorRef } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -62,6 +62,8 @@ export default class Signup implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly toastService = inject(ShowToast);
   private readonly recaptchaService = inject(RecaptchaService);
+  private readonly ngZone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   protected readonly isLoading = this.authStore.loading;
   protected readonly error = this.authStore.error;
@@ -111,14 +113,44 @@ export default class Signup implements OnInit, OnDestroy {
     this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
 
     if (!this.useCustomCaptcha) {
+      this.initRecaptchaWithRetry();
+    }
+  }
+
+  /**
+   * Intenta renderizar reCAPTCHA esperando a que el elemento esté en el DOM.
+   * Esto es necesario porque el formulario está dentro de un bloque @defer.
+   */
+  private async initRecaptchaWithRetry(attempts = 0) {
+    const elementId = 'recaptcha-signup';
+    const element = document.getElementById(elementId);
+
+    if (element) {
       try {
-        await this.recaptchaService.render('recaptcha-signup', (token: string) => {
-          this.recaptchaToken = token;
+        await this.recaptchaService.render(elementId, (token: string) => {
+          // Usamos ngZone.run para que Angular detecte el cambio inmediatamente
+          // y el botón se habilite sin tener que hacer click fuera.
+          this.ngZone.run(() => {
+            this.recaptchaToken = token;
+            this.cdr.detectChanges(); // Forzamos la detección de cambios inmediata
+          });
         });
       } catch (err) {
         console.error('Error renderizando reCAPTCHA:', err);
-        this.useCustomCaptcha = true;
+        this.ngZone.run(() => {
+          this.useCustomCaptcha = true;
+          this.cdr.markForCheck();
+        });
       }
+    } else if (attempts < 20) {
+      // Reintentar cada 200ms por un máximo de 4 segundos
+      setTimeout(() => this.initRecaptchaWithRetry(attempts + 1), 200);
+    } else {
+      console.warn('No se encontró el elemento reCAPTCHA tras varios intentos, usando fallback.');
+      this.ngZone.run(() => {
+        this.useCustomCaptcha = true;
+        this.cdr.markForCheck();
+      });
     }
   }
 

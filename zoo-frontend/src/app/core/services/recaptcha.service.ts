@@ -88,7 +88,9 @@ export class RecaptchaService {
           
           const element = document.getElementById(elementId);
           if (!element) {
-            reject(new Error(`Elemento con ID ${elementId} no encontrado`));
+            // Silently resolve if the element is no longer in the DOM
+            // to avoid unnecessary console errors during navigation or defer loading.
+            resolve();
             return;
           }
 
