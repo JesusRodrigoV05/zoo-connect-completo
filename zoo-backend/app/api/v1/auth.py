@@ -11,7 +11,7 @@ from app.core.dependencies import get_current_active_user
 from app.core.config import settings
 from app.models.user import User
 #reset token
-from app.schemas.auth import ForgotPasswordRequest, ResetPasswordRequest
+from app.schemas.auth import ForgotPasswordRequest, ResetPasswordRequest, EmailVerificationRequest
 from app.core import email_service
 from app.core.password_utils import generate_strong_password
 from app.crud import token as crud_token
@@ -69,7 +69,7 @@ def _issue_tokens_for_user(user, db: Session):
     return access_token, rt["token"]
 #crud_user.create_public_user ya maneja IntegrityError y lanza un HTTPException 409
 @router.post("/register", response_model=UserCreateResponse, status_code=201)
-def register(user_in: UserCreate, db: Session = Depends(get_db)):
+async def register(user_in: UserCreate, db: Session = Depends(get_db)):
     # 1. Intentar descifrar la contraseña si viene cifrada (RSA)
     if user_in.password and not user_in.generate_password:
         try:
@@ -98,6 +98,21 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
 
     user = crud_user.create_public_user(db=db, user_in=user_in_with_password)
+    
+    # 2. Enviar correo de verificación de forma SÍNCRONA
+    try:
+        await email_service.send_verification_email(
+            email_to=user.email,
+            code=user.verification_code,
+            username=user.username
+        )
+    except Exception as e:
+        # Si falla el envío de correo, eliminamos el usuario para que pueda re-intentar con un email válido
+        crud_user.delete_user_by_admin(db, user.id)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo enviar el correo de verificación. Verifique si el email es correcto o existe."
+        )
 
     # Devolver la información del usuario y, si se generó, la contraseña temporal
     return {
@@ -111,6 +126,16 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         "created_at": user.created_at,
         "generated_password": generated_password,
     }
+
+@router.post("/verify-email", status_code=status.HTTP_200_OK)
+def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
+    success = crud_user.verify_user_email(db, email=body.email, code=body.code)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Código de verificación inválido o usuario no encontrado."
+        )
+    return {"message": "Email verificado con éxito. Ya puedes iniciar sesión."}
 
 
 #rate limiting

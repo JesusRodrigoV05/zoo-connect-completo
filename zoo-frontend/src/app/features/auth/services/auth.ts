@@ -100,4 +100,8 @@ export class Auth {
       requestData,
     );
   }
+
+  verifyEmail(email: string, code: string): Observable<any> {
+    return this.http.post<any>(`${this.authUrl}/verify-email`, { email, code });
+  }
 }

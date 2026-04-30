@@ -37,6 +37,10 @@ class ResetPasswordRequest(BaseModel):
         if not re.search(r"[0-9]", v):
             raise ValueError("La contraseña debe contener al menos un numero")
         return v
+
+class EmailVerificationRequest(BaseModel):
+    email: EmailStr
+    code: str
     
 #2fa
 class LoginStep2Response(BaseModel):

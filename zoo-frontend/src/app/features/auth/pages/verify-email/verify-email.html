@@ -1,0 +1,77 @@
+<div class="auth-page-container">
+  <p-card class="auth-card auth-card-wide">
+    <div class="auth-card-content">
+      <div class="auth-image-container">
+        <img
+          ngSrc="/assets/images/login.png"
+          alt="Imagen de un tigre"
+          width="600"
+          height="400"
+          priority
+        />
+      </div>
+
+      <div class="auth-form-container">
+        <div class="auth-header">
+          <app-logo-image [size]="150" />
+          <h1>Verifica tu correo</h1>
+          <p class="subtitle">Ingresa el código de 6 dígitos enviado a <strong>{{ email() }}</strong></p>
+        </div>
+
+        <div class="auth-content">
+          <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+            <div class="field">
+              <span class="p-float-label">
+                <input
+                  id="code"
+                  type="text"
+                  pInputText
+                  formControlName="code"
+                  class="w-full"
+                  maxlength="6"
+                  style="text-align: center; font-size: 2rem; letter-spacing: 0.5rem; font-weight: bold;"
+                />
+                <label for="code">Código de Verificación</label>
+              </span>
+              @if (getCodeError()) {
+                <p-message severity="error" [text]="getCodeError()!" />
+              }
+            </div>
+
+            <div class="auth-button-container">
+              <p-button
+                type="submit"
+                label="Verificar Cuenta"
+                severity="primary"
+                [rounded]="true"
+                [disabled]="isLoading()"
+                styleClass="auth-button"
+                fluid
+              >
+                @if (isLoading()) {
+                  <zoo-loader
+                    [size]="20"
+                    [color]="'var(--p-primary-contrast-color)'"
+                  />
+                }
+              </p-button>
+            </div>
+          </form>
+
+          <div class="auth-info-box">
+            <i class="pi pi-info-circle"></i>
+            <p>
+              ¿No recibiste el código? Revisa tu carpeta de spam o asegúrate de que el correo sea correcto.
+            </p>
+          </div>
+
+          <div class="auth-link-container">
+            <p>
+              <a routerLink="/login">Volver al inicio de sesión</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-card>
+</div>

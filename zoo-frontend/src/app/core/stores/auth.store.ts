@@ -264,6 +264,22 @@ export const AuthStore = signalStore(
           }
         },
 
+        async verifyEmail(email: string, code: string): Promise<void> {
+          patchState(store, { loading: true, error: null });
+          try {
+            await firstValueFrom(authService.verifyEmail(email, code));
+            patchState(store, { loading: false });
+            toastService.showSuccess(
+              '¡Éxito!',
+              'Correo verificado correctamente. Ya puedes iniciar sesión.',
+            );
+            await router.navigate(['/login']);
+          } catch (error: any) {
+            handleError(error, 'verificación de email');
+            throw error;
+          }
+        },
+
         async updateProfilePicture(fotoUrl: string, silent = false) {
           patchState(store, { loading: true, error: null });
 
