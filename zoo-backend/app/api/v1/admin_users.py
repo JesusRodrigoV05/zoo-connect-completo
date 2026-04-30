@@ -8,6 +8,7 @@ from app.schemas.user import UserOut, AdminUserCreate, AdminUserUpdate
 from app.core.dependencies import require_permission
 from app.core.enums import PermissionCode
 
+# pagination
 from fastapi_pagination import Page, Params
 from app.schemas.user import UserOutWithRole
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -37,17 +38,25 @@ def admin_list_users(
         None, description="Filtrar por estado activo/inactivo"
     ),
     search: Optional[str] = Query(None, description="Buscar por nombre o email"),
+    sort_by: Optional[str] = Query(
+        "id", description="Campo para ordenar: id, email, username, created_at"
+    ),
+    sort_type: Optional[str] = Query("desc", description="Dirección: asc o desc"),
     page: int = Query(1, ge=1, description="Número de página"),
-    page_size: int = Query(20, ge=1, le=100, description="Tamaño de página"),
+    size: int = Query(10, ge=1, le=100, description="Tamaño de página"),
     db: Session = Depends(get_db),
 ):
-    params = Params(page=page, size=page_size)
-    query = crud_user.get_users_query(
-        db=db, role_id=role_id, is_active=is_active, search=search
+    return paginate(
+        crud_user.get_users_query(
+            db=db,
+            role_id=role_id,
+            is_active=is_active,
+            search=search,
+            sort_by=sort_by,
+            sort_type=sort_type,
+        ),
+        Params(page=page, size=size),
     )
-    return paginate(query, params)
-    db: Session = Depends(get_db),
-
 
 @router.get("/users/{user_id}", response_model=UserOut)
 def admin_get_user(user_id: int, db: Session = Depends(get_db)):
@@ -100,7 +109,6 @@ def admin_delete_user(user_id: int, db: Session = Depends(get_db)):
 )
 def get_audit_logs(db: Session = Depends(get_db)):
     return paginate(crud_audit.get_audit_logs_query(db=db))
-
 @router.get(
     "/users/{user_id}/password-history",
     response_model=List[PasswordHistoryOut],

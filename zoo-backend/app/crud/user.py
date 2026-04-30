@@ -19,7 +19,6 @@ from app.core.security import get_password_hash, verify_password
 from app.core.enums import UserRole
 from app.core.config import settings
 
-
 def _get_visitante_role_id(db: Session) -> int:
 
     role = db.query(Role).filter(Role.name == UserRole.VISITANTE.value).first()
@@ -57,6 +56,8 @@ def get_users_query(
     role_id: Optional[int] = None,
     is_active: Optional[bool] = None,
     search: Optional[str] = None,
+    sort_by: Optional[str] = "id",
+    sort_type: Optional[str] = "desc",
 ) -> Query:
     query = db.query(User).options(joinedload(User.role))
 
@@ -70,9 +71,22 @@ def get_users_query(
         query = query.filter(
             (User.username.ilike(f"%{search}%")) | (User.email.ilike(f"%{search}%"))
         )
+    # Ordenamiento seguro (evitar inyección SQL)
+    valid_sort_fields = {
+        "id": User.id,
+        "email": User.email,
+        "username": User.username,
+        "created_at": User.created_at,
+        "is_active": User.is_active,
+    }
 
-    return query.order_by(User.id)
+    sort_field = valid_sort_fields.get(sort_by, User.id)
+    if (sort_type or "desc").lower() == "asc":
+        query = query.order_by(sort_field.asc())
+    else:
+        query = query.order_by(sort_field.desc())
 
+    return query
 
 def create_public_user(db: Session, user_in: UserCreate) -> User:
     hashed_password = get_password_hash(user_in.password)

@@ -418,3 +418,72 @@
     font-weight: 500;
   }
 }
+
+.password-tips-container {
+  background: var(--p-surface-50);
+  border: 1px solid var(--p-primary-200);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  animation: slideInUp 0.3s ease-out;
+
+  .tips-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--p-primary-700);
+    font-weight: 600;
+    margin-bottom: 1rem;
+
+    i { color: var(--p-primary-500); }
+  }
+
+  .tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tip-card {
+    background: var(--p-surface-card);
+    border: 1px solid var(--p-surface-200);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: var(--p-primary-300);
+      box-shadow: var(--p-shadow-1);
+    }
+
+    .tip-title {
+      font-weight: 600;
+      color: var(--p-text-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .tip-example {
+      font-size: 0.85rem;
+      color: var(--p-text-muted-color);
+      font-style: italic;
+      margin-bottom: 0.25rem;
+    }
+
+    .tip-result {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--p-primary-700);
+      font-size: 1rem;
+      background: var(--p-primary-50);
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .tip-description {
+      font-size: 0.8rem;
+      color: var(--p-text-muted-color);
+    }
+  }
+}

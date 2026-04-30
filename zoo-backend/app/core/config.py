@@ -48,6 +48,12 @@ class Settings(BaseSettings):
     #
     FRONTEND_RESET_PASSWORD_URL: AnyHttpUrl = "http://localhost:3000/reset-password"
     PASSWORD_RESET_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # ReCAPTCHA v2 (Google) - Visible widget
+    RECAPTCHA_SECRET_KEY: str = "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx"
+    RECAPTCHA_SITE_KEY: str = "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx"
+    RECAPTCHA_VERIFY_URL: str = "https://www.google.com/recaptcha/api/siteverify"
+    #
     #
     # Políticas de histórico de contraseñas por rol
     PASSWORD_HISTORY_ADMIN_MAX: int = 5
@@ -73,6 +79,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
         extra = "ignore"  # Ignorar campos extra como RECAPTCHA
+
 
 
 settings = Settings()

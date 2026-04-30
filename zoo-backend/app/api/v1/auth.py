@@ -31,7 +31,6 @@ from app.schemas.auth import ForgotPasswordRequest, ResetPasswordRequest, EmailV
 from app.core import email_service
 from app.core.password_utils import generate_strong_password
 
-#
 # 2fa
 from typing import Optional, Union
 from app.schemas.auth import (
@@ -65,6 +64,8 @@ from app.core.enums import AuditEvent
 from app.core.security import verify_password
 from app.crud import permission as crud_permission
 
+# recaptcha
+from app.core.recaptcha import verify_recaptcha, is_valid_recaptcha
 router = APIRouter()
 
 
@@ -101,7 +102,24 @@ def _issue_tokens_for_user(user, db: Session):
 
 # crud_user.create_public_user ya maneja IntegrityError y lanza un HTTPException 409
 @router.post("/register", response_model=UserCreateResponse, status_code=201)
-async def register(user_in: UserCreate, db: Session = Depends(get_db)):
+async def register(
+    user_in: UserCreate, request: Request, db: Session = Depends(get_db)
+):
+    # 0. Verificar reCAPTCHA v2 (server-side) para creación de usuarios
+    if hasattr(user_in, "recaptcha_token") and user_in.recaptcha_token:
+        client_ip = request.client.host if request.client else None
+        recaptcha_result = await verify_recaptcha(user_in.recaptcha_token, client_ip)
+        if not is_valid_recaptcha(recaptcha_result):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            )
+    elif settings.RECAPTCHA_SECRET_KEY != "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Falta verificación de seguridad (reCAPTCHA).",
+        )
+
     # 1. Intentar descifrar la contraseña si viene cifrada (RSA)
     if user_in.password and not user_in.generate_password:
         try:
@@ -169,7 +187,6 @@ def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
         )
     return {"message": "Email verificado con éxito. Ya puedes iniciar sesión."}
 
-
 # rate limiting
 @router.post("/login", response_model=Union[TokenResponse, LoginStep2Response])
 @limiter.limit("10/minute")
@@ -183,7 +200,25 @@ async def login(
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
-
+    # 0. Verificar reCAPTCHA v2 (server-side)
+    if payload.recaptcha_token:
+        client_ip = request.client.host if request.client else None
+        recaptcha_result = await verify_recaptcha(payload.recaptcha_token, client_ip)
+        if not is_valid_recaptcha(recaptcha_result):
+            background_tasks.add_task(
+                crud_audit.create_audit_log,
+                event=AuditEvent.LOGIN_FAILURE,
+                attempted_email=payload.email,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            )
+    elif settings.RECAPTCHA_SECRET_KEY != "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Falta verificación de seguridad (reCAPTCHA).",
+        )
     # 1. Descifrar contraseña RSA
     try:
         decrypted_password = RSAManager.decrypt_password(payload.password)
@@ -499,7 +534,6 @@ def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
     crud_token.delete_reset_token(db, token=body.token)
 
     return {"msg": "Contraseña actualizada exitosamente"}
-
 
 # put user
 @router.put("/update-profile", response_model=UserOut)

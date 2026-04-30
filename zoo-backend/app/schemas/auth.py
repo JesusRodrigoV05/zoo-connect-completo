@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, constr, validator
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 # ret token
@@ -8,11 +8,10 @@ import re
 # 2fa
 from typing import Annotated, Union
 
-
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-
+    recaptcha_token: Optional[str] = None
 
 # cambios refresh token jesus
 # class TokenRefreshRequest(BaseModel):
@@ -50,7 +49,6 @@ class ResetPasswordRequest(BaseModel):
 class EmailVerificationRequest(BaseModel):
     email: EmailStr
     code: str
-    
 
 # 2fa
 class LoginStep2Response(BaseModel):
@@ -67,7 +65,6 @@ class TOTPLoginRequest(BaseModel):
     session_token: str
     code: TOTPCodem
 
-
 # Password History
 class PasswordHistoryOut(BaseModel):
     id: int
@@ -77,3 +74,4 @@ class PasswordHistoryOut(BaseModel):
 
     class Config:
         from_attributes = True
+
