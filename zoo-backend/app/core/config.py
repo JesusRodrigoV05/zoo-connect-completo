@@ -78,6 +78,8 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_cors_origins(cls, v: str | List[str]):
         if isinstance(v, str):
+            # Eliminar corchetes o comillas accidentales si vienen de Render/Vercel
+            v = v.replace("[", "").replace("]", "").replace("\"", "").replace("'", "")
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
 
