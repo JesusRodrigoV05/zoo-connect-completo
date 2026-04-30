@@ -8,55 +8,86 @@ import string
 
 from app.models.user import User
 from app.models.role import Role
-from app.schemas.user import UserCreate, AdminUserCreate, AdminUserUpdate, UserUpdateProfile
+from app.schemas.user import (
+    UserCreate,
+    AdminUserCreate,
+    AdminUserUpdate,
+    UserUpdateProfile,
+)
 from app.core.security import get_password_hash
 from app.core.enums import UserRole
+
 
 def _get_visitante_role_id(db: Session) -> int:
 
     role = db.query(Role).filter(Role.name == UserRole.VISITANTE.value).first()
     if not role:
-        raise RuntimeError(f"Rol por defecto '{UserRole.VISITANTE.value}' no encontrado en la base de datos")
+        raise RuntimeError(
+            f"Rol por defecto '{UserRole.VISITANTE.value}' no encontrado en la base de datos"
+        )
     return role.id
+
 
 def get_user(db: Session, user_id: int) -> Optional[User]:
     """
     Obtiene un usuario por su ID
     """
-    return db.query(User).options(
-        joinedload(User.role)
-    ).filter(User.id == user_id).first()
+    return (
+        db.query(User).options(joinedload(User.role)).filter(User.id == user_id).first()
+    )
+
 
 def get_user_by_email(db: Session, email: str) -> User | None:
     """
     Busca un usuario por su email, aplicando la misma normalizacion
     """
     normalized_email = email.strip().lower()
-    return db.query(User).options(
-        joinedload(User.role)
-    ).filter(User.email == normalized_email).first()
+    return (
+        db.query(User)
+        .options(joinedload(User.role))
+        .filter(User.email == normalized_email)
+        .first()
+    )
+
 
 def get_users_query(
-    db: Session, 
-    role_id: Optional[int] = None, 
-    is_active: Optional[bool] = None, 
-    search: Optional[str] = None
+    db: Session,
+    role_id: Optional[int] = None,
+    is_active: Optional[bool] = None,
+    search: Optional[str] = None,
+    sort_by: Optional[str] = "id",
+    sort_type: Optional[str] = "desc",
 ) -> Query:
     query = db.query(User).options(joinedload(User.role))
-    
+
     if role_id is not None:
         query = query.filter(User.role_id == role_id)
-        
+
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
-        
+
     if search:
         query = query.filter(
-            (User.username.ilike(f"%{search}%")) | 
-            (User.email.ilike(f"%{search}%"))
+            (User.username.ilike(f"%{search}%")) | (User.email.ilike(f"%{search}%"))
         )
-        
-    return query.order_by(User.id)
+
+    # Ordenamiento seguro (evitar inyección SQL)
+    valid_sort_fields = {
+        "id": User.id,
+        "email": User.email,
+        "username": User.username,
+        "created_at": User.created_at,
+        "is_active": User.is_active,
+    }
+
+    sort_field = valid_sort_fields.get(sort_by, User.id)
+    if (sort_type or "desc").lower() == "asc":
+        query = query.order_by(sort_field.asc())
+    else:
+        query = query.order_by(sort_field.desc())
+
+    return query
+
 
 def create_public_user(db: Session, user_in: UserCreate) -> User:
     hashed_password = get_password_hash(user_in.password)
@@ -69,12 +100,12 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         email=user_in.email,
         username=user_in.username,
         hashed_password=hashed_password,
-        is_active=False, # Inactivo hasta verificar
+        is_active=False,  # Inactivo hasta verificar por email
         email_verified=False,
         verification_code=verification_code,
-        role_id=role_id
+        role_id=role_id,
     )
-    
+
     db.add(user)
     try:
         db.commit()
@@ -82,10 +113,11 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Email o nombre de usuario ya existen: {e.orig}"
+            detail=f"Email o nombre de usuario ya existen: {e.orig}",
         )
     db.refresh(user)
     return user
+
 
 def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
     hashed_password = get_password_hash(user_in.password)
@@ -95,9 +127,9 @@ def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
         username=user_in.username,
         hashed_password=hashed_password,
         is_active=user_in.is_active,
-        role_id=user_in.role_id 
+        role_id=user_in.role_id,
     )
-    
+
     db.add(user)
     try:
         db.commit()
@@ -105,12 +137,15 @@ def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Email o nombre de usuario ya existen: {e.orig}"
+            detail=f"Email o nombre de usuario ya existen: {e.orig}",
         )
     db.refresh(user)
     return user
 
-def update_user_by_admin(db: Session, db_user_to_update: User, user_in: AdminUserUpdate) -> User:
+
+def update_user_by_admin(
+    db: Session, db_user_to_update: User, user_in: AdminUserUpdate
+) -> User:
     update_data = user_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_user_to_update, field, value)
@@ -121,38 +156,41 @@ def update_user_by_admin(db: Session, db_user_to_update: User, user_in: AdminUse
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Conflicto de datos: {e.orig}"
+            status_code=status.HTTP_409_CONFLICT, detail=f"Conflicto de datos: {e.orig}"
         )
     db.refresh(db_user_to_update)
     return db_user_to_update
+
 
 def delete_user_by_admin(db: Session, user_id_to_delete: int) -> Optional[User]:
     db_user = db.query(User).filter(User.id == user_id_to_delete).first()
     if not db_user:
         return None
-    
+
     db.delete(db_user)
     db.commit()
     return db_user
 
-def update_own_profile(db: Session, db_user_to_update: User, user_in: UserUpdateProfile) -> User:
+
+def update_own_profile(
+    db: Session, db_user_to_update: User, user_in: UserUpdateProfile
+) -> User:
     update_data = user_in.model_dump(exclude_unset=True)
-    
+
     for field, value in update_data.items():
         setattr(db_user_to_update, field, value)
-        
+
     db.add(db_user_to_update)
     try:
         db.commit()
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Conflicto de datos: {e.orig}"
+            status_code=status.HTTP_409_CONFLICT, detail=f"Conflicto de datos: {e.orig}"
         )
     db.refresh(db_user_to_update)
     return db_user_to_update
+
 
 def update_password(db: Session, db_user: User, new_password: str) -> User:
     db_user.hashed_password = get_password_hash(new_password)
@@ -160,7 +198,6 @@ def update_password(db: Session, db_user: User, new_password: str) -> User:
     db.commit()
     db.refresh(db_user)
     return db_user
-
 def verify_user_email(db: Session, email: str, code: str) -> bool:
     """
     Verifica el código y activa al usuario.
@@ -168,13 +205,13 @@ def verify_user_email(db: Session, email: str, code: str) -> bool:
     user = get_user_by_email(db, email=email)
     if not user:
         return False
-    
+
     if user.verification_code == code:
         user.email_verified = True
         user.is_active = True
-        user.verification_code = None # Limpiar código tras éxito
+        user.verification_code = None  # Limpiar código tras éxito
         db.add(user)
         db.commit()
         return True
-    
+
     return False

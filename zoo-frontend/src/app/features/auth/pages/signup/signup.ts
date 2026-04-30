@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -26,11 +26,13 @@ import { ToggleButtonModule } from "primeng/togglebutton";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 import { ShowToast } from "@app/shared/services";
+import { RecaptchaService } from "@app/core/services/recaptcha.service";
+import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-captcha";
 
 @Component({
   selector: "app-signup",
   standalone: true,
-  imports: [
+   imports: [
     ReactiveFormsModule,
     FormsModule,
     RouterLink,
@@ -46,18 +48,20 @@ import { ShowToast } from "@app/shared/services";
     CommonModule,
     ToggleButtonModule,
     ToastModule,
+    CustomCaptcha,
   ],
   providers: [MessageService],
   templateUrl: "./signup.html",
   styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Signup implements OnInit {
+export default class Signup implements OnInit, OnDestroy {
   protected readonly authStore = inject(AuthStore);
   authService = inject(Auth);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly toastService = inject(ShowToast);
+  private readonly recaptchaService = inject(RecaptchaService);
 
   protected readonly isLoading = this.authStore.loading;
   protected readonly error = this.authStore.error;
@@ -87,14 +91,39 @@ export default class Signup implements OnInit {
   protected strengthClass = "weak";
   protected generatedPassword: string | null = null;
   protected generatePassword = false;
+  protected showTips = false;
+  protected recaptchaToken: string | null = null;
+  protected useCustomCaptcha = false;
+  protected customCaptchaToken: string | null = null;
 
   protected isPasswordStrong(): boolean {
     if (this.generatePassword) return true;
     return Object.values(this.rules).every(rule => rule === true);
   }
 
-  protected onSubmit(): void {
-    this.submitForm();
+  async ngOnInit() {
+    const pwControl = this.signupForm.get('password');
+    if (pwControl) {
+      pwControl.valueChanges.subscribe((v: string) => this.onPasswordChange(v || ''));
+    }
+
+    // Determinar si usar widget de reCAPTCHA o fallback propio
+    this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
+
+    if (!this.useCustomCaptcha) {
+      try {
+        await this.recaptchaService.render('recaptcha-signup', (token: string) => {
+          this.recaptchaToken = token;
+        });
+      } catch (err) {
+        console.error('Error renderizando reCAPTCHA:', err);
+        this.useCustomCaptcha = true;
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    this.recaptchaService.reset();
   }
 
   protected async submitForm(): Promise<void> {
@@ -110,19 +139,35 @@ export default class Signup implements OnInit {
       }
     }
 
+    // Verificar que el usuario haya completado el CAPTCHA
+    const token = this.useCustomCaptcha ? this.customCaptchaToken : this.recaptchaToken;
+    if (!token) {
+      this.toastService.showWarning("Verificación requerida", "Por favor, verifica que no eres un robot.");
+      return;
+    }
+
     const { email, username } = this.signupForm.value;
     const password = this.signupForm.value.password;
 
     try {
-      const res = await this.authStore.register(email, username, password, false);
+      const res = await this.authStore.register(email, username, password, false, token);
       if (res && res.generated_password) {
         this.generatedPassword = res.generated_password as string;
       } else {
         await this.router.navigate(['/verify-email'], { queryParams: { email } });
       }
     } catch (e) {
-      // errors are handled in store
+      // Resetear reCAPTCHA después del intento
+      if (!this.useCustomCaptcha) {
+        this.recaptchaService.reset();
+        this.recaptchaToken = null;
+        await this.ngOnInit();
+      }
     }
+  }
+
+  protected onSubmit(): void {
+    this.submitForm();
   }
 
   private passwordMatchValidator(form: FormGroup) {
@@ -157,13 +202,6 @@ export default class Signup implements OnInit {
   }
   get confirmPassword() {
     return this.signupForm.get("confirmPassword") as FormControl;
-  }
-
-  ngOnInit(): void {
-    const pwControl = this.signupForm.get('password');
-    if (pwControl) {
-      pwControl.valueChanges.subscribe((v: string) => this.onPasswordChange(v || ''));
-    }
   }
 
   protected onPasswordChange(p: string) {
@@ -226,46 +264,38 @@ export default class Signup implements OnInit {
     }
   }
 
-  protected generateSuggestion() {
-    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const lowercase = "abcdefghijklmnopqrstuvwxyz";
-    const digits = "0123456789";
-    const symbols = "!@#$%^&*()-_";
-    const all = uppercase + lowercase + digits + symbols;
-
-    let pass = "";
-    pass += uppercase[Math.floor(Math.random() * uppercase.length)];
-    pass += lowercase[Math.floor(Math.random() * lowercase.length)];
-    pass += digits[Math.floor(Math.random() * digits.length)];
-    pass += symbols[Math.floor(Math.random() * symbols.length)];
-
-    for (let i = 0; i < 8; i++) {
-      pass += all[Math.floor(Math.random() * all.length)];
+  // Password tips for memorable passwords
+  protected passwordTips = [
+    {
+      title: "Usa una canción favorita",
+      example: "Qué triste es mi ausencia",
+      result: "QmEma#24",
+      description: "Toma la primera letra de cada palabra + el año"
+    },
+    {
+      title: "Usa una fecha especial",
+      example: "18 de junio - Cumpleaños",
+      result: "18dJ#1806",
+      description: "Combina números con la inicial del mes"
+    },
+    {
+      title: "Usa un dicho popular",
+      example: "Al que madruga Dios le ayuda",
+      result: "aQmDlA#18",
+      description: "Iniciales en minúsculas + carácter especial + año"
+    },
+    {
+      title: "Usa una frase personal",
+      example: "Mi gato feliz salta alto",
+      result: "MgFsAl#23",
+      description: "Iniciales de tus palabras favoritas"
     }
+  ];
 
-    pass = pass.split('').sort(() => Math.random() - 0.5).join('');
-
-    if (this.isValidSuggestion(pass)) {
-      this.signupForm.patchValue({
-        password: pass,
-        confirmPassword: pass
-      });
-      this.signupForm.get('password')?.markAsDirty();
-      this.signupForm.get('confirmPassword')?.markAsDirty();
-      this.onPasswordChange(pass);
-    } else {
-      this.generateSuggestion();
-    }
-  }
-
-  private isValidSuggestion(v: string): boolean {
-    return v.length >= 8 &&
-           /[A-Z]/.test(v) &&
-           /[a-z]/.test(v) &&
-           /[0-9]/.test(v) &&
-           /[!@#$%^&*()\-=_+\[\]{}|;:,.<>?]/.test(v) &&
-           !/(.)\1\1/.test(v) &&
-           !this.hasSequentialChars(v, 3);
+  protected getPasswordHint(): string {
+    const tips = this.passwordTips;
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    return `Ejemplo: "${randomTip.example}" → "${randomTip.result}"`;
   }
 
   protected copyGenerated() {
@@ -313,5 +343,16 @@ export default class Signup implements OnInit {
     }
     return null;
   }
-}
 
+  protected recaptchaError(): boolean {
+    return this.signupForm.touched && !this.recaptchaToken && !this.customCaptchaToken;
+  }
+
+  onCustomCaptchaChange(verified: boolean): void {
+    // Handled by token change
+  }
+
+  onCustomTokenChange(token: string): void {
+    this.customCaptchaToken = token;
+  }
+}

@@ -1,6 +1,7 @@
 export interface LoginRequest {
   email: string;
   password: string;
+  recaptcha_token?: string;
 }
 
 export interface RegisterRequest {
@@ -8,6 +9,7 @@ export interface RegisterRequest {
   username: string;
   password?: string;
   generate_password?: boolean;
+  recaptcha_token?: string;
 }
 
 export interface RegisterResponse {
