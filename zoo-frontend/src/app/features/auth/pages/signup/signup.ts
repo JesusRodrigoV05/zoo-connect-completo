@@ -55,66 +55,28 @@ import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-capt
   styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Signup implements OnInit, OnDestroy {
-  protected readonly authStore = inject(AuthStore);
-  authService = inject(Auth);
-  private readonly fb = inject(FormBuilder);
-  private readonly router = inject(Router);
-  private readonly toastService = inject(ShowToast);
-  private readonly recaptchaService = inject(RecaptchaService);
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, AfterViewInit } from "@angular/core";
+// ... (imports remain)
 
-  protected readonly isLoading = this.authStore.loading;
-  protected readonly error = this.authStore.error;
+export default class Signup implements OnInit, OnDestroy, AfterViewInit {
+  // ... (properties remain)
 
-  protected readonly signupForm: FormGroup = this.fb.group(
-    {
-      email: ["", [Validators.required, Validators.email]],
-      username: ["", [Validators.required, Validators.minLength(3)]],
-      password: ["", [Validators.minLength(12)]],
-      confirmPassword: ["", [Validators.required]],
-    },
-    { validators: this.passwordMatchValidator },
-  );
-
-  // Password rules + strength
-  protected rules = {
-    length: false,
-    uppercase: false,
-    lowercase: false,
-    digit: false,
-    special: false,
-    noRepeats: false,
-    noSequence: false,
-  };
-  protected strengthPercent = 0;
-  protected strengthLabel = "Débil";
-  protected strengthClass = "weak";
-  protected generatedPassword: string | null = null;
-  protected generatePassword = false;
-  protected showTips = false;
-  protected recaptchaToken: string | null = null;
-  protected useCustomCaptcha = false;
-  protected customCaptchaToken: string | null = null;
-
-  protected isPasswordStrong(): boolean {
-    if (this.generatePassword) return true;
-    return Object.values(this.rules).every(rule => rule === true);
-  }
-
-  async ngOnInit() {
+  ngOnInit() {
     const pwControl = this.signupForm.get('password');
     if (pwControl) {
       pwControl.valueChanges.subscribe((v: string) => this.onPasswordChange(v || ''));
     }
+  }
 
-    // Determinar si usar widget de reCAPTCHA o fallback propio
+  async ngAfterViewInit() {
     this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
-
     if (!this.useCustomCaptcha) {
       try {
-        await this.recaptchaService.render('recaptcha-signup', (token: string) => {
-          this.recaptchaToken = token;
-        });
+        setTimeout(async () => {
+          await this.recaptchaService.render('recaptcha-signup', (token: string) => {
+            this.recaptchaToken = token;
+          });
+        }, 500);
       } catch (err) {
         console.error('Error renderizando reCAPTCHA:', err);
         this.useCustomCaptcha = true;
