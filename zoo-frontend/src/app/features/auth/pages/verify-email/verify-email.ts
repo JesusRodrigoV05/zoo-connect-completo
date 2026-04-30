@@ -44,6 +44,8 @@ export default class VerifyEmail {
 
   protected readonly email = signal<string>(this.route.snapshot.queryParams['email'] || '');
   protected readonly isLoading = this.authStore.loading;
+  protected readonly isResending = signal<boolean>(false);
+  protected readonly resendCooldown = signal<number>(0);
 
   protected readonly verifyForm: FormGroup = this.fb.group({
     code: ["", [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
@@ -67,6 +69,35 @@ export default class VerifyEmail {
     } catch (e) {
       // Error handled by store/toast
     }
+  }
+
+  async onResendCode(): Promise<void> {
+    if (this.resendCooldown() > 0 || this.isResending()) return;
+
+    if (!this.email()) {
+      this.toastService.showError("Error", "No se encontró el correo electrónico.");
+      return;
+    }
+
+    this.isResending.set(true);
+    try {
+      await this.authStore.resendVerification(this.email());
+      this.startResendCooldown();
+    } catch (e) {
+      // Error handled by store/toast
+    } finally {
+      this.isResending.set(false);
+    }
+  }
+
+  private startResendCooldown(): void {
+    this.resendCooldown.set(60);
+    const interval = setInterval(() => {
+      this.resendCooldown.update(v => v - 1);
+      if (this.resendCooldown() <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
   }
 
   getCodeError(): string | null {

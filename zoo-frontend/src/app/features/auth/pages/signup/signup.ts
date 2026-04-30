@@ -156,8 +156,20 @@ export default class Signup implements OnInit, OnDestroy {
       } else {
         await this.router.navigate(['/verify-email'], { queryParams: { email } });
       }
-    } catch (e) {
-      // Resetear reCAPTCHA después del intento
+    } catch (e: any) {
+      if (e?.status === 409) {
+        // El usuario ya existe, preguntamos si quiere verificar su cuenta
+        this.toastService.clear();
+        this.toastService.showInfo(
+          "Usuario registrado", 
+          "Este correo ya está registrado. Si aún no has verificado tu cuenta, puedes hacerlo ahora."
+        );
+        setTimeout(() => {
+          this.router.navigate(['/verify-email'], { queryParams: { email } });
+        }, 3000);
+      }
+      
+      // Resetear reCAPTCHA después del intento fallido
       if (!this.useCustomCaptcha) {
         this.recaptchaService.reset();
         this.recaptchaToken = null;

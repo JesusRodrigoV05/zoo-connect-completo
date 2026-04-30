@@ -60,9 +60,22 @@
 
           <div class="auth-info-box">
             <i class="pi pi-info-circle"></i>
-            <p>
-              ¿No recibiste el código? Revisa tu carpeta de spam o asegúrate de que el correo sea correcto.
-            </p>
+            <div>
+              <p>
+                El código de verificación expira en <strong>30 minutos</strong>.
+              </p>
+              <p>
+                ¿No recibiste el código? 
+                <button 
+                  type="button" 
+                  class="auth-resend-link" 
+                  (click)="onResendCode()" 
+                  [disabled]="resendCooldown() > 0 || isResending()"
+                >
+                  {{ resendCooldown() > 0 ? 'Reenviar en ' + resendCooldown() + 's' : 'Reenviar código' }}
+                </button>
+              </p>
+            </div>
           </div>
 
           <div class="auth-link-container">

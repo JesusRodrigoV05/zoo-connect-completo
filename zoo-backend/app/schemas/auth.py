@@ -47,6 +47,9 @@ class EmailVerificationRequest(BaseModel):
     email: EmailStr
     code: str
 
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
+
 # 2fa
 class LoginStep2Response(BaseModel):
     step: str = "2fa_required"

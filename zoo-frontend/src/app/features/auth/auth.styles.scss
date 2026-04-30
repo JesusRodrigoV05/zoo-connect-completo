@@ -481,9 +481,30 @@
       display: inline-block;
     }
 
-    .tip-description {
-      font-size: 0.8rem;
-      color: var(--p-text-muted-color);
     }
+  }
+}
+
+.auth-resend-link {
+  background: none;
+  border: none;
+  color: var(--p-primary-color);
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: var(--p-text-muted-color);
+    text-decoration: none;
+    opacity: 1;
   }
 }

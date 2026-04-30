@@ -5,6 +5,7 @@ from starlette import status
 from typing import List, Optional
 import secrets
 import string
+from datetime import datetime, timedelta, timezone
 
 from app.models.user import User
 from app.models.role import Role
@@ -94,6 +95,7 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
     
     # Generar código de 6 dígitos
     verification_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=30)
 
     user = User(
         email=user_in.email,
@@ -102,6 +104,7 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         is_active=False,  # Inactivo hasta verificar por email
         email_verified=False,
         verification_code=verification_code,
+        verification_code_expires_at=expires_at,
         role_id=role_id,
     )
 
@@ -204,18 +207,45 @@ def update_password(db: Session, db_user: User, new_password: str) -> User:
     db.refresh(db_user)
     return db_user
 
+def generate_new_verification_code(db: Session, email: str) -> Optional[User]:
+    """
+    Genera un nuevo código de verificación y actualiza la expiración.
+    """
+    user = get_user_by_email(db, email)
+    if not user or user.email_verified:
+        return None
+
+    new_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+    user.verification_code = new_code
+    user.verification_code_expires_at = datetime.now(timezone.utc) + timedelta(minutes=30)
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 def verify_user_email(db: Session, email: str, code: str) -> bool:
     """
-    Verifica el código y activa al usuario.
+    Verifica el código, comprueba la expiración y activa al usuario.
     """
     user = get_user_by_email(db, email=email)
     if not user:
+        return False
+
+    # Si ya está verificado, retornar True
+    if user.email_verified:
+        return True
+
+    # Verificar expiración
+    if user.verification_code_expires_at and datetime.now(timezone.utc) > user.verification_code_expires_at:
         return False
 
     if user.verification_code == code:
         user.email_verified = True
         user.is_active = True
         user.verification_code = None  # Limpiar código tras éxito
+        user.verification_code_expires_at = None
         db.add(user)
         db.commit()
         return True

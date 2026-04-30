@@ -126,6 +126,8 @@ export const AuthStore = signalStore(
               : 'Sesión expirada o no autorizado';
         } else if (error?.status === 400 && context === 'login') {
           errorMessage = 'Usuario inactivo. Contacte al administrador';
+        } else if (error?.status === 409 && context === 'register') {
+          errorMessage = 'Este email o usuario ya está registrado';
         } else if (error?.status === 403 && context === 'login') {
           errorMessage =
             'Cuenta bloqueada temporalmente, intente dentro de 30 minutos';
@@ -277,6 +279,21 @@ export const AuthStore = signalStore(
             await router.navigate(['/login']);
           } catch (error: any) {
             handleError(error, 'verificación de email');
+            throw error;
+          }
+        },
+
+        async resendVerification(email: string): Promise<void> {
+          patchState(store, { loading: true, error: null });
+          try {
+            await firstValueFrom(authService.resendVerification(email));
+            patchState(store, { loading: false });
+            toastService.showSuccess(
+              'Enviado',
+              'Si el email está registrado, se ha enviado un nuevo código.',
+            );
+          } catch (error: any) {
+            handleError(error, 'reenvío de código');
             throw error;
           }
         },

@@ -30,6 +30,7 @@ from app.schemas.auth import (
     ForgotPasswordRequest,
     ResetPasswordRequest,
     EmailVerificationRequest,
+    ResendVerificationRequest,
 )
 
 from app.core import email_service
@@ -188,9 +189,30 @@ def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Código de verificación inválido o usuario no encontrado."
+            detail="Código de verificación inválido, expirado o usuario no encontrado."
         )
     return {"message": "Email verificado con éxito. Ya puedes iniciar sesión."}
+
+@router.post("/resend-verification", status_code=status.HTTP_200_OK)
+@limiter.limit("3/10minute")
+async def resend_verification(
+    request: Request,
+    body: ResendVerificationRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    user = crud_user.generate_new_verification_code(db, email=body.email)
+    
+    if user:
+        background_tasks.add_task(
+            email_service.send_verification_email,
+            email_to=user.email,
+            code=user.verification_code,
+            username=user.username
+        )
+    
+    # Retornamos éxito siempre por seguridad (evitar enumeración de usuarios)
+    return {"message": "Si el email está registrado, se ha enviado un nuevo código."}
 
 # rate limiting
 @router.post("/login", response_model=Union[TokenResponse, LoginStep2Response])
