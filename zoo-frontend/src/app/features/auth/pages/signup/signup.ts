@@ -150,7 +150,7 @@ export default class Signup implements OnInit, OnDestroy {
     const password = this.signupForm.value.password;
 
     try {
-      const res = await this.authStore.register(email, username, password, false, token);
+      const res = await this.authStore.register(email, username, password, this.generatePassword, token);
       if (res && res.generated_password) {
         this.generatedPassword = res.generated_password as string;
       } else {
