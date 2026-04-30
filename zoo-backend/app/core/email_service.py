@@ -6,19 +6,19 @@ from app.core.config import settings
 from fastapi_mail import ConnectionConfig
 
 # Configuración SMTP (Opcional: Si solo vas a usar Postmark vía HTTP, esta parte no la necesitas realmente)
-conf = ConnectionConfig(
-    MAIL_USERNAME=settings.MAIL_USERNAME,
-    MAIL_PASSWORD=settings.MAIL_PASSWORD,
-    MAIL_FROM=settings.MAIL_FROM,
-    MAIL_PORT=settings.MAIL_PORT,
-    MAIL_SERVER=settings.MAIL_SERVER,
-    MAIL_STARTTLS=settings.MAIL_STARTTLS,
-    MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
-    USE_CREDENTIALS=True,
-    TIMEOUT=60,
-    VALIDATE_CERTS=True,
-    MAIL_FROM_NAME=settings.MAIL_FROM_NAME
-)
+# conf = ConnectionConfig(
+#     MAIL_USERNAME=settings.MAIL_USERNAME,
+#     MAIL_PASSWORD=settings.MAIL_PASSWORD,
+#     MAIL_FROM=settings.MAIL_FROM,
+#     MAIL_PORT=settings.MAIL_PORT,
+#     MAIL_SERVER=settings.MAIL_SERVER,
+#     MAIL_STARTTLS=settings.MAIL_STARTTLS,
+#     MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
+#     USE_CREDENTIALS=True,
+#     TIMEOUT=60,
+#     VALIDATE_CERTS=True,
+#     MAIL_FROM_NAME=settings.MAIL_FROM_NAME
+# )
 
 
 async def _send_email_via_postmark(email_to: str, subject: str, html_body: str) -> None:
