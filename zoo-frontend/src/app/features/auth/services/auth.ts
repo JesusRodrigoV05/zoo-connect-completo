@@ -104,4 +104,17 @@ export class Auth {
   verifyEmail(email: string, code: string): Observable<any> {
     return this.http.post<any>(`${this.authUrl}/verify-email`, { email, code });
   }
+
+  getPasswordHistory(userId: number, limit: number = 10): Observable<Array<{id: number, user_id: number, password_hash: string, created_at: string}>> {
+    return this.http.get<Array<{id: number, user_id: number, password_hash: string, created_at: string}>>(
+      `${environment.apiUrl}/admin/users/${userId}/password-history`,
+      { params: { limit: limit.toString() } }
+    );
+  }
+
+  clearPasswordHistory(userId: number): Observable<{msg: string}> {
+    return this.http.delete<{msg: string}>(
+      `${environment.apiUrl}/admin/users/${userId}/password-history`
+    );
+  }
 }

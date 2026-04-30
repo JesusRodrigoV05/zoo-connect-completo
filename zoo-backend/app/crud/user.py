@@ -8,55 +8,71 @@ import string
 
 from app.models.user import User
 from app.models.role import Role
-from app.schemas.user import UserCreate, AdminUserCreate, AdminUserUpdate, UserUpdateProfile
-from app.core.security import get_password_hash
+from app.models.password_history import PasswordHistory
+from app.schemas.user import (
+    UserCreate,
+    AdminUserCreate,
+    AdminUserUpdate,
+    UserUpdateProfile,
+)
+from app.core.security import get_password_hash, verify_password
 from app.core.enums import UserRole
+from app.core.config import settings
+
 
 def _get_visitante_role_id(db: Session) -> int:
 
     role = db.query(Role).filter(Role.name == UserRole.VISITANTE.value).first()
     if not role:
-        raise RuntimeError(f"Rol por defecto '{UserRole.VISITANTE.value}' no encontrado en la base de datos")
+        raise RuntimeError(
+            f"Rol por defecto '{UserRole.VISITANTE.value}' no encontrado en la base de datos"
+        )
     return role.id
+
 
 def get_user(db: Session, user_id: int) -> Optional[User]:
     """
     Obtiene un usuario por su ID
     """
-    return db.query(User).options(
-        joinedload(User.role)
-    ).filter(User.id == user_id).first()
+    return (
+        db.query(User).options(joinedload(User.role)).filter(User.id == user_id).first()
+    )
+
 
 def get_user_by_email(db: Session, email: str) -> User | None:
     """
     Busca un usuario por su email, aplicando la misma normalizacion
     """
     normalized_email = email.strip().lower()
-    return db.query(User).options(
-        joinedload(User.role)
-    ).filter(User.email == normalized_email).first()
+    return (
+        db.query(User)
+        .options(joinedload(User.role))
+        .filter(User.email == normalized_email)
+        .first()
+    )
+
 
 def get_users_query(
-    db: Session, 
-    role_id: Optional[int] = None, 
-    is_active: Optional[bool] = None, 
-    search: Optional[str] = None
+    db: Session,
+    role_id: Optional[int] = None,
+    is_active: Optional[bool] = None,
+    search: Optional[str] = None,
 ) -> Query:
     query = db.query(User).options(joinedload(User.role))
-    
+
     if role_id is not None:
         query = query.filter(User.role_id == role_id)
-        
+
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
-        
+
     if search:
         query = query.filter(
-            (User.username.ilike(f"%{search}%")) | 
-            (User.email.ilike(f"%{search}%"))
+            (User.username.ilike(f"%{search}%")) | (User.email.ilike(f"%{search}%"))
         )
-        
+
     return query.order_by(User.id)
+
 
 def create_public_user(db: Session, user_in: UserCreate) -> User:
     hashed_password = get_password_hash(user_in.password)
@@ -74,7 +90,7 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         verification_code=verification_code,
         role_id=role_id
     )
-    
+
     db.add(user)
     try:
         db.commit()
@@ -82,10 +98,11 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Email o nombre de usuario ya existen: {e.orig}"
+            detail=f"Email o nombre de usuario ya existen: {e.orig}",
         )
     db.refresh(user)
     return user
+
 
 def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
     hashed_password = get_password_hash(user_in.password)
@@ -95,9 +112,9 @@ def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
         username=user_in.username,
         hashed_password=hashed_password,
         is_active=user_in.is_active,
-        role_id=user_in.role_id 
+        role_id=user_in.role_id,
     )
-    
+
     db.add(user)
     try:
         db.commit()
@@ -105,12 +122,15 @@ def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Email o nombre de usuario ya existen: {e.orig}"
+            detail=f"Email o nombre de usuario ya existen: {e.orig}",
         )
     db.refresh(user)
     return user
 
-def update_user_by_admin(db: Session, db_user_to_update: User, user_in: AdminUserUpdate) -> User:
+
+def update_user_by_admin(
+    db: Session, db_user_to_update: User, user_in: AdminUserUpdate
+) -> User:
     update_data = user_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_user_to_update, field, value)
@@ -121,40 +141,49 @@ def update_user_by_admin(db: Session, db_user_to_update: User, user_in: AdminUse
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Conflicto de datos: {e.orig}"
+            status_code=status.HTTP_409_CONFLICT, detail=f"Conflicto de datos: {e.orig}"
         )
     db.refresh(db_user_to_update)
     return db_user_to_update
+
 
 def delete_user_by_admin(db: Session, user_id_to_delete: int) -> Optional[User]:
     db_user = db.query(User).filter(User.id == user_id_to_delete).first()
     if not db_user:
         return None
-    
+
     db.delete(db_user)
     db.commit()
     return db_user
 
-def update_own_profile(db: Session, db_user_to_update: User, user_in: UserUpdateProfile) -> User:
+
+def update_own_profile(
+    db: Session, db_user_to_update: User, user_in: UserUpdateProfile
+) -> User:
     update_data = user_in.model_dump(exclude_unset=True)
-    
+
     for field, value in update_data.items():
         setattr(db_user_to_update, field, value)
-        
+
     db.add(db_user_to_update)
     try:
         db.commit()
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Conflicto de datos: {e.orig}"
+            status_code=status.HTTP_409_CONFLICT, detail=f"Conflicto de datos: {e.orig}"
         )
     db.refresh(db_user_to_update)
     return db_user_to_update
 
+
 def update_password(db: Session, db_user: User, new_password: str) -> User:
+    # Guardar en histórico antes de actualizar
+    _save_password_to_history(db, db_user, db_user.hashed_password)
+
+    # Verificar límite de histórico según rol
+    _enforce_password_history_limit(db, db_user)
+
     db_user.hashed_password = get_password_hash(new_password)
     db.add(db_user)
     db.commit()
@@ -178,3 +207,74 @@ def verify_user_email(db: Session, email: str, code: str) -> bool:
         return True
     
     return False
+
+def _save_password_to_history(db: Session, user: User, password_hash: str) -> None:
+    """Guarda el hash de la contraseña actual en el histórico."""
+    history_entry = PasswordHistory(user_id=user.id, password_hash=password_hash)
+    db.add(history_entry)
+    db.commit()
+
+
+def _enforce_password_history_limit(db: Session, user: User) -> None:
+    """Elimina entradas antiguas del histórico si se excede el límite del rol."""
+    if not user.role:
+        return
+
+    role_name = user.role.name
+    limit = _get_password_history_limit(role_name)
+
+    if limit <= 0:
+        return
+
+    # Obtener registros ordenados por fecha (más reciente primero)
+    history_records = (
+        db.query(PasswordHistory)
+        .filter(PasswordHistory.user_id == user.id)
+        .order_by(PasswordHistory.created_at.desc())
+        .all()
+    )
+
+    # Si excedemos el límite, eliminar los más antiguos
+    if len(history_records) > limit:
+        records_to_delete = history_records[limit:]
+        for record in records_to_delete:
+            db.delete(record)
+        db.commit()
+
+
+def _get_password_history_limit(role_name: str) -> int:
+    """Obtiene el límite de histórico según el rol."""
+    role_limits = {
+        "administrador": settings.PASSWORD_HISTORY_ADMIN_MAX,
+        "osi": settings.PASSWORD_HISTORY_ESPECIALISTA_MAX,
+        "veterinario": settings.PASSWORD_HISTORY_ESPECIALISTA_MAX,
+        "cuidador": settings.PASSWORD_HISTORY_ESPECIALISTA_MAX,
+        "visitante": settings.PASSWORD_HISTORY_PACIENTE_MAX,
+    }
+    return role_limits.get(role_name, settings.PASSWORD_HISTORY_USUARIO_BASICO_MAX)
+
+
+def is_password_in_history(db: Session, user: User, new_password: str) -> bool:
+    """Verifica si la nueva contraseña ya estuvo en el histórico."""
+    history_records = (
+        db.query(PasswordHistory)
+        .filter(PasswordHistory.user_id == user.id)
+        .order_by(PasswordHistory.created_at.desc())
+        .all()
+    )
+
+    for record in history_records:
+        if verify_password(new_password, record.password_hash):
+            return True
+    return False
+
+
+def get_password_history(db: Session, user_id: int, limit: int = 10) -> list:
+    """Obtiene el histórico de contraseñas de un usuario."""
+    return (
+        db.query(PasswordHistory)
+        .filter(PasswordHistory.user_id == user_id)
+        .order_by(PasswordHistory.created_at.desc())
+        .limit(limit)
+        .all()
+    )

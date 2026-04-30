@@ -14,6 +14,7 @@ import { Enable2faDialog } from "../enable-2fa-dialog/enable-2fa-dialog";
 import { Disable2faDialog } from "../disable-2fa-dialog";
 import { AuthStore } from "@stores/auth.store";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { PasswordHistoryComponent } from "../password-history/password-history";
 
 @Component({
   selector: "seguridad-ajustes",
@@ -25,6 +26,7 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
     TooltipModule,
     Enable2faDialog,
     Disable2faDialog,
+    PasswordHistoryComponent,
   ],
   templateUrl: "./seguridad-ajustes.html",
   styleUrls: ["./seguridad-ajustes.scss", "../settings-content.scss"],

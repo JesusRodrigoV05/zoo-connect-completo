@@ -1,34 +1,43 @@
 from pydantic import BaseModel, EmailStr, Field, constr, validator
-#ret token
+from typing import List
+from datetime import datetime
+
+# ret token
 import re
-#2fa
+
+# 2fa
 from typing import Annotated, Union
+
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-#cambios refresh token jesus
-#class TokenRefreshRequest(BaseModel):
+
+
+# cambios refresh token jesus
+# class TokenRefreshRequest(BaseModel):
 #    refresh_token: str
+
 
 class TokenResponse(BaseModel):
     access_token: str
-    #refresh_token: str
+    # refresh_token: str
     token_type: str = "bearer"
-    #expires_in: int | None = None
+    # expires_in: int | None = None
 
-    #class Config:
+    # class Config:
     #    from_attributes = True
 
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
+
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
 
-    @validator('new_password')
+    @validator("new_password")
     def validate_password_strength(cls, v):
         if len(v) < 8:
             raise ValueError("La contraseña debe tener al menos 8 caracteres")
@@ -42,13 +51,29 @@ class EmailVerificationRequest(BaseModel):
     email: EmailStr
     code: str
     
-#2fa
+
+# 2fa
 class LoginStep2Response(BaseModel):
-
     step: str = "2fa_required"
-    session_token: str 
+    session_token: str
 
-TOTPCodem = Annotated[str, Field(..., strip_whitespace=True, min_length=6, max_length=10)]
+
+TOTPCodem = Annotated[
+    str, Field(..., strip_whitespace=True, min_length=6, max_length=10)
+]
+
+
 class TOTPLoginRequest(BaseModel):
     session_token: str
     code: TOTPCodem
+
+
+# Password History
+class PasswordHistoryOut(BaseModel):
+    id: int
+    user_id: int
+    password_hash: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
