@@ -1,12 +1,14 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AnyHttpUrl, field_validator
 from typing import List, Union
 
 # correo
-from pydantic import validator, EmailStr
+from pydantic import EmailStr
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+
     # heredando de basesettings indicamos que no sea un basenormal y que lea automaticamente las varibles de entorno
     # del .en
     DATABASE_URL: str
@@ -62,10 +64,5 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
-
 
 settings = Settings()
