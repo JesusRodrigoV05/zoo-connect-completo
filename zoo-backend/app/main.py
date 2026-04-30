@@ -60,10 +60,14 @@ app = FastAPI(
     description="API para la gestion de un zoologico",
     version="5.0.0",
 )
+origins = [
+    "http://localhost:4200",
+    "https://vercel-zoo-connect-git-main-mfjm0265-7988s-projects.vercel.app", # Tu URL de Vercel
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
