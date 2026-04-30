@@ -1,28 +1,22 @@
 import httpx
-from pydantic import EmailStr
 from app.core.config import settings
 
 
-async def _send_email_via_postmark(email_to: str, subject: str, html_body: str) -> None:
-    """Envía un email usando la API de Postmark (HTTPS - compatible con Render)."""
-    url = "https://api.postmarkapp.com/email"
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "X-Postmark-Server-Token": settings.POSTMARK_SERVER_TOKEN,
-    }
-    payload = {
-        "From": f"{settings.MAIL_FROM_NAME} <{settings.MAIL_FROM}>",
-        "To": email_to,
-        "Subject": subject,
-        "HtmlBody": html_body,
-        "MessageStream": "outbound",
+async def _send_email_via_mailgun(email_to: str, subject: str, html_body: str) -> None:
+    """Envía un email usando la API de Mailgun (HTTPS - compatible con Render)."""
+    url = f"https://api.mailgun.net/v3/{settings.MAILGUN_DOMAIN}/messages"
+    auth = ("api", settings.MAILGUN_API_KEY)
+    data = {
+        "from": f"{settings.MAIL_FROM_NAME} <{settings.MAIL_FROM}>",
+        "to": [email_to],
+        "subject": subject,
+        "html": html_body,
     }
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, headers=headers, json=payload, timeout=10.0)
-        if response.status_code not in (200, 202):
-            raise Exception(f"Postmark error {response.status_code}: {response.text}")
-    print(f"Correo enviado a {email_to} vía Postmark")
+        response = await client.post(url, auth=auth, data=data, timeout=10.0)
+        if response.status_code != 200:
+            raise Exception(f"Mailgun error {response.status_code}: {response.text}")
+    print(f"Correo enviado a {email_to} vía Mailgun")
 
 
 async def send_password_reset_email(email_to: EmailStr, token: str, username: str):
@@ -58,7 +52,7 @@ async def send_password_reset_email(email_to: EmailStr, token: str, username: st
     </body>
     </html>
     """
-    await _send_email_via_postmark(
+    await _send_email_via_mailgun(
         email_to, "Restablece tu contraseña de ZooConnect", html_template
     )
     print(f"Correo de reset enviado a {email_to}")
@@ -87,7 +81,7 @@ async def send_generated_password_email(
     </body>
     </html>
     """
-    await _send_email_via_postmark(
+    await _send_email_via_mailgun(
         email_to, "Tu contraseña temporal de ZooConnect", html_template
     )
     print(f"Correo con contraseña generada enviado a {email_to}")
@@ -125,7 +119,7 @@ async def send_verification_email(email_to: EmailStr, code: str, username: str):
     </body>
     </html>
     """
-    await _send_email_via_postmark(
+    await _send_email_via_mailgun(
         email_to, "Activa tu cuenta de ZooConnect", html_template
     )
     print(f"Correo de verificación enviado a {email_to}")

@@ -30,14 +30,9 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY: str
     CLOUDINARY_API_SECRET: str
     #
-    # correo
-    MAIL_USERNAME: EmailStr
-    MAIL_PASSWORD: str
+    # correo - Postmark (API HTTPS - compatible con Render)
+    POSTMARK_SERVER_TOKEN: str
     MAIL_FROM: EmailStr
-    MAIL_PORT: int = 587
-    MAIL_SERVER: str = "smtp.gmail.com"
-    MAIL_STARTTLS: bool = True
-    MAIL_SSL_TLS: bool = False
     MAIL_FROM_NAME: str = "ZooConnect"
     # 2fa
     TOTP_ENCRYPTION_KEY: str
