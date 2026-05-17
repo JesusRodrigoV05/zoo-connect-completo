@@ -1,4 +1,4 @@
-**NOMBRE DEL DOCUMENTO**
+gitmgithub.com:JesusRodrigoV05/zoo-connect-completo.git**NOMBRE DEL DOCUMENTO**
 
 Información del Documento
 
@@ -50,7 +50,7 @@ Histórico de revisiones del Documento
 La advertencia debe estar en la primera hoja de preferencia al pie de la misma, si el formato de su documentación es otro y no permite añadir en esa hoja, se recomienda añadir en la siguiente hoja.
 
 | **ADVERTENCIA**                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Este documento y su contenido se clasifica como **USO INTERNO**, contiene información propia de la empresa, siendo de uso exclusivo de NOMBRE DE LA EMPRESA. No puede ser distribuida ni divulgada a personas ajenas a la misma sin autorización de la MAE, en forma total o parcial; la reproducción o divulgación NO autorizada de este material estará sujeta a sanciones que correspondan de acuerdo la legislación vigente y a las políticas y normas de la Empresa. |
 
 **TABLA DE CONTENIDO / INDICE**
@@ -93,15 +93,15 @@ Definir las líneas de acción a seguir para que la Empresa efectúe la gestión
 
 <!-- -->
 
-a)  Identificar los procesos críticos de la Empresa para lograr la adecuada Gestión de la Continuidad de Negocio.
+a) Identificar los procesos críticos de la Empresa para lograr la adecuada Gestión de la Continuidad de Negocio.
 
-b)  Identificar los recursos tecnológicos necesarios para la gestión de la interrupción y el impacto en el negocio.
+b) Identificar los recursos tecnológicos necesarios para la gestión de la interrupción y el impacto en el negocio.
 
-c)  Identificar los recursos mínimos necesarios: humanos, logísticos y técnicos para el funcionamiento de los servicios o procesos críticos previamente definidos.
+c) Identificar los recursos mínimos necesarios: humanos, logísticos y técnicos para el funcionamiento de los servicios o procesos críticos previamente definidos.
 
-d)  Establecer las responsabilidades de personas clave incluyendo proveedores y terceros, para gestionar la Continuidad del Negocio durante un evento de interrupción.
+d) Establecer las responsabilidades de personas clave incluyendo proveedores y terceros, para gestionar la Continuidad del Negocio durante un evento de interrupción.
 
-e)  Mantener la disponibilidad de las operaciones críticas a partir de la recuperación de los procesos críticos de acuerdo a los planes de continuidad y contingencia establecidos.
+e) Mantener la disponibilidad de las operaciones críticas a partir de la recuperación de los procesos críticos de acuerdo a los planes de continuidad y contingencia establecidos.
 
 <!-- -->
 
@@ -118,7 +118,7 @@ Los términos utilizados en el presente documento se encuentran en el Glosario d
 5.  **DOCUMENTOS INTERNOS RELACIONADOS**
 
 | **DESCRIPCIÓN**                        | **CÓDIGO** |
-|----------------------------------------|------------|
+| -------------------------------------- | ---------- |
 | Cadena de valor de la Empresa          | EST-003    |
 | Políticas de Seguridad de Información  | POL-001    |
 | Metodología de Continuidad del Negocio | MET-004    |
@@ -142,7 +142,6 @@ GCN -- Gestión de Continuidad del Negocio
 PCN -- Plan de Continuidad del Negocio
 
 8.  **NORMAS**
-
     1.  **NORMAS DE GESTIÓN DE CONTINUIDAD DEL NEGOCIO**
 
 El Plan de Continuidad de Negocio se gestiona como un proceso de mejora continua con el fin de gestionar los respectivos Planes de Continuidad y Planes de Contingencia, así como su aplicación por los dueños de los procesos y por quienes son responsables de su operativa.
