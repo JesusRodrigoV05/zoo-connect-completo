@@ -133,7 +133,11 @@ describe("Test #3: GetAnimales service — HTTP + adapter + error handling + val
         expect(result.items[1].habitat.nombre).toBe("Sabana");
       });
 
-      const req = httpMock.expectOne(service.animalesUrl);
+      const req = httpMock.expectOne((request) =>
+        request.url === service.animalesUrl &&
+        request.params.get("page") === "1" &&
+        request.params.get("size") === "10"
+      );
       req.flush({ items: backendItems, total: 2, page: 1, size: 10, totalPages: 1 });
     });
 
@@ -146,7 +150,11 @@ describe("Test #3: GetAnimales service — HTTP + adapter + error handling + val
         },
       });
 
-      const req = httpMock.expectOne(service.animalesUrl);
+      const req = httpMock.expectOne((request) =>
+        request.url === service.animalesUrl &&
+        request.params.get("page") === "1" &&
+        request.params.get("size") === "10"
+      );
       req.flush("Server error", { status: 500, statusText: "Internal Server Error" });
     });
   });

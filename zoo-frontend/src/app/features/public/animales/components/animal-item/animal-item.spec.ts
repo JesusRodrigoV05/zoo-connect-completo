@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, flushMicrotasks } from "@angular/core/testing";
+import { TestBed, flushMicrotasks } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { provideRouter, Router } from "@angular/router";
 import { Animal, EstadoOperativo } from "@models/animales";
@@ -136,6 +136,8 @@ describe("Test #4: AnimalItem component — Computed signals + navegación + edg
     fixture.detectChanges();
 
     const img = fixture.debugElement.query(By.css("img"));
-    expect(img.nativeElement.getAttribute("ng-reflect-view-transition-name")).toBe("animal-img-123");
+    const vtn = img.nativeElement.getAttribute("ng-reflect-view-transition-name")
+      ?? img.nativeElement.style.viewTransitionName;
+    expect(vtn).toBe("animal-img-123");
   });
 });

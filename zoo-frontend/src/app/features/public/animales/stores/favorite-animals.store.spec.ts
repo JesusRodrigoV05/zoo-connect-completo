@@ -46,11 +46,15 @@ describe("Test #2: FavoriteStore — Optimistic update + rollback automático", 
   let favoriteServiceSpy: jasmine.SpyObj<FavoriteAnimals>;
 
   beforeEach(() => {
-    const spy = jasmine.createSpyObj("FavoriteAnimals", [
+    const spy = jasmine.createSpyObj<FavoriteAnimals>("FavoriteAnimals", [
       "getFavoriteAnimals",
       "addFavoriteAnimal",
       "removeFavoriteAnimal",
     ]);
+
+    spy.getFavoriteAnimals.and.returnValue(of([]));
+    spy.addFavoriteAnimal.and.returnValue(of(undefined as any));
+    spy.removeFavoriteAnimal.and.returnValue(of(undefined as any));
 
     TestBed.configureTestingModule({
       providers: [
@@ -61,6 +65,10 @@ describe("Test #2: FavoriteStore — Optimistic update + rollback automático", 
 
     store = TestBed.inject(FavoriteStore);
     favoriteServiceSpy = TestBed.inject(FavoriteAnimals) as jasmine.SpyObj<FavoriteAnimals>;
+  });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
   });
 
   describe("isAnimalFavorite", () => {
