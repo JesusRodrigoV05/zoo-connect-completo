@@ -91,9 +91,9 @@ describe("FavoriteAnimals service", () => {
       req.flush(mockResponse);
     });
 
-    it("maneja respuesta directa como array (sin wrapper items)", () => {
+    it("maneja respuesta como array directo [{ animal: ... }] (sin wrapper items)", () => {
       const animal1 = buildBackendAnimal(1, "Simba");
-      const mockResponse = [animal1];
+      const mockResponse = [{ animal: animal1 }];
 
       service.getFavoriteAnimals().subscribe((result) => {
         expect(result.length).toBe(1);
