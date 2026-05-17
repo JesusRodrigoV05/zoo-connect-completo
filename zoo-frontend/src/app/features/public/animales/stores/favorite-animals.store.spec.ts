@@ -1,4 +1,4 @@
-import { TestBed, flushMicrotasks } from "@angular/core/testing";
+import { TestBed, fakeAsync, flushMicrotasks } from "@angular/core/testing";
 import { of, throwError } from "rxjs";
 import { Animal, EstadoOperativo } from "@models/animales";
 import { FavoriteStore } from "./favorite-animals.store";
@@ -76,15 +76,15 @@ describe("Test #2: FavoriteStore — Optimistic update + rollback automático", 
       expect(store.isAnimalFavorite(1)).toBe(false);
     });
 
-    it("devuelve true cuando el animal esta en favoritos", async () => {
+    it("devuelve true cuando el animal esta en favoritos", fakeAsync(() => {
       const animal = buildAnimal(1, "Simba");
       favoriteServiceSpy.addFavoriteAnimal.and.returnValue(of(animal));
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
 
       expect(store.isAnimalFavorite(1)).toBe(true);
-    });
+    }));
   });
 
   describe("hasFavorites", () => {
@@ -92,78 +92,78 @@ describe("Test #2: FavoriteStore — Optimistic update + rollback automático", 
       expect(store.hasFavorites()).toBe(false);
     });
 
-    it("cambia a true cuando se agrega un favorito", async () => {
+    it("cambia a true cuando se agrega un favorito", fakeAsync(() => {
       const animal = buildAnimal(1, "Simba");
       favoriteServiceSpy.addFavoriteAnimal.and.returnValue(of(animal));
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
 
       expect(store.hasFavorites()).toBe(true);
-    });
+    }));
 
-    it("vuelve a false cuando se elimina el ultimo favorito", async () => {
+    it("vuelve a false cuando se elimina el ultimo favorito", fakeAsync(() => {
       const animal = buildAnimal(1, "Simba");
       favoriteServiceSpy.addFavoriteAnimal.and.returnValue(of(animal));
       favoriteServiceSpy.removeFavoriteAnimal.and.returnValue(of(undefined as any));
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
       expect(store.hasFavorites()).toBe(true);
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
       expect(store.hasFavorites()).toBe(false);
-    });
+    }));
   });
 
   describe("toggleFavorite — agregar (no existe)", () => {
-    it("optimistic add → HTTP success → queda en store", async () => {
+    it("optimistic add → HTTP success → queda en store", fakeAsync(() => {
       const animal = buildAnimal(1, "Simba");
       favoriteServiceSpy.addFavoriteAnimal.and.returnValue(of(animal));
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
 
       expect(store.isAnimalFavorite(1)).toBe(true);
       expect(store.entities().length).toBe(1);
       expect(favoriteServiceSpy.addFavoriteAnimal).toHaveBeenCalledWith(1);
-    });
+    }));
   });
 
   describe("toggleFavorite — eliminar (ya existe)", () => {
-    it("optimistic remove → HTTP success → se va del store", async () => {
+    it("optimistic remove → HTTP success → se va del store", fakeAsync(() => {
       const animal = buildAnimal(1, "Simba");
       favoriteServiceSpy.addFavoriteAnimal.and.returnValue(of(animal));
       favoriteServiceSpy.removeFavoriteAnimal.and.returnValue(of(undefined as any));
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
       expect(store.isAnimalFavorite(1)).toBe(true);
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
       expect(store.isAnimalFavorite(1)).toBe(false);
       expect(store.entities().length).toBe(0);
       expect(favoriteServiceSpy.removeFavoriteAnimal).toHaveBeenCalledWith(1);
-    });
+    }));
   });
 
   describe("toggleFavorite — rollback automatico", () => {
-    it("agregar → HTTP falla → rollback automatico al estado anterior (vacío)", async () => {
+    it("agregar → HTTP falla → rollback automatico al estado anterior (vacío)", fakeAsync(() => {
       const animal = buildAnimal(1, "Simba");
       favoriteServiceSpy.addFavoriteAnimal.and.returnValue(
         throwError(() => new Error("Network error"))
       );
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
 
       expect(store.isAnimalFavorite(1)).toBe(false);
       expect(store.entities().length).toBe(0);
-    });
+    }));
 
-    it("eliminar → HTTP falla → rollback automatico (vuelve a favorito)", async () => {
+    it("eliminar → HTTP falla → rollback automatico (vuelve a favorito)", fakeAsync(() => {
       const animal = buildAnimal(1, "Simba");
       favoriteServiceSpy.addFavoriteAnimal.and.returnValue(of(animal));
       favoriteServiceSpy.removeFavoriteAnimal.and.returnValue(
@@ -171,41 +171,41 @@ describe("Test #2: FavoriteStore — Optimistic update + rollback automático", 
       );
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
       expect(store.isAnimalFavorite(1)).toBe(true);
 
       store.toggleFavorite(animal);
-      await flushMicrotasks();
+      flushMicrotasks();
 
       expect(store.isAnimalFavorite(1)).toBe(true);
       expect(store.entities().length).toBe(1);
-    });
+    }));
   });
 
   describe("loadFavorites", () => {
-    it("carga favoritos desde el servicio y los pone en el store", async () => {
+    it("carga favoritos desde el servicio y los pone en el store", fakeAsync(() => {
       const animals = [buildAnimal(1, "Simba"), buildAnimal(2, "Nala")];
       favoriteServiceSpy.getFavoriteAnimals.and.returnValue(of(animals));
 
       store.loadFavorites();
-      await flushMicrotasks();
+      flushMicrotasks();
 
       expect(store.entities().length).toBe(2);
       expect(store.isAnimalFavorite(1)).toBe(true);
       expect(store.isAnimalFavorite(2)).toBe(true);
       expect(store.hasFavorites()).toBe(true);
-    });
+    }));
 
-    it("setea error cuando falla la carga", async () => {
+    it("setea error cuando falla la carga", fakeAsync(() => {
       favoriteServiceSpy.getFavoriteAnimals.and.returnValue(
         throwError(() => new Error("Failed to load"))
       );
 
       store.loadFavorites();
-      await flushMicrotasks();
+      flushMicrotasks();
 
       expect(store.error()).toContain("Failed to load");
       expect(store.isLoading()).toBe(false);
-    });
+    }));
   });
 });
