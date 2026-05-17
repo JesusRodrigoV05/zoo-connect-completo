@@ -1,8 +1,4 @@
-import jasmineCore from "jasmine-core";
-
-(globalThis as any).jasmine = jasmineCore;
-
-import { getTestBed, TestBed } from "@angular/core/testing";
+import { getTestBed } from "@angular/core/testing";
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
@@ -12,7 +8,3 @@ getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting(),
 );
-
-afterEach(() => {
-  TestBed.resetTestingModule();
-});

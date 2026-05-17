@@ -48,7 +48,10 @@
                 "output": "/assets/logos"
               }
             ],
-            "styles": ["src/styles.scss", "node_modules/aos/dist/aos.css"],
+            "styles": [
+              "src/styles.scss",
+              "node_modules/aos/dist/aos.css"
+            ],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
@@ -113,7 +116,12 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss"
+            ],
+            "polyfills": [
+              "src/test-setup.ts"
+            ]
           }
         }
       }
