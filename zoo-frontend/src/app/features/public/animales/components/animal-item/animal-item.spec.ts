@@ -1,4 +1,4 @@
-import { TestBed, flushMicrotasks } from "@angular/core/testing";
+import { ComponentFixture, TestBed, flushMicrotasks } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { provideRouter, Router } from "@angular/router";
 import { Animal, EstadoOperativo } from "@models/animales";
