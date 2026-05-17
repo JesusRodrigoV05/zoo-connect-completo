@@ -65,57 +65,94 @@ describe("Test #3: GetAnimales service — HTTP + adapter + error handling + val
 
   describe("getAllAnimals", () => {
     it("envia request con page=1, size=10 por defecto", () => {
-      service.getAllAnimals().subscribe();
+      // Arrange
+      const mockResponse = { items: [], total: 0, page: 1, size: 10, totalPages: 0 };
 
+      // Act
+      service.getAllAnimals().subscribe((result) => {
+        expect(result.items).toEqual([]);
+        expect(result.total).toBe(0);
+      });
+
+      // Assert
       const req = httpMock.expectOne((request) => {
         const page = request.params.get("page");
         const size = request.params.get("size");
         return page === "1" && size === "10";
       });
 
-      req.flush({ items: [], total: 0, page: 1, size: 10, totalPages: 0 });
+      req.flush(mockResponse);
     });
 
     it("envia request con page y size personalizados", () => {
-      service.getAllAnimals(3, 25).subscribe();
+      // Arrange
+      const mockResponse = { items: [], total: 0, page: 3, size: 25, totalPages: 0 };
 
+      // Act
+      service.getAllAnimals(3, 25).subscribe((result) => {
+        expect(result.page).toBe(3);
+        expect(result.size).toBe(25);
+      });
+
+      // Assert
       const req = httpMock.expectOne((request) => {
         const page = request.params.get("page");
         const size = request.params.get("size");
         return page === "3" && size === "25";
       });
 
-      req.flush({ items: [], total: 0, page: 3, size: 25, totalPages: 0 });
+      req.flush(mockResponse);
     });
 
     it("corrige page negativa a page=1", () => {
-      service.getAllAnimals(-5, 10).subscribe();
+      // Arrange
+      const mockResponse = { items: [], total: 0, page: 1, size: 10, totalPages: 0 };
 
+      // Act
+      service.getAllAnimals(-5, 10).subscribe((result) => {
+        expect(result.page).toBe(1);
+      });
+
+      // Assert
       const req = httpMock.expectOne((request) => {
         return request.params.get("page") === "1";
       });
 
-      req.flush({ items: [], total: 0, page: 1, size: 10, totalPages: 0 });
+      req.flush(mockResponse);
     });
 
     it("corrige page=0 a page=1", () => {
-      service.getAllAnimals(0, 10).subscribe();
+      // Arrange
+      const mockResponse = { items: [], total: 0, page: 1, size: 10, totalPages: 0 };
 
+      // Act
+      service.getAllAnimals(0, 10).subscribe((result) => {
+        expect(result.page).toBe(1);
+      });
+
+      // Assert
       const req = httpMock.expectOne((request) => {
         return request.params.get("page") === "1";
       });
 
-      req.flush({ items: [], total: 0, page: 1, size: 10, totalPages: 0 });
+      req.flush(mockResponse);
     });
 
     it("corrige size negativa a size=10", () => {
-      service.getAllAnimals(1, -1).subscribe();
+      // Arrange
+      const mockResponse = { items: [], total: 0, page: 1, size: 10, totalPages: 0 };
 
+      // Act
+      service.getAllAnimals(1, -1).subscribe((result) => {
+        expect(result.size).toBe(10);
+      });
+
+      // Assert
       const req = httpMock.expectOne((request) => {
         return request.params.get("size") === "10";
       });
 
-      req.flush({ items: [], total: 0, page: 1, size: 10, totalPages: 0 });
+      req.flush(mockResponse);
     });
 
     it("transforma la respuesta backend con AnimalAdapter.fromBackend", () => {
@@ -161,11 +198,19 @@ describe("Test #3: GetAnimales service — HTTP + adapter + error handling + val
 
   describe("getAnimalById", () => {
     it("envia GET a /animals/animals/:id con el ID correcto", () => {
-      service.getAnimalById(42).subscribe();
+      // Arrange
+      const backendAnimal = buildBackendAnimal({ id_animal: 42, nombre_animal: "Simba" });
 
+      // Act
+      service.getAnimalById(42).subscribe((animal) => {
+        expect(animal.id_animal).toBe(42);
+        expect(animal.nombre).toBe("Simba");
+      });
+
+      // Assert
       const req = httpMock.expectOne(`${service.animalesUrl}/42`);
       expect(req.request.method).toBe("GET");
-      req.flush(buildBackendAnimal({ id_animal: 42 }));
+      req.flush(backendAnimal);
     });
 
     it("transforma la respuesta individual con AnimalAdapter.fromBackend", () => {
