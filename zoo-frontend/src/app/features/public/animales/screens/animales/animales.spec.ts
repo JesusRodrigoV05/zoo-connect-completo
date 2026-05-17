@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from "@angular/core/testing";
+import { ComponentFixture, TestBed, flushMicrotasks } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import {
   HttpClientTestingModule,
@@ -60,7 +60,7 @@ function buildPaginatedResponse(items: BackendAnimalResponse[], page: number, si
   };
 }
 
-describe("Test #1: AnimalesScreen — Paginación + infinite scroll + fakeAsync", () => {
+describe("Test #1: AnimalesScreen — Paginación + infinite scroll + async/await", () => {
   let component: Animales;
   let fixture: ComponentFixture<Animales>;
   let httpMock: HttpTestingController;
@@ -97,27 +97,27 @@ describe("Test #1: AnimalesScreen — Paginación + infinite scroll + fakeAsync"
     httpMock.verify();
   });
 
-  it("carga inicial → 12 animales, isLoading=false", fakeAsync(() => {
+  it("carga inicial → 12 animales, isLoading=false", async () => {
     const items = createPageItems(12, 1);
     flushInitialRequest().flush(buildPaginatedResponse(items, 1, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     expect(component["animals"]().length).toBe(12);
     expect(component["isLoading"]()).toBe(false);
     expect(component["hasMoreData"]()).toBe(true);
-  }));
+  });
 
-  it("scroll → página 2, se acumulan 24, no se pierden anteriores", fakeAsync(() => {
+  it("scroll → página 2, se acumulan 24, no se pierden anteriores", async () => {
     const page1 = createPageItems(12, 1);
     flushInitialRequest().flush(buildPaginatedResponse(page1, 1, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     expect(component["animals"]().length).toBe(12);
 
     component.onScrollDown();
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     const req2 = httpMock.expectOne((request) =>
@@ -125,27 +125,27 @@ describe("Test #1: AnimalesScreen — Paginación + infinite scroll + fakeAsync"
     );
     const page2 = createPageItems(12, 13);
     req2.flush(buildPaginatedResponse(page2, 2, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     expect(component["animals"]().length).toBe(24);
     expect(component["animals"]()[0].nombre).toBe("Animal 1");
     expect(component["animals"]()[12].nombre).toBe("Animal 13");
-  }));
+  });
 
-  it("scroll mientras isLoading=true → NO hace request duplicado", fakeAsync(() => {
+  it("scroll mientras isLoading=true → NO hace request duplicado", async () => {
     const page1 = createPageItems(12, 1);
     flushInitialRequest().flush(buildPaginatedResponse(page1, 1, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     component.onScrollDown();
-    tick();
+    await flushMicrotasks();
 
     component.onScrollDown();
     component.onScrollDown();
     component.onScrollDown();
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     const requests = httpMock.match((request) =>
@@ -155,63 +155,63 @@ describe("Test #1: AnimalesScreen — Paginación + infinite scroll + fakeAsync"
     expect(requests.length).toBe(1);
 
     requests[0].flush(buildPaginatedResponse(createPageItems(12, 13), 2, 12, 100));
-    tick();
-  }));
+    await flushMicrotasks();
+  });
 
-  it("backend devuelve menos de 12 → hasMoreData=false", fakeAsync(() => {
+  it("backend devuelve menos de 12 → hasMoreData=false", async () => {
     const page1 = createPageItems(12, 1);
     flushInitialRequest().flush(buildPaginatedResponse(page1, 1, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     component.onScrollDown();
-    tick();
+    await flushMicrotasks();
 
     const req2 = httpMock.expectOne((request) =>
       request.params.get("page") === "2"
     );
     const partialPage = createPageItems(5, 13);
     req2.flush(buildPaginatedResponse(partialPage, 2, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     expect(component["hasMoreData"]()).toBe(false);
-  }));
+  });
 
-  it("error HTTP → isLoading vuelve a false", fakeAsync(() => {
+  it("error HTTP → isLoading vuelve a false", async () => {
     const page1 = createPageItems(12, 1);
     flushInitialRequest().flush(buildPaginatedResponse(page1, 1, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     component.onScrollDown();
-    tick();
+    await flushMicrotasks();
 
     const req2 = httpMock.expectOne((request) =>
       request.params.get("page") === "2"
     );
     req2.flush("Server error", { status: 500, statusText: "Internal Server Error" });
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     expect(component["isLoading"]()).toBe(false);
-  }));
+  });
 
-  it("hasMoreData=false → no muestra loading trigger", fakeAsync(() => {
+  it("hasMoreData=false → no muestra loading trigger", async () => {
     const page1 = createPageItems(12, 1);
     flushInitialRequest().flush(buildPaginatedResponse(page1, 1, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     component.onScrollDown();
-    tick();
+    await flushMicrotasks();
 
     const req2 = httpMock.expectOne((request) =>
       request.params.get("page") === "2"
     );
     const partialPage = createPageItems(3, 13);
     req2.flush(buildPaginatedResponse(partialPage, 2, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     const trigger = fixture.debugElement.query(By.css(".loading-trigger"));
@@ -219,15 +219,15 @@ describe("Test #1: AnimalesScreen — Paginación + infinite scroll + fakeAsync"
 
     expect(trigger).toBeNull();
     expect(endMessage).not.toBeNull();
-  }));
+  });
 
-  it("renderiza AnimalItem por cada animal cargado", fakeAsync(() => {
+  it("renderiza AnimalItem por cada animal cargado", async () => {
     const items = createPageItems(12, 1);
     flushInitialRequest().flush(buildPaginatedResponse(items, 1, 12, 100));
-    tick();
+    await flushMicrotasks();
     fixture.detectChanges();
 
     const animalItems = fixture.debugElement.queryAll(By.directive(AnimalItem));
     expect(animalItems.length).toBe(12);
-  }));
+  });
 });

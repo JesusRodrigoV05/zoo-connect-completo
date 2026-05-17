@@ -1,5 +1,4 @@
-import { Component } from "@angular/core";
-import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
+import { ComponentFixture, TestBed, flushMicrotasks } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { provideRouter, Router } from "@angular/router";
 import { Animal, EstadoOperativo } from "@models/animales";
@@ -120,17 +119,17 @@ describe("Test #4: AnimalItem component — Computed signals + navegación + edg
     expect(speciesBadge.nativeElement.textContent).toContain("Elefante Africano");
   });
 
-  it("click en la card navega a /animales/:id con el id correcto", fakeAsync(() => {
+  it("click en la card navega a /animales/:id con el id correcto", async () => {
     const navigateSpy = spyOn(router, "navigate");
     fixture.componentRef.setInput("animal", buildAnimal({ id_animal: 99 }));
     fixture.detectChanges();
 
     const card = fixture.debugElement.query(By.css(".animal-card"));
     card.triggerEventHandler("click", null);
-    tick();
+    await flushMicrotasks();
 
     expect(navigateSpy).toHaveBeenCalledWith(["/animales", 99]);
-  }));
+  });
 
   it("view-transition-name se genera con el id del animal", () => {
     fixture.componentRef.setInput("animal", buildAnimal({ id_animal: 123 }));
