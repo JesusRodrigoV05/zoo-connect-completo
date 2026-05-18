@@ -45,3 +45,13 @@ Thumbs.db
 API.md
 .github/
 .env
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
