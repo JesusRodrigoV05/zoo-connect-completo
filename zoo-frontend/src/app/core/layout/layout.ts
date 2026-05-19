@@ -33,107 +33,264 @@ import {
 export default class Layout {
   protected authStore = inject(AuthStore);
   protected drawerVisible = signal(false);
-  rutaBaseVet = '/vet';
-  rutaBaseCui = '/cuidador';
 
   puedo = computed<boolean>(() => !this.authStore.isVisitante());
 
+  private readonly hasPermission = (permission: string): boolean =>
+    this.authStore.hasPermission(permission);
+
+  private firstAllowedRoute(children: NavigationItem[], fallback: string): string {
+    return children[0]?.route ?? fallback;
+  }
+
   menuItems = computed<NavigationItem[]>(() => {
-    if (this.authStore.isAdmin()) {
-      return [
-        {
-          text: 'Dashboard',
-          icon: 'pi pi-th-large',
-          route: '/admin/dashboard',
+    const items: NavigationItem[] = [];
+
+    if (this.hasPermission('view_admin_dashboard')) {
+      items.push({
+        text: 'Dashboard',
+        icon: 'pi pi-th-large',
+        route: this.authStore.isOsi() ? '/osi/dashboard' : '/admin/dashboard',
+      });
+    }
+
+    if (this.hasPermission('manage_permissions')) {
+      items.push({
+        text: 'Roles y Accesos',
+        icon: 'pi pi-shield',
+        route: this.authStore.isOsi() ? '/osi/roles-accesos' : '/admin/roles',
+      });
+    }
+
+    if (this.hasPermission('access_animals_management')) {
+      const children: NavigationItem[] = [
+        this.hasPermission('animals_list_species') && {
+          text: 'Lista de Especies',
+          icon: 'pi pi-list',
+          route: '/admin/animales/especies/lista',
         },
-        {
+        this.hasPermission('animals_create_species') && {
+          text: 'Añadir Especie',
+          icon: 'pi pi-plus',
+          route: '/admin/animales/especies/crear',
+        },
+        this.hasPermission('animals_list_habitats') && {
+          text: 'Lista de Hábitats',
+          icon: 'pi pi-list',
+          route: '/admin/animales/habitat/lista',
+        },
+        this.hasPermission('animals_create_habitats') && {
+          text: 'Añadir Hábitat',
+          icon: 'pi pi-plus',
+          route: '/admin/animales/habitat/crear',
+        },
+        this.hasPermission('animals_list_animals') && {
+          text: 'Lista de Animales',
+          icon: 'pi pi-list',
+          route: '/admin/animales/lista',
+        },
+        this.hasPermission('animals_create_animals') && {
+          text: 'Añadir Animal',
+          icon: 'pi pi-plus',
+          route: '/admin/animales/crear',
+        },
+      ].filter(Boolean) as NavigationItem[];
+
+      if (children.length) {
+        items.push({
           text: 'Gestión de Animales',
           icon: 'pi pi-id-card',
-          route: '/admin/animales',
+          route: this.firstAllowedRoute(children, '/admin/animales'),
+          children,
+        });
+      }
+    }
+
+    if (this.hasPermission('access_tasks_management')) {
+      const children: NavigationItem[] = [
+        this.hasPermission('tasks_operations_board') && {
+          text: 'Tablero de Operaciones',
+          icon: 'pi pi-th-large',
+          route: '/admin/tareas/operaciones',
         },
-        {
-          text: 'Gestión Tareas',
+        this.hasPermission('tasks_routines_planner') && {
+          text: 'Planificador de Rutinas',
+          icon: 'pi pi-calendar',
+          route: '/admin/tareas/planificador',
+        },
+        this.hasPermission('tasks_types_config') && {
+          text: 'Configuración Tipos',
+          icon: 'pi pi-cog',
+          route: '/admin/tareas/configuracion',
+        },
+      ].filter(Boolean) as NavigationItem[];
+
+      if (children.length) {
+        items.push({
+          text: 'Gestión de Tareas',
           icon: 'pi pi-list-check',
-          route: '/admin/tareas',
+          route: this.firstAllowedRoute(children, '/admin/tareas'),
+          children,
+        });
+      }
+    }
+
+    if (this.hasPermission('access_inventory_management')) {
+      const children: NavigationItem[] = [
+        this.hasPermission('inventory_create_product') && {
+          text: 'Crear producto',
+          icon: 'pi pi-plus',
+          route: '/admin/inventario/crear',
         },
-        {
+        this.hasPermission('inventory_list_products') && {
+          text: 'Lista de Productos',
+          icon: 'pi pi-list',
+          route: '/admin/inventario/lista',
+        },
+        this.hasPermission('inventory_create_supplier') && {
+          text: 'Crear proveedor',
+          icon: 'pi pi-plus',
+          route: '/admin/inventario/proveedor/crear',
+        },
+        this.hasPermission('inventory_list_suppliers') && {
+          text: 'Lista de Proveedores',
+          icon: 'pi pi-list',
+          route: '/admin/inventario/proveedor/lista',
+        },
+        this.hasPermission('inventory_list_types') && {
+          text: 'Lista de tipos',
+          icon: 'pi pi-tags',
+          route: '/admin/inventario/tipo/lista',
+        },
+        this.hasPermission('inventory_list_units') && {
+          text: 'Lista de unidades',
+          icon: 'pi pi-table',
+          route: '/admin/inventario/unidades/lista',
+        },
+        this.hasPermission('inventory_movements_history') && {
+          text: 'Historial de movimientos',
+          icon: 'pi pi-history',
+          route: '/admin/inventario/transacciones/lista',
+        },
+      ].filter(Boolean) as NavigationItem[];
+
+      if (children.length) {
+        items.push({
           text: 'Gestión Inventario',
           icon: 'pi pi-box',
-          route: '/admin/inventario',
+          route: this.firstAllowedRoute(children, '/admin/inventario'),
+          children,
+        });
+      }
+    }
+
+    if (this.hasPermission('access_users_management')) {
+      const children: NavigationItem[] = [
+        this.hasPermission('users_create') && {
+          text: 'Crear Usuario',
+          icon: 'pi pi-user-plus',
+          route: '/admin/usuarios/crear',
         },
-        {
+        this.hasPermission('users_list') && {
+          text: 'Lista de Usuarios',
+          icon: 'pi pi-users',
+          route: '/admin/usuarios/lista',
+        },
+      ].filter(Boolean) as NavigationItem[];
+
+      if (children.length) {
+        items.push({
           text: 'Gestión de Usuarios',
           icon: 'pi pi-users',
-          route: '/admin/usuarios',
+          route: this.firstAllowedRoute(children, '/admin/usuarios'),
+          children,
+        });
+      }
+    }
+
+    if (this.hasPermission('access_surveys_management')) {
+      const children: NavigationItem[] = [
+        this.hasPermission('surveys_list') && {
+          text: 'Lista',
+          icon: 'pi pi-list',
+          route: '/admin/encuestas/lista',
         },
-        {
+        this.hasPermission('surveys_create') && {
+          text: 'Crear Encuesta',
+          icon: 'pi pi-plus',
+          route: '/admin/encuestas/crear',
+        },
+      ].filter(Boolean) as NavigationItem[];
+
+      if (children.length) {
+        items.push({
           text: 'Gestión de Encuestas',
           icon: 'pi pi-chart-line',
-          route: '/admin/encuestas',
-        },
-        {
-          text: 'Auxiliar Auditoría',
-          icon: 'pi pi-history',
+          route: this.firstAllowedRoute(children, '/admin/encuestas'),
+          children,
+        });
+      }
+    }
+
+    if (this.hasPermission('access_audit_assistant')) {
+      const children: NavigationItem[] = [
+        this.hasPermission('audit_application_logs') && {
+          text: 'Registros de Aplicación',
+          icon: 'pi pi-database',
           route: '/admin/audit',
         },
-      ];
+        this.hasPermission('audit_user_logs') && {
+          text: 'Registros de Usuario',
+          icon: 'pi pi-user',
+          route: '/admin/audit',
+        },
+      ].filter(Boolean) as NavigationItem[];
+
+      if (children.length) {
+        items.push({
+          text: 'Auxiliar Auditoría',
+          icon: 'pi pi-history',
+          route: this.firstAllowedRoute(children, '/admin/audit'),
+          children,
+        });
+      }
     }
 
-    if (this.authStore.isVeterinario()) {
-      return [
-        // {
-        //   text: 'Dashboard Médico',
-        //   icon: 'pi pi-heart-pulse',
-        //   route: `${this.rutaBaseVet}/dashboard`,
-        // },
-        {
-          text: 'Mis Tareas',
-          icon: 'pi pi-check-square',
-          route: `${this.rutaBaseVet}/mis-tareas`,
-          tooltip: 'Consultas y procedimientos asignados',
-        },
-        {
-          text: 'Gestión de Dietas',
-          icon: 'pi pi-apple',
-          route: `${this.rutaBaseVet}/dietas/`,
-          tooltip: 'Planificación nutricional',
-        },
-        {
-          text: 'Historiales Clínicos',
-          icon: 'pi pi-clipboard',
-          route: `${this.rutaBaseVet}/historiales/`,
-          tooltip: 'Registro médico y seguimiento',
-        },
-      ];
+    if (this.hasPermission('caregiver_my_tasks')) {
+      items.push({
+        text: 'Mis tareas',
+        icon: 'pi pi-check-square',
+        route: '/cuidador/mis-tareas',
+      });
     }
 
-    if (this.authStore.isCuidador()) {
-      return [
-        {
-          text: 'Mis Tareas',
-          icon: 'pi pi-check-square',
-          route: `${this.rutaBaseCui}/mis-tareas`,
-          tooltip: 'Consultas y procedimientos asignados',
-        },
-      ];
+    if (this.hasPermission('medical_my_tasks')) {
+      items.push({
+        text: 'Mis Tareas',
+        icon: 'pi pi-check-square',
+        route: '/vet/mis-tareas',
+      });
     }
 
-    if (this.authStore.isOsi()) {
-      return [
-        {
-          text: 'Dashboard',
-          icon: 'pi pi-th-large',
-          route: '/osi/dashboard',
-        },
-        {
-          text: 'Roles y Accesos',
-          icon: 'pi pi-shield',
-          route: '/osi/roles-accesos',
-        },
-      ];
+    if (this.hasPermission('medical_diets')) {
+      items.push({
+        text: 'Gestión de Dietas',
+        icon: 'pi pi-apple',
+        route: '/vet/dietas/lista',
+        tooltip: 'Planificación nutricional',
+      });
     }
 
-    return [];
+    if (this.hasPermission('medical_clinical_records')) {
+      items.push({
+        text: 'Historiales Clínicos',
+        icon: 'pi pi-clipboard',
+        route: '/vet/historiales/lista',
+        tooltip: 'Registro médico y seguimiento',
+      });
+    }
+
+    return items;
   });
 
   toggleDrawer(): void {

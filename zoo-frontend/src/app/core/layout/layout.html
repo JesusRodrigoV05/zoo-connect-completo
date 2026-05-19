@@ -32,6 +32,8 @@
         <h3 class="drawer-header-title">Panel Médico</h3>
         } @else if (authStore.isCuidador()) {
         <h3 class="drawer-header-title">Panel Cuidador</h3>
+        } @else if (authStore.isOsi()) {
+        <h3 class="drawer-header-title">Panel OSI</h3>
         }
       </div>
     </ng-template>

@@ -1879,17 +1879,17 @@ export class OnboardingService {
           {
             element: ".tour-permissions-title",
             popover: {
-              title: "Gestión de permisos por usuario",
+              title: "Gestión de permisos por rol",
               description:
-                "Vista para revisar y ajustar los permisos asignados a cada usuario.",
+                "Vista para revisar y ajustar los permisos asignados a cada rol.",
             },
           },
           {
             element: ".tour-permissions-search",
             popover: {
-              title: "Buscar por usuario correo",
+              title: "Buscar por rol",
               description:
-                "Filtra la matriz por nombre de usuario, correo o rol. <br><strong>Ejemplo:</strong> escribir admin@zoo.com para ubicar una cuenta.",
+                "Filtra la matriz por nombre de rol. <br><strong>Ejemplo:</strong> escribir OIS 1 para ubicar el rol.",
             },
           },
           {
@@ -1905,15 +1905,7 @@ export class OnboardingService {
             popover: {
               title: "Tabla",
               description:
-                "Muestra los usuarios y sus permisos asociados en columnas comparables.",
-            },
-          },
-          {
-            element: ".tour-permissions-col-user",
-            popover: {
-              title: "Usuario",
-              description:
-                "Identifica a la persona a la que se le asignan o revisan permisos. <br><strong>Ejemplo:</strong> jlopez / usuario@zoo.com.",
+                "Muestra los roles y sus permisos asociados en columnas comparables.",
             },
           },
           {
@@ -1921,7 +1913,7 @@ export class OnboardingService {
             popover: {
               title: "Rol",
               description:
-                "Muestra el rol base del usuario para entender su nivel de acceso. <br><strong>Ejemplo:</strong> OSI.",
+                "Identifica el rol al que se le asignan o revisan permisos. <br><strong>Ejemplo:</strong> OIS 1.",
             },
           },
           {

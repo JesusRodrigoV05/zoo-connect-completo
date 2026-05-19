@@ -68,7 +68,7 @@
 .permissions-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1100px;
+  min-width: 2200px;
 }
 
 .permissions-table th,
@@ -84,6 +84,37 @@
   background: #f8fafc;
   z-index: 1;
   text-align: left;
+}
+
+.permissions-table thead tr:nth-child(2) th {
+  top: 3.5rem;
+}
+
+.permission-group-header {
+  text-align: center;
+  border-left: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.permission-subheader {
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+.group-toggle-row td {
+  background: #fcfcfd;
+  border-bottom-style: dashed;
+}
+
+.permission-group-toggle {
+  text-align: center;
+}
+
+.permission-group-toggle label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475467);
 }
 
 .permissions-table thead th span,
@@ -132,6 +163,11 @@
 .permission-cell input[type="checkbox"] {
   width: 1.15rem;
   height: 1.15rem;
+}
+
+.permission-cell input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .actions-cell {

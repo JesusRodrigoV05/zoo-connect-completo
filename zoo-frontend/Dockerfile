@@ -1,7 +1,7 @@
 FROM node:22-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 RUN node --max-old-space-size=2048 ./node_modules/@angular/cli/bin/ng build --configuration production --output-hashing=none --optimization=true
 FROM node:22-slim AS runtime

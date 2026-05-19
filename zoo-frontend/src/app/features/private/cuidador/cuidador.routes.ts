@@ -4,6 +4,7 @@ export default [
   {
     path: "mis-tareas",
     title: "Mis Tareas",
+    data: { requiredPermissions: ["caregiver_my_tasks"] },
     loadComponent: () => import("./mis-tareas/mis-tareas"),
   },
   {

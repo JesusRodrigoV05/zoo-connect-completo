@@ -15,7 +15,7 @@ from app.models.user_permission import UserPermission
 
 DEFAULT_PERMISSIONS = [
     {"code": PermissionCode.MANAGE_USERS.value, "name": "Gestionar usuarios", "description": "Crear, editar y desactivar usuarios del sistema.", "module": "admin"},
-    {"code": PermissionCode.MANAGE_PERMISSIONS.value, "name": "Gestionar permisos", "description": "Asignar permisos funcionales a cada usuario.", "module": "admin"},
+    {"code": PermissionCode.MANAGE_PERMISSIONS.value, "name": "Gestionar permisos", "description": "Asignar permisos funcionales por rol.", "module": "admin"},
     {"code": PermissionCode.VIEW_AUDIT_LOGS.value, "name": "Ver auditoría", "description": "Consultar los registros de auditoría del sistema.", "module": "admin"},
     {"code": PermissionCode.VIEW_ADMIN_DASHBOARD.value, "name": "Ver panel administrativo", "description": "Acceso al panel principal de administración.", "module": "admin"},
     {"code": PermissionCode.MANAGE_ANIMALS.value, "name": "Gestionar animales", "description": "Crear y editar animales y su información operativa.", "module": "animales"},
@@ -25,6 +25,38 @@ DEFAULT_PERMISSIONS = [
     {"code": PermissionCode.VIEW_INVENTORY.value, "name": "Ver inventario", "description": "Consultar inventario y reportes asociados.", "module": "inventario"},
     {"code": PermissionCode.MANAGE_INVENTORY.value, "name": "Gestionar inventario", "description": "Crear, editar y eliminar recursos del inventario.", "module": "inventario"},
     {"code": PermissionCode.MANAGE_SURVEYS.value, "name": "Gestionar encuestas", "description": "Crear y administrar encuestas y preguntas.", "module": "encuestas"},
+    {"code": PermissionCode.ACCESS_ANIMALS_MANAGEMENT.value, "name": "Gestión de Animales", "description": "Habilita el grupo de gestión de animales en el menú.", "module": "animales"},
+    {"code": PermissionCode.ANIMALS_LIST_SPECIES.value, "name": "Lista de Especies", "description": "Acceso a la lista de especies.", "module": "animales"},
+    {"code": PermissionCode.ANIMALS_CREATE_SPECIES.value, "name": "Añadir Especie", "description": "Acceso al formulario de creación de especies.", "module": "animales"},
+    {"code": PermissionCode.ANIMALS_LIST_HABITATS.value, "name": "Lista de Hábitats", "description": "Acceso a la lista de hábitats.", "module": "animales"},
+    {"code": PermissionCode.ANIMALS_CREATE_HABITATS.value, "name": "Añadir Hábitat", "description": "Acceso al formulario de creación de hábitats.", "module": "animales"},
+    {"code": PermissionCode.ANIMALS_LIST_ANIMALS.value, "name": "Lista de Animales", "description": "Acceso a la lista de animales.", "module": "animales"},
+    {"code": PermissionCode.ANIMALS_CREATE_ANIMALS.value, "name": "Añadir Animal", "description": "Acceso al formulario de creación de animales.", "module": "animales"},
+    {"code": PermissionCode.ACCESS_TASKS_MANAGEMENT.value, "name": "Gestión de Tareas", "description": "Habilita el grupo de gestión de tareas en el menú.", "module": "tareas"},
+    {"code": PermissionCode.TASKS_OPERATIONS_BOARD.value, "name": "Tablero de Operaciones", "description": "Acceso al tablero de operaciones.", "module": "tareas"},
+    {"code": PermissionCode.TASKS_ROUTINES_PLANNER.value, "name": "Planificador de Rutinas", "description": "Acceso al planificador de rutinas.", "module": "tareas"},
+    {"code": PermissionCode.TASKS_TYPES_CONFIG.value, "name": "Configuración Tipos", "description": "Acceso a la configuración de tipos de tareas.", "module": "tareas"},
+    {"code": PermissionCode.ACCESS_INVENTORY_MANAGEMENT.value, "name": "Gestión de Inventario", "description": "Habilita el grupo de gestión de inventario en el menú.", "module": "inventario"},
+    {"code": PermissionCode.INVENTORY_CREATE_PRODUCT.value, "name": "Crear producto", "description": "Acceso al formulario de creación de productos.", "module": "inventario"},
+    {"code": PermissionCode.INVENTORY_LIST_PRODUCTS.value, "name": "Lista de Productos", "description": "Acceso a la lista de productos.", "module": "inventario"},
+    {"code": PermissionCode.INVENTORY_CREATE_SUPPLIER.value, "name": "Crear proveedor", "description": "Acceso al formulario de creación de proveedores.", "module": "inventario"},
+    {"code": PermissionCode.INVENTORY_LIST_SUPPLIERS.value, "name": "Lista de Proveedores", "description": "Acceso a la lista de proveedores.", "module": "inventario"},
+    {"code": PermissionCode.INVENTORY_LIST_TYPES.value, "name": "Lista de tipos", "description": "Acceso a la lista de tipos de producto.", "module": "inventario"},
+    {"code": PermissionCode.INVENTORY_LIST_UNITS.value, "name": "Lista de unidades", "description": "Acceso a la lista de unidades de medida.", "module": "inventario"},
+    {"code": PermissionCode.INVENTORY_MOVEMENTS_HISTORY.value, "name": "Historial de movimientos", "description": "Acceso al historial de movimientos de inventario.", "module": "inventario"},
+    {"code": PermissionCode.ACCESS_USERS_MANAGEMENT.value, "name": "Gestión de Usuarios", "description": "Habilita el grupo de gestión de usuarios en el menú.", "module": "admin"},
+    {"code": PermissionCode.USERS_CREATE.value, "name": "Crear Usuario", "description": "Acceso al formulario de creación de usuarios.", "module": "admin"},
+    {"code": PermissionCode.USERS_LIST.value, "name": "Lista de Usuarios", "description": "Acceso a la lista de usuarios.", "module": "admin"},
+    {"code": PermissionCode.ACCESS_SURVEYS_MANAGEMENT.value, "name": "Gestión de Encuestas", "description": "Habilita el grupo de gestión de encuestas en el menú.", "module": "encuestas"},
+    {"code": PermissionCode.SURVEYS_LIST.value, "name": "Lista", "description": "Acceso a la lista de encuestas.", "module": "encuestas"},
+    {"code": PermissionCode.SURVEYS_CREATE.value, "name": "Crear Encuesta", "description": "Acceso al formulario de creación de encuestas.", "module": "encuestas"},
+    {"code": PermissionCode.ACCESS_AUDIT_ASSISTANT.value, "name": "Auxiliar Auditoría", "description": "Habilita el grupo de auditoría en el menú.", "module": "admin"},
+    {"code": PermissionCode.AUDIT_APPLICATION_LOGS.value, "name": "Registros de Aplicación", "description": "Acceso a registros de aplicación.", "module": "admin"},
+    {"code": PermissionCode.AUDIT_USER_LOGS.value, "name": "Registros de Usuario", "description": "Acceso a registros de usuario.", "module": "admin"},
+    {"code": PermissionCode.CAREGIVER_MY_TASKS.value, "name": "Mis tareas (Cuidador)", "description": "Acceso a tareas asignadas del cuidador.", "module": "cuidador"},
+    {"code": PermissionCode.MEDICAL_MY_TASKS.value, "name": "Mis Tareas (Médico)", "description": "Acceso a tareas asignadas del médico.", "module": "veterinario"},
+    {"code": PermissionCode.MEDICAL_DIETS.value, "name": "Gestión de Dietas", "description": "Acceso a gestión de dietas.", "module": "veterinario"},
+    {"code": PermissionCode.MEDICAL_CLINICAL_RECORDS.value, "name": "Historiales Clínicos", "description": "Acceso a historiales clínicos.", "module": "veterinario"},
 ]
 
 
@@ -44,12 +76,21 @@ def ensure_permissions_catalog(db: Session) -> List[Permission]:
 def ensure_role_permissions(db: Session) -> None:
     permissions_by_code = {permission.code: permission for permission in db.query(Permission).all()}
     role_by_name = {role.name: role for role in db.query(Role).all()}
+    all_permission_codes = list(permissions_by_code.keys())
 
     role_permissions_map = {
-        "administrador": list(permissions_by_code.keys()),
+        "administrador": all_permission_codes,
         "osi": [PermissionCode.MANAGE_USERS.value, PermissionCode.MANAGE_PERMISSIONS.value, PermissionCode.VIEW_AUDIT_LOGS.value, PermissionCode.VIEW_ADMIN_DASHBOARD.value],
-        "veterinario": [PermissionCode.MANAGE_ANIMALS.value, PermissionCode.MANAGE_VETERINARY_MODULE.value, PermissionCode.VIEW_INVENTORY.value],
-        "cuidador": [PermissionCode.MANAGE_ANIMALS.value, PermissionCode.MANAGE_TASKS.value, PermissionCode.VIEW_INVENTORY.value],
+        "veterinario": [
+            PermissionCode.MANAGE_VETERINARY_MODULE.value,
+            PermissionCode.MEDICAL_MY_TASKS.value,
+            PermissionCode.MEDICAL_DIETS.value,
+            PermissionCode.MEDICAL_CLINICAL_RECORDS.value,
+        ],
+        "cuidador": [
+            PermissionCode.MANAGE_TASKS.value,
+            PermissionCode.CAREGIVER_MY_TASKS.value,
+        ],
         "visitante": [],
     }
 
@@ -96,12 +137,6 @@ def get_effective_permission_entries(db: Session, user_id: int) -> List[dict]:
         if not permission or not permission.is_active:
             continue
         entries[permission.code] = {"permission": permission, "allowed": bool(role_permission.allowed), "source": "role"}
-
-    for user_permission in getattr(user, "user_permissions", []):
-        permission = user_permission.permission
-        if not permission or not permission.is_active:
-            continue
-        entries[permission.code] = {"permission": permission, "allowed": bool(user_permission.allowed), "source": "user"}
 
     return list(entries.values())
 

@@ -8,6 +8,7 @@ export interface NavigationItem {
   readonly text: string;
   readonly icon: string;
   readonly route: string;
+  readonly children?: NavigationItem[];
   readonly disabled?: boolean;
   readonly comingSoon?: boolean;
   readonly badge?: string | number;
