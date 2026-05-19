@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
-RUN node --max-old-space-size=2048 ./node_modules/@angular/cli/bin/ng build --configuration production --output-hashing=none --optimization=true
+RUN node --max-old-space-size=2048 ./node_modules/@angular/cli/bin/ng build --configuration production --optimization=true
 FROM node:22-slim AS runtime
 EXPOSE 4200
 WORKDIR /app
