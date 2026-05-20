@@ -117,7 +117,7 @@ describe("FavoriteAnimals service", () => {
 
     it("propaga error HTTP correctamente", () => {
       service.getFavoriteAnimals().subscribe({
-        next: () => fail("should have failed"),
+        next: () => { throw new Error("should have failed"); },
         error: (err) => {
           expect(err.status).toBe(500);
         },
@@ -158,7 +158,7 @@ describe("FavoriteAnimals service", () => {
 
     it("propaga error HTTP al agregar favorito", () => {
       service.addFavoriteAnimal(99).subscribe({
-        next: () => fail("should have failed"),
+        next: () => { throw new Error("should have failed"); },
         error: (err) => {
           expect(err.status).toBe(404);
         },
@@ -180,7 +180,7 @@ describe("FavoriteAnimals service", () => {
 
     it("propaga error HTTP al eliminar favorito", () => {
       service.removeFavoriteAnimal(99).subscribe({
-        next: () => fail("should have failed"),
+        next: () => { throw new Error("should have failed"); },
         error: (err) => {
           expect(err.status).toBe(403);
         },

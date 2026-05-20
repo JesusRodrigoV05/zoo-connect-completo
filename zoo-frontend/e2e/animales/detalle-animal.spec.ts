@@ -7,6 +7,14 @@ test.describe('Detalle de Animal', () => {
 
   test.beforeEach(async ({ page: pwPage }) => {
     page = new AnimalDetailPage(pwPage);
+
+    await pwPage.route('**/favorite_animals/favorites*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [] }),
+      });
+    });
   });
 
   test('carga de detalle — muestra toda la información del animal', async ({
@@ -29,14 +37,6 @@ test.describe('Detalle de Animal', () => {
       });
     });
 
-    await pwPage.route('**/favorite_animals/favorites*', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [] }),
-      });
-    });
-
     await page.navigate(1);
     await page.waitForContentToLoad();
 
@@ -56,14 +56,6 @@ test.describe('Detalle de Animal', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(animal),
-      });
-    });
-
-    await pwPage.route('**/favorite_animals/favorites*', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [] }),
       });
     });
 
@@ -96,14 +88,6 @@ test.describe('Detalle de Animal', () => {
       });
     });
 
-    await pwPage.route('**/favorite_animals/favorites*', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [] }),
-      });
-    });
-
     await page.navigate(3);
     await page.waitForContentToLoad();
     expect(await page.getGender()).toContain('Macho');
@@ -123,14 +107,6 @@ test.describe('Detalle de Animal', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(animal),
-      });
-    });
-
-    await pwPage.route('**/favorite_animals/favorites*', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [] }),
       });
     });
 

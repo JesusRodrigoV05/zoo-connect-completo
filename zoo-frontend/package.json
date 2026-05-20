@@ -1,6 +1,7 @@
 {
   "name": "zoo-connect-web",
   "version": "0.0.0",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -12,7 +13,6 @@
     "serve:ssr": "bun dist/zoo-connect-web/server/server.mjs",
     "e2e": "ng e2e"
   },
-  "private": true,
   "dependencies": {
     "@angular/cdk": "20.2.10",
     "@angular/common": "^21.0.3",
@@ -50,17 +50,12 @@
     "@playwright/test": "1.60.0",
     "@types/aos": "^3.0.7",
     "@types/express": "^5.0.6",
-    "@types/jasmine": "~5.1.13",
     "@types/node": "^20.19.25",
     "@vitest/browser-playwright": "^4.1.6",
-    "jasmine-core": "~5.7.1",
-    "karma": "~6.4.4",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.1",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "jsdom": "^29.1.1",
     "playwright": "^1.60.0",
     "playwright-ng-schematics": "21.1.0",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.6"
   }
 }

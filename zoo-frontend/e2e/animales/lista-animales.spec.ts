@@ -10,6 +10,14 @@ test.describe('Lista de Animales', () => {
 
   test.beforeEach(async ({ page: pwPage }) => {
     page = new AnimalesListPage(pwPage);
+
+    await pwPage.route('**/favorite_animals/favorites*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [] }),
+      });
+    });
   });
 
   test('carga inicial — muestra 12 animales con nombre y especie', async ({

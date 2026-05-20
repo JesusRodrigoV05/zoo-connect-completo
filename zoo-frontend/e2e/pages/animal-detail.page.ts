@@ -82,9 +82,8 @@ export class AnimalDetailPage {
   }
 
   async isFavoriteActive() {
-    const heartIcon = this.favoriteButton.locator('box-icon');
-    const type = await heartIcon.getAttribute('type');
-    return type === 'solid';
+    const classes = await this.favoriteButton.getAttribute('class');
+    return classes?.includes('active') ?? false;
   }
 
   async clickBack() {

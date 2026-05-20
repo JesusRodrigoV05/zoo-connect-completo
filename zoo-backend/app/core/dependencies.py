@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
@@ -30,6 +32,23 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     user = crud_user.get_user_by_email(db, email)
     if not user:
         raise credentials_exception
+    return user
+
+def get_current_user_optional(token: Optional[str] = Depends(OAuth2PasswordBearer(tokenUrl="auth/login", auto_error=False)), db: Session = Depends(get_db)) -> Optional[User]:
+    """Retorna el usuario autenticado si hay token válido, o None si no hay token o es inválido."""
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        if payload.get("type") != "access":
+            return None
+        email = payload.get("sub")
+        if not email:
+            return None
+    except JWTError:
+        return None
+
+    user = crud_user.get_user_by_email(db, email)
     return user
 
 def get_current_active_user(current_user: User = Depends(get_current_user)):
