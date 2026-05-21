@@ -52,9 +52,10 @@ class Settings(BaseSettings):
     PASSWORD_RESET_TOKEN_EXPIRE_MINUTES: int = 30
 
     # ReCAPTCHA v2 (Google) - Visible widget
-    RECAPTCHA_SECRET_KEY: str = "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx"
+    RECAPTCHA_SECRET_KEY: str
     RECAPTCHA_SITE_KEY: str = "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx"
     RECAPTCHA_VERIFY_URL: str = "https://www.google.com/recaptcha/api/siteverify"
+    REQUIRE_RECAPTCHA: bool = True
     #
     #
     # Políticas de histórico de contraseñas por rol

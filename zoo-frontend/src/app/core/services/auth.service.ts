@@ -236,7 +236,7 @@ export class AuthService {
     } else if (error?.status === 400 && context === 'login') {
       errorMessage = 'Usuario inactivo. Contacte al administrador';
     } else if (error?.status === 403 && context === 'login') {
-      errorMessage = 'Cuenta bloqueada temporalmente, intente dentro de 30 minutos';
+      errorMessage = 'Cuenta bloqueada temporalmente, intente dentro de 5 minutos';
     } else if (error?.status === 400 && context === 'register') {
       errorMessage = error.error?.message?.includes('email') ? 'Este email ya está registrado. Intente con otro email' : 'Datos de registro inválidos';
     } else if (error?.status === 422 && context === 'register') {

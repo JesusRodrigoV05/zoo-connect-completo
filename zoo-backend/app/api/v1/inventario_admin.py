@@ -1,11 +1,17 @@
 from typing import Optional
+import logging
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Query
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import require_admin_user, require_inventory_read_permission
+from app.core.dependencies import (
+    require_inventory_create_product_permission,
+    require_inventory_create_supplier_permission,
+    require_inventory_manage_permission,
+    require_inventory_read_permission,
+)
 from app.core.uploader import delete_from_cloudinary, upload_to_cloudinary
 from app.crud import inventario
 from app.db.session import get_db
@@ -14,6 +20,7 @@ from app.schemas import inventario as schemas_inv
 
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 # helpers
 def _get_tipo_producto_or_404(
@@ -57,7 +64,7 @@ def _get_producto_or_404(id: int, db: Session = Depends(get_db)) -> models_inv.P
     "/tipos-producto",
     response_model=schemas_inv.TipoProductoOut,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_manage_permission)],
 )
 def create_tipo_producto(
     tipo_producto_in: schemas_inv.TipoProductoCreate,
@@ -101,7 +108,7 @@ def get_tipo_producto(
 @router.put(
     "/tipos-producto/{id}",
     response_model=schemas_inv.TipoProductoOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_manage_permission)],
 )
 def update_tipo_producto(
     id: int,
@@ -115,7 +122,7 @@ def update_tipo_producto(
 @router.delete(
     "/tipos-producto/{id}",
     response_model=schemas_inv.TipoProductoOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_manage_permission)],
 )
 def soft_delete_tipo_producto(
     db_obj: models_inv.TipoProducto = Depends(_get_tipo_producto_or_404),
@@ -131,7 +138,7 @@ def soft_delete_tipo_producto(
     "/unidades-medida",
     response_model=schemas_inv.UnidadMedidaOut,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_manage_permission)],
 )
 def create_unidad_medida(
     unidad_in: schemas_inv.UnidadMedidaCreate,
@@ -156,7 +163,7 @@ def list_unidades_medida(
 @router.get(
     "/unidades-medida/{id}",
     response_model=schemas_inv.UnidadMedidaOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_read_permission)],
 )
 def get_unidad_medida(
     db_obj: models_inv.UnidadMedida = Depends(_get_unidad_medida_or_404),
@@ -167,7 +174,7 @@ def get_unidad_medida(
 @router.put(
     "/unidades-medida/{id}",
     response_model=schemas_inv.UnidadMedidaOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_manage_permission)],
 )
 def update_unidad_medida(
     id: int,
@@ -181,7 +188,7 @@ def update_unidad_medida(
 @router.delete(
     "/unidades-medida/{id}",
     response_model=schemas_inv.UnidadMedidaOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_manage_permission)],
 )
 def soft_delete_unidad_medida(
     db_obj: models_inv.UnidadMedida = Depends(_get_unidad_medida_or_404),
@@ -197,7 +204,7 @@ def soft_delete_unidad_medida(
     "/proveedores",
     response_model=schemas_inv.ProveedorOut,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_supplier_permission)],
 )
 def create_proveedor(
     proveedor_in: schemas_inv.ProveedorCreate,
@@ -209,7 +216,7 @@ def create_proveedor(
 @router.get(
     "/proveedores",
     response_model=Page[schemas_inv.ProveedorOut],
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_read_permission)],
 )
 def list_proveedores(
     include_inactive: bool = False,
@@ -222,7 +229,7 @@ def list_proveedores(
 @router.get(
     "/proveedores/{id}",
     response_model=schemas_inv.ProveedorOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_read_permission)],
 )
 def get_proveedor(
     db_obj: models_inv.Proveedor = Depends(_get_proveedor_or_404),
@@ -233,7 +240,7 @@ def get_proveedor(
 @router.put(
     "/proveedores/{id}",
     response_model=schemas_inv.ProveedorOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_supplier_permission)],
 )
 def update_proveedor(
     id: int,
@@ -247,7 +254,7 @@ def update_proveedor(
 @router.delete(
     "/proveedores/{id}",
     response_model=schemas_inv.ProveedorOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_supplier_permission)],
 )
 def soft_delete_proveedor(
     db_obj: models_inv.Proveedor = Depends(_get_proveedor_or_404),
@@ -263,7 +270,7 @@ def soft_delete_proveedor(
     "/productos",
     response_model=schemas_inv.ProductoOut,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_product_permission)],
 )
 def create_producto(
     db: Session = Depends(get_db),
@@ -301,12 +308,14 @@ def create_producto(
         if public_id:
             try:
                 delete_from_cloudinary(public_id)
-                print(
-                    f"Rollback: Imagen {public_id} eliminada de Cloudinary tras error en BD"
+                logger.info(
+                    "Rollback de imagen en Cloudinary tras error en BD",
+                    extra={"public_id": public_id},
                 )
             except Exception as e_cloud:
-                print(
-                    f"ERROR CRÍTICO: No se pudo hacer rollback de imagen {public_id}: {e_cloud}"
+                logger.exception(
+                    "No se pudo hacer rollback de imagen en Cloudinary",
+                    extra={"public_id": public_id, "error": str(e_cloud)},
                 )
 
         raise e
@@ -341,7 +350,7 @@ def get_producto(
 @router.put(
     "/productos/{id}",
     response_model=schemas_inv.ProductoOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_product_permission)],
 )
 def update_producto(
     id: int,
@@ -355,7 +364,7 @@ def update_producto(
 @router.put(
     "/productos/{id}/imagen",
     response_model=schemas_inv.ProductoOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_product_permission)],
 )
 def update_producto_imagen(
     id: int,
@@ -394,8 +403,9 @@ def update_producto_imagen(
         try:
             delete_from_cloudinary(old_public_id)
         except Exception as e:
-            print(
-                f"ADVERTENCIA: No se pudo eliminar la imagen antigua {old_public_id}: {e}"
+            logger.warning(
+                "No se pudo eliminar la imagen antigua de Cloudinary",
+                extra={"public_id": old_public_id, "error": str(e)},
             )
 
     return db_producto_actualizado
@@ -404,7 +414,7 @@ def update_producto_imagen(
 @router.delete(
     "/productos/{id}",
     response_model=schemas_inv.ProductoOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_product_permission)],
 )
 def soft_delete_producto(
     db_obj: models_inv.Producto = Depends(_get_producto_or_404),
@@ -416,7 +426,7 @@ def soft_delete_producto(
 @router.delete(
     "/productos/{id}/imagen",
     response_model=schemas_inv.ProductoOut,
-    dependencies=[Depends(require_admin_user)],
+    dependencies=[Depends(require_inventory_create_product_permission)],
 )
 def delete_producto_imagen(
     id: int,
@@ -433,8 +443,9 @@ def delete_producto_imagen(
         try:
             delete_from_cloudinary(public_id_to_delete)
         except Exception as e:
-            print(
-                f"Advertencia: No se pudo eliminar de Cloudinary {public_id_to_delete}: {e}"
+            logger.warning(
+                "No se pudo eliminar imagen de Cloudinary",
+                extra={"public_id": public_id_to_delete, "error": str(e)},
             )
 
     return db_producto_actualizado

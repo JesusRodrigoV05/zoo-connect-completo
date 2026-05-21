@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from fastapi.concurrency import run_in_threadpool
+import logging
 
 from fastapi_pagination import add_pagination
 from app.core.config import settings
@@ -29,29 +30,31 @@ from app.api.v1 import (
     roles,
 )
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Iniciando ZooConnect API")
+    logger.info("Iniciando ZooConnect API")
 
-    print("Verificando datos semilla")
+    logger.info("Verificando datos semilla")
     await run_in_threadpool(init_db)
 
-    print("Verificando usuario administrador")
+    logger.info("Verificando usuario administrador")
     await run_in_threadpool(create_default_admin)
 
-    print("Iniciando Scheduler")
+    logger.info("Iniciando Scheduler")
     setup_scheduler()
 
-    print("Verificacion exitosa")
+    logger.info("Verificacion exitosa")
 
     yield
 
-    print("Apagando Zoocoonect")
+    logger.info("Apagando ZooConnect")
     if scheduler.running:
         scheduler.shutdown()
-        print("APScheduler detenido")
-    print("ZooConnect API detenida")
+        logger.info("APScheduler detenido")
+    logger.info("ZooConnect API detenida")
 
 
 app = FastAPI(
@@ -86,12 +89,12 @@ app.include_router(surveys.router, prefix="/zooconnect/surveys")
 app.include_router(trivia.router, prefix="/zooconnect/trivia", tags=["trivia"])
 app.include_router(favorite_animals.router, prefix="/zooconnect/favorite_animals")
 app.include_router(
-    vendp.router, prefix="/zooconnect/security", tags=["Seguridad 2fa:)"]
+    vendp.router, prefix="/zooconnect/security", tags=["Seguridad"]
 )
 app.include_router(
     inventario_admin.router,
     prefix="/zooconnect/inventario",
-    tags=["Poderoso inventario"],
+    tags=["Inventario"],
 )
 app.include_router(
     transacciones.router,
@@ -103,10 +106,10 @@ app.include_router(
 )
 app.include_router(tareas.router, prefix="/zooconnect/tareas", tags=["Tareas"])
 app.include_router(
-    veterinario.router, prefix="/zooconnect/veterinario", tags=["Cruz Roja"]
+    veterinario.router, prefix="/zooconnect/veterinario", tags=["Veterinario"]
 )
-app.include_router(dashboards.router, prefix="/zooconnect/dashboards", tags=["Jesus"])
-app.include_router(reportes.router, prefix="/zooconnect/reportes", tags=["VI"])
+app.include_router(dashboards.router, prefix="/zooconnect/dashboards", tags=["Dashboards"])
+app.include_router(reportes.router, prefix="/zooconnect/reportes", tags=["Reportes"])
 app.include_router(
     onboarding.router, prefix="/zooconnect/onboarding", tags=["Onboarding"]
 )

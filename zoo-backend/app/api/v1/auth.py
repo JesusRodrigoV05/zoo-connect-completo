@@ -10,6 +10,7 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
+import logging
 
 from app.db.session import get_db
 from app.schemas.user import (
@@ -72,6 +73,7 @@ from app.crud import permission as crud_permission
 from app.core.recaptcha import verify_recaptcha, is_valid_recaptcha
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("/public-key")
@@ -112,9 +114,13 @@ async def register(
     user_in: UserCreate,
     db: Session = Depends(get_db),
 ):
-    # 0. Verificar reCAPTCHA v2 (server-side) para creación de usuarios (si se envía token)
-    # Nota: reCAPTCHA es opcional - solo se verifica si se envía el token
-    if hasattr(user_in, "recaptcha_token") and user_in.recaptcha_token:
+    # 0. Verificar reCAPTCHA v2 server-side si esta requerido por entorno.
+    if settings.REQUIRE_RECAPTCHA and not user_in.recaptcha_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificacion de seguridad requerida.",
+        )
+    if user_in.recaptcha_token:
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(user_in.recaptcha_token, client_ip)
         if not is_valid_recaptcha(recaptcha_result):
@@ -158,8 +164,9 @@ async def register(
         )
     except Exception as e:
         # Log del error pero no bloqueamos el registro
-        print(
-            f"ADVERTENCIA: No se pudo enviar correo de verificación a {user.email}: {str(e)}"
+        logger.warning(
+            "No se pudo enviar correo de verificacion",
+            extra={"email": user.email, "error": str(e)},
         )
         # El usuario queda registrado pero sin verificar (puede reenviar después)
     except Exception as e:
@@ -208,7 +215,17 @@ async def login(
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
-    # 0. Verificar reCAPTCHA v2 (server-side) - solo si se envía token
+    # 0. Verificar reCAPTCHA v2 server-side si esta requerido por entorno.
+    if settings.REQUIRE_RECAPTCHA and not payload.recaptcha_token:
+        background_tasks.add_task(
+            crud_audit.create_audit_log,
+            event=AuditEvent.LOGIN_FAILURE,
+            attempted_email=payload.email,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificacion de seguridad requerida.",
+        )
     if payload.recaptcha_token:
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(payload.recaptcha_token, client_ip)

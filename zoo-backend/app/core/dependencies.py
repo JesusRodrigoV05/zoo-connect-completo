@@ -71,12 +71,56 @@ def require_animal_management_permission(current_user: User = Depends(get_curren
     return require_permission(PermissionCode.MANAGE_ANIMALS)(current_user=current_user, db=db)
 
 
+def require_animal_catalog_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.MANAGE_ANIMAL_CATALOG)(current_user=current_user, db=db)
+
+
+def require_animals_create_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.ANIMALS_CREATE_ANIMALS)(current_user=current_user, db=db)
+
+
+def require_species_create_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.ANIMALS_CREATE_SPECIES)(current_user=current_user, db=db)
+
+
+def require_habitats_create_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.ANIMALS_CREATE_HABITATS)(current_user=current_user, db=db)
+
+
 def require_task_management_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     return require_permission(PermissionCode.MANAGE_TASKS)(current_user=current_user, db=db)
 
 
+def require_task_config_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.TASKS_TYPES_CONFIG)(current_user=current_user, db=db)
+
+
+def require_task_planner_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.TASKS_ROUTINES_PLANNER)(current_user=current_user, db=db)
+
+
+def require_task_operations_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.TASKS_OPERATIONS_BOARD)(current_user=current_user, db=db)
+
+
 def require_inventory_read_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     return require_permission(PermissionCode.VIEW_INVENTORY)(current_user=current_user, db=db)
+
+
+def require_inventory_manage_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.MANAGE_INVENTORY)(current_user=current_user, db=db)
+
+
+def require_inventory_create_product_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.INVENTORY_CREATE_PRODUCT)(current_user=current_user, db=db)
+
+
+def require_inventory_create_supplier_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.INVENTORY_CREATE_SUPPLIER)(current_user=current_user, db=db)
+
+
+def require_inventory_movements_permission(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return require_permission(PermissionCode.INVENTORY_MOVEMENTS_HISTORY)(current_user=current_user, db=db)
 
 
 def require_veterinario(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
