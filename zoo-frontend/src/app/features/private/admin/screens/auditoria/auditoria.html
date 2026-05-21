@@ -1,4 +1,11 @@
 <zoo-main-container>
+  <header class="audit-page-header">
+    <div>
+      <h1>{{ title() }}</h1>
+      <p>{{ subtitle() }}</p>
+    </div>
+  </header>
+
   <p-dataview
     styleClass="tour-audit-dataview"
     [value]="auditorias()"
@@ -18,7 +25,7 @@
           <div class="audit-header">
             <p-tag
               styleClass="tour-audit-description"
-              [value]="item.event"
+              [value]="item.action || item.event"
               [severity]="getSeverity(item.event)"
             ></p-tag>
             @if(isFirst){
@@ -30,18 +37,30 @@
               (onClick)="startGuidedTour()"
             />
             }
-            <span class="audit-timestamp tour-audit-date"
-              >{{ item.timestamp | date : "medium" }}</span
-            >
+            <span class="audit-timestamp tour-audit-date">
+              {{ item.timestamp | date : "medium" }}
+            </span>
           </div>
           <div class="audit-body">
             <div class="audit-detail tour-audit-user">
               <strong>Usuario:</strong>
-              <span>{{ item.user.username }} ({{ item.user.email }})</span>
+              <span>
+                @if (item.user) {
+                  {{ item.user.username }} ({{ item.user.email }})
+                } @else {
+                  Sistema
+                }
+              </span>
             </div>
+            @if(item.detail) {
+            <div class="audit-detail">
+              <strong>Detalle:</strong>
+              <span>{{ item.detail }}</span>
+            </div>
+            }
             @if(item.attempted_email) {
             <div class="audit-detail">
-              <strong>Email Intentado:</strong>
+              <strong>Referencia:</strong>
               <span>{{ item.attempted_email }}</span>
             </div>
             }
@@ -49,7 +68,7 @@
         </div>
         } @empty {
         <div class="empty-message">
-          <span>No se encontraron registros de auditoría.</span>
+          <span>No se encontraron registros.</span>
         </div>
         }
       </div>

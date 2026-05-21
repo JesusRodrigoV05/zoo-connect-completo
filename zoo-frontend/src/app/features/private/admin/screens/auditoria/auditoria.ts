@@ -7,8 +7,8 @@ import {
   signal,
 } from '@angular/core';
 import { AuditoriaService } from '../../services/auditoria';
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { DataViewModule, DataViewLazyLoadEvent, DataViewPageEvent } from 'primeng/dataview';
+import { DatePipe } from '@angular/common';
+import { DataViewModule, DataViewPageEvent } from 'primeng/dataview';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { PaginatedResponse } from '@models/common';
@@ -17,6 +17,8 @@ import { startWith, switchMap, tap } from 'rxjs';
 import { MainContainer } from '@app/shared/components/main-container';
 import { ButtonModule } from 'primeng/button';
 import { OnboardingService } from '@app/shared/services/onboarding.service';
+import { ActivatedRoute } from '@angular/router';
+import { Auditoria as AuditoriaModel } from '@models/auditoria';
 
 @Component({
   selector: 'app-auditoria',
@@ -35,12 +37,24 @@ import { OnboardingService } from '@app/shared/services/onboarding.service';
 export default class Auditoria {
   protected auditService = inject(AuditoriaService);
   private readonly onboarding = inject(OnboardingService);
+  private readonly route = inject(ActivatedRoute);
   private tourPrompted = false;
+  protected readonly logType = signal<"application" | "security">(
+    this.route.snapshot.data["logType"] === "application" ? "application" : "security",
+  );
+  protected readonly title = computed(() =>
+    this.logType() === "security" ? "Log de Seguridad OSI" : "Log de Aplicación",
+  );
+  protected readonly subtitle = computed(() =>
+    this.logType() === "security"
+      ? "Eventos de autenticación, 2FA y cambios de permisos."
+      : "Eventos funcionales y operativos de la aplicación.",
+  );
 
   protected isLoading = signal(true);
   protected paginationState = signal<DataViewPageEvent>({ first: 0, rows: 10 });
 
-  private initialResponse: PaginatedResponse<Auditoria> = {
+  private initialResponse: PaginatedResponse<AuditoriaModel> = {
     items: [],
     total: 0,
     page: 1,
@@ -51,7 +65,11 @@ export default class Auditoria {
   private auditoriaResponse$ = toObservable(this.paginationState).pipe(
     tap(() => this.isLoading.set(true)),
     switchMap((state) =>
-      this.auditService.getAuditLogs(state.first / state.rows + 1, state.rows)
+      this.auditService.getAuditLogs(
+        state.first / state.rows + 1,
+        state.rows,
+        this.logType(),
+      )
     ),
     tap(() => this.isLoading.set(false)),
     startWith(this.initialResponse)
@@ -80,10 +98,10 @@ export default class Auditoria {
   }
 
   protected getSeverity(event: string): 'success' | 'info' | 'warn' | 'danger' {
-    if (event.includes('LOGIN_SUCCESS')) return 'success';
-    if (event.includes('LOGIN_FAILED')) return 'danger';
-    if (event.includes('CREATE')) return 'info';
-    if (event.includes('DELETE')) return 'warn';
+    if (event.includes('login_exitoso')) return 'success';
+    if (event.includes('login_fallido')) return 'danger';
+    if (event.includes('created')) return 'info';
+    if (event.includes('deleted')) return 'warn';
     return 'info';
   }
 

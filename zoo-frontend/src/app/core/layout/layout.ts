@@ -235,22 +235,22 @@ export default class Layout {
     if (this.hasPermission('access_audit_assistant')) {
       const children: NavigationItem[] = [
         this.hasPermission('audit_application_logs') && {
-          text: 'Registros de Aplicación',
+          text: 'Log de Aplicación',
           icon: 'pi pi-database',
-          route: '/admin/audit',
+          route: '/admin/audit/aplicacion',
         },
-        this.hasPermission('audit_user_logs') && {
-          text: 'Registros de Usuario',
-          icon: 'pi pi-user',
-          route: '/admin/audit',
+        this.hasPermission('audit_security_logs') && {
+          text: 'Log de Seguridad OSI',
+          icon: 'pi pi-shield',
+          route: '/admin/audit/seguridad',
         },
       ].filter(Boolean) as NavigationItem[];
 
       if (children.length) {
         items.push({
-          text: 'Auxiliar Auditoría',
+          text: 'Auditoría',
           icon: 'pi pi-history',
-          route: this.firstAllowedRoute(children, '/admin/audit'),
+          route: this.firstAllowedRoute(children, '/admin/audit/seguridad'),
           children,
         });
       }

@@ -11,17 +11,18 @@ import { Observable } from "rxjs";
 export class AuditoriaService {
   private http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
-  private readonly auditUrl = `${this.apiUrl}/admin_users/audit-logs`;
+  private readonly auditUrl = `${this.apiUrl}/audit`;
 
   getAuditLogs(
     page: number,
-    size: number
+    size: number,
+    type: "application" | "security" = "security",
   ): Observable<PaginatedResponse<Auditoria>> {
     const params = new HttpParams()
       .set("page", page.toString())
       .set("size", size.toString());
 
-    return this.http.get<PaginatedResponse<Auditoria>>(this.auditUrl, {
+    return this.http.get<PaginatedResponse<Auditoria>>(`${this.auditUrl}/${type}`, {
       params,
     });
   }

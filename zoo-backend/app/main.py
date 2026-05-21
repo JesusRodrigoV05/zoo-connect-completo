@@ -28,6 +28,7 @@ from app.api.v1 import (
     onboarding,
     permissions,
     roles,
+    audit_logs,
 )
 
 logger = logging.getLogger(__name__)
@@ -84,6 +85,7 @@ app.include_router(
     tags=["permissions"],
 )
 app.include_router(roles.router, prefix="/zooconnect/admin_roles", tags=["roles"])
+app.include_router(audit_logs.router, prefix="/zooconnect/audit", tags=["audit"])
 app.include_router(animals.router, prefix="/zooconnect/animals")
 app.include_router(surveys.router, prefix="/zooconnect/surveys")
 app.include_router(trivia.router, prefix="/zooconnect/trivia", tags=["trivia"])

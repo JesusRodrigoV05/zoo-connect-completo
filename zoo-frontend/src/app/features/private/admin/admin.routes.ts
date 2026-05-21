@@ -177,8 +177,19 @@ export default [
   },
   {
     path: "audit",
-    title: "Auditoría",
-    data: { requiredPermissions: ["view_audit_logs"] },
+    redirectTo: "audit/seguridad",
+    pathMatch: "full",
+  },
+  {
+    path: "audit/aplicacion",
+    title: "Log de Aplicación",
+    data: { requiredPermissions: ["audit_application_logs"], logType: "application" },
+    loadComponent: () => import("./screens/auditoria/auditoria"),
+  },
+  {
+    path: "audit/seguridad",
+    title: "Log de Seguridad OSI",
+    data: { requiredPermissions: ["audit_security_logs"], logType: "security" },
     loadComponent: () => import("./screens/auditoria/auditoria"),
   },
   {
@@ -188,35 +199,31 @@ export default [
     loadComponent: () => import("./screens/gestion-permisos/gestion-permisos"),
   },
   {
+    path: "roles/crear",
+    title: "Crear Rol",
+    data: { requiredPermissions: ["manage_permissions"] },
+    loadComponent: () =>
+      import("./screens/gestion-roles/components/crear-rol/crear-rol"),
+  },
+  {
+    path: "roles/editar/:id",
+    title: "Editar Rol",
+    data: { requiredPermissions: ["manage_permissions"] },
+    loadComponent: () =>
+      import("./screens/gestion-roles/components/crear-rol/crear-rol"),
+  },
+  {
+    path: "roles/permisos/:id",
+    title: "Permisos del Rol",
+    data: { requiredPermissions: ["manage_permissions"] },
+    loadComponent: () =>
+      import("./screens/gestion-roles/components/editar-permisos/editar-permisos"),
+  },
+  {
     path: "roles",
     title: "Gestión de Roles",
     data: { requiredPermissions: ["manage_permissions"] },
     loadComponent: () => import("./screens/gestion-roles/gestion-roles"),
-    children: [
-      {
-        path: "crear",
-        title: "Crear Rol",
-        loadComponent: () =>
-          import("./screens/gestion-roles/components/crear-rol/crear-rol"),
-      },
-      {
-        path: "editar/:id",
-        title: "Editar Rol",
-        loadComponent: () =>
-          import("./screens/gestion-roles/components/crear-rol/crear-rol"),
-      },
-      {
-        path: "permisos/:id",
-        title: "Permisos del Rol",
-        loadComponent: () =>
-          import("./screens/gestion-roles/components/editar-permisos/editar-permisos"),
-      },
-      {
-        path: "",
-        redirectTo: "lista",
-        pathMatch: "full",
-      },
-    ],
   },
   {
     path: "inventario",

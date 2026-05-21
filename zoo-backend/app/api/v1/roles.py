@@ -7,12 +7,13 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_active_user, require_permission
-from app.core.enums import PermissionCode
+from app.core.enums import AuditLogType, PermissionCode
 from app.crud import audit as crud_audit
 from app.crud import permission as crud_permission
 from app.crud import role as crud_role
 from app.db.session import get_db
 from app.models.role import Role
+from app.models.role_permission import RolePermission
 from app.models.user import User
 from app.schemas.role import (
     RoleCreate,
@@ -55,6 +56,9 @@ def create_role(
         role = crud_role.create_role(db, role_in)
         crud_audit.create_audit_log(
             event="role_created",
+            log_type=AuditLogType.APPLICATION,
+            action="Crear rol",
+            detail=f"Se creó el rol {role.name}",
             user_id=current_user.id,
             attempted_email=role.name,
         )
@@ -87,6 +91,9 @@ def update_role(
 
     crud_audit.create_audit_log(
         event="role_updated",
+        log_type=AuditLogType.APPLICATION,
+        action="Actualizar rol",
+        detail=f"Se actualizó el rol {role.name}",
         user_id=current_user.id,
         attempted_email=role.name,
     )
@@ -109,6 +116,9 @@ def delete_role(
 
         crud_audit.create_audit_log(
             event="role_deleted",
+            log_type=AuditLogType.APPLICATION,
+            action="Eliminar rol",
+            detail=f"Se eliminó el rol {role.name}",
             user_id=current_user.id,
             attempted_email=role.name,
         )
@@ -144,6 +154,9 @@ def update_role_permissions(
 
     crud_audit.create_audit_log(
         event="role_permissions_updated",
+        log_type=AuditLogType.SECURITY,
+        action="Actualizar permisos de rol",
+        detail=f"Se actualizaron los permisos del rol {role.name}",
         user_id=current_user.id,
         attempted_email=role.name,
     )
@@ -153,7 +166,10 @@ def update_role_permissions(
 
 def _build_role_item(db: Session, role: Role) -> RoleItem:
     user_count = db.query(User).filter(User.role_id == role.id).count()
-    has_custom = db.query(Role).filter(Role.id == role.id).first() is not None
+    has_custom = (
+        db.query(RolePermission).filter(RolePermission.role_id == role.id).first()
+        is not None
+    )
 
     return RoleItem(
         id=role.id,

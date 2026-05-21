@@ -91,9 +91,9 @@ export default class CrearRol {
           finalize(() => this.saving.set(false)),
         )
         .subscribe({
-          next: () => {
-            this.toast.showSuccess("Éxito", "Rol creado correctamente");
-            this.router.navigate(["/admin/roles"]);
+          next: (role) => {
+            this.toast.showSuccess("Éxito", "Rol creado correctamente. Asigne sus accesos.");
+            this.router.navigate(["/admin/roles/permisos", role.id]);
           },
           error: (err: HttpErrorResponse) => {
             this.toast.showError("Error", err.message || "No se pudo crear el rol");

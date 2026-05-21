@@ -50,14 +50,18 @@ DEFAULT_PERMISSIONS = [
     {"code": PermissionCode.ACCESS_SURVEYS_MANAGEMENT.value, "name": "Gestión de Encuestas", "description": "Habilita el grupo de gestión de encuestas en el menú.", "module": "encuestas"},
     {"code": PermissionCode.SURVEYS_LIST.value, "name": "Lista", "description": "Acceso a la lista de encuestas.", "module": "encuestas"},
     {"code": PermissionCode.SURVEYS_CREATE.value, "name": "Crear Encuesta", "description": "Acceso al formulario de creación de encuestas.", "module": "encuestas"},
-    {"code": PermissionCode.ACCESS_AUDIT_ASSISTANT.value, "name": "Auxiliar Auditoría", "description": "Habilita el grupo de auditoría en el menú.", "module": "admin"},
-    {"code": PermissionCode.AUDIT_APPLICATION_LOGS.value, "name": "Registros de Aplicación", "description": "Acceso a registros de aplicación.", "module": "admin"},
-    {"code": PermissionCode.AUDIT_USER_LOGS.value, "name": "Registros de Usuario", "description": "Acceso a registros de usuario.", "module": "admin"},
+    {"code": PermissionCode.ACCESS_AUDIT_ASSISTANT.value, "name": "Auditoría", "description": "Habilita el grupo de auditoría en el menú.", "module": "admin"},
+    {"code": PermissionCode.AUDIT_APPLICATION_LOGS.value, "name": "Log de Aplicación", "description": "Acceso a registros funcionales y operativos de la aplicación.", "module": "admin"},
+    {"code": PermissionCode.AUDIT_SECURITY_LOGS.value, "name": "Log de Seguridad OSI", "description": "Acceso OSI a eventos de seguridad, autenticación y cambios de permisos.", "module": "admin"},
     {"code": PermissionCode.CAREGIVER_MY_TASKS.value, "name": "Mis tareas (Cuidador)", "description": "Acceso a tareas asignadas del cuidador.", "module": "cuidador"},
     {"code": PermissionCode.MEDICAL_MY_TASKS.value, "name": "Mis Tareas (Médico)", "description": "Acceso a tareas asignadas del médico.", "module": "veterinario"},
     {"code": PermissionCode.MEDICAL_DIETS.value, "name": "Gestión de Dietas", "description": "Acceso a gestión de dietas.", "module": "veterinario"},
     {"code": PermissionCode.MEDICAL_CLINICAL_RECORDS.value, "name": "Historiales Clínicos", "description": "Acceso a historiales clínicos.", "module": "veterinario"},
 ]
+
+DEPRECATED_PERMISSION_CODES = {
+    PermissionCode.AUDIT_USER_LOGS.value,
+}
 
 
 def ensure_permissions_catalog(db: Session) -> List[Permission]:
@@ -68,19 +72,41 @@ def ensure_permissions_catalog(db: Session) -> List[Permission]:
             permission = Permission(**permission_data)
             db.add(permission)
             db.flush()
+        else:
+            permission.name = permission_data["name"]
+            permission.description = permission_data["description"]
+            permission.module = permission_data["module"]
+            permission.is_active = True
         permissions.append(permission)
+
+    if DEPRECATED_PERMISSION_CODES:
+        (
+            db.query(Permission)
+            .filter(Permission.code.in_(DEPRECATED_PERMISSION_CODES))
+            .update({"is_active": False}, synchronize_session=False)
+        )
     db.commit()
     return permissions
 
 
 def ensure_role_permissions(db: Session) -> None:
-    permissions_by_code = {permission.code: permission for permission in db.query(Permission).all()}
+    permissions_by_code = {
+        permission.code: permission
+        for permission in db.query(Permission).filter(Permission.is_active.is_(True)).all()
+    }
     role_by_name = {role.name: role for role in db.query(Role).all()}
     all_permission_codes = list(permissions_by_code.keys())
 
     role_permissions_map = {
         "administrador": all_permission_codes,
-        "osi": [PermissionCode.MANAGE_USERS.value, PermissionCode.MANAGE_PERMISSIONS.value, PermissionCode.VIEW_AUDIT_LOGS.value, PermissionCode.VIEW_ADMIN_DASHBOARD.value],
+        "osi": [
+            PermissionCode.MANAGE_USERS.value,
+            PermissionCode.MANAGE_PERMISSIONS.value,
+            PermissionCode.ACCESS_AUDIT_ASSISTANT.value,
+            PermissionCode.AUDIT_SECURITY_LOGS.value,
+            PermissionCode.VIEW_AUDIT_LOGS.value,
+            PermissionCode.VIEW_ADMIN_DASHBOARD.value,
+        ],
         "veterinario": [
             PermissionCode.MANAGE_VETERINARY_MODULE.value,
             PermissionCode.MEDICAL_MY_TASKS.value,

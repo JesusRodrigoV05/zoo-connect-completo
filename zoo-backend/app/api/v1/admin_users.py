@@ -6,7 +6,7 @@ from app.db.session import get_db
 from app.crud import user as crud_user
 from app.schemas.user import UserOut, AdminUserCreate, AdminUserUpdate
 from app.core.dependencies import require_permission
-from app.core.enums import PermissionCode
+from app.core.enums import AuditLogType, PermissionCode
 
 # pagination
 from fastapi_pagination import Page, Params
@@ -104,11 +104,13 @@ def admin_delete_user(user_id: int, db: Session = Depends(get_db)):
 @router.get(
     "/audit-logs",
     response_model=Page[AuditLogOut],
-    dependencies=[Depends(require_permission(PermissionCode.VIEW_AUDIT_LOGS))],
+    dependencies=[Depends(require_permission(PermissionCode.AUDIT_SECURITY_LOGS))],
     summary="Obtener logs de auditoria de autenticacion",
 )
 def get_audit_logs(db: Session = Depends(get_db)):
-    return paginate(crud_audit.get_audit_logs_query(db=db))
+    return paginate(
+        crud_audit.get_audit_logs_by_type_query(db=db, log_type=AuditLogType.SECURITY)
+    )
 @router.get(
     "/users/{user_id}/password-history",
     response_model=List[PasswordHistoryOut],

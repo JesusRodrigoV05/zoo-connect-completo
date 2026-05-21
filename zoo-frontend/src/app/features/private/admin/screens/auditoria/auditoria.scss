@@ -2,6 +2,22 @@
   display: block;
 }
 
+.audit-page-header {
+  margin-bottom: 1rem;
+
+  h1 {
+    margin: 0;
+    color: var(--p-text-color);
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: var(--p-text-muted-color);
+  }
+}
+
 .audit-list-container {
   display: flex;
   flex-direction: column;

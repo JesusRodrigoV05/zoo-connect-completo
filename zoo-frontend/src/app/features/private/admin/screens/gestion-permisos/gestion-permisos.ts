@@ -93,8 +93,8 @@ const ACCESS_GROUPS: AccessGroup[] = [
     label: "Auxiliar Auditoría",
     headerPermissionCodes: ["access_audit_assistant", "view_audit_logs"],
     children: [
-      { key: "app-logs", label: "Registros de Aplicación", permissionCodes: ["audit_application_logs"] },
-      { key: "user-logs", label: "Registros de Usuario", permissionCodes: ["audit_user_logs"] },
+      { key: "app-logs", label: "Log de Aplicación", permissionCodes: ["audit_application_logs"] },
+      { key: "security-logs", label: "Log de Seguridad OSI", permissionCodes: ["audit_security_logs"] },
     ],
   },
 ];

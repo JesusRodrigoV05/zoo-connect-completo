@@ -48,6 +48,7 @@ class PermissionCode(str, Enum):
     SURVEYS_CREATE = "surveys_create"
     ACCESS_AUDIT_ASSISTANT = "access_audit_assistant"
     AUDIT_APPLICATION_LOGS = "audit_application_logs"
+    AUDIT_SECURITY_LOGS = "audit_security_logs"
     AUDIT_USER_LOGS = "audit_user_logs"
     CAREGIVER_MY_TASKS = "caregiver_my_tasks"
     MEDICAL_MY_TASKS = "medical_my_tasks"
@@ -72,3 +73,8 @@ class AuditEvent(str, Enum):
     ROLE_UPDATED = "role_updated"
     ROLE_DELETED = "role_deleted"
     ROLE_PERMISSIONS_UPDATED = "role_permissions_updated"
+
+
+class AuditLogType(str, Enum):
+    APPLICATION = "application"
+    SECURITY = "security"

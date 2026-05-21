@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_active_user, require_permission
-from app.core.enums import AuditEvent, PermissionCode
+from app.core.enums import AuditEvent, AuditLogType, PermissionCode
 from app.crud import audit as crud_audit
 from app.crud import permission as crud_permission
 from app.db.session import get_db
@@ -107,6 +107,9 @@ def update_user_permissions(
 
     crud_audit.create_audit_log(
         event=AuditEvent.PERMISSION_UPDATE,
+        log_type=AuditLogType.SECURITY,
+        action="Actualizar permisos de usuario",
+        detail=f"Se actualizaron permisos específicos del usuario {updated_user.email}",
         user_id=current_user.id,
         attempted_email=updated_user.email,
     )
