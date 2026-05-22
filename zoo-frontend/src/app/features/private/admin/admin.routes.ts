@@ -194,7 +194,7 @@ export default [
   },
   {
     path: "permisos",
-    title: "Permisos OSI",
+    title: "Matriz de Roles",
     data: { requiredPermissions: ["manage_permissions"] },
     loadComponent: () => import("./screens/gestion-permisos/gestion-permisos"),
   },
@@ -221,7 +221,7 @@ export default [
   },
   {
     path: "roles",
-    title: "Gestión de Roles",
+    title: "Roles",
     data: { requiredPermissions: ["manage_permissions"] },
     loadComponent: () => import("./screens/gestion-roles/gestion-roles"),
   },

@@ -72,17 +72,15 @@ export default class GestionRoles {
     this.loadRoles();
   }
 
-  protected onPageChange(newPage: number): void {
-    this.page.set(newPage);
+  protected onPageChange(event: { first?: number; rows?: number }): void {
+    const rows = event.rows ?? this.pageSize();
+    this.pageSize.set(rows);
+    this.page.set(Math.floor((event.first ?? 0) / rows) + 1);
     this.loadRoles();
   }
 
   protected goToEdit(roleId: number): void {
     this.router.navigate(["/admin/roles/editar", roleId]);
-  }
-
-  protected goToPermissions(roleId: number): void {
-    this.router.navigate(["/admin/roles/permisos", roleId]);
   }
 
   protected createRole(): void {

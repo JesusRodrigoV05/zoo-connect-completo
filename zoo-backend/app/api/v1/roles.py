@@ -1,9 +1,9 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
-from fastapi_pagination import Page
+from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_active_user, require_permission
@@ -31,14 +31,18 @@ router = APIRouter(
 @router.get("", response_model=Page[RoleItem])
 def list_roles(
     search: Optional[str] = Query(None, description="Buscar por nombre de rol"),
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    query = db.query(Role)
+    query = db.query(Role).order_by(Role.id)
 
     if search:
         query = query.filter(Role.name.ilike(f"%{search}%"))
 
-    return paginate(query)
+    roles_page = paginate(query, Params(page=page, size=size))
+    roles_page.items = [_build_role_item(db, role) for role in roles_page.items]
+    return roles_page
 
 
 @router.get("/permissions/catalog")
@@ -54,7 +58,7 @@ def create_role(
 ):
     try:
         role = crud_role.create_role(db, role_in)
-        crud_audit.create_audit_log(
+        _safe_create_audit_log(
             event="role_created",
             log_type=AuditLogType.APPLICATION,
             action="Crear rol",
@@ -65,6 +69,21 @@ def create_role(
         return _build_role_item(db, role)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        db.rollback()
+        print(f"ERROR de integridad creando rol: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="No se pudo crear el rol por una restricción de base de datos",
+        )
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"ERROR creando rol: {e}")
+        raise HTTPException(status_code=500, detail="No se pudo crear el rol")
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR inesperado creando rol: {e}")
+        raise HTTPException(status_code=500, detail="No se pudo crear el rol")
 
 
 @router.get("/{role_id}", response_model=RoleDetail)
@@ -85,11 +104,14 @@ def update_role(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    role = crud_role.update_role(db, role_id, role_in)
-    if not role:
-        raise HTTPException(status_code=404, detail="Rol no encontrado")
+    try:
+        role = crud_role.update_role(db, role_id, role_in)
+        if not role:
+            raise HTTPException(status_code=404, detail="Rol no encontrado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    crud_audit.create_audit_log(
+    _safe_create_audit_log(
         event="role_updated",
         log_type=AuditLogType.APPLICATION,
         action="Actualizar rol",
@@ -114,7 +136,7 @@ def delete_role(
 
         crud_role.delete_role(db, role_id)
 
-        crud_audit.create_audit_log(
+        _safe_create_audit_log(
             event="role_deleted",
             log_type=AuditLogType.APPLICATION,
             action="Eliminar rol",
@@ -152,7 +174,7 @@ def update_role_permissions(
         permissions_payload=[item.model_dump() for item in payload],
     )
 
-    crud_audit.create_audit_log(
+    _safe_create_audit_log(
         event="role_permissions_updated",
         log_type=AuditLogType.SECURITY,
         action="Actualizar permisos de rol",
@@ -162,6 +184,13 @@ def update_role_permissions(
     )
 
     return _build_role_detail(db, role)
+
+
+def _safe_create_audit_log(**kwargs) -> None:
+    try:
+        crud_audit.create_audit_log(**kwargs)
+    except Exception as exc:
+        print(f"ERROR registrando auditoría de roles: {exc}")
 
 
 def _build_role_item(db: Session, role: Role) -> RoleItem:

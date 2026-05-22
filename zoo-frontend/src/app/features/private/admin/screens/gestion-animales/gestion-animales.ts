@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component  } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MenuButton } from '../../models';
 import { ButtonModule } from 'primeng/button';
@@ -30,6 +30,7 @@ export default class GestionAnimales {
       ruta: `${this.rutaEspecies}/lista`,
       icono: 'pi pi-list',
       descripcion: 'Ver todas las especies registradas',
+      permisos: ['animals_list_species'],
       exacto: true,
     },
     {
@@ -37,6 +38,7 @@ export default class GestionAnimales {
       ruta: `${this.rutaEspecies}/crear`,
       icono: 'pi pi-plus',
       descripcion: 'Crear una nueva especie',
+      permisos: ['animals_create_species'],
       exacto: false,
     },
     {
@@ -44,6 +46,7 @@ export default class GestionAnimales {
       ruta: `${this.rutaHabitats}/lista`,
       icono: 'pi pi-map-marker',
       descripcion: 'Ver todos los hábitats',
+      permisos: ['animals_list_habitats'],
       exacto: true,
     },
     {
@@ -51,6 +54,7 @@ export default class GestionAnimales {
       ruta: `${this.rutaHabitats}/crear`,
       icono: 'pi pi-image',
       descripcion: 'Crear un nuevo hábitat',
+      permisos: ['animals_create_habitats'],
       exacto: false,
     },
     {
@@ -58,6 +62,7 @@ export default class GestionAnimales {
       ruta: `${this.rutaAdmin}/lista`,
       icono: 'pi pi-users',
       descripcion: 'Ver y gestionar todos los animales',
+      permisos: ['animals_list_animals'],
       exacto: true,
     },
     {
@@ -65,6 +70,7 @@ export default class GestionAnimales {
       ruta: `${this.rutaAdmin}/crear`,
       icono: 'pi pi-plus-circle',
       descripcion: 'Registrar un nuevo animal',
+      permisos: ['animals_create_animals'],
       exacto: false,
     },
   ];

@@ -21,14 +21,16 @@
         pTooltip="Recargar"
         styleClass="tour-especies-reload-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Registrar Especie"
-        [rounded]="true"
-        severity="primary"
-        (onClick)="navigateToCreate()"
-        styleClass="tour-especies-register-btn"
-      />
+      @if (canCreateSpecies()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Registrar Especie"
+          [rounded]="true"
+          severity="primary"
+          (onClick)="navigateToCreate()"
+          styleClass="tour-especies-register-btn"
+        />
+      }
     </div>
   </div>
 
@@ -101,13 +103,15 @@
       } @empty {
       <div class="empty-state">
         <p>No hay especies disponibles.</p>
-        <p-button
-          icon="pi pi-plus"
-          label="Registrar Primera Especie"
-          [rounded]="true"
-          severity="primary"
-          (onClick)="navigateToCreate()"
-        />
+        @if (canCreateSpecies()) {
+          <p-button
+            icon="pi pi-plus"
+            label="Registrar Primera Especie"
+            [rounded]="true"
+            severity="primary"
+            (onClick)="navigateToCreate()"
+          />
+        }
       </div>
       }
     </ng-template>

@@ -60,16 +60,20 @@ export default class CrearRol {
   }
 
   protected save(): void {
-    if (!this.roleName().trim()) {
+    const roleName = this.roleName().trim();
+
+    if (!roleName) {
       this.toast.showError("Error", "El nombre del rol es requerido");
       return;
     }
+
+    this.roleName.set(roleName);
 
     this.saving.set(true);
 
     if (this.isEditMode() && this.roleId()) {
       this.service
-        .updateRole(this.roleId()!, this.roleName())
+        .updateRole(this.roleId()!, roleName)
         .pipe(
           takeUntilDestroyed(this.destroyRef),
           finalize(() => this.saving.set(false)),
@@ -85,7 +89,7 @@ export default class CrearRol {
         });
     } else {
       this.service
-        .createRole(this.roleName())
+        .createRole(roleName)
         .pipe(
           takeUntilDestroyed(this.destroyRef),
           finalize(() => this.saving.set(false)),

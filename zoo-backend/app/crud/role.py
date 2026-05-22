@@ -1,6 +1,7 @@
 from typing import List, Optional
 
-from sqlalchemy import func
+from sqlalchemy import func, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.enums import UserRole
@@ -87,16 +88,33 @@ def _build_role_detail(db: Session, role: Role) -> RoleDetail:
 
 
 def create_role(db: Session, role_in: RoleCreate) -> Role:
-    existing = get_role_by_name(db, role_in.name)
+    role_name = role_in.name.strip()
+    if not role_name:
+        raise ValueError("El nombre del rol es requerido")
+
+    existing = get_role_by_name(db, role_name)
     if existing:
-        raise ValueError(f"El rol '{role_in.name}' ya existe")
+        raise ValueError(f"El rol '{role_name}' ya existe")
 
-    if role_in.name.lower() in [r.value.lower() for r in UserRole]:
-        raise ValueError(f"El nombre '{role_in.name}' esta reservado para el sistema")
+    if role_name.lower() in [r.value.lower() for r in UserRole]:
+        raise ValueError(f"El nombre '{role_name}' esta reservado para el sistema")
 
-    role = Role(name=role_in.name)
+    _sync_role_id_sequence(db)
+    role = Role(name=role_name)
     db.add(role)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        existing = get_role_by_name(db, role_name)
+        if existing:
+            raise ValueError(f"El rol '{role_name}' ya existe") from exc
+
+        _sync_role_id_sequence(db)
+        role = Role(name=role_name)
+        db.add(role)
+        db.commit()
+
     db.refresh(role)
     return role
 
@@ -107,16 +125,20 @@ def update_role(db: Session, role_id: int, role_in: RoleUpdate) -> Optional[Role
         return None
 
     if role_in.name is not None:
-        existing = get_role_by_name(db, role_in.name)
-        if existing and existing.id != role_id:
-            raise ValueError(f"El rol '{role_in.name}' ya existe")
+        role_name = role_in.name.strip()
+        if not role_name:
+            raise ValueError("El nombre del rol es requerido")
 
-        if role_in.name.lower() in [r.value.lower() for r in UserRole]:
+        existing = get_role_by_name(db, role_name)
+        if existing and existing.id != role_id:
+            raise ValueError(f"El rol '{role_name}' ya existe")
+
+        if role_name.lower() in [r.value.lower() for r in UserRole]:
             raise ValueError(
-                f"El nombre '{role_in.name}' esta reservado para el sistema"
+                f"El nombre '{role_name}' esta reservado para el sistema"
             )
 
-        role.name = role_in.name
+        role.name = role_name
 
     db.commit()
     db.refresh(role)
@@ -184,3 +206,18 @@ def replace_role_permissions(
 
     db.commit()
     return get_role_with_permissions(db, role_id)
+
+
+def _sync_role_id_sequence(db: Session) -> None:
+    if db.bind and db.bind.dialect.name == "postgresql":
+        db.execute(
+            text(
+                """
+                SELECT setval(
+                    pg_get_serial_sequence('roles', 'id'),
+                    COALESCE((SELECT MAX(id) FROM roles), 0) + 1,
+                    false
+                )
+                """
+            )
+        )

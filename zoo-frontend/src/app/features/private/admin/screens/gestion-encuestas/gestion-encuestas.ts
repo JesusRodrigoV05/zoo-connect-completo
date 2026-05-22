@@ -34,6 +34,7 @@ export default class GestionEncuestas {
       texto: "Lista",
       descripcion: "Ver y gestionar todas las encuestas creadas.",
       ruta: "/admin/encuestas/",
+      permisos: ["surveys_list"],
       exacto: true,
     },
     {
@@ -41,6 +42,7 @@ export default class GestionEncuestas {
       texto: "Crear Encuesta",
       descripcion: "Diseñar una nueva encuesta desde cero.",
       ruta: "/admin/encuestas/crear",
+      permisos: ["surveys_create"],
     },
   ]);
 }

@@ -2,6 +2,7 @@ import {
   afterNextRender,
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   effect,
   inject,
@@ -27,6 +28,7 @@ import { FormsModule } from "@angular/forms";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { NgClass } from "@angular/common";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "app-lista-especies",
@@ -54,6 +56,7 @@ export default class ListaEspecies {
   private readonly toastService = inject(ShowToast);
   private confirmation = inject(ZooConfirmationService);
   private readonly onboarding = inject(OnboardingService);
+  private readonly authStore = inject(AuthStore);
 
   protected readonly currentPage = signal(1);
   protected readonly pageSize = signal(10);
@@ -67,6 +70,9 @@ export default class ListaEspecies {
   protected readonly idDetalleSeleccionado = signal<number | null>(null);
   protected readonly layout = signal<"list" | "grid">("list");
   protected readonly options: ("list" | "grid")[] = ["list", "grid"];
+  protected readonly canCreateSpecies = computed(() =>
+    this.authStore.hasPermission("animals_create_species"),
+  );
 
   constructor() {
     afterNextRender(() => {

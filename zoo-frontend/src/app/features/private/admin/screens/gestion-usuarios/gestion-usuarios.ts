@@ -28,6 +28,7 @@ export default class GestionUsuarios {
       texto: 'Crear Usuario',
       descripcion: 'Agregar nuevo usuario al sistema',
       ruta: '/admin/usuarios/crear',
+      permisos: ['users_create'],
       exacto: false,
     },
     {
@@ -35,6 +36,7 @@ export default class GestionUsuarios {
       texto: 'Lista de Usuarios',
       descripcion: 'Ver y gestionar usuarios existentes',
       ruta: '/admin/usuarios',
+      permisos: ['users_list'],
       exacto: true,
     },
   ];

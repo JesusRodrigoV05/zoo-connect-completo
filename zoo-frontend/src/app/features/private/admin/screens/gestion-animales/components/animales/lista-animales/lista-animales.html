@@ -21,14 +21,16 @@
         pTooltip="Recargar"
         styleClass="tour-animales-reload-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Registrar Animal"
-        [rounded]="true"
-        severity="primary"
-        routerLink="/admin/animales/crear"
-        styleClass="tour-animales-register-btn"
-      />
+      @if (canCreateAnimals()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Registrar Animal"
+          [rounded]="true"
+          severity="primary"
+          routerLink="/admin/animales/crear"
+          styleClass="tour-animales-register-btn"
+        />
+      }
     </div>
   </div>
 
@@ -111,13 +113,15 @@
     <ng-template #empty>
       <div class="empty-state">
         <p>No hay animales disponibles.</p>
-        <p-button
-          icon="pi pi-plus"
-          label="Registrar Primer Animal"
-          [rounded]="true"
-          severity="primary"
-          routerLink="/admin/animal/crear"
-        />
+        @if (canCreateAnimals()) {
+          <p-button
+            icon="pi pi-plus"
+            label="Registrar Primer Animal"
+            [rounded]="true"
+            severity="primary"
+            routerLink="/admin/animales/crear"
+          />
+        }
       </div>
     </ng-template>
   </p-dataview>

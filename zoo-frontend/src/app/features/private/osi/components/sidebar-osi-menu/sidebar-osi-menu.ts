@@ -23,7 +23,7 @@ export class SidebarOsiMenu {
       route: "/osi/dashboard",
     },
     {
-      text: "Roles y Accesos",
+      text: "Matriz de Roles",
       icon: "pi pi-shield",
       route: "/osi/roles-accesos",
     },

@@ -19,14 +19,16 @@
         pTooltip="Recargar"
         styleClass="tour-habitat-reload-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Registrar Hábitat"
-        [rounded]="true"
-        severity="primary"
-        (click)="navigateToCreate()"
-        styleClass="tour-habitat-register-btn"
-      />
+      @if (canCreateHabitats()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Registrar Hábitat"
+          [rounded]="true"
+          severity="primary"
+          (click)="navigateToCreate()"
+          styleClass="tour-habitat-register-btn"
+        />
+      }
     </div>
   </div>
 
@@ -96,13 +98,15 @@
     <ng-template #empty>
       <div class="empty-state">
         <p>No hay hábitats disponibles.</p>
-        <p-button
-          icon="pi pi-plus"
-          label="Registrar Primer Hábitat"
-          [rounded]="true"
-          severity="primary"
-          (click)="navigateToCreate()"
-        />
+        @if (canCreateHabitats()) {
+          <p-button
+            icon="pi pi-plus"
+            label="Registrar Primer Hábitat"
+            [rounded]="true"
+            severity="primary"
+            (click)="navigateToCreate()"
+          />
+        }
       </div>
     </ng-template>
   </p-dataview>

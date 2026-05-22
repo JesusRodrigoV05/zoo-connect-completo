@@ -56,7 +56,7 @@ export default class Layout {
 
     if (this.hasPermission('manage_permissions')) {
       items.push({
-        text: 'Roles y Accesos',
+        text: this.authStore.isOsi() ? 'Matriz de Roles' : 'Roles',
         icon: 'pi pi-shield',
         route: this.authStore.isOsi() ? '/osi/roles-accesos' : '/admin/roles',
       });

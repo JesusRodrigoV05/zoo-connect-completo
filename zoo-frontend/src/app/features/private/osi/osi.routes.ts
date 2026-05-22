@@ -10,7 +10,7 @@ const osiRoutes: Routes = [
   },
   {
     path: "roles-accesos",
-    title: "Roles y Accesos",
+    title: "Matriz de Roles",
     data: { requiredPermissions: ["manage_permissions"] },
     loadComponent: () =>
       import("../admin/screens/gestion-permisos/gestion-permisos"),
