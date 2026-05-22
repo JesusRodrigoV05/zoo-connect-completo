@@ -238,7 +238,7 @@ export default class Signup implements OnInit, OnDestroy {
 
   protected onPasswordChange(p: string) {
     const v = p || '';
-    this.rules.length = v.length >= 8;
+    this.rules.length = v.length >= 12;
     this.rules.uppercase = /[A-Z]/.test(v);
     this.rules.lowercase = /[a-z]/.test(v);
     this.rules.digit = /[0-9]/.test(v);
@@ -289,7 +289,7 @@ export default class Signup implements OnInit, OnDestroy {
       cpw?.updateValueAndValidity();
       pw?.updateValueAndValidity();
     } else {
-      pw?.setValidators([Validators.minLength(8)]);
+      pw?.setValidators([Validators.minLength(12)]);
       cpw?.setValidators([Validators.required]);
       cpw?.updateValueAndValidity();
       pw?.updateValueAndValidity();

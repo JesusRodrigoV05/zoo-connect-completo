@@ -15,10 +15,11 @@ export class RestorePassword {
     return this.http.post<{ msg: string }>(`${this.authUrl}/forgot-password`, { email });
   }
 
-  resetPassword(token: string, newPassword: string): Observable<{ msg: string }> {
+  resetPassword(token: string, newPassword: string, recaptchaToken?: string): Observable<{ msg: string }> {
     return this.http.post<{ msg: string }>(`${this.authUrl}/reset-password`, {
       token,
-      new_password: newPassword
+      new_password: newPassword,
+      recaptcha_token: recaptchaToken
     });
   }
 }

@@ -608,7 +608,26 @@ async def forgot_password(
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
-def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
+async def reset_password(
+    request: Request,
+    body: ResetPasswordRequest, 
+    db: Session = Depends(get_db)
+):
+    # 0. Verificar reCAPTCHA v2 server-side si esta requerido por entorno.
+    if settings.REQUIRE_RECAPTCHA and not body.recaptcha_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificacion de seguridad requerida.",
+        )
+    if body.recaptcha_token:
+        client_ip = request.client.host if request.client else None
+        recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
+        if not is_valid_recaptcha(recaptcha_result):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            )
+
     user = crud_token.get_user_by_reset_token(db, token=body.token)
 
     if not user:
