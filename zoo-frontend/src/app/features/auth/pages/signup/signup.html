@@ -217,6 +217,15 @@
                 <i class="pi pi-info-circle"></i>
                 <span>Por seguridad, cámbiala tras entrar.</span>
               </div>
+              <div class="alert-actions mt-3">
+                <p-button 
+                  label="Ir a Verificar Cuenta" 
+                  icon="pi pi-check-circle" 
+                  styleClass="w-full" 
+                  [routerLink]="['/verify-email']" 
+                  [queryParams]="{ email: signupForm.get('email')?.value }"
+                />
+              </div>
             </div>
           </form>
 

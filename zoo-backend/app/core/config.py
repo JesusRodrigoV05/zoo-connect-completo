@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     #
     # correo - Postmark (API HTTPS - compatible con Render)
     POSTMARK_SERVER_TOKEN: str
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_SERVER: str
+    MAIL_PORT: int
+    MAIL_STARTTLS: bool = True
+    MAIL_SSL_TLS: bool = False
     MAIL_FROM: EmailStr
     MAIL_FROM_NAME: str = "ZooConnect"
     # 2fa

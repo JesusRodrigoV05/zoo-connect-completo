@@ -61,7 +61,13 @@
           <div class="auth-info-box">
             <i class="pi pi-info-circle"></i>
             <p>
-              ¿No recibiste el código? Revisa tu carpeta de spam o asegúrate de que el correo sea correcto.
+              ¿No recibiste el código? 
+              <ng-container *ngIf="!isResending() && resendCooldown() <= 0">
+                <a href="#" (click)="$event.preventDefault(); resendCode()">Reenviar código</a> 
+              </ng-container>
+              <span *ngIf="isResending()" class="text-muted">Reenviando...</span>
+              <span *ngIf="resendCooldown() > 0" class="text-muted">Reenviar en {{ getCooldownMessage() }}</span>
+              o revisa tu carpeta de spam.
             </p>
           </div>
 

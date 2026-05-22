@@ -51,6 +51,18 @@ def get_user_by_email(db: Session, email: str) -> User | None:
     )
 
 
+def get_user_by_username(db: Session, username: str) -> User | None:
+    """
+    Busca un usuario por su nombre de usuario.
+    """
+    return (
+        db.query(User)
+        .options(joinedload(User.role))
+        .filter(User.username == username)
+        .first()
+    )
+
+
 def get_users_query(
     db: Session,
     role_id: Optional[int] = None,
@@ -221,6 +233,32 @@ def verify_user_email(db: Session, email: str, code: str) -> bool:
         return True
 
     return False
+
+def resend_verification_code(db: Session, email: str) -> Optional[User]:
+    """
+    Genera un nuevo código de verificación para un usuario no verificado.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    user = get_user_by_email(db, email=email)
+    if not user:
+        logger.warning(f"Intento de reenvío para email no encontrado: {email}")
+        return None
+        
+    if user.email_verified:
+        logger.info(f"Intento de reenvío para email ya verificado: {email}")
+        return None
+
+    # Generar nuevo código de 6 dígitos
+    new_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+    user.verification_code = new_code
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    logger.info(f"NUEVO CODIGO GENERADO para {email}: {new_code}")
+    return user
 
 def _save_password_to_history(db: Session, user: User, password_hash: str) -> None:
     """Guarda el hash de la contraseña actual en el histórico."""

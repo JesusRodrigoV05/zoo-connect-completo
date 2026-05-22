@@ -7,12 +7,15 @@ from app.models.user import User
 from app.core.security import get_password_hash
 from app.crud.permission import ensure_permissions_catalog, ensure_role_permissions
 
+from app.core.config import settings
+
 def create_default_admin():
     db = SessionLocal()
     try:
         print("--- Iniciando Semillas (Seeds) ---")
 
         print("1. Verificando Roles...")
+        # ... (roles logic)
         roles_basicos = [
             {"id": 1, "name": "administrador"},
             {"id": 2, "name": "visitante"},
@@ -49,8 +52,14 @@ def create_default_admin():
         # Lista de usuarios a crear
         usuarios_seed = [
             {
+                "email": settings.DEFAULT_ADMIN_EMAIL,
+                "username": "admin_primary",
+                "password": settings.DEFAULT_ADMIN_PASSWORD,
+                "role": "administrador"
+            },
+            {
                 "email": "admin@zooconnect.com",
-                "username": "admin_central",
+                "username": "admin_legacy",
                 "password": "AdminZ0o_2026_SecurePass!",
                 "role": "administrador"
             },

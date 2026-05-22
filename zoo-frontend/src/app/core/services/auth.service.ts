@@ -238,6 +238,13 @@ export class AuthService {
     } else if (error?.status === 403 && context === 'login') {
       errorMessage = 'Cuenta bloqueada temporalmente, intente dentro de 5 minutos';
     } else if (error?.status === 400 && context === 'register') {
+      const detail = error.error?.detail;
+      if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
+        const email = detail?.email || '';
+        this.router.navigate(['/verify-email'], { queryParams: { email } });
+        this.setState({ loading: false });
+        return;
+      }
       errorMessage = error.error?.message?.includes('email') ? 'Este email ya está registrado. Intente con otro email' : 'Datos de registro inválidos';
     } else if (error?.status === 422 && context === 'register') {
       errorMessage = 'Formato de email inválido o contraseña muy débil';

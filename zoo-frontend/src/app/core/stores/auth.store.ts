@@ -115,6 +115,7 @@ export const AuthStore = signalStore(
       };
 
       const handleError = (error: any, context: string): string => {
+        console.log('DEBUG: handleError called', { context, status: error?.status, detail: error?.error?.detail });
         console.error(`Error en ${context}:`, error);
         let errorMessage = `Error en ${context}`;
         if (typeof error === 'string') {
@@ -125,11 +126,26 @@ export const AuthStore = signalStore(
               ? 'Email o contraseña incorrectos'
               : 'Sesión expirada o no autorizado';
         } else if (error?.status === 400 && context === 'login') {
+          const detail = error.error?.detail;
+          if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
+            const email = detail?.email || '';
+            router.navigate(['/verify-email'], { queryParams: { email } });
+            patchState(store, { loading: false });
+            return '';
+          }
           errorMessage = 'Usuario inactivo. Contacte al administrador';
         } else if (error?.status === 403 && context === 'login') {
-          errorMessage =
-            'Cuenta bloqueada temporalmente, intente dentro de 5 minutos';
+          errorMessage = error.error?.detail || 'Cuenta bloqueada temporalmente, intente más tarde';
         } else if (error?.status === 400 && context === 'register') {
+          const detail = error.error?.detail;
+          console.log('DEBUG: register 400 detail', detail);
+          if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
+            const email = detail?.email || '';
+            console.log('DEBUG: Redirecting to verify-email with email', email);
+            router.navigate(['/verify-email'], { queryParams: { email } });
+            patchState(store, { loading: false }); // Asegurar que el loading se apague
+            return '';
+          }
           errorMessage = error.error?.message?.includes('email')
             ? 'Este email ya está registrado. Intente con otro email'
             : 'Datos de registro inválidos';

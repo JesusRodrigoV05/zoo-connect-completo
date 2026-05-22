@@ -1,4 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { environment } from "@env";
+import { firstValueFrom } from "rxjs";
 import {
   FormBuilder,
   FormGroup,
@@ -41,13 +44,54 @@ export default class VerifyEmail {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly toastService = inject(ShowToast);
+  private readonly http = inject(HttpClient);
 
   protected readonly email = signal<string>(this.route.snapshot.queryParams['email'] || '');
   protected readonly isLoading = this.authStore.loading;
+  protected readonly isResending = signal<boolean>(false);
+  protected readonly resendCooldown = signal<number>(0);
+  private cooldownInterval: any;
 
   protected readonly verifyForm: FormGroup = this.fb.group({
     code: ["", [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
   });
+
+  async resendCode(): Promise<void> {
+    if (!this.email() || this.resendCooldown() > 0) {
+      return;
+    }
+
+    try {
+      this.isResending.set(true);
+      await firstValueFrom(
+        this.http.post<{message: string}>(`${environment.apiUrl}/auth/resend-verification`, { email: this.email() })
+      );
+      this.toastService.showSuccess("Éxito", "Código reenviado exitosamente.");
+      this.startCooldown();
+    } catch (e) {
+      this.toastService.showError("Error", "No se pudo reenviar el código.");
+    } finally {
+      this.isResending.set(false);
+    }
+  }
+
+  private startCooldown() {
+    this.resendCooldown.set(180); // 3 minutes in seconds
+    if (this.cooldownInterval) clearInterval(this.cooldownInterval);
+    
+    this.cooldownInterval = setInterval(() => {
+      this.resendCooldown.update(v => v - 1);
+      if (this.resendCooldown() <= 0) {
+        clearInterval(this.cooldownInterval);
+      }
+    }, 1000);
+  }
+
+  protected getCooldownMessage(): string {
+    const minutes = Math.floor(this.resendCooldown() / 60);
+    const seconds = this.resendCooldown() % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
 
   async onSubmit(): Promise<void> {
     if (this.verifyForm.invalid) {

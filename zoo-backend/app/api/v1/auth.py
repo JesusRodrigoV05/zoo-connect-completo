@@ -32,6 +32,7 @@ from app.schemas.auth import (
     ForgotPasswordRequest,
     ResetPasswordRequest,
     EmailVerificationRequest,
+    ResendVerificationRequest,
 )
 
 from app.core import email_service
@@ -155,27 +156,56 @@ async def register(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    user = crud_user.create_public_user(db=db, user_in=user_in_with_password)
+    # Verificar si el usuario ya existe (por email o username)
+    logger.debug(f"Iniciando registro para email: {user_in_with_password.email}, username: {user_in_with_password.username}")
+    existing_user_email = crud_user.get_user_by_email(db, email=user_in_with_password.email)
+    existing_user_username = crud_user.get_user_by_username(db, username=user_in_with_password.username)
+    
+    existing_user = existing_user_email or existing_user_username
+
+    if existing_user:
+        logger.debug(f"Usuario ya existe: email={existing_user.email}, username={existing_user.username}, verificado={existing_user.email_verified}")
+        if not existing_user.email_verified:
+            # Si ya existe y no está verificado, lanzamos ACCOUNT_UNVERIFIED
+            # No importa si el conflicto es por email o username, si no está verificado
+            # le permitimos intentar verificar esa cuenta existente.
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "status": "ACCOUNT_UNVERIFIED",
+                    "email": existing_user.email
+                },
+            )
+        else:
+            # Si ya está verificado, es un conflicto normal (409)
+            conflict_detail = "Email ya registrado" if existing_user_email else "Nombre de usuario ya en uso"
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=conflict_detail,
+            )
+
+    try:
+        user = crud_user.create_public_user(db=db, user_in=user_in_with_password)
+        logger.info(f"Usuario creado exitosamente: id={user.id}, email={user.email}, code={user.verification_code}")
+    except Exception as e:
+        logger.error(f"Error al crear usuario en BD: {str(e)}")
+        raise e
 
     # 2. Enviar correo de verificación (no bloqueante para registro)
     try:
+        logger.debug(f"Intentando enviar correo de verificación a {user.email}")
         await email_service.send_verification_email(
             email_to=user.email, code=user.verification_code, username=user.username
         )
+        logger.info(f"Correo de verificación enviado a {user.email}")
     except Exception as e:
         # Log del error pero no bloqueamos el registro
-        logger.warning(
-            "No se pudo enviar correo de verificacion",
-            extra={"email": user.email, "error": str(e)},
+        logger.error(
+            f"Error crítico enviando correo de verificacion a {user.email}: {str(e)}",
+            exc_info=True
         )
         # El usuario queda registrado pero sin verificar (puede reenviar después)
-    except Exception as e:
-        # Si falla el envío de correo, eliminamos el usuario para que pueda re-intentar con un email válido
-        crud_user.delete_user_by_admin(db, user.id)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No se pudo enviar el correo de verificación. Verifique si el email es correcto o existe.",
-        )
+        # NOTA: He eliminado el segundo bloque except Exception que era redundante y causaba confusión.
 
     # Devolver la información del usuario y, si se generó, la contraseña temporal
     return {
@@ -193,13 +223,42 @@ async def register(
 
 @router.post("/verify-email", status_code=status.HTTP_200_OK)
 def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
+    logger.debug(f"Intentando verificar email: {body.email} con código: {body.code}")
     success = crud_user.verify_user_email(db, email=body.email, code=body.code)
     if not success:
+        logger.warning(f"Fallo de verificación de email para {body.email}: código incorrecto o usuario no encontrado")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Código de verificación inválido o usuario no encontrado.",
         )
-    return {"message": "Email verificado con éxito. Ya puedes iniciar sesión."}
+    logger.info(f"Email verificado exitosamente para {body.email}")
+    return {"message": "Email verificado exitosamente. Ahora puedes iniciar sesión."}
+
+
+@router.post("/resend-verification", status_code=status.HTTP_200_OK)
+async def resend_verification(
+    body: ResendVerificationRequest, db: Session = Depends(get_db)
+):
+    logger.info(f"DEBUG: Solicitud de reenvío para {body.email}")
+    user = crud_user.resend_verification_code(db, email=body.email)
+    if not user:
+        logger.info(f"DEBUG: No se pudo reenviar código para {body.email} (no existe o ya verificado)")
+        # Por seguridad, no decimos si el email existe o no si ya está verificado
+        return {"message": "Si la cuenta existe y no está verificada, se ha enviado un nuevo código."}
+
+    logger.info(f"DEBUG: Código a enviar para {user.email}: {user.verification_code}")
+    try:
+        await email_service.send_verification_email(
+            email_to=user.email, code=user.verification_code, username=user.username
+        )
+    except Exception as e:
+        logger.error(f"Error reenviando verificación: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo enviar el correo de verificación.",
+        )
+
+    return {"message": "Código de verificación reenviado exitosamente."}
 
 
 # rate limiting
@@ -267,9 +326,12 @@ async def login(
 
     # el usuario existe ahora verificamos si no esta blqoueado
     if policia.is_account_locked(user):
+        from datetime import datetime, timezone
+        remaining = user.locked_until - datetime.now(timezone.utc)
+        minutes_left = max(1, int(remaining.total_seconds() / 60))
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Cuenta bloqueada temporalmente, intente mas tarde",
+            detail=f"Cuenta bloqueada temporalmente. Intente nuevamente en {minutes_left} minuto(s).",
         )
     # el usuario existe ya aparte no esta bloqueado, vemos la contraseña
     if not verify_password(payload.password, user.hashed_password):
@@ -292,10 +354,23 @@ async def login(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
         )
-    # contraseña correcta vemos si esta activo
-    if not user.is_active:
+    # contraseña correcta vemos si esta verificado
+    if not user.email_verified:
+        logger.info(f"Intento de login para usuario no verificado: {user.email}")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario inactivo"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "status": "ACCOUNT_UNVERIFIED",
+                "email": user.email,
+                "message": "Tu cuenta no ha sido verificada. Por favor, verifica tu correo."
+            },
+        )
+
+    # vemos si esta activo
+    if not user.is_active:
+        logger.info(f"Intento de login para usuario inactivo: {user.email}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario inactivo. Contacte al administrador."
         )
     # limpiadmor contadores redis
     await policia.clear_login_failures(user.email, cache)

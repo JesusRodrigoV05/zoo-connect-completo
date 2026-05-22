@@ -1,28 +1,48 @@
 import httpx
 from pydantic import EmailStr
 from app.core.config import settings
-# Mantenemos las importaciones de fastapi_mail solo si planeas usar 'conf' en otro lado. 
-# Si todo tu sistema usará Postmark, podrías incluso borrar fastapi_mail por completo.
-from fastapi_mail import ConnectionConfig
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 
-# Configuración SMTP (Opcional: Si solo vas a usar Postmark vía HTTP, esta parte no la necesitas realmente)
-# conf = ConnectionConfig(
-#     MAIL_USERNAME=settings.MAIL_USERNAME,
-#     MAIL_PASSWORD=settings.MAIL_PASSWORD,
-#     MAIL_FROM=settings.MAIL_FROM,
-#     MAIL_PORT=settings.MAIL_PORT,
-#     MAIL_SERVER=settings.MAIL_SERVER,
-#     MAIL_STARTTLS=settings.MAIL_STARTTLS,
-#     MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
-#     USE_CREDENTIALS=True,
-#     TIMEOUT=60,
-#     VALIDATE_CERTS=True,
-#     MAIL_FROM_NAME=settings.MAIL_FROM_NAME
-# )
+# Configuración SMTP
+print(f"DEBUG: Iniciando email_service con MAIL_SERVER={settings.MAIL_SERVER}, MAIL_PORT={settings.MAIL_PORT}, MAIL_FROM={settings.MAIL_FROM}")
+conf = ConnectionConfig(
+    MAIL_USERNAME=settings.MAIL_USERNAME,
+    MAIL_PASSWORD=settings.MAIL_PASSWORD,
+    MAIL_FROM=settings.MAIL_FROM,
+    MAIL_PORT=settings.MAIL_PORT,
+    MAIL_SERVER=settings.MAIL_SERVER,
+    MAIL_STARTTLS=settings.MAIL_STARTTLS,
+    MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
+    USE_CREDENTIALS=True,
+    VALIDATE_CERTS=True,
+    MAIL_FROM_NAME=settings.MAIL_FROM_NAME
+)
+
+
+async def _send_email_via_smtp(email_to: str, subject: str, html_body: str) -> None:
+    """Envía un email usando SMTP (fastapi-mail)."""
+    print(f"DEBUG: Configurando envío de email a {email_to}")
+    print(f"DEBUG: MAIL_SERVER={settings.MAIL_SERVER}, MAIL_PORT={settings.MAIL_PORT}, MAIL_FROM={settings.MAIL_FROM}")
+    message = MessageSchema(
+        subject=subject,
+        recipients=[email_to],
+        body=html_body,
+        subtype=MessageType.html
+    )
+    fm = FastMail(conf)
+    try:
+        await fm.send_message(message)
+        print(f"SUCCESS: Correo enviado a {email_to} vía SMTP ({settings.MAIL_SERVER})")
+    except Exception as e:
+        import traceback
+        print(f"ERROR: Fallo al enviar correo a {email_to}: {str(e)}")
+        traceback.print_exc()
+        raise e
 
 
 async def _send_email_via_postmark(email_to: str, subject: str, html_body: str) -> None:
     """Envía un email usando la API de Postmark (HTTPS - compatible con Render)."""
+    # Mantenemos esto por si acaso, pero el default ahora será SMTP
     url = "https://api.postmarkapp.com/email"
     headers = {
         "Accept": "application/json",
@@ -76,7 +96,7 @@ async def send_password_reset_email(email_to: EmailStr, token: str, username: st
     </body>
     </html>
     """
-    await _send_email_via_postmark(
+    await _send_email_via_smtp(
         email_to, "Restablece tu contraseña de ZooConnect", html_template
     )
     print(f"Correo de reset enviado a {email_to}")
@@ -105,7 +125,7 @@ async def send_generated_password_email(
     </body>
     </html>
     """
-    await _send_email_via_postmark(
+    await _send_email_via_smtp(
         email_to, "Tu contraseña temporal de ZooConnect", html_template
     )
     print(f"Correo con contraseña generada enviado a {email_to}")
@@ -143,8 +163,7 @@ async def send_verification_email(email_to: EmailStr, code: str, username: str):
     </body>
     </html>
     """
-    await _send_email_via_postmark(
+    await _send_email_via_smtp(
         email_to, "Activa tu cuenta de ZooConnect", html_template
     )
-    # ELIMINAMOS "await fm.send_message(message)" AQUÍ
     print(f"Correo de verificación enviado a {email_to}")
