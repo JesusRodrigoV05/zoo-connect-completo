@@ -9,6 +9,7 @@
     "build:vercel": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:unit": "vitest run --reporter=verbose",
     "serve:ssr": "bun dist/zoo-connect-web/server/server.mjs"
   },
   "private": true,
@@ -54,6 +55,8 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "4.1.7",
+    "@vitest/coverage-v8": "4.1.7"
   }
 }
