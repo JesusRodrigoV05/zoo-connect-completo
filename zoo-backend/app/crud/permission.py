@@ -164,6 +164,12 @@ def get_effective_permission_entries(db: Session, user_id: int) -> List[dict]:
             continue
         entries[permission.code] = {"permission": permission, "allowed": bool(role_permission.allowed), "source": "role"}
 
+    for user_perm in getattr(user, "user_permissions", []):
+        permission = user_perm.permission
+        if not permission or not permission.is_active:
+            continue
+        entries[permission.code] = {"permission": permission, "allowed": bool(user_perm.allowed), "source": "user"}
+
     return list(entries.values())
 
 

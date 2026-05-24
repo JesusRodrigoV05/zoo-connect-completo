@@ -1,7 +1,10 @@
+import logging
 import cloudinary
 import cloudinary.uploader
 from fastapi import UploadFile, HTTPException, status
 from typing import Dict
+
+logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 
@@ -23,7 +26,7 @@ def upload_to_cloudinary(file: UploadFile, folder: str) -> Dict:
         )
         return upload_result
     except Exception as e:
-        print(f"Error al subir a Cloudinary: {e}")
+        logger.exception("Error al subir a Cloudinary")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Ocurrio un error al subir el archivo"
@@ -33,4 +36,4 @@ def delete_from_cloudinary(public_id: str):
     try:
         cloudinary.uploader.destroy(public_id)
     except Exception as e:
-        print(f"Error al eliminar de Cloudinary (public_id: {public_id}): {e}")
+        logger.warning("Error al eliminar de Cloudinary (public_id: %s): %s", public_id, e)

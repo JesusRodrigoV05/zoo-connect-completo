@@ -1,5 +1,8 @@
+import logging
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile, Form
+
+logger = logging.getLogger(__name__)
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.orm import Session
@@ -350,9 +353,9 @@ def upload_resultado_examen(
         )
 
     except Exception as e:
-        print(f" Error en BD: {public_id}")
+        logger.error("Error en BD al crear resultado: %s", public_id)
         delete_from_cloudinary(public_id)
-        raise e
+        raise
 
 @router.delete("/resultados-examen/{id}")
 def delete_resultado_examen(
@@ -368,6 +371,6 @@ def delete_resultado_examen(
         try:
             delete_from_cloudinary(public_id)
         except Exception as e:
-            print(f"Advertencia: No se pudo borrar imagen de Cloudinary {public_id}: {e}")
+            logger.warning("No se pudo borrar imagen de Cloudinary %s: %s", public_id, e)
             
     return {"detail": "Resultado y archivo eliminados correctamente"}

@@ -44,6 +44,7 @@ from app.schemas.auth import (
     LoginRequest,
     TokenResponse,
     LoginStep2Response,
+    MustChangePasswordResponse,
     TOTPLoginRequest,
 )
 from app.crud import two_factor as crud_2fa
@@ -207,7 +208,6 @@ async def register(
         # El usuario queda registrado pero sin verificar (puede reenviar después)
         # NOTA: He eliminado el segundo bloque except Exception que era redundante y causaba confusión.
 
-    # Devolver la información del usuario y, si se generó, la contraseña temporal
     return {
         "id": user.id,
         "email": user.email,
@@ -217,12 +217,28 @@ async def register(
         "role_id": user.role_id,
         "photo_url": user.photo_url,
         "created_at": user.created_at,
-        "generated_password": generated_password,
     }
 
 
 @router.post("/verify-email", status_code=status.HTTP_200_OK)
-def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
+async def verify_email(
+    request: Request,
+    body: EmailVerificationRequest,
+    db: Session = Depends(get_db),
+):
+    if not body.recaptcha_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificacion de seguridad requerida.",
+        )
+    client_ip = request.client.host if request.client else None
+    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
+    if not is_valid_recaptcha(recaptcha_result):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificación de seguridad fallida. Intenta nuevamente.",
+        )
+
     logger.debug(f"Intentando verificar email: {body.email} con código: {body.code}")
     success = crud_user.verify_user_email(db, email=body.email, code=body.code)
     if not success:
@@ -237,8 +253,23 @@ def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
 
 @router.post("/resend-verification", status_code=status.HTTP_200_OK)
 async def resend_verification(
-    body: ResendVerificationRequest, db: Session = Depends(get_db)
+    request: Request,
+    body: ResendVerificationRequest,
+    db: Session = Depends(get_db),
 ):
+    if not body.recaptcha_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificacion de seguridad requerida.",
+        )
+    client_ip = request.client.host if request.client else None
+    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
+    if not is_valid_recaptcha(recaptcha_result):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificación de seguridad fallida. Intenta nuevamente.",
+        )
+
     logger.info(f"DEBUG: Solicitud de reenvío para {body.email}")
     user = crud_user.resend_verification_code(db, email=body.email)
     if not user:
@@ -374,10 +405,18 @@ async def login(
         )
     # limpiadmor contadores redis
     await policia.clear_login_failures(user.email, cache)
-    # comprobamos 2fa
+    # comprobamos 2fa (antes que must_change_password)
     if user.is_totp_enabled:
         session_token = create_2fa_session_token(subject=user.email)
         return LoginStep2Response(session_token=session_token)
+    # comprobamos si debe cambiar contraseña
+    if user.must_change_password:
+        reset_token = crud_token.create_password_reset_token(db, user.id)
+        return MustChangePasswordResponse(reset_token=reset_token)
+    # comprobamos si la contraseña expiró
+    if crud_user.is_password_expired(user):
+        reset_token = crud_token.create_password_reset_token(db, user.id)
+        return MustChangePasswordResponse(reset_token=reset_token)
     # login exitoso
     background_tasks.add_task(
         crud_audit.create_audit_log,
@@ -397,12 +436,26 @@ async def login(
 # 2fA
 @router.post("/2fa/verify-login", response_model=TokenResponse)
 async def verify_login_2fa(
+    request: Request,
     body: TOTPLoginRequest,
     response: Response,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
+    if not body.recaptcha_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificacion de seguridad requerida.",
+        )
+    client_ip = request.client.host if request.client else None
+    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
+    if not is_valid_recaptcha(recaptcha_result):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificación de seguridad fallida. Intenta nuevamente.",
+        )
+
     # verficamos token y codigo 2fa
 
     credentials_exception = HTTPException(
@@ -463,13 +516,20 @@ async def verify_login_2fa(
 
     await policia.clear_login_failures(user.email, cache)
 
+    if user.must_change_password:
+        reset_token = crud_token.create_password_reset_token(db, user.id)
+        return MustChangePasswordResponse(reset_token=reset_token)
+    if crud_user.is_password_expired(user):
+        reset_token = crud_token.create_password_reset_token(db, user.id)
+        return MustChangePasswordResponse(reset_token=reset_token)
+
     access_token, refresh_token = _issue_tokens_for_user(user, db)
     set_refresh_cookie(response, refresh_token)
 
     return TokenResponse(access_token=access_token, token_type="bearer")
 
 
-""""
+"""
 @router.post("/refresh", response_model=TokenResponse)
 def refresh_token(body: TokenRefreshRequest, db: Session = Depends(get_db)):
     try:
@@ -587,10 +647,24 @@ def read_users_me(
 # endpoints reset password
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
 async def forgot_password(
+    request: Request,
     body: ForgotPasswordRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
+
+    if not body.recaptcha_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificacion de seguridad requerida.",
+        )
+    client_ip = request.client.host if request.client else None
+    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
+    if not is_valid_recaptcha(recaptcha_result):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verificación de seguridad fallida. Intenta nuevamente.",
+        )
 
     user = crud_user.get_user_by_email(db, email=body.email)
 
@@ -647,6 +721,18 @@ async def reset_password(
 
     crud_token.delete_reset_token(db, token=body.token)
 
+    if user.must_change_password:
+        user.must_change_password = False
+        db.add(user)
+        db.commit()
+
+        if user.is_totp_enabled:
+            return {"msg": "Contraseña actualizada exitosamente. Inicia sesión nuevamente."}
+
+        access_token, refresh_token = _issue_tokens_for_user(user, db)
+        set_refresh_cookie(response, refresh_token)
+        return TokenResponse(access_token=access_token, token_type="bearer")
+
     return {"msg": "Contraseña actualizada exitosamente"}
 
 
@@ -660,6 +746,16 @@ async def update_users_me(
 ):
 
     if user_in.email and user_in.email != current_user.email:
+        if not user_in.password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Debes confirmar tu contraseña para cambiar el correo electrónico",
+            )
+        if not verify_password(user_in.password, current_user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Contraseña incorrecta",
+            )
         existing_user_with_new_email = crud_user.get_user_by_email(
             db, email=user_in.email
         )

@@ -134,9 +134,10 @@ def delete_tarea_recurrente(
 @router.post("/", response_model=schemas_tarea.TareaOut, dependencies=[Depends(require_task_operations_permission)])
 def create_tarea_manual(
     tarea_in: schemas_tarea.TareaCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
-    return crud_tarea.create_tarea_manual(db, tarea_in)
+    return crud_tarea.create_tarea_manual(db, tarea_in, current_user)
 
 @router.get("/mis-tareas", response_model=Page[schemas_tarea.TareaOut])
 def list_mis_tareas(
@@ -173,9 +174,10 @@ def assign_tarea(
     body: schemas_tarea.TareaAssign,
     db_tarea: models_tarea.Tarea = Depends(_get_tarea_or_404),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     db_usuario = _get_cuidador_or_404(body.usuario_asignado_id, db)
-    return crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario)
+    return crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario, current_user=current_user)
 
 
 #Ejecuion tareas
@@ -189,6 +191,8 @@ def completar_tarea_simple(
 ):
     if db_tarea.usuario_asignado_id is None:
         raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aun")
+    if db_tarea.usuario_asignado_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No puedes completar una tarea que no te fue asignada")
     
     return crud_tarea.completar_tarea_simple(
         db=db,
@@ -206,6 +210,8 @@ def completar_tarea_alimentacion(
 ):
     if db_tarea.usuario_asignado_id is None:
          raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aún")
+    if db_tarea.usuario_asignado_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No puedes completar una tarea que no te fue asignada")
         
     return crud_tarea.completar_tarea_alimentacion(
         db=db,
@@ -224,6 +230,10 @@ def complete_task_tratamiento(
     tarea = crud_tarea.get_tarea(db, id_tarea)
     if not tarea:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    if tarea.usuario_asignado_id is None:
+        raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aun")
+    if tarea.usuario_asignado_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No puedes completar una tarea que no te fue asignada")
 
     return crud_tarea.completar_tarea_tratamiento(
         db=db, 

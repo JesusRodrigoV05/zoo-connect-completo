@@ -29,6 +29,7 @@ from app.core.password_policy import validate_password_strength_func
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
+    recaptcha_token: Optional[str] = None
 
 
 class ResetPasswordRequest(BaseModel):
@@ -43,9 +44,11 @@ class ResetPasswordRequest(BaseModel):
 class EmailVerificationRequest(BaseModel):
     email: EmailStr
     code: str
+    recaptcha_token: Optional[str] = None
 
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
+    recaptcha_token: Optional[str] = None
 
 # 2fa
 class LoginStep2Response(BaseModel):
@@ -61,6 +64,12 @@ TOTPCodem = Annotated[
 class TOTPLoginRequest(BaseModel):
     session_token: str
     code: TOTPCodem
+    recaptcha_token: Optional[str] = None
+
+class MustChangePasswordResponse(BaseModel):
+    status: str = "must_change_password"
+    reset_token: str
+
 
 # Password History
 class PasswordHistoryOut(BaseModel):

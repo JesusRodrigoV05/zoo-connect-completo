@@ -100,7 +100,7 @@
     </ng-template>
 
     <ng-template #list let-items>
-      @for (product of items; track product.id_producto) {
+      @for (product of items; track product.id) {
       <zoo-producto-item
         [product]="product"
         layout="list"
@@ -111,7 +111,7 @@
     </ng-template>
 
     <ng-template #grid let-items>
-      @for (product of items; track product.id_producto) {
+      @for (product of items; track product.id) {
       <zoo-producto-item
         [product]="product"
         layout="grid"

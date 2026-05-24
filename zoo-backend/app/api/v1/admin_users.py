@@ -40,8 +40,7 @@ def get_user_password_history(
     current_user: User = Depends(get_current_active_user)
 ):
     """Obtiene el histórico de contraseñas de un usuario específico."""
-    print(f"!!! TRACE: get_user_password_history CALLED !!!")
-    print(f"!!! TRACE: current_user.id={current_user.id}, requested={user_id} !!!")
+    logger.debug("get_user_password_history CALLED - current_user.id=%s, requested=%s", current_user.id, user_id)
     
     # Verificar si es admin con permiso MANAGE_USERS o si es el propio usuario
     is_admin = getattr(current_user, "is_admin", False)

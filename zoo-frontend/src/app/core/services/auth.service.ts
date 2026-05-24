@@ -199,15 +199,11 @@ export class AuthService {
   }
 
   private setTokens(accessToken: string): void {
-    if (isPlatformBrowser()) {
-      localStorage.setItem('access_token', accessToken);
-    }
     this.setState({ accessToken, error: null });
   }
 
   private clearAuthStateAndStorage(): void {
     if (isPlatformBrowser()) {
-      localStorage.removeItem('access_token');
       localStorage.removeItem(this.themeService.THEME_KEY);
     }
     this.state$.next(initialState);
@@ -273,29 +269,9 @@ export class AuthService {
   async initializeAuth(): Promise<void> {
     this.setState({ loading: true });
     try {
-      const accessToken = isPlatformBrowser() ? localStorage.getItem('access_token') : null;
-      if (accessToken) {
-        this.setState({ accessToken });
-        if (this.isTokenValid(accessToken)) {
-          await this.loadUserProfile();
-        } else {
-          try {
-            await this.refreshTokens();
-            await this.loadUserProfile();
-          } catch (refreshError) {
-            this.clearAuthStateAndStorage();
-          }
-        }
-      } else {
-        try {
-          await this.refreshTokens();
-          await this.loadUserProfile();
-        } catch (e) {
-          this.clearAuthStateAndStorage();
-        }
-      }
-    } catch (error) {
-      console.error('Error durante inicialización:', error);
+      await this.refreshTokens();
+      await this.loadUserProfile();
+    } catch {
       this.clearAuthStateAndStorage();
     } finally {
       this.setState({ loading: false });

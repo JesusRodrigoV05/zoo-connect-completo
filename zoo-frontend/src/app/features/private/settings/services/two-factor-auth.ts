@@ -43,6 +43,7 @@ export class TwoFactorAuth {
   verifyLogin2FA(
     sessionToken: string,
     code: string,
+    recaptchaToken?: string,
   ): Observable<{
     access_token: string;
     refresh_token: string;
@@ -55,6 +56,7 @@ export class TwoFactorAuth {
     }>(`${this.apiUrl}/auth/2fa/verify-login`, {
       session_token: sessionToken,
       code,
+      recaptcha_token: recaptchaToken,
     });
   }
 }

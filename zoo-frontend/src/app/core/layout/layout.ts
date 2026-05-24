@@ -62,198 +62,186 @@ export default class Layout {
       });
     }
 
-    if (this.hasPermission('access_animals_management')) {
-      const children: NavigationItem[] = [
-        this.hasPermission('animals_list_species') && {
-          text: 'Lista de Especies',
-          icon: 'pi pi-list',
-          route: '/admin/animales/especies/lista',
-        },
-        this.hasPermission('animals_create_species') && {
-          text: 'Añadir Especie',
-          icon: 'pi pi-plus',
-          route: '/admin/animales/especies/crear',
-        },
-        this.hasPermission('animals_list_habitats') && {
-          text: 'Lista de Hábitats',
-          icon: 'pi pi-list',
-          route: '/admin/animales/habitat/lista',
-        },
-        this.hasPermission('animals_create_habitats') && {
-          text: 'Añadir Hábitat',
-          icon: 'pi pi-plus',
-          route: '/admin/animales/habitat/crear',
-        },
-        this.hasPermission('animals_list_animals') && {
-          text: 'Lista de Animales',
-          icon: 'pi pi-list',
-          route: '/admin/animales/lista',
-        },
-        this.hasPermission('animals_create_animals') && {
-          text: 'Añadir Animal',
-          icon: 'pi pi-plus',
-          route: '/admin/animales/crear',
-        },
-      ].filter(Boolean) as NavigationItem[];
+    const animalsChildren: NavigationItem[] = [
+      this.hasPermission('animals_list_species') && {
+        text: 'Lista de Especies',
+        icon: 'pi pi-list',
+        route: '/admin/animales/especies/lista',
+      },
+      this.hasPermission('animals_create_species') && {
+        text: 'Añadir Especie',
+        icon: 'pi pi-plus',
+        route: '/admin/animales/especies/crear',
+      },
+      this.hasPermission('animals_list_habitats') && {
+        text: 'Lista de Hábitats',
+        icon: 'pi pi-list',
+        route: '/admin/animales/habitat/lista',
+      },
+      this.hasPermission('animals_create_habitats') && {
+        text: 'Añadir Hábitat',
+        icon: 'pi pi-plus',
+        route: '/admin/animales/habitat/crear',
+      },
+      this.hasPermission('animals_list_animals') && {
+        text: 'Lista de Animales',
+        icon: 'pi pi-list',
+        route: '/admin/animales/lista',
+      },
+      this.hasPermission('animals_create_animals') && {
+        text: 'Añadir Animal',
+        icon: 'pi pi-plus',
+        route: '/admin/animales/crear',
+      },
+    ].filter(Boolean) as NavigationItem[];
 
-      if (children.length) {
-        items.push({
-          text: 'Gestión de Animales',
-          icon: 'pi pi-id-card',
-          route: this.firstAllowedRoute(children, '/admin/animales'),
-          children,
-        });
-      }
+    if (animalsChildren.length) {
+      items.push({
+        text: 'Gestión de Animales',
+        icon: 'pi pi-id-card',
+        route: this.firstAllowedRoute(animalsChildren, '/admin/animales'),
+        children: animalsChildren,
+      });
     }
 
-    if (this.hasPermission('access_tasks_management')) {
-      const children: NavigationItem[] = [
-        this.hasPermission('tasks_operations_board') && {
-          text: 'Tablero de Operaciones',
-          icon: 'pi pi-th-large',
-          route: '/admin/tareas/operaciones',
-        },
-        this.hasPermission('tasks_routines_planner') && {
-          text: 'Planificador de Rutinas',
-          icon: 'pi pi-calendar',
-          route: '/admin/tareas/planificador',
-        },
-        this.hasPermission('tasks_types_config') && {
-          text: 'Configuración Tipos',
-          icon: 'pi pi-cog',
-          route: '/admin/tareas/configuracion',
-        },
-      ].filter(Boolean) as NavigationItem[];
+    const tasksChildren: NavigationItem[] = [
+      this.hasPermission('tasks_operations_board') && {
+        text: 'Tablero de Operaciones',
+        icon: 'pi pi-th-large',
+        route: '/admin/tareas/operaciones',
+      },
+      this.hasPermission('tasks_routines_planner') && {
+        text: 'Planificador de Rutinas',
+        icon: 'pi pi-calendar',
+        route: '/admin/tareas/planificador',
+      },
+      this.hasPermission('tasks_types_config') && {
+        text: 'Configuración Tipos',
+        icon: 'pi pi-cog',
+        route: '/admin/tareas/configuracion',
+      },
+    ].filter(Boolean) as NavigationItem[];
 
-      if (children.length) {
-        items.push({
-          text: 'Gestión de Tareas',
-          icon: 'pi pi-list-check',
-          route: this.firstAllowedRoute(children, '/admin/tareas'),
-          children,
-        });
-      }
+    if (tasksChildren.length) {
+      items.push({
+        text: 'Gestión de Tareas',
+        icon: 'pi pi-list-check',
+        route: this.firstAllowedRoute(tasksChildren, '/admin/tareas'),
+        children: tasksChildren,
+      });
     }
 
-    if (this.hasPermission('access_inventory_management')) {
-      const children: NavigationItem[] = [
-        this.hasPermission('inventory_create_product') && {
-          text: 'Crear producto',
-          icon: 'pi pi-plus',
-          route: '/admin/inventario/crear',
-        },
-        this.hasPermission('inventory_list_products') && {
-          text: 'Lista de Productos',
-          icon: 'pi pi-list',
-          route: '/admin/inventario/lista',
-        },
-        this.hasPermission('inventory_create_supplier') && {
-          text: 'Crear proveedor',
-          icon: 'pi pi-plus',
-          route: '/admin/inventario/proveedor/crear',
-        },
-        this.hasPermission('inventory_list_suppliers') && {
-          text: 'Lista de Proveedores',
-          icon: 'pi pi-list',
-          route: '/admin/inventario/proveedor/lista',
-        },
-        this.hasPermission('inventory_list_types') && {
-          text: 'Lista de tipos',
-          icon: 'pi pi-tags',
-          route: '/admin/inventario/tipo/lista',
-        },
-        this.hasPermission('inventory_list_units') && {
-          text: 'Lista de unidades',
-          icon: 'pi pi-table',
-          route: '/admin/inventario/unidades/lista',
-        },
-        this.hasPermission('inventory_movements_history') && {
-          text: 'Historial de movimientos',
-          icon: 'pi pi-history',
-          route: '/admin/inventario/transacciones/lista',
-        },
-      ].filter(Boolean) as NavigationItem[];
+    const inventoryChildren: NavigationItem[] = [
+      this.hasPermission('inventory_create_product') && {
+        text: 'Crear producto',
+        icon: 'pi pi-plus',
+        route: '/admin/inventario/crear',
+      },
+      this.hasPermission('inventory_list_products') && {
+        text: 'Lista de Productos',
+        icon: 'pi pi-list',
+        route: '/admin/inventario/lista',
+      },
+      this.hasPermission('inventory_create_supplier') && {
+        text: 'Crear proveedor',
+        icon: 'pi pi-plus',
+        route: '/admin/inventario/proveedor/crear',
+      },
+      this.hasPermission('inventory_list_suppliers') && {
+        text: 'Lista de Proveedores',
+        icon: 'pi pi-list',
+        route: '/admin/inventario/proveedor/lista',
+      },
+      this.hasPermission('inventory_list_types') && {
+        text: 'Lista de tipos',
+        icon: 'pi pi-tags',
+        route: '/admin/inventario/tipo/lista',
+      },
+      this.hasPermission('inventory_list_units') && {
+        text: 'Lista de unidades',
+        icon: 'pi pi-table',
+        route: '/admin/inventario/unidades/lista',
+      },
+      this.hasPermission('inventory_movements_history') && {
+        text: 'Historial de movimientos',
+        icon: 'pi pi-history',
+        route: '/admin/inventario/transacciones/lista',
+      },
+    ].filter(Boolean) as NavigationItem[];
 
-      if (children.length) {
-        items.push({
-          text: 'Gestión Inventario',
-          icon: 'pi pi-box',
-          route: this.firstAllowedRoute(children, '/admin/inventario'),
-          children,
-        });
-      }
+    if (inventoryChildren.length) {
+      items.push({
+        text: 'Gestión Inventario',
+        icon: 'pi pi-box',
+        route: this.firstAllowedRoute(inventoryChildren, '/admin/inventario'),
+        children: inventoryChildren,
+      });
     }
 
-    if (this.hasPermission('access_users_management')) {
-      const children: NavigationItem[] = [
-        this.hasPermission('users_create') && {
-          text: 'Crear Usuario',
-          icon: 'pi pi-user-plus',
-          route: '/admin/usuarios/crear',
-        },
-        this.hasPermission('users_list') && {
-          text: 'Lista de Usuarios',
-          icon: 'pi pi-users',
-          route: '/admin/usuarios/lista',
-        },
-      ].filter(Boolean) as NavigationItem[];
+    const usersChildren: NavigationItem[] = [
+      this.hasPermission('users_create') && {
+        text: 'Crear Usuario',
+        icon: 'pi pi-user-plus',
+        route: '/admin/usuarios/crear',
+      },
+      this.hasPermission('users_list') && {
+        text: 'Lista de Usuarios',
+        icon: 'pi pi-users',
+        route: '/admin/usuarios/lista',
+      },
+    ].filter(Boolean) as NavigationItem[];
 
-      if (children.length) {
-        items.push({
-          text: 'Gestión de Usuarios',
-          icon: 'pi pi-users',
-          route: this.firstAllowedRoute(children, '/admin/usuarios'),
-          children,
-        });
-      }
+    if (usersChildren.length) {
+      items.push({
+        text: 'Gestión de Usuarios',
+        icon: 'pi pi-users',
+        route: this.firstAllowedRoute(usersChildren, '/admin/usuarios'),
+        children: usersChildren,
+      });
     }
 
-    if (this.hasPermission('access_surveys_management')) {
-      const children: NavigationItem[] = [
-        this.hasPermission('surveys_list') && {
-          text: 'Lista',
-          icon: 'pi pi-list',
-          route: '/admin/encuestas/lista',
-        },
-        this.hasPermission('surveys_create') && {
-          text: 'Crear Encuesta',
-          icon: 'pi pi-plus',
-          route: '/admin/encuestas/crear',
-        },
-      ].filter(Boolean) as NavigationItem[];
+    const surveysChildren: NavigationItem[] = [
+      this.hasPermission('surveys_list') && {
+        text: 'Lista',
+        icon: 'pi pi-list',
+        route: '/admin/encuestas/lista',
+      },
+      this.hasPermission('surveys_create') && {
+        text: 'Crear Encuesta',
+        icon: 'pi pi-plus',
+        route: '/admin/encuestas/crear',
+      },
+    ].filter(Boolean) as NavigationItem[];
 
-      if (children.length) {
-        items.push({
-          text: 'Gestión de Encuestas',
-          icon: 'pi pi-chart-line',
-          route: this.firstAllowedRoute(children, '/admin/encuestas'),
-          children,
-        });
-      }
+    if (surveysChildren.length) {
+      items.push({
+        text: 'Gestión de Encuestas',
+        icon: 'pi pi-chart-line',
+        route: this.firstAllowedRoute(surveysChildren, '/admin/encuestas'),
+        children: surveysChildren,
+      });
     }
 
-    if (this.hasPermission('access_audit_assistant')) {
-      const children: NavigationItem[] = [
-        this.hasPermission('audit_application_logs') && {
-          text: 'Log de Aplicación',
-          icon: 'pi pi-database',
-          route: '/admin/audit/aplicacion',
-        },
-        this.hasPermission('audit_security_logs') && {
-          text: 'Log de Seguridad OSI',
-          icon: 'pi pi-shield',
-          route: '/admin/audit/seguridad',
-        },
-      ].filter(Boolean) as NavigationItem[];
+    const auditChildren: NavigationItem[] = [
+      this.hasPermission('audit_application_logs') && {
+        text: 'Log de Aplicación',
+        icon: 'pi pi-database',
+        route: '/admin/audit/aplicacion',
+      },
+      this.hasPermission('audit_security_logs') && {
+        text: 'Log de Seguridad OSI',
+        icon: 'pi pi-shield',
+        route: '/admin/audit/seguridad',
+      },
+    ].filter(Boolean) as NavigationItem[];
 
-      if (children.length) {
-        items.push({
-          text: 'Auditoría',
-          icon: 'pi pi-history',
-          route: this.firstAllowedRoute(children, '/admin/audit/seguridad'),
-          children,
-        });
-      }
+    if (auditChildren.length) {
+      items.push({
+        text: 'Auditoría',
+        icon: 'pi pi-history',
+        route: this.firstAllowedRoute(auditChildren, '/admin/audit/seguridad'),
+        children: auditChildren,
+      });
     }
 
     if (this.hasPermission('caregiver_my_tasks')) {

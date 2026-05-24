@@ -1,6 +1,9 @@
+import logging
 from typing import List, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
+
+logger = logging.getLogger(__name__)
 from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -71,18 +74,18 @@ def create_role(
         raise HTTPException(status_code=400, detail=str(e))
     except IntegrityError as e:
         db.rollback()
-        print(f"ERROR de integridad creando rol: {e}")
+        logger.error("Error de integridad creando rol: %s", e)
         raise HTTPException(
             status_code=400,
             detail="No se pudo crear el rol por una restricción de base de datos",
         )
     except SQLAlchemyError as e:
         db.rollback()
-        print(f"ERROR creando rol: {e}")
+        logger.error("Error creando rol: %s", e)
         raise HTTPException(status_code=500, detail="No se pudo crear el rol")
     except Exception as e:
         db.rollback()
-        print(f"ERROR inesperado creando rol: {e}")
+        logger.exception("Error inesperado creando rol")
         raise HTTPException(status_code=500, detail="No se pudo crear el rol")
 
 
@@ -190,7 +193,7 @@ def _safe_create_audit_log(**kwargs) -> None:
     try:
         crud_audit.create_audit_log(**kwargs)
     except Exception as exc:
-        print(f"ERROR registrando auditoría de roles: {exc}")
+        logger.error("Error registrando auditoria de roles: %s", exc)
 
 
 def _build_role_item(db: Session, role: Role) -> RoleItem:

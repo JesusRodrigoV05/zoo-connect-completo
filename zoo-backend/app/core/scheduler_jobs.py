@@ -1,13 +1,16 @@
+import logging
 from sqlalchemy.orm import Session
 from datetime import date, datetime, timedelta
 from croniter import croniter
+
+logger = logging.getLogger(__name__)
 from app.db.session import SessionLocal
 from app.models.tarea import TareaRecurrente, Tarea
 
 def generar_tareas_diarias():
 
     db: Session = SessionLocal()
-    print(f"[{datetime.now()}] Iniciando job: 'generar_tareas_diarias'...")
+    logger.info("[%s] Iniciando job: 'generar_tareas_diarias'...", datetime.now())
 
     try:
         today = date.today()
@@ -39,7 +42,7 @@ def generar_tareas_diarias():
                 if tarea_existente:
                     continue
 
-                print(f" + Creando tarea automatica: '{plantilla.titulo_plantilla}'...")
+                logger.debug(" + Creando tarea automatica: '%s'...", plantilla.titulo_plantilla)
 
                 nueva_tarea = Tarea(
                     titulo=plantilla.titulo_plantilla,
@@ -61,13 +64,13 @@ def generar_tareas_diarias():
             except Exception as e_inner:
                 db.rollback()
                 errores_count += 1
-                print(f"Error procesando plantilla ID {plantilla.id_tarea_recurrente}: {e_inner}")
+                logger.error("Error procesando plantilla ID %s: %s", plantilla.id_tarea_recurrente, e_inner)
                 continue
 
-        print(f"Job completado. Creadas: {tareas_creadas_count}. Errores: {errores_count}")
+        logger.info("Job completado. Creadas: %s. Errores: %s", tareas_creadas_count, errores_count)
 
     except Exception as e:
-        print(f" ERROR El job 'generar_tareas_diarias' fallo a nivel general: {e}")
+        logger.exception("El job 'generar_tareas_diarias' fallo a nivel general")
     
     finally:
         db.close()

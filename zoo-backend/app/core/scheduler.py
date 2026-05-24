@@ -1,7 +1,10 @@
+import logging
 import redis
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.core.config import settings
 from app.core.scheduler_jobs import generar_tareas_diarias
+
+logger = logging.getLogger(__name__)
 
 SCHEDULER_LOCK_KEY = "scheduler:generar_tareas_diarias_lock"
 LOCK_TIMEOUT_SECONDS = 60 * 10
@@ -26,28 +29,28 @@ def job_wrapper_generar_tareas():
         have_lock = lock.acquire(blocking=False)
         
         if have_lock:
-            print("[Scheduler] Ejecutando generacion de tareas...")
+            logger.info("[Scheduler] Ejecutando generacion de tareas...")
             try:
                 generar_tareas_diarias()
             finally:
                 try:
                     lock.release()
-                    print("Bloqueo liberado")
+                    logger.debug("Bloqueo liberado")
                 except redis.exceptions.LockError:
-                    print("No se pudo liberar el bloqueo")
+                    logger.warning("No se pudo liberar el bloqueo")
         else:
-            print("Bloqueo ocupado. Otro worker esta trabajando sin descanso")
+            logger.info("Bloqueo ocupado. Otro worker esta trabajando sin descanso")
             
     except redis.ConnectionError:
-        print("[Scheduler] Error: No se pudo conectar a Redis")
+        logger.error("[Scheduler] Error: No se pudo conectar a Redis")
     except Exception as e:
-        print(f"Scheduler] Error inesperado en wrapper: {e}")
+        logger.exception("[Scheduler] Error inesperado en wrapper")
     finally:
         if redis_client:
             redis_client.close()
 
 def setup_scheduler():
-    print("Configurando APScheduler...")
+    logger.info("Configurando APScheduler...")
 
     scheduler.add_job(
         job_wrapper_generar_tareas,
@@ -61,4 +64,4 @@ def setup_scheduler():
 
     if not scheduler.running:
         scheduler.start()
-        print("APScheduler iniciado en segundo plano")
+        logger.info("APScheduler iniciado en segundo plano")

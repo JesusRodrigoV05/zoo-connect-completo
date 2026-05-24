@@ -41,6 +41,13 @@ class UserUpdateProfile(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     photo_url: Optional[str] = None
+    password: Optional[str] = None
+
+    @field_validator("password")
+    def validate_password_strength(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            return validate_password_strength_func(v)
+        return v
 
 
 class UserOut(BaseModel):

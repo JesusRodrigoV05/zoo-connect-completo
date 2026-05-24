@@ -51,6 +51,8 @@ export interface LoginResponse {
   expires_in?: number | null;
   session_token?: string;
   step?: string;
+  status?: string;
+  reset_token?: string;
 }
 
 export interface TokenResponse {

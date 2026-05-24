@@ -100,6 +100,7 @@ def create_default_admin():
                         username=u_data["username"],
                         hashed_password=get_password_hash(u_data["password"]),
                         is_active=True,
+                        must_change_password=True,
                         role_id=role.id
                     ))
 
@@ -113,8 +114,9 @@ def create_default_admin():
                 db.add(User(
                     email=osi_email,
                     username="osi",
-                    hashed_password=get_password_hash("osi123"),
+                    hashed_password=get_password_hash("Osi_Secure_Change_2026!"),
                     is_active=True,
+                    must_change_password=True,
                     role_id=osi_role.id,
                 ))
 
