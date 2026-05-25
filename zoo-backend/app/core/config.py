@@ -34,6 +34,13 @@ class Settings(BaseSettings):
     POSTMARK_SERVER_TOKEN: str
     MAIL_FROM: EmailStr
     MAIL_FROM_NAME: str = "ZooConnect"
+    # Opcional: configuración SMTP (soporte para envío via SMTP si se desea)
+    MAIL_USERNAME: str | None = None
+    MAIL_PASSWORD: str | None = None
+    MAIL_PORT: int = 587
+    MAIL_SERVER: str = "smtp.gmail.com"
+    MAIL_STARTTLS: bool = True
+    MAIL_SSL_TLS: bool = False
     # 2fa
     TOTP_ENCRYPTION_KEY: str
     # redis

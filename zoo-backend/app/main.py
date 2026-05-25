@@ -5,6 +5,7 @@ from fastapi.concurrency import run_in_threadpool
 
 from fastapi_pagination import add_pagination
 from app.core.config import settings
+from app.core.security.middleware import SecurityContextMiddleware
 from app.scripts.create_admin import create_default_admin
 from app.scripts.seeds import init_db
 from app.core.scheduler import scheduler, setup_scheduler
@@ -71,6 +72,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
+app.add_middleware(SecurityContextMiddleware)
 
 
 app.include_router(auth.router, prefix="/zooconnect/auth", tags=["auth"])

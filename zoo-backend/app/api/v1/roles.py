@@ -1,14 +1,15 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Query
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_active_user, require_permission
 from app.core.enums import PermissionCode
-from app.crud import audit as crud_audit
+from app.core.security.events import SecurityEventType
+from app.core.security.publisher import publish_security_event
+from app.core.security.schemas import SecurityLogEvent
 from app.crud import permission as crud_permission
 from app.crud import role as crud_role
 from app.db.session import get_db
@@ -25,6 +26,27 @@ from app.schemas.role import (
 router = APIRouter(
     dependencies=[Depends(require_permission(PermissionCode.MANAGE_PERMISSIONS))]
 )
+
+
+def _publish_role_event(
+    *,
+    background_tasks: BackgroundTasks,
+    current_user: User,
+    action: str,
+    role_name: str,
+):
+    publish_security_event(
+        SecurityLogEvent(
+            event_type=SecurityEventType.ROLE_CHANGED,
+            severity="CRITICAL",
+            user_id=current_user.id,
+            module="roles",
+            action=action,
+            status="success",
+            metadata={"role_name": role_name},
+        ),
+        background_tasks=background_tasks,
+    )
 
 
 @router.get("", response_model=Page[RoleItem])
@@ -50,13 +72,15 @@ def create_role(
     role_in: RoleCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = None,
 ):
     try:
         role = crud_role.create_role(db, role_in)
-        crud_audit.create_audit_log(
-            event="role_created",
-            user_id=current_user.id,
-            attempted_email=role.name,
+        _publish_role_event(
+            background_tasks=background_tasks,
+            current_user=current_user,
+            action="create_role",
+            role_name=role.name,
         )
         return _build_role_item(db, role)
     except ValueError as e:
@@ -80,15 +104,17 @@ def update_role(
     role_in: RoleUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = None,
 ):
     role = crud_role.update_role(db, role_id, role_in)
     if not role:
         raise HTTPException(status_code=404, detail="Rol no encontrado")
 
-    crud_audit.create_audit_log(
-        event="role_updated",
-        user_id=current_user.id,
-        attempted_email=role.name,
+    _publish_role_event(
+        background_tasks=background_tasks,
+        current_user=current_user,
+        action="update_role",
+        role_name=role.name,
     )
 
     return _build_role_item(db, role)
@@ -99,6 +125,7 @@ def delete_role(
     role_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = None,
 ):
     try:
         role = crud_role.get_role(db, role_id)
@@ -107,10 +134,11 @@ def delete_role(
 
         crud_role.delete_role(db, role_id)
 
-        crud_audit.create_audit_log(
-            event="role_deleted",
-            user_id=current_user.id,
-            attempted_email=role.name,
+        _publish_role_event(
+            background_tasks=background_tasks,
+            current_user=current_user,
+            action="delete_role",
+            role_name=role.name,
         )
 
         return {"message": "Rol eliminado correctamente"}
@@ -135,6 +163,7 @@ def update_role_permissions(
     payload: List[RolePermissionToggle] = Body(default_factory=list),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = None,
 ):
     role = crud_role.replace_role_permissions(
         db=db,
@@ -142,10 +171,11 @@ def update_role_permissions(
         permissions_payload=[item.model_dump() for item in payload],
     )
 
-    crud_audit.create_audit_log(
-        event="role_permissions_updated",
-        user_id=current_user.id,
-        attempted_email=role.name,
+    _publish_role_event(
+        background_tasks=background_tasks,
+        current_user=current_user,
+        action="update_role_permissions",
+        role_name=role.name,
     )
 
     return _build_role_detail(db, role)

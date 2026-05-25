@@ -1,11 +1,13 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_active_user, require_permission
-from app.core.enums import AuditEvent, PermissionCode
-from app.crud import audit as crud_audit
+from app.core.enums import PermissionCode
+from app.core.security.events import SecurityEventType
+from app.core.security.publisher import publish_security_event
+from app.core.security.schemas import SecurityLogEvent
 from app.crud import permission as crud_permission
 from app.db.session import get_db
 from app.models.user import User
@@ -98,6 +100,7 @@ def update_user_permissions(
     payload: List[UserPermissionToggle] = Body(default_factory=list),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = None,
 ):
     updated_user = crud_permission.replace_user_permissions(
         db=db,
@@ -105,10 +108,20 @@ def update_user_permissions(
         permissions_payload=[item.model_dump() for item in payload],
     )
 
-    crud_audit.create_audit_log(
-        event=AuditEvent.PERMISSION_UPDATE,
-        user_id=current_user.id,
-        attempted_email=updated_user.email,
+    publish_security_event(
+        SecurityLogEvent(
+            event_type=SecurityEventType.PERMISSION_CHANGED,
+            severity="CRITICAL",
+            user_id=current_user.id,
+            module="permissions",
+            action="update_user_permissions",
+            status="success",
+            metadata={
+                "target_user_id": updated_user.id,
+                "permissions_count": len(payload),
+            },
+        ),
+        background_tasks=background_tasks,
     )
 
     return _build_user_item(db, updated_user)

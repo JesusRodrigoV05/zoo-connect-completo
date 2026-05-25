@@ -27,4 +27,4 @@ RUN mkdir -p /app/temp_keys /app/.cache/fontconfig \
     && chmod 777 /app/temp_keys
 USER appuser
 EXPOSE 8000
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "alembic upgrade heads && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

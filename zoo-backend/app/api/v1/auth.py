@@ -61,11 +61,12 @@ from app.crud.auth import set_refresh_cookie, clear_refresh_cookie
 # redis
 from redis.asyncio import Redis
 from app.db.cache import get_cache_client
-from app.crud import audit as crud_audit
 from app.core import policia
 from app.core.rsa_manager import RSAManager
-from app.core.enums import AuditEvent
 from app.core.security import verify_password
+from app.core.security.events import SecurityEventType
+from app.core.security.publisher import publish_security_event
+from app.core.security.schemas import SecurityLogEvent
 from app.crud import permission as crud_permission
 
 # recaptcha
@@ -103,6 +104,33 @@ def _issue_tokens_for_user(user, db: Session):
     )
 
     return access_token, rt["token"]
+
+
+def _publish_security_event(
+    *,
+    background_tasks: BackgroundTasks,
+    request: Request,
+    event_type: str,
+    user_id: int | None,
+    module: str,
+    action: str,
+    status: str,
+    metadata: dict | None = None,
+    severity: str = "WARN",
+):
+    publish_security_event(
+        SecurityLogEvent(
+            event_type=event_type,
+            severity=severity,
+            user_id=user_id,
+            module=module,
+            action=action,
+            status=status,
+            metadata=metadata or {},
+        ),
+        background_tasks=background_tasks,
+        request=request,
+    )
 
 
 # crud_user.create_public_user ya maneja IntegrityError y lanza un HTTPException 409
@@ -200,119 +228,142 @@ def verify_email(body: EmailVerificationRequest, db: Session = Depends(get_db)):
 @limiter.limit("10/minute")
 async def login(
     request: Request,
-    # prueba redis
     background_tasks: BackgroundTasks,
-    #
     response: Response,
     payload: LoginRequest,
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
-    # 0. Verificar reCAPTCHA v2 (server-side) - solo si se envía token
     if payload.recaptcha_token:
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(payload.recaptcha_token, client_ip)
         if not is_valid_recaptcha(recaptcha_result):
-            background_tasks.add_task(
-                crud_audit.create_audit_log,
-                event=AuditEvent.LOGIN_FAILURE,
-                attempted_email=payload.email,
+            _publish_security_event(
+                background_tasks=background_tasks,
+                request=request,
+                event_type=SecurityEventType.LOGIN_FAILED,
+                user_id=None,
+                module="auth",
+                action="login",
+                status="failure",
+                metadata={
+                    "attempted_email": payload.email,
+                    "reason": "recaptcha_failed",
+                },
             )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Verificación de seguridad fallida. Intenta nuevamente.",
             )
-    # 1. Descifrar contraseña RSA
+
     try:
         decrypted_password = RSAManager.decrypt_password(payload.password)
         payload.password = decrypted_password
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error de seguridad: Credenciales no cifradas correctamente.",
         )
 
-    # paso 1
     user = crud_user.get_user_by_email(db, payload.email)
-    # paso 2 manejar el usuario no encontrado
+
     if not user:
-        background_tasks.add_task(
-            crud_audit.create_audit_log,
-            # db,
-            event=AuditEvent.LOGIN_FAILURE,
-            attempted_email=payload.email,
+        _publish_security_event(
+            background_tasks=background_tasks,
+            request=request,
+            event_type=SecurityEventType.LOGIN_FAILED,
+            user_id=None,
+            module="auth",
+            action="login",
+            status="failure",
+            metadata={
+                "attempted_email": payload.email,
+                "reason": "user_not_found",
+            },
         )
-        # Incrementamos nuestro contador
         await policia.increment_login_failure(payload.email, cache)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
         )
 
-    # el usuario existe ahora verificamos si no esta blqoueado
     if policia.is_account_locked(user):
+        _publish_security_event(
+            background_tasks=background_tasks,
+            request=request,
+            event_type=SecurityEventType.ACCOUNT_LOCKED,
+            user_id=user.id,
+            module="auth",
+            action="login",
+            status="failure",
+            metadata={"reason": "account_locked"},
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Cuenta bloqueada temporalmente, intente mas tarde",
         )
-    # el usuario existe ya aparte no esta bloqueado, vemos la contraseña
+
     if not verify_password(payload.password, user.hashed_password):
-        # Contraseña incorrecta.
-        background_tasks.add_task(
-            crud_audit.create_audit_log,
-            # db,
-            event=AuditEvent.LOGIN_FAILURE,
+        _publish_security_event(
+            background_tasks=background_tasks,
+            request=request,
+            event_type=SecurityEventType.LOGIN_FAILED,
             user_id=user.id,
-            attempted_email=user.email,
+            module="auth",
+            action="login",
+            status="failure",
+            metadata={
+                "attempted_email": user.email,
+                "reason": "invalid_credentials",
+            },
         )
 
         await policia.increment_login_failure(user.email, cache)
-
         failures = await policia.get_login_failures(user.email, cache)
+
         if failures >= policia.MAX_FAILED_ATTEMPTS:
+            _publish_security_event(
+                background_tasks=background_tasks,
+                request=request,
+                event_type=SecurityEventType.ACCOUNT_LOCKED,
+                user_id=user.id,
+                module="auth",
+                action="login",
+                status="success",
+                metadata={"reason": "max_failed_attempts"},
+            )
             background_tasks.add_task(policia.lock_account, user_id=user.id)
             await policia.clear_login_failures(user.email, cache)
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
         )
-    # contraseña correcta vemos si esta activo
+
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario inactivo"
         )
-    # limpiadmor contadores redis
+
     await policia.clear_login_failures(user.email, cache)
-    # comprobamos 2fa
+
     if user.is_totp_enabled:
         session_token = create_2fa_session_token(subject=user.email)
         return LoginStep2Response(session_token=session_token)
-    # login exitoso
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        # db,
-        event=AuditEvent.LOGIN_SUCCESS,
-        user_id=user.id,
-        attempted_email=user.email,
-    )
 
     access_token, refresh_token = _issue_tokens_for_user(user, db)
-    #
     set_refresh_cookie(response, refresh_token)
-    # return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
     return TokenResponse(access_token=access_token, token_type="bearer")
 
 
 # 2fA
 @router.post("/2fa/verify-login", response_model=TokenResponse)
 async def verify_login_2fa(
+    request: Request,
     body: TOTPLoginRequest,
     response: Response,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
-    # verficamos token y codigo 2fa
-
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Token de sesion 2FA invalido",
@@ -330,14 +381,12 @@ async def verify_login_2fa(
     except JWTError:
         raise credentials_exception
 
-    # 2. Obtener el usuario
     user = crud_user.get_user_by_email(db, email)
     if not user or not user.is_active or not user.is_totp_enabled:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario no válido para 2FA"
         )
 
-    # 3. Verificar el codigo
     is_code_valid = False
 
     if len(body.code) == 6:
@@ -350,24 +399,19 @@ async def verify_login_2fa(
         is_code_valid = crud_2fa.validate_backup_code(db, user, body.code)
 
     if not is_code_valid:
-        background_tasks.add_task(
-            crud_audit.create_audit_log,
-            # db,
-            event=AuditEvent.LOGIN_FAILURE,
+        _publish_security_event(
+            background_tasks=background_tasks,
+            request=request,
+            event_type=SecurityEventType.LOGIN_FAILED,
             user_id=user.id,
-            attempted_email=user.email,
+            module="auth",
+            action="verify_2fa",
+            status="failure",
+            metadata={"attempted_email": user.email, "reason": "invalid_2fa_code"},
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Codigo 2fa invalido"
         )
-
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        # db,
-        event=AuditEvent.V2P_SUCCESS,
-        user_id=user.id,
-        attempted_email=user.email,
-    )
 
     await policia.clear_login_failures(user.email, cache)
 
@@ -516,7 +560,12 @@ async def forgot_password(
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
-def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
+def reset_password(
+    request: Request,
+    body: ResetPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     user = crud_token.get_user_by_reset_token(db, token=body.token)
 
     if not user:
@@ -525,7 +574,6 @@ def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
             detail="El token es invaslido o ha expirado",
         )
 
-    # Verificar que la nueva contraseña no esté en el histórico
     if crud_user.is_password_in_history(db, user, body.new_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -533,8 +581,19 @@ def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
         )
 
     crud_user.update_password(db, db_user=user, new_password=body.new_password)
-
     crud_token.delete_reset_token(db, token=body.token)
+
+    _publish_security_event(
+        background_tasks=background_tasks,
+        request=request,
+        event_type=SecurityEventType.PASSWORD_CHANGED,
+        user_id=user.id,
+        module="auth",
+        action="reset_password",
+        status="success",
+        metadata={"source": "reset_password"},
+        severity="CRITICAL",
+    )
 
     return {"msg": "Contraseña actualizada exitosamente"}
 

@@ -34,11 +34,15 @@ async def increment_login_failure(
         return
 
     key = _get_redis_key(email)
-    
-    async with cache.pipeline() as pipe:
-        await pipe.incr(key)
-        await pipe.expire(key, FAILED_ATTEMPTS_TTL_SECONDS)
-        await pipe.execute()
+
+    try:
+        async with cache.pipeline() as pipe:
+            await pipe.incr(key)
+            await pipe.expire(key, FAILED_ATTEMPTS_TTL_SECONDS)
+            await pipe.execute()
+    except Exception as exc:
+        print(f"Advertencia: Redis no disponible durante increment_login_failure: {exc}")
+        return
 
 
 async def get_login_failures(
@@ -53,8 +57,13 @@ async def get_login_failures(
         return 0
 
     key = _get_redis_key(email)
-    failures = await cache.get(key)
-    
+
+    try:
+        failures = await cache.get(key)
+    except Exception as exc:
+        print(f"Advertencia: Redis no disponible durante get_login_failures: {exc}")
+        return 0
+
     return int(failures) if failures else 0
 
 
@@ -68,9 +77,14 @@ async def clear_login_failures(
     if not cache:
         print("Advertencia: Cliente Redis no disponible Omitiendo limpieza de fallos🙌")
         return
-        
+
     key = _get_redis_key(email)
-    await cache.delete(key)
+
+    try:
+        await cache.delete(key)
+    except Exception as exc:
+        print(f"Advertencia: Redis no disponible durante clear_login_failures: {exc}")
+        return
 
 
 def lock_account(user_id: int) -> None:

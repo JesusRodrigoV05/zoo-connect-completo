@@ -11,9 +11,18 @@ Thumbs.db
 *.sublime-workspace
 
 venv/
+.venv/
 __pycache__/
 *.pyc
 *.sqlite3
+
+# Artefactos locales del backend
+logs/
+temp_keys/
+.pytest_cache/
+*.log
+
+# Build y dependencias
 
 dist/
 tmp/
