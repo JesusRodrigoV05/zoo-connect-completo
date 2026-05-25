@@ -293,7 +293,7 @@ async def resend_verification(
 
 
 # rate limiting
-@router.post("/login", response_model=Union[TokenResponse, LoginStep2Response])
+@router.post("/login", response_model=Union[TokenResponse, LoginStep2Response, MustChangePasswordResponse])
 @limiter.limit("10/minute")
 async def login(
     request: Request,
@@ -434,7 +434,7 @@ async def login(
 
 
 # 2fA
-@router.post("/2fa/verify-login", response_model=TokenResponse)
+@router.post("/2fa/verify-login", response_model=Union[TokenResponse, MustChangePasswordResponse])
 async def verify_login_2fa(
     request: Request,
     body: TOTPLoginRequest,
