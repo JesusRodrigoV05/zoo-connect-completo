@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 from app.db.session import get_db
-from app.core.dependencies import require_animal_management_permission, require_admin_user
+from app.core.dependencies import require_animal_management_permission, require_admin_user, get_current_active_user
 from app.models.user import User
 
 from app.crud import transacciones as crud_transacciones
@@ -12,6 +12,8 @@ from app.crud import inventario as crud_inventario
 from app.schemas import transacciones as schemas_tra
 from app.schemas import inventario as schemas_inv
 from app.models import inventario as models_inv
+from app.crud import audit as crud_audit
+from app.core.enums import AuditLogType
 
 router = APIRouter()
 
@@ -21,7 +23,8 @@ router = APIRouter()
 def create_entrada_inventario_endpoint(
     entrada_in: schemas_tra.EntradaInventarioCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_animal_management_permission)
+    current_user: User = Depends(require_animal_management_permission),
+    background_tasks: BackgroundTasks = BackgroundTasks()
 ):
 
     if not entrada_in.detalles:
@@ -30,11 +33,20 @@ def create_entrada_inventario_endpoint(
             detail="La entrada debe tener al menos un detalle"
         )
         
-    return crud_transacciones.create_entrada_inventario(
+    entrada = crud_transacciones.create_entrada_inventario(
         db=db, 
         entrada_in=entrada_in, 
         usuario_id=current_user.id
     )
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="inventory_entry_created",
+        log_type=AuditLogType.APPLICATION,
+        action="Creación de entrada de inventario",
+        detail=f"Entrada ID: {entrada.id}, Proveedor ID: {entrada.proveedor_id}",
+        user_id=current_user.id
+    )
+    return entrada
 
 @router.get("/entradas", response_model=Page[schemas_tra.EntradaInventarioOut])
 def list_entradas_inventario(
@@ -51,7 +63,8 @@ def list_entradas_inventario(
 def create_salida_inventario_endpoint(
     salida_in: schemas_tra.SalidaInventarioCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_animal_management_permission)
+    current_user: User = Depends(require_animal_management_permission),
+    background_tasks: BackgroundTasks = BackgroundTasks()
 ):
 
     if not salida_in.detalles:
@@ -60,11 +73,20 @@ def create_salida_inventario_endpoint(
             detail="La salida debe tener al menos un detalle"
         )
 
-    return crud_transacciones.create_salida_inventario(
+    salida = crud_transacciones.create_salida_inventario(
         db=db, 
         salida_in=salida_in, 
         usuario_id=current_user.id
     )
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="inventory_exit_created",
+        log_type=AuditLogType.APPLICATION,
+        action="Creación de salida de inventario",
+        detail=f"Salida ID: {salida.id}, Tipo Salida ID: {salida.tipo_salida_id}",
+        user_id=current_user.id
+    )
+    return salida
 
 @router.get("/salidas/{id}", response_model=schemas_tra.SalidaOut)
 def get_salida_inventario_endpoint(
@@ -112,8 +134,19 @@ def _get_tipo_salida_or_404(
 def create_tipo_salida(
     tipo_in: schemas_tra.TipoSalidaCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
 ):
-    return crud_transacciones.create_tipo_salida(db, tipo_in)
+    tipo = crud_transacciones.create_tipo_salida(db, tipo_in)
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="inventory_exit_type_created",
+        log_type=AuditLogType.APPLICATION,
+        action="Creación de tipo de salida",
+        detail=f"Nombre: {tipo_in.nombre_tipo_salida}",
+        user_id=current_user.id
+    )
+    return tipo
 
 @router.get("/tipos-salida", response_model=Page[schemas_tra.TipoSalidaOut], dependencies=[Depends(require_admin_user)])
 def list_tipos_salida(
@@ -129,12 +162,34 @@ def update_tipo_salida(
     tipo_in: schemas_tra.TipoSalidaUpdate,
     db_obj: models_inv.TipoSalida = Depends(_get_tipo_salida_or_404),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
 ):
-    return crud_transacciones.update_tipo_salida(db, db_obj, tipo_in)
+    updated_tipo = crud_transacciones.update_tipo_salida(db, db_obj, tipo_in)
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="inventory_exit_type_updated",
+        log_type=AuditLogType.APPLICATION,
+        action="Actualización de tipo de salida",
+        detail=f"ID: {id}",
+        user_id=current_user.id
+    )
+    return updated_tipo
 
 @router.delete("/tipos-salida/{id}", response_model=schemas_tra.TipoSalidaOut, dependencies=[Depends(require_admin_user)])
 def delete_tipo_salida(
     db_obj: models_inv.TipoSalida = Depends(_get_tipo_salida_or_404),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
 ):
-    return crud_transacciones.delete_tipo_salida(db, db_obj)
+    deleted_tipo = crud_transacciones.delete_tipo_salida(db, db_obj)
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="inventory_exit_type_deleted",
+        log_type=AuditLogType.APPLICATION,
+        action="Eliminación de tipo de salida",
+        detail=f"ID: {db_obj.id}",
+        user_id=current_user.id
+    )
+    return deleted_tipo

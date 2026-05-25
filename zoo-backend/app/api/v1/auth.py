@@ -309,9 +309,11 @@ async def login(
         )
 
     # paso 1
+    logger.debug(f"DEBUG LOGIN: Intentando login para: {payload.email}")
     user = crud_user.get_user_by_email(db, payload.email)
     # paso 2 manejar el usuario no encontrado
     if not user:
+        logger.debug(f"DEBUG LOGIN: Usuario no encontrado en BD: {payload.email}")
         background_tasks.add_task(
             crud_audit.create_audit_log,
             # db,
@@ -324,6 +326,7 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
         )
 
+    logger.debug(f"DEBUG LOGIN: Usuario encontrado: {user.email}, email_verified={user.email_verified}, is_active={user.is_active}")
     # el usuario existe ahora verificamos si no esta blqoueado
     if policia.is_account_locked(user):
         from datetime import datetime, timezone
@@ -355,6 +358,7 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
         )
     # contraseña correcta vemos si esta verificado
+    logger.debug(f"DEBUG LOGIN: Verificando email_verified para {user.email}: {user.email_verified}")
     if not user.email_verified:
         logger.info(f"Intento de login para usuario no verificado: {user.email}")
         raise HTTPException(

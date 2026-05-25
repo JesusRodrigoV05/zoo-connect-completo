@@ -115,7 +115,12 @@ export const AuthStore = signalStore(
       };
 
       const handleError = (error: any, context: string): string => {
-        console.log('DEBUG: handleError called', { context, status: error?.status, detail: error?.error?.detail });
+        console.log('DEBUG FRONTEND: Error detectado', { 
+          context, 
+          status: error?.status, 
+          errorBody: error?.error,
+          detail: error?.error?.detail 
+        });
         console.error(`Error en ${context}:`, error);
         let errorMessage = `Error en ${context}`;
         if (typeof error === 'string') {
@@ -129,6 +134,7 @@ export const AuthStore = signalStore(
           const detail = error.error?.detail;
           if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
             const email = detail?.email || '';
+            console.log('DEBUG FRONTEND: Cuenta no verificada detectada. Redirigiendo a /verify-email', { email });
             router.navigate(['/verify-email'], { queryParams: { email } });
             patchState(store, { loading: false });
             return '';
@@ -401,13 +407,15 @@ export const AuthStore = signalStore(
           patchState(store, { loading: true });
           try {
             const accessToken = getTokenFromStorage(ACCESS_TOKEN_KEY);
+            const currentRoute = router.url;
+            const isPublicRoute = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'].some(path => currentRoute.includes(path));
 
             if (accessToken) {
               patchState(store, { accessToken });
 
               if (isTokenValid(accessToken)) {
                 await methods.loadUserProfile();
-              } else {
+              } else if (!isPublicRoute) {
                 try {
                   await methods.refreshTokens();
                   await methods.loadUserProfile();
@@ -415,7 +423,7 @@ export const AuthStore = signalStore(
                   clearAuthStateAndStorage();
                 }
               }
-            } else {
+            } else if (!isPublicRoute) {
               try {
                 const response: LoginResponse = await firstValueFrom(
                   authService.refreshToken(),

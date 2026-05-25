@@ -20,49 +20,65 @@
   >
     <ng-template #list let-items>
       <div class="audit-list-container">
+        <!-- Encabezados de "tabla" -->
+        <div class="audit-item audit-table-header">
+          <div class="audit-col-event">Evento / Acción</div>
+          <div class="audit-col-user">Usuario</div>
+          <div class="audit-col-detail">Detalle / Referencia</div>
+          <div class="audit-col-date">Fecha y Hora</div>
+        </div>
+
         @for (item of items; track item.id; let isFirst = $first) {
-        <div class="audit-item" [class.tour-audit-first-row]="isFirst">
-          <div class="audit-header">
+        <div class="audit-item audit-row" [class.tour-audit-first-row]="isFirst">
+          <!-- Columna Evento -->
+          <div class="audit-col-event">
             <p-tag
               styleClass="tour-audit-description"
               [value]="item.action || item.event"
               [severity]="getSeverity(item.event)"
             ></p-tag>
-            @if(isFirst){
-            <p-button
-              label="Tour guiado"
-              icon="pi pi-question-circle"
-              severity="contrast"
-              [rounded]="true"
-              (onClick)="startGuidedTour()"
-            />
-            }
-            <span class="audit-timestamp tour-audit-date">
-              {{ item.timestamp | date : "medium" }}
-            </span>
           </div>
-          <div class="audit-body">
-            <div class="audit-detail tour-audit-user">
-              <strong>Usuario:</strong>
-              <span>
-                @if (item.user) {
-                  {{ item.user.username }} ({{ item.user.email }})
-                } @else {
-                  Sistema
-                }
-              </span>
-            </div>
+
+          <!-- Columna Usuario -->
+          <div class="audit-col-user tour-audit-user">
+            @if (item.user) {
+              <div class="user-info">
+                <span class="username">{{ item.user.username }}</span>
+                <span class="email text-muted">{{ item.user.email }}</span>
+              </div>
+            } @else {
+              <span class="text-muted">Sistema</span>
+            }
+          </div>
+
+          <!-- Columna Detalle -->
+          <div class="audit-col-detail">
             @if(item.detail) {
-            <div class="audit-detail">
-              <strong>Detalle:</strong>
-              <span>{{ item.detail }}</span>
-            </div>
+              <span class="detail-text">{{ item.detail }}</span>
             }
             @if(item.attempted_email) {
-            <div class="audit-detail">
-              <strong>Referencia:</strong>
-              <span>{{ item.attempted_email }}</span>
-            </div>
+              <span class="ref-text text-muted">Ref: {{ item.attempted_email }}</span>
+            }
+            @if(!item.detail && !item.attempted_email) {
+              <span class="text-muted">-</span>
+            }
+          </div>
+
+          <!-- Columna Fecha -->
+          <div class="audit-col-date tour-audit-date">
+            <span class="audit-timestamp">
+              {{ item.timestamp | date : "medium" }}
+            </span>
+            
+            @if(isFirst){
+              <p-button
+                icon="pi pi-question-circle"
+                severity="contrast"
+                [rounded]="true"
+                [text]="true"
+                pTooltip="Iniciar tour guiado"
+                (onClick)="startGuidedTour()"
+              />
             }
           </div>
         </div>

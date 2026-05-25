@@ -92,7 +92,8 @@ app.get('/api/generate-quiz', requireAuth, async (req, res) => {
     const topic =
       (req.query['category'] as string) || 'Fauna Silvestre y Conservación';
 
-    const ai = new GoogleGenAI({});
+    const apiKey = (process.env['GEMINI_API_KEY'] || '') as any;
+    const ai = new GoogleGenAI(apiKey);
 
     const prompt = `
           Genera un quiz educativo sobre: "${topic}".
