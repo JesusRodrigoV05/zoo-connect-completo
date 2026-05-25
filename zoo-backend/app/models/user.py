@@ -31,6 +31,8 @@ class User(Base):
     totp_secret = Column(String(255), nullable=True)
     #redis
     locked_until = Column(DateTime(timezone=True), nullable=True)
+    must_change_password = Column(Boolean, default=True, nullable=False)
+    password_changed_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

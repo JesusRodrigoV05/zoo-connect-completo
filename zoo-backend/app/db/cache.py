@@ -1,5 +1,8 @@
+import logging
 import redis.asyncio as redis
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 try:
     pool = redis.ConnectionPool.from_url(
@@ -10,11 +13,11 @@ try:
 
     cache_client = redis.Redis.from_pool(pool)
     
-    print("Conectado a Redis")
+    logger.info("Conectado a Redis")
 
 except Exception as e:
-    print(f"Error: No se pudo conectar a Redis en {settings.REDIS_URL}")
-    print(f"Detalle: {e}")
+    logger.error("No se pudo conectar a Redis en %s", settings.REDIS_URL)
+    logger.debug("Detalle: %s", e)
     cache_client = None
 
 async def get_cache_client() -> redis.Redis | None:

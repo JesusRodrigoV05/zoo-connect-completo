@@ -1,6 +1,9 @@
+import logging
 from sqlalchemy.orm import Session
 from redis.asyncio import Redis
 from datetime import datetime, timedelta, timezone
+
+logger = logging.getLogger(__name__)
 
 from app.db.session import SessionLocal
 from app.models.user import User
@@ -30,7 +33,7 @@ async def increment_login_failure(
     Incrementa el contador de fallos en Redis para un email
     """
     if not cache:
-        print("Advertencia: Cliente Redis no disponible Omitiendo incremento de fallos")
+        logger.warning("Cliente Redis no disponible. Omitiendo incremento de fallos")
         return
 
     key = _get_redis_key(email)
@@ -49,7 +52,7 @@ async def get_login_failures(
     Obtiene el numero de fallos que llevamos
     """
     if not cache:
-        print("Advertencia: Cliente Redis no disponible asumo 0 fallos🙌")
+        logger.warning("Cliente Redis no disponible. Asumo 0 fallos")
         return 0
 
     key = _get_redis_key(email)
@@ -66,7 +69,7 @@ async def clear_login_failures(
     Limpia el contador de fallos de Redis
     """
     if not cache:
-        print("Advertencia: Cliente Redis no disponible Omitiendo limpieza de fallos🙌")
+        logger.warning("Cliente Redis no disponible. Omitiendo limpieza de fallos")
         return
         
     key = _get_redis_key(email)
@@ -87,7 +90,7 @@ def lock_account(user_id: int) -> None:
             db.add(user)
             db.commit()
     except Exception as e:
-        print(f"ERROR EN BACKGROUND TASK (lock_account): {e}")
+        logger.exception("Error en background task (lock_account)")
         db.rollback()
     finally:
         db.close()

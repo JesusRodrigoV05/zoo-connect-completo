@@ -1,8 +1,11 @@
+import logging
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from typing import Optional, List
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 from app.models import veterinario as models_vet
 from app.models.animal import Animal
@@ -358,7 +361,7 @@ def create_receta(
         return db_receta
     except Exception as e:
         db.rollback()
-        print(f"Error: {e}")
+        logger.exception("Error al procesar la receta")
         raise HTTPException(status_code=500, detail="Error al procesar la receta")
 
 def delete_receta(db: Session, receta_id: int):
@@ -449,7 +452,8 @@ def create_resultado_examen(
         return db_resultado
     except Exception as e:
         db.rollback()
-        raise e
+        logger.exception("Error creando resultado de examen")
+        raise HTTPException(status_code=500, detail="Error al crear resultado de examen")
 
 def delete_resultado_examen(db: Session, resultado_id: int):
     db_resultado = db.query(models_vet.ResultadoExamen).filter(

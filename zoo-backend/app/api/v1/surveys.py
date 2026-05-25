@@ -300,7 +300,7 @@ def list_user_participaciones(db: Session = Depends(get_db), current_user: User 
 
 
 @router.get("/surveys/{encuesta_id}/stats", tags=["Encuestas"])
-def get_survey_stats(encuesta_id: int, db: Session = Depends(get_db)):
+def get_survey_stats(encuesta_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     return crud_survey.get_survey_stats(db, encuesta_id)
 
 

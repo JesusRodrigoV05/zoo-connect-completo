@@ -1,7 +1,10 @@
+import logging
 from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 from app.models.inventario import TipoProducto, UnidadMedida, Proveedor, Producto
 
@@ -250,7 +253,7 @@ def create_producto(
         return db_producto
     except IntegrityError as e:
         db.rollback()
-        print(f"Error creando producto: {e}") 
+        logger.exception("Error de integridad creando producto")
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Error de integridad al crear producto")
 
 def update_producto(

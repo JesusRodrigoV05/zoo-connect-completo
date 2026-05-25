@@ -1,7 +1,10 @@
+import logging
 from fastapi import APIRouter, Depends, Query, Response, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import date
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 from app.db.session import get_db
 from app.models.user import User
@@ -32,7 +35,7 @@ def download_diario_operativo(
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
     except Exception as e:
-        print(f"Error generando reporte diario: {e}")
+        logger.error("Error generando reporte diario: %s", e)
         raise HTTPException(status_code=500, detail="Error al generar el PDF")
 
 
@@ -55,7 +58,7 @@ def download_ficha_clinica(
     except ValueError:
         raise HTTPException(status_code=404, detail="Historial medico no encontrado")
     except Exception as e:
-        print(f"Error generando ficha clinica: {e}")
+        logger.error("Error generando ficha clinica: %s", e)
         raise HTTPException(status_code=500, detail="Error al generar el PDF")
 
 
@@ -80,5 +83,5 @@ def download_kardex_inventario(
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
     except Exception as e:
-        print(f"Error generando kardex: {e}")
+        logger.error("Error generando kardex: %s", e)
         raise HTTPException(status_code=500, detail="Error al generar el PDF")

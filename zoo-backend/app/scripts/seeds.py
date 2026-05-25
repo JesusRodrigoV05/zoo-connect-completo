@@ -3,8 +3,6 @@ from app.db.session import SessionLocal
 from app.models.tarea import TipoTarea
 from app.models.inventario import TipoSalida
 from app.models.role import Role
-from app.models.user import User
-from app.core.security import get_password_hash
 from app.crud.permission import ensure_permissions_catalog, ensure_role_permissions
 
 def init_db():
@@ -71,27 +69,6 @@ def init_db():
         print("4. Verificando Permisos...")
         ensure_permissions_catalog(db)
         ensure_role_permissions(db)
-
-        print("5. Verificando usuarios de prueba...")
-        osi_role = db.query(Role).filter(Role.name == "osi").first()
-        if osi_role:
-            osi_email = "osi@zconnect.com"
-            osi_user = db.query(User).filter(User.email == osi_email).first()
-            if not osi_user:
-                print("   + Creando usuario OSI de prueba")
-                db.add(User(
-                    email=osi_email,
-                    username="osi",
-                    hashed_password=get_password_hash("osi123"),
-                    is_active=True,
-                    role_id=osi_role.id,
-                ))
-            else:
-                print("   + Actualizando usuario OSI de prueba")
-                osi_user.username = "osi"
-                osi_user.hashed_password = get_password_hash("osi123")
-                osi_user.is_active = True
-                osi_user.role_id = osi_role.id
 
         db.commit()
         print("--- Datos cargados exitosamente ---")

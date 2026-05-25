@@ -1,5 +1,8 @@
+import logging
 from typing import Optional, List
-from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile, Form, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile, Form
+
+logger = logging.getLogger(__name__)
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.orm import Session
@@ -11,8 +14,6 @@ from app.models import veterinario as models_vet
 
 from app.crud import veterinario as crud_vet
 from app.schemas import veterinario as schemas_vet
-from app.crud import audit as crud_audit
-from app.core.enums import AuditLogType
 
 from app.core.uploader import upload_to_cloudinary, delete_from_cloudinary
 
@@ -26,19 +27,9 @@ router = APIRouter()
 def create_tipo_atencion(
     obj_in: schemas_vet.TipoAtencionCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    new_obj = crud_vet.create_tipo_atencion(db, obj_in)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="tipo_atencion_created",
-        log_type=AuditLogType.APPLICATION,
-        action="Creación de tipo de atención",
-        detail=f"Nombre: {obj_in.nombre_tipo}",
-        user_id=current_user.id
-    )
-    return new_obj
+    return crud_vet.create_tipo_atencion(db, obj_in)
 
 @router.get("/tipos-atencion", response_model=List[schemas_vet.TipoAtencionOut])
 def list_tipos_atencion(
@@ -53,37 +44,17 @@ def update_tipo_atencion(
     id: int,
     obj_in: schemas_vet.TipoAtencionUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    updated_obj = crud_vet.update_tipo_atencion(db, id, obj_in)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="tipo_atencion_updated",
-        log_type=AuditLogType.APPLICATION,
-        action="Actualización de tipo de atención",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return updated_obj
+    return crud_vet.update_tipo_atencion(db, id, obj_in)
 
 @router.delete("/tipos-atencion/{id}", response_model=schemas_vet.TipoAtencionOut)
 def delete_tipo_atencion(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    deleted_obj = crud_vet.delete_tipo_atencion(db, id)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="tipo_atencion_deleted",
-        log_type=AuditLogType.APPLICATION,
-        action="Eliminación de tipo de atención",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return deleted_obj
+    return crud_vet.delete_tipo_atencion(db, id)
 
 
 #TIPO EXAMEN
@@ -91,19 +62,9 @@ def delete_tipo_atencion(
 def create_tipo_examen(
     obj_in: schemas_vet.TipoExamenCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    new_obj = crud_vet.create_tipo_examen(db, obj_in)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="tipo_examen_created",
-        log_type=AuditLogType.APPLICATION,
-        action="Creación de tipo de examen",
-        detail=f"Nombre: {obj_in.nombre_tipo}",
-        user_id=current_user.id
-    )
-    return new_obj
+    return crud_vet.create_tipo_examen(db, obj_in)
 
 @router.get("/tipos-examen", response_model=List[schemas_vet.TipoExamenOut])
 def list_tipos_examen(
@@ -118,37 +79,17 @@ def update_tipo_examen(
     id: int,
     obj_in: schemas_vet.TipoExamenUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    updated_obj = crud_vet.update_tipo_examen(db, id, obj_in)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="tipo_examen_updated",
-        log_type=AuditLogType.APPLICATION,
-        action="Actualización de tipo de examen",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return updated_obj
+    return crud_vet.update_tipo_examen(db, id, obj_in)
 
 @router.delete("/tipos-examen/{id}", response_model=schemas_vet.TipoExamenOut)
 def delete_tipo_examen(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    deleted_obj = crud_vet.delete_tipo_examen(db, id)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="tipo_examen_deleted",
-        log_type=AuditLogType.APPLICATION,
-        action="Eliminación de tipo de examen",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return deleted_obj
+    return crud_vet.delete_tipo_examen(db, id)
 
 #HISTORIAL MEDICO
 
@@ -156,19 +97,9 @@ def delete_tipo_examen(
 def create_historial(
     historial_in: schemas_vet.HistorialMedicoCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario) 
 ):
-    new_historial = crud_vet.create_historial(db, historial_in, veterinario_id=current_user.id)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="historial_medico_created",
-        log_type=AuditLogType.APPLICATION,
-        action="Creación de historial médico",
-        detail=f"Animal ID: {historial_in.animal_id}",
-        user_id=current_user.id
-    )
-    return new_historial
+    return crud_vet.create_historial(db, historial_in, veterinario_id=current_user.id)
 
 @router.get("/historiales", response_model=Page[schemas_vet.HistorialMedicoOut])
 def list_historiales(
@@ -198,8 +129,7 @@ def update_historial(
     id: int,
     historial_in: schemas_vet.HistorialMedicoUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
     db_historial = crud_vet.get_historial(db, id)
     if not db_historial:
@@ -208,16 +138,7 @@ def update_historial(
     if not current_user.is_admin and db_historial.veterinario_id != current_user.id:
         raise HTTPException(status_code=403, detail="Solo el veterinario autor o un admin puede editar este historial")
 
-    updated_historial = crud_vet.update_historial(db, db_historial, historial_in)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="historial_medico_updated",
-        log_type=AuditLogType.APPLICATION,
-        action="Actualización de historial médico",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return updated_historial
+    return crud_vet.update_historial(db, db_historial, historial_in)
 
 
 #RPDOCEDIMIENTOS
@@ -227,56 +148,26 @@ def create_procedimiento(
     id_historial: int,
     proc_in: schemas_vet.ProcedimientoCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    new_proc = crud_vet.create_procedimiento(db, proc_in, historial_id=id_historial)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="procedimiento_medico_created",
-        log_type=AuditLogType.APPLICATION,
-        action="Creación de procedimiento médico",
-        detail=f"Historial ID: {id_historial}, Tipo: {proc_in.tipo_atencion_id}",
-        user_id=current_user.id
-    )
-    return new_proc
+    return crud_vet.create_procedimiento(db, proc_in, historial_id=id_historial)
 
 @router.put("/procedimientos/{id}", response_model=schemas_vet.ProcedimientoOut)
 def update_procedimiento(
     id: int,
     proc_in: schemas_vet.ProcedimientoUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    updated_proc = crud_vet.update_procedimiento(db, id, proc_in)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="procedimiento_medico_updated",
-        log_type=AuditLogType.APPLICATION,
-        action="Actualización de procedimiento médico",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return updated_proc
+    return crud_vet.update_procedimiento(db, id, proc_in)
 
 @router.delete("/procedimientos/{id}")
 def delete_procedimiento(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_animal_management_permission),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_animal_management_permission)
 ):
-    deleted_proc = crud_vet.delete_procedimiento(db, id)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="procedimiento_medico_deleted",
-        log_type=AuditLogType.APPLICATION,
-        action="Eliminación de procedimiento médico",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return deleted_proc
+    return crud_vet.delete_procedimiento(db, id)
 
 @router.get("/procedimientos", response_model=Page[schemas_vet.ProcedimientoOut])
 def list_procedimientos(
@@ -336,37 +227,17 @@ def create_receta_medica(
     id_historial: int,
     receta_in: schemas_vet.RecetaMedicaCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    new_receta = crud_vet.create_receta(db, receta_in, historial_id=id_historial)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="receta_medica_created",
-        log_type=AuditLogType.APPLICATION,
-        action="Creación de receta médica",
-        detail=f"Historial ID: {id_historial}, Producto ID: {receta_in.producto_id}",
-        user_id=current_user.id
-    )
-    return new_receta
+    return crud_vet.create_receta(db, receta_in, historial_id=id_historial)
 
 @router.delete("/recetas/{id}")
 def delete_receta_medica(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    deleted_receta = crud_vet.delete_receta(db, id)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="receta_medica_deleted",
-        log_type=AuditLogType.APPLICATION,
-        action="Eliminación de receta médica",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return deleted_receta
+    return crud_vet.delete_receta(db, id)
 
 
 #ORDENES
@@ -409,37 +280,17 @@ def create_orden_examen(
     id_historial: int,
     orden_in: schemas_vet.OrdenExamenCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    new_orden = crud_vet.create_orden_examen(db, orden_in, historial_id=id_historial)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="orden_examen_created",
-        log_type=AuditLogType.APPLICATION,
-        action="Creación de orden de examen",
-        detail=f"Historial ID: {id_historial}, Tipo: {orden_in.tipo_examen_id}",
-        user_id=current_user.id
-    )
-    return new_orden
+    return crud_vet.create_orden_examen(db, orden_in, historial_id=id_historial)
 
 @router.delete("/ordenes-examen/{id}")
 def delete_orden_examen(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
-    deleted_orden = crud_vet.delete_orden_examen(db, id)
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="orden_examen_deleted",
-        log_type=AuditLogType.APPLICATION,
-        action="Eliminación de orden de examen",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
-    return deleted_orden
+    return crud_vet.delete_orden_examen(db, id)
 
 #RESULTADOS
 @router.get("/resultados-examen", response_model=Page[schemas_vet.ResultadoExamenOut])
@@ -474,8 +325,7 @@ def upload_resultado_examen(
     conclusiones: Optional[str] = Form(None), 
     file: UploadFile = File(..., description="Archivo de evidencia"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
 
     upload_result = None
@@ -494,35 +344,24 @@ def upload_resultado_examen(
     try:
         resultado_in = schemas_vet.ResultadoExamenCreate(conclusiones=conclusiones)
         
-        new_resultado = crud_vet.create_resultado_examen(
+        return crud_vet.create_resultado_examen(
             db=db,
             orden_id=id_orden,
             resultado_in=resultado_in,
             file_url=file_url,
             public_id=public_id
         )
-        
-        background_tasks.add_task(
-            crud_audit.create_audit_log,
-            event="resultado_examen_uploaded",
-            log_type=AuditLogType.APPLICATION,
-            action="Subida de resultado de examen",
-            detail=f"Orden ID: {id_orden}",
-            user_id=current_user.id
-        )
-        return new_resultado
 
     except Exception as e:
-        print(f" Error en BD: {public_id}")
+        logger.error("Error en BD al crear resultado: %s", public_id)
         delete_from_cloudinary(public_id)
-        raise e
+        raise
 
 @router.delete("/resultados-examen/{id}")
 def delete_resultado_examen(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_veterinario),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    current_user: User = Depends(require_veterinario)
 ):
     result = crud_vet.delete_resultado_examen(db, id)
     
@@ -532,14 +371,6 @@ def delete_resultado_examen(
         try:
             delete_from_cloudinary(public_id)
         except Exception as e:
-            print(f"Advertencia: No se pudo borrar imagen de Cloudinary {public_id}: {e}")
+            logger.warning("No se pudo borrar imagen de Cloudinary %s: %s", public_id, e)
             
-    background_tasks.add_task(
-        crud_audit.create_audit_log,
-        event="resultado_examen_deleted",
-        log_type=AuditLogType.APPLICATION,
-        action="Eliminación de resultado de examen",
-        detail=f"ID: {id}",
-        user_id=current_user.id
-    )
     return {"detail": "Resultado y archivo eliminados correctamente"}

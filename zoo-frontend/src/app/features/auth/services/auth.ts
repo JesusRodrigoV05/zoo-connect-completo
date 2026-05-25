@@ -106,8 +106,12 @@ export class Auth {
     );
   }
 
-  verifyEmail(email: string, code: string): Observable<any> {
-    return this.http.post<any>(`${this.authUrl}/verify-email`, { email, code });
+  verifyEmail(email: string, code: string, recaptchaToken?: string): Observable<any> {
+    return this.http.post<any>(`${this.authUrl}/verify-email`, {
+      email,
+      code,
+      recaptcha_token: recaptchaToken,
+    });
   }
 
   getPasswordHistory(userId: number, limit: number = 10): Observable<Array<{id: number, user_id: number, password_hash: string, created_at: string}>> {

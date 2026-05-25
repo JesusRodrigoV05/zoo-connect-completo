@@ -1,3 +1,4 @@
+import logging
 from typing import List, Optional
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
@@ -5,6 +6,8 @@ from fastapi import HTTPException, Query, status
 from datetime import date
 from decimal import Decimal
 from sqlalchemy import desc, asc
+
+logger = logging.getLogger(__name__)
 
 from app.models.inventario import (
     Producto, StockLote, EntradaInventario, DetalleEntrada, 
@@ -158,10 +161,11 @@ def create_entrada_inventario(db: Session, entrada_in: EntradaInventarioCreate, 
 
     except (ValueError, IntegrityError) as e:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error procesando entrada: {str(e)}")
+        logger.error("Error procesando entrada de inventario: %s", e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error procesando entrada")
     except Exception as e:
         db.rollback()
-        print(f"Error critico en entrada: {e}")
+        logger.exception("Error critico en entrada de inventario")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
     
 #proceso de salida
@@ -290,10 +294,11 @@ def create_salida_inventario(
 
     except (ValueError, IntegrityError) as e:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error: {e}")
+        logger.error("Error procesando salida de inventario: %s", e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error procesando salida")
     except Exception as e:
         db.rollback()
-        print(f"Error interno: {e}")
+        logger.exception("Error critico en salida de inventario")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
 
 #consultas de estado

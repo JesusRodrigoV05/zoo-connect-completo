@@ -1,3 +1,5 @@
+import logging
+from datetime import datetime, timezone
 from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
@@ -5,6 +7,8 @@ from starlette import status
 from typing import List, Optional
 import secrets
 import string
+
+logger = logging.getLogger(__name__)
 
 from app.models.user import User
 from app.models.role import Role
@@ -16,6 +20,7 @@ from app.schemas.user import (
     UserUpdateProfile,
 )
 from app.core.security import get_password_hash, verify_password
+from app.core.password_policy import validate_password_strength_func
 from app.core.enums import UserRole
 from app.core.config import settings
 
@@ -115,6 +120,7 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         email_verified=False,
         verification_code=verification_code,
         role_id=role_id,
+        password_changed_at=datetime.now(timezone.utc),
     )
 
     db.add(user)
@@ -122,9 +128,10 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         db.commit()
     except IntegrityError as e:
         db.rollback()
+        logger.exception("Error de integridad creando usuario")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Email o nombre de usuario ya existen: {e.orig}",
+            detail="Email o nombre de usuario ya existen",
         )
     db.refresh(user)
     return user
@@ -139,6 +146,7 @@ def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
         hashed_password=hashed_password,
         is_active=user_in.is_active,
         role_id=user_in.role_id,
+        password_changed_at=datetime.now(timezone.utc),
     )
 
     db.add(user)
@@ -146,9 +154,10 @@ def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
         db.commit()
     except IntegrityError as e:
         db.rollback()
+        logger.exception("Error de integridad creando usuario por admin")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Email o nombre de usuario ya existen: {e.orig}",
+            detail="Email o nombre de usuario ya existen",
         )
     db.refresh(user)
     return user
@@ -166,8 +175,9 @@ def update_user_by_admin(
         db.commit()
     except IntegrityError as e:
         db.rollback()
+        logger.exception("Conflicto de integridad actualizando usuario por admin")
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=f"Conflicto de datos: {e.orig}"
+            status_code=status.HTTP_409_CONFLICT, detail="Conflicto de datos"
         )
     db.refresh(db_user_to_update)
     return db_user_to_update
@@ -188,6 +198,19 @@ def update_own_profile(
 ) -> User:
     update_data = user_in.model_dump(exclude_unset=True)
 
+    password_raw = update_data.pop("password", None)
+    if password_raw is not None:
+        validate_password_strength_func(password_raw)
+        if is_password_in_history(db, db_user_to_update, password_raw):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No puedes reutilizar una contraseña que ya has usado anteriormente",
+            )
+        _save_password_to_history(db, db_user_to_update, db_user_to_update.hashed_password)
+        _enforce_password_history_limit(db, db_user_to_update)
+        db_user_to_update.hashed_password = get_password_hash(password_raw)
+        db_user_to_update.password_changed_at = datetime.now(timezone.utc)
+
     for field, value in update_data.items():
         setattr(db_user_to_update, field, value)
 
@@ -196,8 +219,9 @@ def update_own_profile(
         db.commit()
     except IntegrityError as e:
         db.rollback()
+        logger.exception("Conflicto de integridad actualizando perfil propio")
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=f"Conflicto de datos: {e.orig}"
+            status_code=status.HTTP_409_CONFLICT, detail="Conflicto de datos"
         )
     db.refresh(db_user_to_update)
     return db_user_to_update
@@ -211,6 +235,7 @@ def update_password(db: Session, db_user: User, new_password: str) -> User:
     _enforce_password_history_limit(db, db_user)
 
     db_user.hashed_password = get_password_hash(new_password)
+    db_user.password_changed_at = datetime.now(timezone.utc)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -304,6 +329,26 @@ def _get_password_history_limit(role_name: str) -> int:
         "visitante": settings.PASSWORD_HISTORY_PACIENTE_MAX,
     }
     return role_limits.get(role_name, settings.PASSWORD_HISTORY_USUARIO_BASICO_MAX)
+
+
+def _get_password_validity_days(role_name: str) -> int:
+    role_validity = {
+        "administrador": settings.PASSWORD_VALIDITY_ADMIN_DAYS,
+        "osi": settings.PASSWORD_VALIDITY_ESPECIALISTA_DAYS,
+        "veterinario": settings.PASSWORD_VALIDITY_ESPECIALISTA_DAYS,
+        "cuidador": settings.PASSWORD_VALIDITY_ESPECIALISTA_DAYS,
+        "visitante": settings.PASSWORD_VALIDITY_PACIENTE_DAYS,
+    }
+    return role_validity.get(role_name, settings.PASSWORD_VALIDITY_USUARIO_BASICO_DAYS)
+
+
+def is_password_expired(user: User) -> bool:
+    if user.password_changed_at is None:
+        return False
+    validity_days = _get_password_validity_days(user.role.name if user.role else "visitante")
+    from datetime import timedelta
+    expiry = user.password_changed_at + timedelta(days=validity_days)
+    return expiry < datetime.now(timezone.utc)
 
 
 def is_password_in_history(db: Session, user: User, new_password: str) -> bool:

@@ -1,7 +1,10 @@
+import logging
 from typing import List, Optional
 from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
+
+logger = logging.getLogger(__name__)
 
 from app.models.tarea import Dieta, DetalleDieta
 from app.models.animal import Animal, Especie
@@ -93,7 +96,8 @@ def create_dieta(db: Session, dieta_in: DietaCreate) -> Dieta:
         raise HTTPException(status_code=409, detail=f"El animal o especie ya tiene una dieta asignada")
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error creando dieta: {e}")
+        logger.exception("Error creando dieta")
+        raise HTTPException(status_code=500, detail="Error creando dieta")
 
 def get_dieta_for_animal(db: Session, animal_id: int) -> Optional[Dieta]:
     #primero buscamos dieta especficia del animal sino de la especie
@@ -167,7 +171,8 @@ def update_dieta(
         raise HTTPException(status_code=409, detail="Conflicto de integridad al actualizar dieta")
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error actualizando dieta: {e}")
+        logger.exception("Error actualizando dieta")
+        raise HTTPException(status_code=500, detail="Error actualizando dieta")
 
 def delete_dieta(db: Session, db_dieta: Dieta) -> Dieta:
     db_dieta.is_active = False

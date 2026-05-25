@@ -1,10 +1,13 @@
+import logging
 import httpx
 from pydantic import EmailStr
 from app.core.config import settings
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 
+logger = logging.getLogger(__name__)
+
 # Configuración SMTP
-print(f"DEBUG: Iniciando email_service con MAIL_SERVER={settings.MAIL_SERVER}, MAIL_PORT={settings.MAIL_PORT}, MAIL_FROM={settings.MAIL_FROM}")
+logger.debug("Iniciando email_service con MAIL_SERVER=%s, MAIL_PORT=%s, MAIL_FROM=%s", settings.MAIL_SERVER, settings.MAIL_PORT, settings.MAIL_FROM)
 conf = ConnectionConfig(
     MAIL_USERNAME=settings.MAIL_USERNAME,
     MAIL_PASSWORD=settings.MAIL_PASSWORD,
@@ -21,8 +24,8 @@ conf = ConnectionConfig(
 
 async def _send_email_via_smtp(email_to: str, subject: str, html_body: str) -> None:
     """Envía un email usando SMTP (fastapi-mail)."""
-    print(f"DEBUG: Configurando envío de email a {email_to}")
-    print(f"DEBUG: MAIL_SERVER={settings.MAIL_SERVER}, MAIL_PORT={settings.MAIL_PORT}, MAIL_FROM={settings.MAIL_FROM}")
+    logger.debug("Configurando envio de email a %s", email_to)
+    logger.debug("MAIL_SERVER=%s, MAIL_PORT=%s, MAIL_FROM=%s", settings.MAIL_SERVER, settings.MAIL_PORT, settings.MAIL_FROM)
     message = MessageSchema(
         subject=subject,
         recipients=[email_to],
@@ -32,12 +35,10 @@ async def _send_email_via_smtp(email_to: str, subject: str, html_body: str) -> N
     fm = FastMail(conf)
     try:
         await fm.send_message(message)
-        print(f"SUCCESS: Correo enviado a {email_to} vía SMTP ({settings.MAIL_SERVER})")
+        logger.info("Correo enviado a %s via SMTP (%s)", email_to, settings.MAIL_SERVER)
     except Exception as e:
-        import traceback
-        print(f"ERROR: Fallo al enviar correo a {email_to}: {str(e)}")
-        traceback.print_exc()
-        raise e
+        logger.exception("Fallo al enviar correo a %s", email_to)
+        raise
 
 
 async def _send_email_via_postmark(email_to: str, subject: str, html_body: str) -> None:
@@ -60,7 +61,7 @@ async def _send_email_via_postmark(email_to: str, subject: str, html_body: str) 
         response = await client.post(url, headers=headers, json=payload, timeout=10.0)
         if response.status_code not in (200, 202):
             raise Exception(f"Postmark error {response.status_code}: {response.text}")
-    print(f"Correo enviado a {email_to} vía Postmark")
+    logger.info("Correo enviado a %s via Postmark", email_to)
 
 
 async def send_password_reset_email(email_to: EmailStr, token: str, username: str):
@@ -99,7 +100,7 @@ async def send_password_reset_email(email_to: EmailStr, token: str, username: st
     await _send_email_via_smtp(
         email_to, "Restablece tu contraseña de ZooConnect", html_template
     )
-    print(f"Correo de reset enviado a {email_to}")
+    logger.info("Correo de reset enviado a %s", email_to)
 
 
 async def send_generated_password_email(
@@ -128,7 +129,7 @@ async def send_generated_password_email(
     await _send_email_via_smtp(
         email_to, "Tu contraseña temporal de ZooConnect", html_template
     )
-    print(f"Correo con contraseña generada enviado a {email_to}")
+    logger.info("Correo con contrasena generada enviado a %s", email_to)
 
 
 async def send_verification_email(email_to: EmailStr, code: str, username: str):
@@ -166,4 +167,4 @@ async def send_verification_email(email_to: EmailStr, code: str, username: str):
     await _send_email_via_smtp(
         email_to, "Activa tu cuenta de ZooConnect", html_template
     )
-    print(f"Correo de verificación enviado a {email_to}")
+    logger.info("Correo de verificacion enviado a %s", email_to)

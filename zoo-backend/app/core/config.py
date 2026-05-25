@@ -20,8 +20,9 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     MEDIA_DIR: str = "./media"
     CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
+        "http://localhost:4200",
         "https://vercel-zoo-connect.vercel.app",
+        "https://vercel-zoo-connect-git-main-mfjm0265-7988s-projects.vercel.app",
     ]
     DEFAULT_ADMIN_EMAIL: str
     DEFAULT_ADMIN_PASSWORD: str

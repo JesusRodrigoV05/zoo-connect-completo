@@ -1,4 +1,4 @@
-import { computed, inject, PLATFORM_ID } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withComputed,
@@ -15,7 +15,6 @@ import {
   UpdateProfileRequest,
   RegisterResponse,
 } from "@models/usuario/request_response.model";
-import { isPlatformBrowser } from "@angular/common";
 import { ShowToast } from "@app/shared/services";
 import { Theme } from "@app/features/private/settings/services/theme-service";
 import { environment } from "@env";
@@ -41,8 +40,6 @@ function getInitialState(): AuthState {
   };
 }
 
-const ACCESS_TOKEN_KEY = 'access_token';
-
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(getInitialState()),
@@ -67,33 +64,11 @@ export const AuthStore = signalStore(
       store,
       authService = inject(Auth),
       router = inject(Router),
-      platformId = inject(PLATFORM_ID),
       toastService = inject(ShowToast),
       themeService = inject(Theme),
       encryptionService = inject(EncryptionService),
     ) => {
-      const setTokenInStorage = (key: string, value: string): void => {
-        if (isPlatformBrowser(platformId)) {
-          localStorage.setItem(key, value);
-        }
-      };
-
-      const getTokenFromStorage = (key: string): string | null => {
-        if (isPlatformBrowser(platformId)) {
-          return localStorage.getItem(key);
-        }
-        return null;
-      };
-
-      const removeTokenFromStorage = (key: string): void => {
-        if (isPlatformBrowser(platformId)) {
-          localStorage.removeItem(key);
-        }
-      };
-
       const clearAuthStateAndStorage = () => {
-        removeTokenFromStorage(ACCESS_TOKEN_KEY);
-        removeTokenFromStorage(themeService.THEME_KEY);
         patchState(store, getInitialState());
       };
 
@@ -115,12 +90,7 @@ export const AuthStore = signalStore(
       };
 
       const handleError = (error: any, context: string): string => {
-        console.log('DEBUG FRONTEND: Error detectado', { 
-          context, 
-          status: error?.status, 
-          errorBody: error?.error,
-          detail: error?.error?.detail 
-        });
+        console.log('DEBUG: handleError called', { context, status: error?.status, detail: error?.error?.detail });
         console.error(`Error en ${context}:`, error);
         let errorMessage = `Error en ${context}`;
         if (typeof error === 'string') {
@@ -134,7 +104,6 @@ export const AuthStore = signalStore(
           const detail = error.error?.detail;
           if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
             const email = detail?.email || '';
-            console.log('DEBUG FRONTEND: Cuenta no verificada detectada. Redirigiendo a /verify-email', { email });
             router.navigate(['/verify-email'], { queryParams: { email } });
             patchState(store, { loading: false });
             return '';
@@ -216,6 +185,18 @@ export const AuthStore = signalStore(
               return;
             }
 
+            if (
+              'status' in loginResponse &&
+              loginResponse.status === 'must_change_password'
+            ) {
+              patchState(store, { loading: false });
+
+              await router.navigate(['/reset-password'], {
+                queryParams: { token: loginResponse.reset_token },
+              });
+              return;
+            }
+
             methods.setTokens(loginResponse.access_token);
             await methods.loadUserProfile();
 
@@ -287,10 +268,10 @@ export const AuthStore = signalStore(
           }
         },
 
-        async verifyEmail(email: string, code: string): Promise<void> {
+        async verifyEmail(email: string, code: string, recaptchaToken?: string): Promise<void> {
           patchState(store, { loading: true, error: null });
           try {
-            await firstValueFrom(authService.verifyEmail(email, code));
+            await firstValueFrom(authService.verifyEmail(email, code, recaptchaToken));
             patchState(store, { loading: false });
             toastService.showSuccess(
               '¡Éxito!',
@@ -395,7 +376,6 @@ export const AuthStore = signalStore(
         },
 
         setTokens(accessToken: string) {
-          setTokenInStorage(ACCESS_TOKEN_KEY, accessToken);
           patchState(store, { accessToken, error: null });
         },
 
@@ -406,37 +386,12 @@ export const AuthStore = signalStore(
         async initializeAuth() {
           patchState(store, { loading: true });
           try {
-            const accessToken = getTokenFromStorage(ACCESS_TOKEN_KEY);
-            const currentRoute = router.url;
-            const isPublicRoute = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'].some(path => currentRoute.includes(path));
-
-            if (accessToken) {
-              patchState(store, { accessToken });
-
-              if (isTokenValid(accessToken)) {
-                await methods.loadUserProfile();
-              } else if (!isPublicRoute) {
-                try {
-                  await methods.refreshTokens();
-                  await methods.loadUserProfile();
-                } catch (refreshError) {
-                  clearAuthStateAndStorage();
-                }
-              }
-            } else if (!isPublicRoute) {
-              try {
-                const response: LoginResponse = await firstValueFrom(
-                  authService.refreshToken(),
-                );
-
-                methods.setTokens(response.access_token);
-                await methods.loadUserProfile();
-              } catch (e) {
-                clearAuthStateAndStorage();
-              }
-            }
-          } catch (error) {
-            console.error('Error durante inicialización:', error);
+            const response: LoginResponse = await firstValueFrom(
+              authService.refreshToken(),
+            );
+            methods.setTokens(response.access_token);
+            await methods.loadUserProfile();
+          } catch {
             clearAuthStateAndStorage();
           } finally {
             patchState(store, { loading: false });

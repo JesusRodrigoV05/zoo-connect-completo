@@ -1,6 +1,9 @@
+import logging
 from enum import Enum
 from sqlalchemy.orm import Session, Query, joinedload
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 from app.db.session import SessionLocal
 from app.models.audit_log import AuditLog
 from app.core.enums import AuditEvent, AuditLogType
@@ -53,7 +56,7 @@ def create_audit_log(
         db.add(db_log)
         db.commit()
     except Exception as e:
-        print(f"ERROR EN BACKGROUND TASK (create_audit_log): {e}")
+        logger.exception("Error en background task (create_audit_log)")
         db.rollback()
     finally:
         db.close()

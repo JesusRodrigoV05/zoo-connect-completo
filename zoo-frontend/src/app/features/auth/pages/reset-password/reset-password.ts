@@ -18,6 +18,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { RestorePassword } from "../../services/restore-password";
 import { ShowToast } from "@app/shared/services";
+import { AuthStore } from "@stores/auth.store";
 import { finalize } from "rxjs/operators";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";
@@ -63,6 +64,7 @@ export default class ResetPassword implements OnInit, OnDestroy {
   private readonly recaptchaService = inject(RecaptchaService);
   private readonly ngZone = inject(NgZone);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly authStore = inject(AuthStore);
 
   protected readonly isResetting = signal(false);
   protected readonly formSubmitted = signal(false);
@@ -275,9 +277,15 @@ export default class ResetPassword implements OnInit, OnDestroy {
         .resetPassword(this.token(), this.resetForm.value.password!, captchaToken)
         .pipe(finalize(() => this.isResetting.set(false)))
         .subscribe({
-          next: (response) => {
-            this.toastService.showSuccess("Éxito", response.msg);
-            this.router.navigate(["/login"]);
+          next: (response: any) => {
+            if (response.access_token) {
+              this.authStore.setTokens(response.access_token);
+              this.authStore.loadUserProfile();
+              this.router.navigate(["/inicio"]);
+            } else {
+              this.toastService.showSuccess("Éxito", response.msg);
+              this.router.navigate(["/login"]);
+            }
           },
           error: (error) => {
             let errorMessage = "Error al restablecer contraseña";

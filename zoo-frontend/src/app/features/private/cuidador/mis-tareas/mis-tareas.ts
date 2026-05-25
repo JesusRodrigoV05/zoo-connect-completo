@@ -205,7 +205,7 @@ export default class MisTareas {
     const descripcion = tarea.descripcion?.toLowerCase();
     const contieneId = descripcion?.includes("receta id");
 
-    const esTipoReceta = tarea.tipoTarea?.id === 2;
+    const esTipoReceta = tarea.tipoTarea?.nombre?.toLowerCase().includes("tratamiento") || false;
 
     return esTipoReceta && contieneId;
   }
