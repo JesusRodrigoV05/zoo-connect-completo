@@ -3,7 +3,13 @@
 }
 
 .audit-page-header {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
 
   h1 {
     margin: 0;
@@ -15,6 +21,33 @@
   p {
     margin: 0.35rem 0 0;
     color: var(--p-text-muted-color);
+  }
+
+  .total-badge {
+    background: var(--p-primary-color);
+    color: var(--p-primary-contrast-color);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: var(--p-shadow-2);
+  }
+}
+
+.audit-filters-bar {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr auto;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: var(--p-surface-card);
+  border: 1px solid var(--p-surface-border);
+  border-radius: var(--p-border-radius);
+  align-items: center;
+
+  .filter-group {
+    display: flex;
+    align-items: center;
   }
 }
 

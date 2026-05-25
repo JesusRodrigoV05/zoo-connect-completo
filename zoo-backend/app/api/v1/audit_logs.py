@@ -12,15 +12,32 @@ from app.schemas.audit import AuditLogOut
 router = APIRouter()
 
 
+from datetime import date
+from typing import Optional
+from fastapi import APIRouter, Depends, Query as FastAPIQuery
+
 @router.get(
     "/application",
     response_model=Page[AuditLogOut],
     dependencies=[Depends(require_permission(PermissionCode.AUDIT_APPLICATION_LOGS))],
     summary="Obtener log de aplicación",
 )
-def get_application_logs(db: Session = Depends(get_db)):
+def get_application_logs(
+    db: Session = Depends(get_db),
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    search: Optional[str] = None,
+    user_id: Optional[int] = None,
+):
     return paginate(
-        crud_audit.get_audit_logs_by_type_query(db=db, log_type=AuditLogType.APPLICATION)
+        crud_audit.get_audit_logs_by_type_query(
+            db=db, 
+            log_type=AuditLogType.APPLICATION,
+            date_from=date_from,
+            date_to=date_to,
+            search=search,
+            user_id=user_id
+        )
     )
 
 
@@ -30,7 +47,20 @@ def get_application_logs(db: Session = Depends(get_db)):
     dependencies=[Depends(require_permission(PermissionCode.AUDIT_SECURITY_LOGS))],
     summary="Obtener log de seguridad OSI",
 )
-def get_security_logs(db: Session = Depends(get_db)):
+def get_security_logs(
+    db: Session = Depends(get_db),
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    search: Optional[str] = None,
+    user_id: Optional[int] = None,
+):
     return paginate(
-        crud_audit.get_audit_logs_by_type_query(db=db, log_type=AuditLogType.SECURITY)
+        crud_audit.get_audit_logs_by_type_query(
+            db=db, 
+            log_type=AuditLogType.SECURITY,
+            date_from=date_from,
+            date_to=date_to,
+            search=search,
+            user_id=user_id
+        )
     )

@@ -1,10 +1,67 @@
 <zoo-main-container>
   <header class="audit-page-header">
-    <div>
-      <h1>{{ title() }}</h1>
-      <p>{{ subtitle() }}</p>
+    <div class="header-content">
+      <div>
+        <h1>{{ title() }}</h1>
+        <p>{{ subtitle() }}</p>
+      </div>
+      <div class="header-stats">
+        <span class="total-badge">{{ totalRecords() }} registros encontrados</span>
+      </div>
     </div>
   </header>
+
+  <!-- Filtros -->
+  <div class="audit-filters-bar card">
+    <div class="filter-group">
+      <span class="p-input-icon-left w-full">
+        <i class="pi pi-search"></i>
+        <input 
+          pInputText 
+          type="text" 
+          placeholder="Buscar evento o detalle..." 
+          class="w-full"
+          [value]="searchTerm()"
+          (input)="updateSearch($event)"
+        />
+      </span>
+    </div>
+
+    <div class="filter-group">
+      <p-datepicker 
+        [ngModel]="dateRange()"
+        (ngModelChange)="onDateChange($event)"
+        selectionMode="range" 
+        [readonlyInput]="true" 
+        placeholder="Rango de fechas"
+        [showIcon]="true"
+        class="w-full"
+        styleClass="w-full"
+      ></p-datepicker>
+    </div>
+
+    <div class="filter-group">
+      <p-select 
+        [options]="usuarios()" 
+        [ngModel]="selectedUserId()"
+        (ngModelChange)="onUserChange($event)"
+        placeholder="Filtrar por usuario" 
+        [showClear]="true"
+        [filter]="true"
+        class="w-full"
+        styleClass="w-full"
+      ></p-select>
+    </div>
+
+    <div class="filter-actions">
+      <p-button 
+        icon="pi pi-filter-slash" 
+        severity="secondary" 
+        pTooltip="Limpiar filtros"
+        (onClick)="clearFilters()"
+      ></p-button>
+    </div>
+  </div>
 
   <p-dataview
     styleClass="tour-audit-dataview"

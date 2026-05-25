@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+from datetime import date, datetime
 from sqlalchemy.orm import Session, Query, joinedload
 from typing import Optional
 
@@ -68,10 +69,35 @@ def get_audit_logs_query(db: Session) -> Query:
     ).order_by(AuditLog.timestamp.desc())
 
 
-def get_audit_logs_by_type_query(db: Session, log_type: AuditLogType | str) -> Query:
-    return (
+def get_audit_logs_by_type_query(
+    db: Session, 
+    log_type: AuditLogType | str,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    search: Optional[str] = None,
+    user_id: Optional[int] = None
+) -> Query:
+    query = (
         db.query(AuditLog)
         .options(joinedload(AuditLog.user))
         .filter(AuditLog.log_type == _enum_value(log_type))
-        .order_by(AuditLog.timestamp.desc())
     )
+
+    if date_from:
+        query = query.filter(AuditLog.timestamp >= datetime.combine(date_from, datetime.min.time()))
+    if date_to:
+        query = query.filter(AuditLog.timestamp <= datetime.combine(date_to, datetime.max.time()))
+    
+    if search:
+        search_filter = f"%{search}%"
+        query = query.filter(
+            (AuditLog.action.ilike(search_filter)) | 
+            (AuditLog.event.ilike(search_filter)) |
+            (AuditLog.detail.ilike(search_filter)) |
+            (AuditLog.attempted_email.ilike(search_filter))
+        )
+
+    if user_id:
+        query = query.filter(AuditLog.user_id == user_id)
+
+    return query.order_by(AuditLog.timestamp.desc())
