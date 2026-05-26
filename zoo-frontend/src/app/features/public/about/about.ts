@@ -12,7 +12,6 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
   selector: "app-about",
   imports: [OurStory, MisionVision],
   templateUrl: "./about.html",
-  styleUrl: "./about.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class About {

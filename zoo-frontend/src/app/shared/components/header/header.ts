@@ -6,7 +6,7 @@ import {
   computed,
 } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { ProfileButton } from "./components/profile-button";
 import { LogoImage } from "../logo-image";
 import { ButtonModule } from "primeng/button";

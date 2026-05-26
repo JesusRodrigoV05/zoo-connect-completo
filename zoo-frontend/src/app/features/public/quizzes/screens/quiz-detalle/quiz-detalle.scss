@@ -124,6 +124,15 @@
   }
 }
 
+.spinner-icon {
+  font-size: 3rem;
+}
+
+.trophy-icon {
+  font-size: 4rem;
+  color: var(--p-primary-500);
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;

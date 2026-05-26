@@ -8,11 +8,11 @@ import {
   FormControl,
 } from "@angular/forms";
 import { RouterLink } from "@angular/router";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { Loader } from "@app/shared/components/loader";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
-import { NgOptimizedImage, CommonModule } from "@angular/common";
+import { NgOptimizedImage, NgClass } from "@angular/common";
 import { LogoImage } from "@app/shared/components";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { InputTextModule } from "primeng/inputtext";
@@ -28,6 +28,7 @@ import { MessageService } from "primeng/api";
 import { ShowToast } from "@app/shared/services";
 import { RecaptchaService } from "@app/core/services/recaptcha.service";
 import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-captcha";
+import { evaluatePasswordStrength } from "@app/shared/utils/password-strength";
 
 @Component({
   selector: "app-signup",
@@ -40,12 +41,12 @@ import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-capt
     ButtonModule,
     CardModule,
     NgOptimizedImage,
+    NgClass,
     LogoImage,
     FloatLabelModule,
     InputTextModule,
     PasswordModule,
     MessageModule,
-    CommonModule,
     ToggleButtonModule,
     ToastModule,
     CustomCaptcha,
@@ -101,6 +102,14 @@ export default class Signup implements OnInit, OnDestroy {
   protected isPasswordStrong(): boolean {
     if (this.generatePassword) return true;
     return Object.values(this.rules).every(rule => rule === true);
+  }
+
+  protected onPasswordChange(p: string) {
+    const result = evaluatePasswordStrength(p);
+    this.rules = result.rules;
+    this.strengthPercent = result.percent;
+    this.strengthLabel = result.label;
+    this.strengthClass = result.class;
   }
 
   async ngOnInit() {
@@ -234,49 +243,6 @@ export default class Signup implements OnInit, OnDestroy {
   }
   get confirmPassword() {
     return this.signupForm.get("confirmPassword") as FormControl;
-  }
-
-  protected onPasswordChange(p: string) {
-    const v = p || '';
-    this.rules.length = v.length >= 12;
-    this.rules.uppercase = /[A-Z]/.test(v);
-    this.rules.lowercase = /[a-z]/.test(v);
-    this.rules.digit = /[0-9]/.test(v);
-    this.rules.special = /[!@#$%^&*()\-=_+\[\]{}|;:,.<>?]/.test(v);
-    this.rules.noRepeats = !/(.)\1\1/.test(v);
-    this.rules.noSequence = !this.hasSequentialChars(v, 3);
-
-    const score = Object.values(this.rules).filter(Boolean).length;
-    this.strengthPercent = Math.round((score / Object.keys(this.rules).length) * 100);
-
-    if (!this.rules.noRepeats || !this.rules.noSequence) {
-      this.strengthLabel = 'Insegura';
-      this.strengthClass = 'weak';
-      this.strengthPercent = Math.min(this.strengthPercent, 20);
-    } else if (score <= 3) {
-      this.strengthLabel = 'Débil';
-      this.strengthClass = 'weak';
-    } else if (score <= 5) {
-      this.strengthLabel = 'Media';
-      this.strengthClass = 'medium';
-    } else {
-      this.strengthLabel = 'Fuerte';
-      this.strengthClass = 'strong';
-    }
-  }
-
-  protected hasSequentialChars(s: string, seqLen = 4): boolean {
-    const t = s.toLowerCase();
-    for (let i = 0; i <= t.length - seqLen; i++) {
-      const chunk = t.slice(i, i + seqLen);
-      if (/^[a-z]+$/.test(chunk) || /^[0-9]+$/.test(chunk)) {
-        const codes = Array.from(chunk).map(c => c.charCodeAt(0));
-        const inc = codes.every((c, idx) => idx === 0 || c - codes[idx - 1] === 1);
-        const dec = codes.every((c, idx) => idx === 0 || codes[idx - 1] - c === 1);
-        if (inc || dec) return true;
-      }
-    }
-    return false;
   }
 
   protected toggleGeneratePassword() {

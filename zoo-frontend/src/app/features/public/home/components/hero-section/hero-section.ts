@@ -9,7 +9,7 @@ import {
   viewChild,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { ButtonModule } from "primeng/button";
 import { GalleriaModule } from "primeng/galleria";

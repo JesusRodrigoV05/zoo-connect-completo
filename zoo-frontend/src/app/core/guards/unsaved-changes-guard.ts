@@ -1,5 +1,5 @@
 import { Signal } from "@angular/core";
-import { inject } from "@angular/core/primitives/di";
+import { inject } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { CanDeactivateFn } from "@angular/router";
 import { ConfirmationService } from "primeng/api";

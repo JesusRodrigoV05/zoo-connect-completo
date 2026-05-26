@@ -80,7 +80,6 @@ export default class Historial implements OnInit {
   }
 
   applyFilters() {
-    console.log("Aplicando filtros:", this.searchTerm(), this.dateRange());
     this.loadData();
   }
 

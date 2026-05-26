@@ -73,7 +73,6 @@ export default class CrearUsuario implements OnInit {
       this.buttonText = "Guardar Cambios";
 
       this.adminUsuarios.getUserById(parseInt(id)).subscribe((user) => {
-        console.log(user);
         this.usuarioForm.patchValue({
           email: user.email,
           username: user.username,

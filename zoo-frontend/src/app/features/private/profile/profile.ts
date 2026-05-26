@@ -6,7 +6,7 @@ import {
   signal,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { Loader } from "@app/shared/components";
 import {
@@ -58,7 +58,6 @@ export default class Profile {
   }
 
   protected shareProfile(): void {
-    console.log("Compartir perfil");
   }
 
   protected viewStats(): void {

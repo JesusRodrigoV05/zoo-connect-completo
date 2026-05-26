@@ -4,7 +4,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   selector: 'app-osi',
   imports: [],
   templateUrl: './osi.html',
-  styleUrl: './osi.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Osi {

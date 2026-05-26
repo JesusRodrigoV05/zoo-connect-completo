@@ -66,7 +66,6 @@ export default class Animales {
           }
 
           this.isLoading.set(false);
-          console.log(this.animals());
         },
         error: (err) => {
           console.error("Error cargando animales:", err);

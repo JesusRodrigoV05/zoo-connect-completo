@@ -29,7 +29,6 @@
                   type="email"
                   formControlName="email"
                   placeholder="Ingresa tu email"
-                  [style]="{ width: '100%' }"
                   autocomplete="email"
                   fluid
                   autofocus
@@ -51,7 +50,6 @@
                   type="text"
                   formControlName="username"
                   placeholder="Ingresa tu nombre de usuario"
-                  [style]="{ width: '100%' }"
                   autocomplete="username"
                   fluid
                 />
@@ -74,7 +72,6 @@
                   [toggleMask]="true"
                   [disabled]="generatePassword"
                   autocomplete="new-password"
-                  [style]="{ width: '100%' }"
                   fluid
                 />
                 <label for="password">Contraseña</label>
@@ -94,7 +91,8 @@
             <small class="p-error recaptcha-error">Por favor, verifica que no eres un robot.</small>
             }
 
-            <div class="field suggestion-action" *ngIf="!generatePassword">
+            @if (!generatePassword) {
+            <div class="field suggestion-action">
               <p-button 
                 type="button" 
                 label="¿Necesitas ideas? Ver tips para recordar" 
@@ -104,8 +102,10 @@
                 (onClick)="showTips = !showTips"
               />
             </div>
+            }
 
-            <div class="password-tips-container" *ngIf="showTips && !generatePassword">
+            @if (showTips && !generatePassword) {
+            <div class="password-tips-container">
               <div class="tips-header">
                 <i class="pi pi-star"></i>
                 <span>Tips para crear una contraseña fácil de recordar</span>
@@ -121,8 +121,10 @@
                 }
               </div>
             </div>
+            }
 
-            <div class="password-strength-container" *ngIf="!generatePassword">
+            @if (!generatePassword) {
+            <div class="password-strength-container">
               <div class="strength-info">
                 <span class="label">Seguridad: <strong>{{ strengthLabel }}</strong></span>
                 <div class="strength-bar-bg">
@@ -157,8 +159,10 @@
                 </div>
               </div>
             </div>
+            }
 
-            <div class="field" *ngIf="!generatePassword">
+            @if (!generatePassword) {
+            <div class="field">
               <p-floatlabel variant="on">
                 <p-password
                   id="confirmPassword"
@@ -167,7 +171,6 @@
                   [feedback]="false"
                   [toggleMask]="true"
                   autocomplete="new-password"
-                  [style]="{ width: '100%' }"
                   fluid
                 />
                 <label for="confirmPassword">Confirmar Contraseña</label>
@@ -178,6 +181,7 @@
               </p-message>
               }
             </div>
+            }
 
             <div class="auth-button-container">
               <p-button
@@ -197,7 +201,8 @@
               </p-button>
             </div>
 
-            <div class="generated-password-alert" *ngIf="generatedPassword">
+            @if (generatedPassword) {
+            <div class="generated-password-alert">
               <div class="alert-header">
                 <i class="pi pi-shield"></i>
                 <span>Contraseña Generada con Éxito</span>
@@ -227,6 +232,8 @@
                 />
               </div>
             </div>
+            }
+
           </form>
 
           <div class="auth-link-container">

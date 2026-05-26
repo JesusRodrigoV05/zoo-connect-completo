@@ -4,7 +4,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   selector: 'app-faq',
   imports: [],
   templateUrl: './faq.html',
-  styleUrl: './faq.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FAQ {

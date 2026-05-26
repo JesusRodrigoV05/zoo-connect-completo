@@ -23,10 +23,6 @@ export class RutinaItem {
   onEdit = output<number>();
   onDelete = output<number>();
 
-  ngOnInit() {
-    console.log(this.item());
-  }
-
   protected cronLabel = computed(() => {
     const cron = this.item().frecuenciaCron;
     if (!cron) return "Sin programar";

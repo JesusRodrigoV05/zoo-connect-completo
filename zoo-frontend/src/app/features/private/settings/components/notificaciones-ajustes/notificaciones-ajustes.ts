@@ -52,8 +52,6 @@ export default class NotificacionesAjustes {
       ...settings,
       [key]: value,
     }));
-    // Guardar...
-    console.log("Notification settings updated:", this.notificationSettings());
   }
 
   protected updateNotificationPreference(
@@ -64,11 +62,6 @@ export default class NotificacionesAjustes {
       ...preferences,
       [key]: value,
     }));
-    // Guardar...
-    console.log(
-      "Notification preferences updated:",
-      this.notificationPreferences(),
-    );
   }
 
   /**

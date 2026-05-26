@@ -12,7 +12,7 @@ import { Router, RouterLink } from "@angular/router";
 import { Loader } from "@app/shared/components";
 import { ButtonModule } from "primeng/button";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { PaginatorModule } from "primeng/paginator";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { InputTextModule } from "primeng/inputtext";
@@ -107,7 +107,7 @@ export default class ListaDietas {
     this.store.setPage(page, size);
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: DataViewPageEvent) {
     const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }

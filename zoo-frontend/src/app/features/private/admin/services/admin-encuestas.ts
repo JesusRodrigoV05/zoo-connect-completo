@@ -22,6 +22,27 @@ import { environment } from "@env";
 import { BackendStatsResponse } from "@models/encuestas";
 import { map, Observable } from "rxjs";
 
+interface CreateSurveyRequest {
+  titulo: string | null;
+  descripcion: string | null;
+  fecha_inicio: string;
+  fecha_fin: string;
+  preguntas: Array<{
+    texto_pregunta: string;
+    es_opcion_unica: boolean;
+    orden: number;
+    opciones: Array<{ texto_opcion: string; orden: number }>;
+  }>;
+}
+
+interface UpdateSurveyRequest {
+  titulo?: string | null;
+  descripcion?: string | null;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  is_active?: boolean;
+}
+
 @Injectable({
   providedIn: "root",
 })
@@ -34,8 +55,8 @@ export class AdminEncuestas {
   private preguntasUrl = `${this.surveysUrl}/surveys/preguntas`;
   private opcionesUrl = `${this.surveysUrl}/surveys/opciones`;
 
-  createSurvey(surveyData: any) {
-    return this.http.post<any>(this.encuestasUrl, surveyData);
+  createSurvey(surveyData: CreateSurveyRequest) {
+    return this.http.post<Encuesta>(this.encuestasUrl, surveyData);
   }
 
   getAllSurveys(skip: number = 0, limit: number = 10): Observable<Encuesta[]> {
@@ -62,8 +83,8 @@ export class AdminEncuestas {
       .pipe(map((response) => surveyStatsAdapter(response)));
   }
 
-  updateSurvey(id: number, surveyData: any) {
-    return this.http.put(`${this.encuestasUrl}/${id}`, surveyData);
+  updateSurvey(id: number, surveyData: UpdateSurveyRequest) {
+    return this.http.put<Encuesta>(`${this.encuestasUrl}/${id}`, surveyData);
   }
 
   deleteSurvey(id: number): Observable<void> {

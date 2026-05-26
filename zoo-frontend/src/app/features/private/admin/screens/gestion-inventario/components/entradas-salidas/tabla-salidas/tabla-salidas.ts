@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from "@angular/core";
-import { TableModule } from "primeng/table";
+import { TableModule, TableLazyLoadEvent } from "primeng/table";
 import { ButtonModule } from "primeng/button";
 import { TagModule } from "primeng/tag";
 import { TooltipModule } from "primeng/tooltip";
@@ -33,8 +33,8 @@ export class TablaSalidas {
 
   pageChange = output<{ page: number; size: number }>();
 
-  onPage(event: any) {
-    const page = event.first / event.rows + 1;
-    this.pageChange.emit({ page, size: event.rows });
+  onPage(event: TableLazyLoadEvent) {
+    const page = (event.first ?? 0) / (event.rows ?? 10) + 1;
+    this.pageChange.emit({ page, size: event.rows ?? 10 });
   }
 }

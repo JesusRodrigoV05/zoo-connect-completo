@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   FormControl,
 } from "@angular/forms";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { Loader } from "@app/shared/components/loader";
 import { FormField } from "@app/shared/components/form-field";
 import { ButtonModule } from "primeng/button";

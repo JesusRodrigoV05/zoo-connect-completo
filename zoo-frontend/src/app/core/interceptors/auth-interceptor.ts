@@ -5,7 +5,7 @@ import {
   HttpRequest,
   HttpErrorResponse,
 } from "@angular/common/http";
-import { AuthStore } from "../stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { inject } from "@angular/core";
 import {
   Observable,

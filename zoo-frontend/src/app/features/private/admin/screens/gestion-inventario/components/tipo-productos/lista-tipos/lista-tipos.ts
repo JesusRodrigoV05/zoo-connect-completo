@@ -12,7 +12,7 @@ import { FormsModule } from "@angular/forms";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { PaginatorModule } from "primeng/paginator";
 import { SelectButtonModule } from "primeng/selectbutton";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { Router, RouterLink } from "@angular/router";
 import { ConfirmationService } from "primeng/api";
 import { TiposProductoStore } from "@app/features/private/admin/stores/admin-tipo-productos.store";
@@ -62,7 +62,7 @@ export default class ListaTipos implements OnInit {
     this.onboarding.startTour("admin-inventario-tipo-lista");
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: DataViewPageEvent) {
     const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }

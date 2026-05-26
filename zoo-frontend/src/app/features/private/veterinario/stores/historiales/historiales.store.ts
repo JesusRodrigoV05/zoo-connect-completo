@@ -66,7 +66,6 @@ export const HistorialesListaStore = signalStore(
             .pipe(
               tapResponse({
                 next: (response) => {
-                  console.log(response.items);
                   patchState(store, {
                     items: response.items,
                     total: response.total,

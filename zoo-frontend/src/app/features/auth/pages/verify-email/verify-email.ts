@@ -18,11 +18,11 @@ import {
   Validators,
 } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { Loader } from "@app/shared/components/loader";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
-import { NgOptimizedImage, CommonModule } from "@angular/common";
+import { NgOptimizedImage } from "@angular/common";
 import { LogoImage } from "@app/shared/components";
 import { InputTextModule } from "primeng/inputtext";
 import { MessageModule } from "primeng/message";
@@ -43,7 +43,6 @@ import { RecaptchaService } from "@app/core/services/recaptcha.service";
     LogoImage,
     InputTextModule,
     MessageModule,
-    CommonModule,
     CustomCaptcha,
   ],
   templateUrl: "./verify-email.html",

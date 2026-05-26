@@ -15,7 +15,7 @@ import { TagModule } from "primeng/tag";
 import { DialogModule } from "primeng/dialog";
 import { TextareaModule } from "primeng/textarea";
 import { TooltipModule } from "primeng/tooltip";
-import { SelectButtonModule } from "primeng/selectbutton";
+import { SelectButtonModule, SelectButtonChangeEvent } from "primeng/selectbutton";
 import { MisTareasStore } from "@app/shared/stores/ejecucion-tarea.store";
 import { Tarea } from "../../admin/models/tareas/tarea.model";
 import { InputNumberModule } from "primeng/inputnumber";
@@ -115,7 +115,7 @@ export default class MisTareas {
     this.store.loadMisTareas({ completadas: this.mostrarCompletadas() });
   }
 
-  onFilterChange(event: any) {
+  onFilterChange(event: SelectButtonChangeEvent) {
     this.mostrarCompletadas.set(event.value);
     this.cargarTareas();
   }

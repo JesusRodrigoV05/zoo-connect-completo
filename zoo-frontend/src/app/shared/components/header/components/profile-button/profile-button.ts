@@ -5,7 +5,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStore } from '@app/core/stores/auth.store';
+import { AuthStore } from '@stores/auth.store';
 import { Usuario } from '@models/usuario/usuario.model';
 import { UserAvatar } from '@app/shared/components/user-avatar';
 import { UserInfo } from '../user-info';

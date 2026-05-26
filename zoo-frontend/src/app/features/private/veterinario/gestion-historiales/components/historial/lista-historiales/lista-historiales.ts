@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { TableModule } from "primeng/table";
+import { TableModule, TablePageEvent } from "primeng/table";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { CheckboxModule } from "primeng/checkbox";
@@ -69,7 +69,7 @@ export default class ListaHistoriales {
     this.router.navigate(["/vet/historiales/", id]);
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: TablePageEvent) {
     const page = event.first / event.rows + 1;
     this.store.updatePagination(page, event.rows);
   }

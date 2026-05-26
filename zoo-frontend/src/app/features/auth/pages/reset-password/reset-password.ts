@@ -25,12 +25,13 @@ import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { FloatLabel } from "primeng/floatlabel";
 import { MessageModule } from "primeng/message";
-import { NgTemplateOutlet, CommonModule, NgOptimizedImage } from "@angular/common";
+import { NgTemplateOutlet, NgClass, NgOptimizedImage } from "@angular/common";
 import { PasswordModule } from "primeng/password";
 import { Loader } from "@app/shared/components/loader";
 import { LogoImage } from "@app/shared/components";
 import { RecaptchaService } from "@app/core/services/recaptcha.service";
 import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-captcha";
+import { evaluatePasswordStrength } from "@app/shared/utils/password-strength";
 
 @Component({
   selector: "app-reset-password",
@@ -44,11 +45,11 @@ import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-capt
     FloatLabel,
     MessageModule,
     NgTemplateOutlet,
+    NgClass,
     PasswordModule,
     RouterLink,
     Loader,
     LogoImage,
-    CommonModule,
     CustomCaptcha,
   ],
   templateUrl: "./reset-password.html",
@@ -157,47 +158,12 @@ export default class ResetPassword implements OnInit, OnDestroy {
   }
 
   protected onPasswordChange(p: string) {
-    const v = p || '';
-    this.rules.length = v.length >= 12;
-    this.rules.uppercase = /[A-Z]/.test(v);
-    this.rules.lowercase = /[a-z]/.test(v);
-    this.rules.digit = /[0-9]/.test(v);
-    this.rules.special = /[!@#$%^&*()\-=_+\[\]{}|;:,.<>?]/.test(v);
-    this.rules.noRepeats = !/(.)\1\1/.test(v);
-    this.rules.noSequence = !this.hasSequentialChars(v, 3);
-
-    const score = Object.values(this.rules).filter(Boolean).length;
-    this.strengthPercent = Math.round((score / Object.keys(this.rules).length) * 100);
-
-    if (!this.rules.noRepeats || !this.rules.noSequence) {
-      this.strengthLabel = 'Insegura';
-      this.strengthClass = 'weak';
-      this.strengthPercent = Math.min(this.strengthPercent, 20);
-    } else if (score <= 3) {
-      this.strengthLabel = 'Débil';
-      this.strengthClass = 'weak';
-    } else if (score <= 5) {
-      this.strengthLabel = 'Media';
-      this.strengthClass = 'medium';
-    } else {
-      this.strengthLabel = 'Fuerte';
-      this.strengthClass = 'strong';
-    }
+    const result = evaluatePasswordStrength(p);
+    this.rules = result.rules;
+    this.strengthPercent = result.percent;
+    this.strengthLabel = result.label;
+    this.strengthClass = result.class;
     this.cdr.markForCheck();
-  }
-
-  protected hasSequentialChars(s: string, seqLen = 4): boolean {
-    const t = s.toLowerCase();
-    for (let i = 0; i <= t.length - seqLen; i++) {
-      const chunk = t.slice(i, i + seqLen);
-      if (/^[a-z]+$/.test(chunk) || /^[0-9]+$/.test(chunk)) {
-        const codes = Array.from(chunk).map(c => c.charCodeAt(0));
-        const inc = codes.every((c, idx) => idx === 0 || c - codes[idx - 1] === 1);
-        const dec = codes.every((c, idx) => idx === 0 || codes[idx - 1] - c === 1);
-        if (inc || dec) return true;
-      }
-    }
-    return false;
   }
 
   protected isPasswordStrong(): boolean {

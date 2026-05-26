@@ -9,7 +9,7 @@ import { Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { ButtonModule } from "primeng/button";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { PaginatorModule } from "primeng/paginator";
 import { ConfirmationService } from "primeng/api";
@@ -62,7 +62,7 @@ export default class ListaUnidad implements OnInit {
     this.onboarding.startTour("admin-inventario-unidad-lista");
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: DataViewPageEvent) {
     const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }

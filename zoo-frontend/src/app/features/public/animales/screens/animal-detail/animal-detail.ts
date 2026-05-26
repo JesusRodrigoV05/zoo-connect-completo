@@ -52,7 +52,6 @@ export default class AnimalDetail implements OnInit {
   }
 
   toggleFav() {
-    console.log("Aqui presionando el boton");
     const currentAnimal = this.animal();
     if (currentAnimal) {
       this.store.toggleFavorite(currentAnimal);

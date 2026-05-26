@@ -90,7 +90,6 @@ export const AuthStore = signalStore(
       };
 
       const handleError = (error: any, context: string): string => {
-        console.log('DEBUG: handleError called', { context, status: error?.status, detail: error?.error?.detail });
         console.error(`Error en ${context}:`, error);
         let errorMessage = `Error en ${context}`;
         if (typeof error === 'string') {
@@ -113,10 +112,8 @@ export const AuthStore = signalStore(
           errorMessage = error.error?.detail || 'Cuenta bloqueada temporalmente, intente más tarde';
         } else if (error?.status === 400 && context === 'register') {
           const detail = error.error?.detail;
-          console.log('DEBUG: register 400 detail', detail);
           if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
             const email = detail?.email || '';
-            console.log('DEBUG: Redirecting to verify-email with email', email);
             router.navigate(['/verify-email'], { queryParams: { email } });
             patchState(store, { loading: false }); // Asegurar que el loading se apague
             return '';
@@ -215,8 +212,6 @@ export const AuthStore = signalStore(
                 patchState(store, { usuario: updatedUser });
               } catch (updateError) {}
             }
-
-            console.log(currentUser);
 
             toastService.showSuccess('Inicio de sesión exitoso', 'Éxito');
 

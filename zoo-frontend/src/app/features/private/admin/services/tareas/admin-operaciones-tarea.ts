@@ -28,10 +28,10 @@ export class AdminOperacionesTarea {
     size = 50,
   ): Observable<PaginatedResponse<Tarea>> {
     const params = new HttpParams().set("page", page).set("size", size);
-    return this.http.get<any>(`${this.apiUrl}/sin-asignar`, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(`${this.apiUrl}/sin-asignar`, { params }).pipe(
       map((res) => ({
         ...res,
-        items: res.items.map((i: any) => TareaAdapter.fromBackend(i)),
+        items: res.items.map((i) => TareaAdapter.fromBackend(i)),
       })),
     );
   }
@@ -41,10 +41,10 @@ export class AdminOperacionesTarea {
     size = 50,
   ): Observable<PaginatedResponse<Tarea>> {
     const params = new HttpParams().set("page", page).set("size", size);
-    return this.http.get<any>(`${this.apiUrl}/asignadas-hoy`, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(`${this.apiUrl}/asignadas-hoy`, { params }).pipe(
       map((res) => ({
         ...res,
-        items: res.items.map((i: any) => TareaAdapter.fromBackend(i)),
+        items: res.items.map((i) => TareaAdapter.fromBackend(i)),
       })),
     );
   }

@@ -74,7 +74,7 @@ export const FavoriteStore = signalStore(
             patchState(store, removeEntity(animal.id_animal));
             return service.removeFavoriteAnimal(animal.id_animal).pipe(
               tapResponse({
-                next: () => console.log("Eliminado de favoritos"),
+                next: () => undefined,
                 error: () =>
                   patchState(
                     store,
@@ -89,7 +89,7 @@ export const FavoriteStore = signalStore(
             );
             return service.addFavoriteAnimal(animal.id_animal).pipe(
               tapResponse({
-                next: () => console.log("Agregado a favoritos"),
+                next: () => undefined,
                 error: () => patchState(store, removeEntity(animal.id_animal)),
               }),
             );

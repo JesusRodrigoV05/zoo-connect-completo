@@ -487,3 +487,23 @@
     }
   }
 }
+
+.totp-input {
+  width: 100%;
+  text-align: center;
+  font-size: 2rem;
+  letter-spacing: 0.5rem;
+  font-weight: 600;
+}
+
+.totp-input-sm {
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+}
+
+.recaptcha-error-block {
+  display: block;
+  margin-top: 0.5rem;
+}

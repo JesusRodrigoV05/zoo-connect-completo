@@ -22,10 +22,10 @@ export class AlimentacionService {
       .set("page", page.toString())
       .set("size", size.toString());
 
-    return this.http.get<any>(`${this.apiUrl}/dietas`, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(`${this.apiUrl}/dietas`, { params }).pipe(
       map((res) => ({
         ...res,
-        items: res.items.map((i: any) => DietaAdapter.fromBackend(i)),
+        items: res.items.map((i) => DietaAdapter.fromBackend(i)),
       })),
     );
   }

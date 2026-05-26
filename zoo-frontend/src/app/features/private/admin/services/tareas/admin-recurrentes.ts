@@ -27,10 +27,10 @@ export class AdminRecurrentes {
       .set("size", size)
       .set("include_inactive", includeInactive);
 
-    return this.http.get<any>(this.tareasRecurrentesUrl, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(this.tareasRecurrentesUrl, { params }).pipe(
       map((response) => ({
         ...response,
-        items: response.items.map((item: any) =>
+        items: response.items.map((item) =>
           TareaRecurrenteAdapter.fromBackend(item),
         ),
       })),

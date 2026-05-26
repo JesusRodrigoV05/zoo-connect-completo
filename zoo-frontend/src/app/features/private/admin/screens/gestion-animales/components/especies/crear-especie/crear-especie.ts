@@ -18,6 +18,7 @@ import { InputTextModule } from "primeng/inputtext";
 import { FloatLabel } from "primeng/floatlabel";
 import { TextareaModule } from "primeng/textarea";
 import { NgTemplateOutlet } from "@angular/common";
+import { HttpErrorResponse } from "@angular/common/http";
 import { CheckboxModule } from "primeng/checkbox";
 import { ShowToast } from "@app/shared/services";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -217,7 +218,7 @@ export default class CrearEspecie implements OnInit {
     this.formSubmitted.set(false);
   }
 
-  private handleApiError(error: any, action: "crear" | "actualizar"): void {
+  private handleApiError(error: HttpErrorResponse, action: "crear" | "actualizar"): void {
     console.error(`Error al ${action} especie:`, error);
     let errorMessage = `Error al ${action} la especie`;
 

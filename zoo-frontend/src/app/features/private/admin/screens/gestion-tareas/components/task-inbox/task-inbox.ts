@@ -21,7 +21,7 @@ export class TaskInbox {
   onAssign = output<number>();
   onCancel = output<number>();
 
-  getPriorityClass(task: any): string {
+  getPriorityClass(task: Tarea): string {
     const text = task.titulo?.toLowerCase() || "";
     if (text.includes("urgente") || text.includes("emergencia"))
       return "priority-high";

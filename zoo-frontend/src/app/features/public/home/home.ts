@@ -38,6 +38,5 @@ export default class Home {
   }
 
   protected onSubmitContact(): void {
-    console.log("Formulario de contacto enviado");
   }
 }

@@ -5,7 +5,7 @@ import {
   inject,
 } from "@angular/core";
 import { ButtonModule } from "primeng/button";
-import { TableModule } from "primeng/table";
+import { TableModule, TableLazyLoadEvent } from "primeng/table";
 import { TooltipModule } from "primeng/tooltip";
 import { RecurrentesStore } from "@app/features/private/admin/stores/tareas/admin-recurrentes.store";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
@@ -49,7 +49,7 @@ export default class Planificador {
     this.onboarding.startTour("admin-tareas-planificador");
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: TableLazyLoadEvent) {
     const page = (event.first ?? 0) / (event.rows ?? 10) + 1;
     const size = event.rows ?? 10;
     this.store.setPage(page, size);

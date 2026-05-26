@@ -12,7 +12,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { TwoFactorAuth } from "@app/features/private/settings/services";
 import { ShowToast } from "@app/shared/services";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { finalize } from "rxjs/operators";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";

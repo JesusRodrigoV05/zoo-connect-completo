@@ -1,1 +1,1 @@
-export * from "./gestion-noticias";
+export { default as GestionNoticias } from "./gestion-noticias";

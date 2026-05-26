@@ -18,6 +18,7 @@ import { CardModule } from "primeng/card";
 import { SelectModule } from "primeng/select";
 import { CheckboxModule } from "primeng/checkbox";
 import { ShowToast } from "@app/shared/services";
+import { HttpErrorResponse } from "@angular/common/http";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AdminAnimales } from "@app/features/private/admin/services/admin-animales";
 import { catchError, finalize } from "rxjs/operators";
@@ -321,7 +322,7 @@ export default class CrearAnimal implements OnInit {
     this.router.navigate(["/admin/animales/lista"]);
   }
 
-  private handleError(error: any): void {
+  private handleError(error: HttpErrorResponse): void {
     this.showToast.showError("Error", "Ocurrió un error: " + error.message);
   }
 

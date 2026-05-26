@@ -27,9 +27,8 @@
                   type="text"
                   pInputText
                   formControlName="code"
-                  class="w-full"
+                  class="w-full totp-input"
                   maxlength="6"
-                  style="text-align: center; font-size: 2rem; letter-spacing: 0.5rem; font-weight: bold;"
                 />
                 <label for="code">Código de Verificación</label>
               </span>
@@ -74,11 +73,15 @@
             <i class="pi pi-info-circle"></i>
             <p>
               ¿No recibiste el código? 
-              <ng-container *ngIf="!isResending() && resendCooldown() <= 0">
+              @if (!isResending() && resendCooldown() <= 0) {
                 <a href="#" (click)="$event.preventDefault(); resendCode()">Reenviar código</a> 
-              </ng-container>
-              <span *ngIf="isResending()" class="text-muted">Reenviando...</span>
-              <span *ngIf="resendCooldown() > 0" class="text-muted">Reenviar en {{ getCooldownMessage() }}</span>
+              }
+              @if (isResending()) {
+                <span class="text-muted">Reenviando...</span>
+              }
+              @if (resendCooldown() > 0) {
+                <span class="text-muted">Reenviar en {{ getCooldownMessage() }}</span>
+              }
               o revisa tu carpeta de spam.
             </p>
           </div>

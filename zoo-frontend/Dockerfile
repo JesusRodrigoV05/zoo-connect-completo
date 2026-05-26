@@ -1,12 +1,13 @@
-FROM node:22-slim AS build
+FROM node:24-slim AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install -g bun
+COPY bun.lock package.json ./
+RUN bun install --frozen-lockfile
 COPY . .
-RUN node --max-old-space-size=2048 ./node_modules/@angular/cli/bin/ng build --configuration production --optimization=true
-FROM node:22-slim AS runtime
-EXPOSE 4200
+RUN bun run build --configuration production
+
+FROM oven/bun:alpine AS runtime
 WORKDIR /app
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/package.json ./
-CMD ["node", "dist/zoo-connect-web/server/server.mjs"]
+EXPOSE 4200
+CMD ["bun", "dist/zoo-connect-web/server/server.mjs"]

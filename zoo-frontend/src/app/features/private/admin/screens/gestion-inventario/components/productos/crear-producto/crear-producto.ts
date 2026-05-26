@@ -19,7 +19,7 @@ import { InputNumberModule } from "primeng/inputnumber";
 import { SelectModule } from "primeng/select";
 import { CheckboxModule } from "primeng/checkbox";
 import { StepperModule } from "primeng/stepper";
-import { FileUpload, FileUploadModule } from "primeng/fileupload";
+import { FileUpload, FileUploadModule, FileSelectEvent } from "primeng/fileupload";
 import { ImageModule } from "primeng/image";
 import { MessageModule } from "primeng/message";
 import { ProductStore } from "@app/features/private/admin/stores/admin-productos.store";
@@ -136,7 +136,7 @@ export default class CrearProducto implements OnInit {
     });
   }
 
-  onFileSelect(event: any) {
+  onFileSelect(event: FileSelectEvent) {
     if (event.files && event.files.length > 0) {
       this.selectedFile.set(event.files[0]);
     }

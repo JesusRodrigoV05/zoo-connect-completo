@@ -137,9 +137,9 @@ export default class Dashboard implements OnInit {
     });
   }
 
-  onFilterChange(event: any) {
-    if (event.value) {
-      this.store.updateAnimalChartFilter(event.value);
+  onFilterChange(event: "clase" | "familia" | "orden" | "filo") {
+    if (event) {
+      this.store.updateAnimalChartFilter(event);
     }
   }
 

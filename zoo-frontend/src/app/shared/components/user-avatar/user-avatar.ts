@@ -5,7 +5,7 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { AuthStore } from '@app/core/stores/auth.store';
+import { AuthStore } from '@stores/auth.store';
 
 @Component({
   selector: 'zoo-user-avatar',
