@@ -29,6 +29,7 @@ services:
     build:
       context: ./zoo-backend
       dockerfile: Dockerfile
+      network: host
     container_name: zoo-backend
     restart: always
     env_file:

@@ -1,8 +1,15 @@
 @defer(on viewport; prefetch on idle; hydrate on viewport){
 <div class="list-page-container">
-  <div class="header-actions">
+  <div class="header-actions tour-habitat-header">
     <h2>Gestión de Hábitats</h2>
     <div class="buttons">
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
       <p-button
         variant="text"
         (onClick)="loadHabitats(currentPage(), pageSize())"
@@ -10,6 +17,7 @@
         severity="danger"
         [rounded]="true"
         pTooltip="Recargar"
+        styleClass="tour-habitat-reload-btn"
       />
       <p-button
         icon="pi pi-plus"
@@ -17,6 +25,7 @@
         [rounded]="true"
         severity="primary"
         (click)="navigateToCreate()"
+        styleClass="tour-habitat-register-btn"
       />
     </div>
   </div>
@@ -26,6 +35,7 @@
   } @else if(error()) { } @else if (habitatData()) { @let response =
   habitatData()!;
   <p-dataview
+    styleClass="tour-habitat-table"
     #dv
     [value]="response.items"
     [paginator]="true"
@@ -41,10 +51,15 @@
   >
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ response.total }} hábitats</span>
-        <span>Página {{ response.page }} de {{ response.pages }}</span>
+        <span class="tour-habitat-column-name"
+          >Total: {{ response.total }} hábitats</span
+        >
+        <span class="tour-habitat-column-actions"
+          >Página {{ response.page }} de {{ response.pages }}</span
+        >
 
         <p-selectbutton
+          styleClass="tour-habitat-view-type"
           [ngModel]="layout()"
           (ngModelChange)="layout.set($event)"
           [options]="options"
@@ -92,6 +107,7 @@
     </ng-template>
   </p-dataview>
   } @else { }
+
 </div>
 } @placeholder{
 <p>Cargando...</p>

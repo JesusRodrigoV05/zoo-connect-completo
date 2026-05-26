@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   OnInit,
+  afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
@@ -16,6 +17,7 @@ import { ProveedorItem } from "../proveedor-item/proveedor-item";
 import { ProveedoresStore } from "@app/features/private/admin/stores/admin-proveedores.store";
 import { ConfirmationService } from "primeng/api";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-proveedor",
@@ -40,6 +42,7 @@ export default class ListaProveedor implements OnInit {
   readonly router = inject(Router);
 
   confirmation = inject(ZooConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
 
   layout: "list" | "grid" = "list";
   layoutOptions = [
@@ -48,7 +51,15 @@ export default class ListaProveedor implements OnInit {
   ];
 
   ngOnInit() {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-inventario-proveedor-lista");
+    });
+
     this.store.loadItems();
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-proveedor-lista");
   }
 
   onPageChange(event: any) {

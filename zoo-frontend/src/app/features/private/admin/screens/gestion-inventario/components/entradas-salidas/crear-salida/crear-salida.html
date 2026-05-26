@@ -1,14 +1,23 @@
 <div class="form-container">
   <p-card styleClass="exit-card">
     <ng-template pTemplate="header">
-      <div class="card-header">
-        <h2>Registrar Salida</h2>
+      <div class="card-header tour-salida-header">
+        <div class="card-header-row">
+          <h2>Registrar Salida</h2>
+          <p-button
+            label="Tour guiado"
+            icon="pi pi-question-circle"
+            severity="contrast"
+            [rounded]="true"
+            (onClick)="startGuidedTour()"
+          />
+        </div>
         <p class="subtitle">Egreso de materiales o alimentos del almacén</p>
       </div>
     </ng-template>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
-      <div class="form-section">
+      <div class="form-section tour-salida-general-section">
         <h4>Datos Generales</h4>
         <div class="form-grid">
           <div class="field">
@@ -50,7 +59,7 @@
         </div>
       </div>
 
-      <div class="form-section mt-4">
+      <div class="form-section mt-4 tour-salida-products-section">
         <div class="flex justify-between align-items-center mb-3">
           <h4>Detalle de Productos</h4>
           <p-button
@@ -58,18 +67,19 @@
             icon="pi pi-plus"
             size="small"
             [outlined]="true"
+            styleClass="tour-salida-add-item-btn"
             (onClick)="addProducto()"
           />
         </div>
 
         <div formArrayName="detalles">
-          <p-table [value]="detalles.controls" styleClass="p-datatable-sm">
+          <p-table [value]="detalles.controls" styleClass="p-datatable-sm tour-salida-table">
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 25%">Producto *</th>
-                <th style="width: 15%">Cantidad *</th>
-                <th style="width: 20%">Tipo Destino</th>
-                <th style="width: 30%">Destino Específico</th>
+                <th style="width: 25%" class="tour-salida-col-producto">Producto *</th>
+                <th style="width: 15%" class="tour-salida-col-cantidad">Cantidad *</th>
+                <th style="width: 20%" class="tour-salida-col-tipo-destino">Tipo Destino</th>
+                <th style="width: 30%" class="tour-salida-col-destino">Destino Específico</th>
                 <th style="width: 10%"></th>
               </tr>
             </ng-template>
@@ -85,7 +95,7 @@
                     [filter]="true"
                     placeholder="Seleccionar..."
                     appendTo="body"
-                    styleClass="w-full table-input"
+                    styleClass="w-full table-input tour-salida-producto-select"
                     fluid
                     [invalid]="isInvalid('productoId', i)"
                   />
@@ -99,7 +109,7 @@
                     buttonLayout="horizontal"
                     inputStyleClass="w-full text-center p-1"
                     fluid
-                    class="compact-number"
+                    class="compact-number tour-salida-cantidad-input"
                     [invalid]="isInvalid('cantidad', i)"
                   />
                 </td>
@@ -111,7 +121,7 @@
                     optionLabel="label"
                     optionValue="value"
                     appendTo="body"
-                    styleClass="w-full table-input"
+                    styleClass="w-full table-input tour-salida-tipo-destino-select"
                     fluid
                     (onChange)="onDestinoTypeChange(i)"
                   />
@@ -127,7 +137,7 @@
                     [filter]="true"
                     placeholder="Buscar animal..."
                     appendTo="body"
-                    styleClass="w-full table-input"
+                    styleClass="w-full table-input tour-salida-destino-select"
                     fluid
                   />
                   } @case ('habitat') {
@@ -139,7 +149,7 @@
                     [filter]="true"
                     placeholder="Buscar hábitat..."
                     appendTo="body"
-                    styleClass="w-full table-input"
+                    styleClass="w-full table-input tour-salida-destino-select"
                     fluid
                   />
                   } @default {
@@ -170,6 +180,7 @@
           icon="pi pi-times"
           [text]="true"
           severity="secondary"
+          styleClass="tour-salida-cancel-btn"
           (onClick)="onCancel()"
           [disabled]="isProcessing()"
         />
@@ -180,6 +191,7 @@
           [loading]="isProcessing()"
           [rounded]="true"
           severity="warn"
+          styleClass="tour-salida-submit-btn"
         />
       </div>
     </form>

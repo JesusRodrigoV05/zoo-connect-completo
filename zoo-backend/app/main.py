@@ -12,8 +12,9 @@ from app.core.scheduler import scheduler, setup_scheduler
 from app.api.v1 import (
     auth, animals, admin_users, favorite_animals, surveys, 
     trivia, vendp, inventario_admin, transacciones, 
-    alimentacion, tareas, veterinario, dashboards, reportes
+    alimentacion, tareas, veterinario, dashboards, reportes, onboarding
 )
+from app.api.v1 import permissions
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -57,6 +58,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/zooconnect/auth", tags=["auth"])
 app.include_router(admin_users.router, prefix="/zooconnect/admin_users", tags=["admin"])
+app.include_router(permissions.router, prefix="/zooconnect/admin_users/permissions", tags=["permissions"])
 app.include_router(animals.router, prefix="/zooconnect/animals")
 app.include_router(surveys.router, prefix="/zooconnect/surveys")
 app.include_router(trivia.router, prefix="/zooconnect/trivia", tags=["trivia"])
@@ -69,5 +71,6 @@ app.include_router(tareas.router, prefix="/zooconnect/tareas", tags=["Tareas"])
 app.include_router(veterinario.router, prefix="/zooconnect/veterinario", tags=["Cruz Roja"]) 
 app.include_router(dashboards.router, prefix="/zooconnect/dashboards", tags=["Jesus"]) 
 app.include_router(reportes.router, prefix="/zooconnect/reportes", tags=["VI"]) 
+app.include_router(onboarding.router, prefix="/zooconnect/onboarding", tags=["Onboarding"]) 
 
 add_pagination(app)

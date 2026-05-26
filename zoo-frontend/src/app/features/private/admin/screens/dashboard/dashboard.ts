@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -19,6 +20,7 @@ import { KpiCard, KpiModel } from "./components/kpi-card/kpi-card";
 import { ZooIcon } from "@app/shared/components/ui/zoo-icon";
 import { GenerarReportes } from "@app/shared/services/generar-reportes";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-dashboard",
@@ -38,10 +40,11 @@ import { ShowToast } from "@app/shared/services";
   styleUrl: "./dashboard.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Dashboard {
+export default class Dashboard implements OnInit {
   readonly store = inject(DashboardStore);
   private reportesService = inject(GenerarReportes);
   private toast = inject(ShowToast);
+  private readonly onboarding = inject(OnboardingService);
 
   protected isDownloadingDiario = signal(false);
 
@@ -128,6 +131,12 @@ export default class Dashboard {
     maintainAspectRatio: false,
   };
 
+  ngOnInit(): void {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-dashboard");
+    });
+  }
+
   onFilterChange(event: any) {
     if (event.value) {
       this.store.updateAnimalChartFilter(event.value);
@@ -150,5 +159,9 @@ export default class Dashboard {
         this.toast.showError("Error", "No se pudo generar el reporte diario.");
       },
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-dashboard");
   }
 }

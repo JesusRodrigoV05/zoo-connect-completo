@@ -9,17 +9,17 @@
     (onLazyLoad)="onPage($event)"
     [rowsPerPageOptions]="[10, 20, 50]"
     dataKey="id"
-    styleClass="p-datatable-sm"
+    styleClass="p-datatable-sm tour-historial-salidas-table"
   >
     <ng-template pTemplate="header">
       <tr>
         <th style="width: 3rem"></th>
-        <th>ID</th>
-        <th>Fecha</th>
-        <th>Motivo (Tipo Salida)</th>
-        <th>Registrado Por</th>
-        <th>Total Items</th>
-        <th class="text-right">Acciones</th>
+        <th class="tour-historial-salidas-id">ID</th>
+        <th class="tour-historial-salidas-fecha">Fecha</th>
+        <th class="tour-historial-salidas-motivo">Motivo (Tipo Salida)</th>
+        <th class="tour-historial-salidas-registrado">Registrado Por</th>
+        <th class="tour-historial-salidas-total">Total Items</th>
+        <th class="text-right tour-historial-salidas-acciones">Acciones</th>
       </tr>
     </ng-template>
 

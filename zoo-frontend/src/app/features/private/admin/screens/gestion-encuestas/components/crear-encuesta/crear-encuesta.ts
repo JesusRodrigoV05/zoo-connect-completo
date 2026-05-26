@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  afterNextRender,
   OnInit,
   signal,
 } from "@angular/core";
@@ -36,6 +37,7 @@ import { Loader } from "@app/shared/components";
 import { CreatePregunta, Encuesta } from "@models/encuestas";
 import { forkJoin, Observable, of } from "rxjs";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 type OpcionFormValue = {
   idOpcion: number | null;
@@ -78,6 +80,7 @@ export default class CrearEncuesta implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private adminEncuestas = inject(AdminEncuestas);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly formSubmitted = signal(false);
   protected readonly isCreating = signal(false);
@@ -89,6 +92,7 @@ export default class CrearEncuesta implements OnInit {
   private encuestaId: string | null = null;
 
   private preguntasAEliminar: number[] = [];
+  private tourPrompted = false;
 
   private readonly basicValidator: ValidatorFn[] = [
     Validators.required,
@@ -117,6 +121,13 @@ export default class CrearEncuesta implements OnInit {
       this.minDateInicio = null;
 
       this.loadEncuestaData(this.encuestaId);
+    }
+
+    if (!this.tourPrompted) {
+      this.tourPrompted = true;
+      afterNextRender(() => {
+        this.onboarding.startTourIfFirstVisit("admin-encuestas-crear");
+      });
     }
   }
 
@@ -410,5 +421,9 @@ export default class CrearEncuesta implements OnInit {
       fechaFin: "La fecha de fin",
     };
     return fieldNames[fieldName] || fieldName;
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-encuestas-crear");
   }
 }

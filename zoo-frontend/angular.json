@@ -60,9 +60,7 @@
               "optimization": {
                 "scripts": true,
                 "styles": true,
-                "fonts": {
-                  "inline": true
-                }
+                "fonts": false
               },
               "budgets": [
                 {
@@ -118,5 +116,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

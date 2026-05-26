@@ -7,6 +7,7 @@ import {
   LoginResponse,
   LogoutResponse,
   RegisterRequest,
+  RegisterResponse,
   ResetPasswordRequest,
   TokenResponse,
   UpdateProfileRequest,
@@ -31,12 +32,13 @@ export class Auth {
   register(
     email: string,
     username: string,
-    password: string,
-  ): Observable<Usuario> {
-    const registerData: RegisterRequest = { email, username, password };
-    return this.http
-      .post<UsuarioBackendResponse>(`${this.authUrl}/register`, registerData)
-      .pipe(map((backendUser) => UsuarioAdapter.fromBackend(backendUser)));
+    password?: string,
+    generate_password: boolean = false,
+  ): Observable<RegisterResponse> {
+    const registerData: RegisterRequest = { email, username };
+    if (password !== undefined) registerData.password = password;
+    if (generate_password) registerData.generate_password = true;
+    return this.http.post<RegisterResponse>(`${this.authUrl}/register`, registerData);
   }
 
   login(email: string, password: string): Observable<LoginResponse> {

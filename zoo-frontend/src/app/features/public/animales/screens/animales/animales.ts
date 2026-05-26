@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   inject,
@@ -11,10 +12,12 @@ import { Loader } from "@app/shared/components";
 import { MainContainer } from "@app/shared/components/main-container";
 import { AnimalItem } from "../../components/animal-item";
 import { provideCloudinaryLoader } from "@angular/common";
+import { ButtonModule } from "primeng/button";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-animales",
-  imports: [InfiniteScroll, MainContainer, AnimalItem],
+  imports: [InfiniteScroll, MainContainer, AnimalItem, ButtonModule],
   templateUrl: "./animales.html",
   styleUrl: "./animales.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +25,7 @@ import { provideCloudinaryLoader } from "@angular/common";
 })
 export default class Animales {
   private animalService = inject(GetAnimales);
+  private readonly onboarding = inject(OnboardingService);
 
   protected animals = signal<Animal[]>([]);
   protected isLoading = signal(false);
@@ -32,6 +36,13 @@ export default class Animales {
 
   constructor() {
     this.loadAnimals();
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("public-animales");
+    });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("public-animales");
   }
 
   onScrollDown() {

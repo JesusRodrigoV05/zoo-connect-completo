@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   signal,
+  afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
@@ -19,6 +20,7 @@ import { ConfirmationService } from "primeng/api";
 import { ShowToast } from "@app/shared/services";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { GenerarReportes } from "@app/shared/services/generar-reportes";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-producto",
@@ -44,6 +46,7 @@ export default class ListaProducto implements OnInit {
   private confirm = inject(ZooConfirmationService);
   private toast = inject(ShowToast);
   private reportesService = inject(GenerarReportes);
+  private onboarding = inject(OnboardingService);
 
   isDownloading = signal(false);
 
@@ -53,6 +56,10 @@ export default class ListaProducto implements OnInit {
   ];
 
   ngOnInit() {
+    afterNextRender(() => {
+      this.onboarding.startTourIfFirstVisit("admin-inventario-producto-lista");
+    });
+
     this.store.setPage(1, 100);
 
     this.store.updateFilters({
@@ -60,6 +67,10 @@ export default class ListaProducto implements OnInit {
       nombre: null,
     });
     this.store.loadProducts();
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-producto-lista");
   }
 
   onPageChange(event: any) {

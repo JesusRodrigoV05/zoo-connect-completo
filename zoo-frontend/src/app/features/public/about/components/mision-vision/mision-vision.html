@@ -1,4 +1,4 @@
-<section class="zoo-mission-section">
+<section class="zoo-mission-section tour-public-about-refugio">
   <div class="organic-bg">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -6,7 +6,15 @@
 
   <div class="content-container">
     <header class="section-header" data-aos="fade-up">
-      <span class="subtitle">El Legado de Elias Thorne</span>
+      <div class="tour-public-about-legacy-row">
+        <span class="subtitle">El Legado de Elias Thorne</span>
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-compass"
+          styleClass="p-button-sm p-button-rounded p-button-outlined"
+          (onClick)="startGuidedTour()"
+        />
+      </div>
       <h2 class="title">
         Más que un zoológico, <span class="highlight">un Refugio</span>
       </h2>
@@ -20,7 +28,7 @@
 
     <div class="cards-grid">
       <article
-        class="organic-card history"
+        class="organic-card history tour-public-about-origen"
         data-aos="fade-right"
         data-aos-delay="100"
       >
@@ -38,7 +46,10 @@
         <div class="card-decoration"></div>
       </article>
 
-      <article class="organic-card mission featured" data-aos="zoom-in">
+      <article
+        class="organic-card mission featured tour-public-about-mision"
+        data-aos="zoom-in"
+      >
         <div class="card-content">
           <div class="icon-blob main">
             <i class="pi pi-heart-fill"></i>
@@ -54,7 +65,7 @@
       </article>
 
       <article
-        class="organic-card vision"
+        class="organic-card vision tour-public-about-vision"
         data-aos="fade-left"
         data-aos-delay="200"
       >
@@ -73,7 +84,7 @@
       </article>
     </div>
 
-    <div class="features-strip">
+    <div class="features-strip tour-public-about-features">
       @for (item of features; track $index) {
       <div
         class="feature-item"

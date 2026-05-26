@@ -91,6 +91,8 @@ export class UsuarioItem {
         return "success";
       case 4:
         return "info";
+      case 5:
+        return "warn";
       default:
         return "info";
     }

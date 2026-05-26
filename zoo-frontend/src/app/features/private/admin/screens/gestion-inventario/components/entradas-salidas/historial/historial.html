@@ -1,5 +1,5 @@
-<div class="history-container">
-  <header class="history-header">
+<div class="history-container tour-historial-page">
+  <header class="history-header tour-historial-header">
     <div class="title-block">
       <h2>Movimientos de Inventario</h2>
       <p>Historial de entradas y salidas de almacén</p>
@@ -12,6 +12,7 @@
           icon="pi pi-arrow-down"
           severity="success"
           [rounded]="true"
+          styleClass="tour-historial-new-entry-btn"
           routerLink="../../transacciones/crear-entrada"
         />
         <p-button
@@ -19,13 +20,21 @@
           icon="pi pi-arrow-up"
           severity="warn"
           [rounded]="true"
+          styleClass="tour-historial-new-exit-btn"
           routerLink="../../transacciones/crear-salida"
+        />
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          (onClick)="startGuidedTour()"
         />
       </div>
     </div>
   </header>
 
-  <div class="tabs-wrapper">
+  <div class="tabs-wrapper tour-historial-tabs">
     <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
       <p-tablist>
         <p-tab value="entradas">
@@ -35,7 +44,7 @@
           </span>
         </p-tab>
         <p-tab value="salidas">
-          <span class="tab-item-content">
+          <span class="tab-item-content tour-historial-tab-salidas">
             <i class="pi pi-sign-out"></i>
             <span>Salidas (Consumo)</span>
           </span>

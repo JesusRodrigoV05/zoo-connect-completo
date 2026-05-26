@@ -6,7 +6,20 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   username: string;
-  password: string;
+  password?: string;
+  generate_password?: boolean;
+}
+
+export interface RegisterResponse {
+  id: number;
+  email: string;
+  username: string;
+  photo_url: string | null;
+  is_active: boolean;
+  role_id: number;
+  created_at: string;
+  permissions?: string[];
+  generated_password?: string | null;
 }
 
 export interface UpdateProfileRequest {

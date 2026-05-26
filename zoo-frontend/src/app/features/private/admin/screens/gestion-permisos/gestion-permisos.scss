@@ -1,0 +1,145 @@
+.permissions-page {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.permissions-title-block {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.permissions-osi-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.permissions-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.permissions-header h1 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.permissions-header p {
+  margin: 0;
+  color: var(--text-secondary, #667085);
+  max-width: 56rem;
+}
+
+.permissions-header h1 {
+  line-height: 1.1;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  margin: 0;
+  color: var(--primary-color, #0f766e);
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actions input {
+  min-width: 18rem;
+}
+
+.table-shell {
+  overflow: auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #fff;
+}
+
+.permissions-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+
+.permissions-table th,
+.permissions-table td {
+  padding: 0.9rem 0.85rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  vertical-align: middle;
+}
+
+.permissions-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  z-index: 1;
+  text-align: left;
+}
+
+.permissions-table thead th span,
+.permissions-table thead th small {
+  display: block;
+}
+
+.permissions-table thead th small {
+  opacity: 0.6;
+  font-size: 0.72rem;
+}
+
+.tour-permissions-col-permission span {
+  display: block;
+  max-width: 10rem;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.user-cell strong,
+.user-cell span {
+  display: block;
+}
+
+.user-cell span {
+  color: var(--text-secondary, #667085);
+  font-size: 0.875rem;
+}
+
+.permission-cell {
+  text-align: center;
+}
+
+.permission-cell input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.loading-state {
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-secondary, #667085);
+}

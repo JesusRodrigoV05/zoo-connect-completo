@@ -20,6 +20,7 @@ import {
   UpdateTipoTarea,
 } from "@app/features/private/admin/models/tareas/tarea.model";
 import { TiposTareaStore } from "@app/features/private/admin/stores/tareas/admin-tipo-tares.store";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "zoo-crear-tipo-tarea",
@@ -45,6 +46,7 @@ export class CrearTipoTarea {
 
   private fb = inject(FormBuilder);
   readonly store = inject(TiposTareaStore);
+  private onboarding = inject(OnboardingService);
 
   protected pageTitle = computed(() =>
     this.editingItem() ? "Editar Tipo" : "Nuevo Tipo de Tarea",
@@ -61,6 +63,13 @@ export class CrearTipoTarea {
     effect(() => {
       if (this.visible()) {
         const item = this.editingItem();
+
+        if (!item) {
+          setTimeout(() => {
+            this.onboarding.startTourIfFirstVisit("admin-tareas-tipo-crear");
+          }, 220);
+        }
+
         if (item) {
           this.form.patchValue({
             nombre: item.nombre,
@@ -72,6 +81,10 @@ export class CrearTipoTarea {
         }
       }
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-tareas-tipo-crear");
   }
 
   save() {

@@ -8,9 +8,12 @@ import {
 import { FormsModule } from "@angular/forms";
 import { CardModule } from "primeng/card";
 import { ToggleSwitchModule } from "primeng/toggleswitch";
+import { ButtonModule } from "primeng/button";
+import { TooltipModule } from "primeng/tooltip";
 import { Enable2faDialog } from "../enable-2fa-dialog/enable-2fa-dialog";
 import { Disable2faDialog } from "../disable-2fa-dialog";
 import { AuthStore } from "@stores/auth.store";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "seguridad-ajustes",
@@ -18,6 +21,8 @@ import { AuthStore } from "@stores/auth.store";
     FormsModule,
     CardModule,
     ToggleSwitchModule,
+    ButtonModule,
+    TooltipModule,
     Enable2faDialog,
     Disable2faDialog,
   ],
@@ -27,6 +32,7 @@ import { AuthStore } from "@stores/auth.store";
 })
 export default class SeguridadAjustes {
   private authStore = inject(AuthStore);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly showEnable2FA = signal(false);
   protected readonly showDisable2FA = signal(false);
@@ -41,6 +47,13 @@ export default class SeguridadAjustes {
     } else {
       this.twoFaModel.set(this.authStore.twoFAenabled());
     }
+  }
+
+  /**
+   * Inicia el tour guiado de la página de Seguridad.
+   */
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("settings-seguridad");
   }
 
   protected on2FAEnabled(): void {

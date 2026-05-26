@@ -8,6 +8,14 @@
 
       <div class="quick-actions">
         <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          styleClass="tour-dashboard-help"
+          (onClick)="startGuidedTour()"
+        />
+        <p-button
           icon="pi pi-file-pdf"
           pTooltip="Descargar Reporte Hoy"
           tooltipPosition="bottom"
@@ -15,6 +23,7 @@
           [rounded]="true"
           [outlined]="true"
           [loading]="isDownloadingDiario()"
+          styleClass="tour-dashboard-daily-report"
           (onClick)="descargarReporteDiario()"
         />
         <p-button
@@ -24,6 +33,7 @@
           [outlined]="true"
           routerLink="/admin/usuarios/crear"
           [rounded]="true"
+          styleClass="tour-dashboard-new-user"
         />
 
         <p-button
@@ -32,6 +42,7 @@
           severity="primary"
           routerLink="/admin/animales/crear"
           [rounded]="true"
+          styleClass="tour-dashboard-register-animal"
         />
 
         <p-button
@@ -41,6 +52,7 @@
           severity="help"
           [rounded]="true"
           routerLink="/admin/tareas/operaciones"
+          styleClass="tour-dashboard-new-task"
         />
 
         <p-button
@@ -50,6 +62,7 @@
           severity="warn"
           [rounded]="true"
           routerLink="/admin/inventario"
+          styleClass="tour-dashboard-inventory"
         />
       </div>
     </div>
@@ -64,12 +77,19 @@
     } @else {
     <div class="grid-kpis">
       @for(kpi of kpis(); track kpi.title) {
-      <app-kpi-card [item]="kpi" />
+      <div
+        [class.tour-kpi-total-animales]="kpi.title === 'Total Animales'"
+        [class.tour-kpi-total-usuarios]="kpi.title === 'Total Usuarios'"
+        [class.tour-kpi-alertas-stock]="kpi.title === 'Alertas Stock'"
+        [class.tour-kpi-tareas-pendientes]="kpi.title === 'Tareas Pendientes'"
+      >
+        <app-kpi-card [item]="kpi" />
+      </div>
       }
     </div>
 
     <div class="grid-charts">
-      <div class="chart-card card-surface">
+      <div class="chart-card card-surface tour-chart-fauna">
         <div class="card-header-flex">
           <h3>Distribución de Fauna</h3>
           <p-selectButton
@@ -95,7 +115,7 @@
         </div>
       </div>
 
-      <div class="chart-card card-surface">
+      <div class="chart-card card-surface tour-chart-rendimiento">
         <div class="card-header-flex">
           <h3>Estado de Tareas (Hoy)</h3>
           <div class="total-badge">

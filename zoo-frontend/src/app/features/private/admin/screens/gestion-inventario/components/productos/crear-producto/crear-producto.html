@@ -10,8 +10,19 @@
         <ng-template #content>
           <p-card class="product-card">
             <ng-template pTemplate="header">
-              <div class="card-header">
-                <h2>{{ pageTitle() }}</h2>
+              <div class="card-header tour-product-step1-header">
+                <div class="card-header-row">
+                  <h2>{{ pageTitle() }}</h2>
+                  @if (!isEditMode()) {
+                  <p-button
+                    label="Tour guiado"
+                    icon="pi pi-question-circle"
+                    severity="contrast"
+                    [rounded]="true"
+                    (onClick)="startGuidedTour()"
+                  />
+                  }
+                </div>
                 <p class="subtitle">Paso 1: Información general del ítem</p>
               </div>
             </ng-template>
@@ -115,6 +126,7 @@
                   icon="pi pi-times"
                   [text]="true"
                   severity="secondary"
+                  styleClass="tour-product-cancel-btn"
                   (onClick)="onCancel()"
                 />
                 <p-button
@@ -134,8 +146,19 @@
         <ng-template #content>
           <p-card class="product-card">
             <ng-template pTemplate="header">
-              <div class="card-header">
-                <h2>Imagen del Producto</h2>
+              <div class="card-header tour-product-step2-header">
+                <div class="card-header-row">
+                  <h2>Imagen del Producto</h2>
+                  @if (!isEditMode()) {
+                  <p-button
+                    label="Tour guiado"
+                    icon="pi pi-question-circle"
+                    severity="contrast"
+                    [rounded]="true"
+                    (onClick)="startGuidedTour()"
+                  />
+                  }
+                </div>
                 <p class="subtitle">Paso 2: Visualización</p>
               </div>
             </ng-template>
@@ -156,6 +179,7 @@
               <p-fileupload
                 #fileUploader
                 mode="advanced"
+                styleClass="tour-product-file-upload"
                 [customUpload]="true"
                 [multiple]="false"
                 accept="image/*"
@@ -185,6 +209,7 @@
                 icon="pi pi-arrow-left"
                 [text]="true"
                 severity="secondary"
+                styleClass="tour-product-back-btn"
                 (onClick)="prevStep()"
                 [disabled]="isProcessing()"
               />
@@ -193,6 +218,7 @@
                 [label]="isProcessing() ? 'Guardando...' : (isEditMode() ? 'Actualizar Todo' : 'Crear Producto')"
                 [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
                 [rounded]="true"
+                styleClass="tour-product-save-btn"
                 (onClick)="finishProcess()"
                 [disabled]="isProcessing()"
               />

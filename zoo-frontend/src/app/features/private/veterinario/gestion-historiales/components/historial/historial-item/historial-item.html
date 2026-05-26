@@ -1,4 +1,4 @@
-<td>
+<td class="tour-vet-historiales-col-paciente">
   <div class="animal-info">
     <p-avatar
       [image]="item().animal?.foto"
@@ -14,7 +14,7 @@
   </div>
 </td>
 
-<td>
+<td class="tour-vet-historiales-col-fecha-tipo">
   <div class="flex flex-column">
     <span class="font-medium text-800">
       {{ item().fechaAtencion | date:'dd MMM yyyy' }}
@@ -26,7 +26,7 @@
   </div>
 </td>
 
-<td>
+<td class="tour-vet-historiales-col-motivo">
   <p
     class="m-0 text-700 text-overflow-ellipsis"
     pTooltip="{{ item().anamnesis }}"
@@ -36,7 +36,7 @@
   </p>
 </td>
 
-<td class="text-center">
+<td class="text-center tour-vet-historiales-col-estado">
   @if(item().abierto) {
   <p-tag
     severity="success"
@@ -54,7 +54,7 @@
   }
 </td>
 
-<td class="text-center">
+<td class="text-center tour-vet-historiales-col-acciones">
   <zoo-item-action-button
     tipo="download"
     (click)="onDownload.emit(item().id)"

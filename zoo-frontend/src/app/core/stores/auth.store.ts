@@ -13,11 +13,13 @@ import { Auth } from "@app/features/auth/services";
 import {
   LoginResponse,
   UpdateProfileRequest,
+  RegisterResponse,
 } from "@models/usuario/request_response.model";
 import { isPlatformBrowser } from "@angular/common";
 import { ShowToast } from "@app/shared/services";
 import { Theme } from "@app/features/private/settings/services/theme-service";
 import { environment } from "@env";
+import { EncryptionService } from "../services/encryption.service";
 
 interface AuthState {
   usuario: Usuario | null;
@@ -54,7 +56,9 @@ export const AuthStore = signalStore(
     isAdmin: computed(() => usuario()?.rol.id === RolId.ADMIN),
     isVeterinario: computed(() => usuario()?.rol.id === RolId.VETERINARIO),
     isCuidador: computed(() => usuario()?.rol.id === RolId.CUIDADOR),
+    isOsi: computed(() => usuario()?.rol.id === RolId.OSI),
     isVisitante: computed(() => usuario()?.rol.id === RolId.VISITANTE),
+    permissions: computed(() => usuario()?.permisos ?? []),
     userId: computed(() => parseInt(usuario()?.id ?? "0")),
   })),
   withMethods(
@@ -65,6 +69,7 @@ export const AuthStore = signalStore(
       platformId = inject(PLATFORM_ID),
       toastService = inject(ShowToast),
       themeService = inject(Theme),
+      encryptionService = inject(EncryptionService),
     ) => {
       const setTokenInStorage = (key: string, value: string): void => {
         if (isPlatformBrowser(platformId)) {
@@ -166,8 +171,11 @@ export const AuthStore = signalStore(
           });
 
           try {
+            // Cifrar contraseña antes de enviar
+            const encryptedPassword = await encryptionService.encrypt(password);
+            
             const loginResponse: LoginResponse = await firstValueFrom(
-              authService.login(email, password),
+              authService.login(email, encryptedPassword),
             );
 
             if (
@@ -224,18 +232,29 @@ export const AuthStore = signalStore(
           });
         },
 
-        async register(email: string, username: string, password: string) {
+        async register(
+          email: string,
+          username: string,
+          password?: string,
+          generate_password: boolean = false,
+        ): Promise<RegisterResponse | undefined> {
           patchState(store, { loading: true, twoFA: false, error: null });
           try {
-            await firstValueFrom(
-              authService.register(email, username, password),
+            let finalPassword = password;
+            if (password && !generate_password) {
+              finalPassword = await encryptionService.encrypt(password);
+            }
+
+            const response: RegisterResponse = await firstValueFrom(
+              authService.register(email, username, finalPassword, generate_password),
             );
             patchState(store, { loading: false });
             toastService.showSuccess(
               "Éxito",
               "Registro exitoso. Por favor, inicie sesión.",
             );
-            await router.navigate(["/login"]);
+            // Do not navigate here — caller (component) may want to show generated password modal
+            return response;
           } catch (error: any) {
             handleError(error, "register");
             throw error;
@@ -336,6 +355,10 @@ export const AuthStore = signalStore(
         setTokens(accessToken: string) {
           setTokenInStorage(ACCESS_TOKEN_KEY, accessToken);
           patchState(store, { accessToken, error: null });
+        },
+
+        hasPermission(permission: string): boolean {
+          return store.usuario()?.permisos?.includes(permission) ?? false;
         },
 
         async initializeAuth() {

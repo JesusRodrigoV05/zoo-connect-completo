@@ -1,8 +1,19 @@
 <div class="form-container">
   <p-card class="unidad-card">
     <ng-template pTemplate="header">
-      <div class="card-header">
-        <h2>{{ pageTitle() }}</h2>
+      <div class="card-header tour-unit-create-header">
+        <div class="card-header-row">
+          <h2>{{ pageTitle() }}</h2>
+          @if (!isEditMode()) {
+          <p-button
+            label="Tour guiado"
+            icon="pi pi-question-circle"
+            severity="contrast"
+            [rounded]="true"
+            (onClick)="startGuidedTour()"
+          />
+          }
+        </div>
         <p class="subtitle">Estandarización de inventario</p>
       </div>
     </ng-template>
@@ -54,6 +65,7 @@
           icon="pi pi-times"
           [text]="true"
           severity="secondary"
+          styleClass="tour-unit-cancel-btn"
           (onClick)="onCancel()"
           [disabled]="isProcessing()"
         >
@@ -64,6 +76,7 @@
           [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
           [rounded]="true"
           type="submit"
+          styleClass="tour-unit-save-btn"
           [disabled]="isProcessing()"
         >
         </p-button>

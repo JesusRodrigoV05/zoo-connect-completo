@@ -2,11 +2,25 @@
   [visible]="visible()"
   (visibleChange)="!$event ? close() : null"
   [modal]="true"
-  [header]="pageTitle()"
   styleClass="tipo-tarea-dialog"
   [draggable]="false"
   [resizable]="false"
 >
+  <ng-template pTemplate="header">
+    <div class="dialog-header-row tour-tipo-crear-header">
+      <span>{{ pageTitle() }}</span>
+      @if (!editingItem()) {
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
+      }
+    </div>
+  </ng-template>
+
   <form [formGroup]="form" class="tipo-form">
     <div class="form-grid">
       <div class="field">

@@ -66,3 +66,38 @@ async def send_password_reset_email(email_to: EmailStr, token: str, username: st
         print(f"Correo de reseteo enviado a {email_to}")
     except Exception as e:
         print(f"Error al enviar correo: {e}")
+
+
+async def send_generated_password_email(email_to: EmailStr, password: str, username: str):
+    """Envía la contraseña generada al usuario (usar solo cuando el usuario la solicita o tras registro automatizado)."""
+    html_template = f"""
+    <html>
+    <head>
+        <style>
+            body {{ font-family: 'Arial', sans-serif; line-height: 1.6; }}
+            .container {{ width: 90%; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }}
+            .password {{ font-family: monospace; background:#f6f6f6; padding:8px; border-radius:4px; display:inline-block }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h3>Hola, {username}</h3>
+            <p>Tu cuenta en ZooConnect fue creada y se generó una contraseña segura para ti.</p>
+            <p>Contraseña temporal: <span class="password">{password}</span></p>
+            <p>Te recomendamos iniciar sesión y cambiar la contraseña inmediatamente.</p>
+        </div>
+    </body>
+    </html>
+    """
+    message = MessageSchema(
+        subject="Tu contraseña temporal de ZooConnect",
+        recipients=[email_to],
+        body=html_template,
+        subtype=MessageType.html
+    )
+
+    try:
+        await fm.send_message(message)
+        print(f"Correo con contraseña generada enviado a {email_to}")
+    except Exception as e:
+        print(f"Error al enviar correo de contraseña generada: {e}")

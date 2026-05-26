@@ -1,29 +1,18 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
-#prueba validacion
 from pydantic import field_validator
-import re
 
-
-def validate_password_strength_func(v: str) -> str:
-    if len(v) < 8:
-        raise ValueError('La contraseña debe tener 8 caracteres como minimo')
-    if not re.search(r"[A-Z]", v):
-        raise ValueError("La contraseña debe contener al menos una mayuscula")
-    if not re.search(r"[0-9]", v):
-        raise ValueError("La contraseña debe contener al menos un numero")
-    return v
-#pydantic guardia seguridad de la api
+# Reuse password policy validator
+from app.core.password_policy import validate_password_strength_func
 class UserBase(BaseModel):
     email: EmailStr
     username: str
 
 class UserCreate(UserBase):
-    password: str
-    @field_validator('password')
-    def validate_password_strength(cls, v: str) -> str:
-        return validate_password_strength_func(v)
+    password: Optional[str] = None
+    # Si se establece a True, el servidor generará una contraseña segura para el usuario
+    generate_password: bool = False
 
 class AdminUserCreate(UserBase):
     password: str
@@ -49,7 +38,7 @@ class UserOut(BaseModel):
     email: EmailStr
     username: str
     is_active: bool
-    is_admin: bool
+    is_admin: bool = False
     role_id: int
     photo_url: Optional[str] = None 
     created_at: datetime 
@@ -67,6 +56,16 @@ class UserOutWithRole(BaseModel):
     role_id: int
     photo_url: Optional[str] = None 
     created_at: datetime 
+
+    class Config:
+        from_attributes = True
+
+class UserProfileOut(UserOutWithRole):
+    permissions: list[str] = Field(default_factory=list)
+
+
+class UserCreateResponse(UserOut):
+    generated_password: Optional[str] = None
 
     class Config:
         from_attributes = True

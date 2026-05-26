@@ -8,3 +8,4 @@ class Role(Base):
     name = Column(String(50), unique=True, nullable=False)
 
     users = relationship("User", back_populates="role")
+    role_permissions = relationship("RolePermission", back_populates="role", cascade="all, delete-orphan")

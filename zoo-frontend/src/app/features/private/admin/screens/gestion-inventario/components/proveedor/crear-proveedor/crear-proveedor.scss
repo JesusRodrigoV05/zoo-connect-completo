@@ -39,6 +39,17 @@
   }
 }
 
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.card-header-row h2 {
+  margin: 0;
+}
+
 .form-section {
   margin-bottom: 2rem;
 

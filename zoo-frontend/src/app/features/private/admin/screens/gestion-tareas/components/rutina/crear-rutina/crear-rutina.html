@@ -13,7 +13,18 @@
             class="back-btn"
           />
           <div>
-            <h2>{{ pageTitle() }}</h2>
+            <div class="header-main tour-rutina-crear-header">
+              <h2>{{ pageTitle() }}</h2>
+              @if (!isEditMode()) {
+              <p-button
+                label="Tour guiado"
+                icon="pi pi-question-circle"
+                severity="contrast"
+                [rounded]="true"
+                (onClick)="startGuidedTour()"
+              />
+              }
+            </div>
             <p class="subtitle">
               Configura la frecuencia y detalles de la tarea recurrente
             </p>
