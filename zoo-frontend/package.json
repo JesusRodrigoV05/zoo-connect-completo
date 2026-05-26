@@ -22,6 +22,7 @@
     "@angular/platform-browser": "^21.2.14",
     "@angular/platform-server": "^21.2.14",
     "@angular/router": "^21.2.14",
+    "@angular/service-worker": "^21.2.14",
     "@angular/ssr": "^21.2.12",
     "@google/genai": "^1.52.0",
     "@ngrx/operators": "^21.1.0",

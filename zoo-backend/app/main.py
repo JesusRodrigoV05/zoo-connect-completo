@@ -74,6 +74,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+SENSITIVE_PREFIXES = (
+    "/zooconnect/auth",
+    "/zooconnect/admin_users",
+    "/zooconnect/audit",
+    "/zooconnect/veterinario",
+    "/zooconnect/reportes",
+    "/zooconnect/security",
+    "/zooconnect/inventario",
+    "/zooconnect/transacciones",
+)
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Strict-Transport-Security"] = (
+        "max-age=63072000; includeSubDomains"
+    )
+    if any(request.url.path.startswith(prefix) for prefix in SENSITIVE_PREFIXES):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return response
+
 
 app.include_router(auth.router, prefix="/zooconnect/auth", tags=["auth"])
 app.include_router(admin_users.router, prefix="/zooconnect/admin_users", tags=["admin"])

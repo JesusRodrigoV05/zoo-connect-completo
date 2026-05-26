@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /vet/
+Disallow: /cuidador/
+Disallow: /osi/
+Disallow: /perfil
+Disallow: /ajustes/
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-2fa
+Disallow: /verify-email
+Disallow: /404
+Disallow: /api/

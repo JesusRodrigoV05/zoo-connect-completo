@@ -46,6 +46,11 @@
                 "glob": "**/*",
                 "input": "public/logos",
                 "output": "/assets/logos"
+              },
+              {
+                "glob": "robots.txt",
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": ["src/styles.scss", "node_modules/aos/dist/aos.css"],
@@ -60,7 +65,7 @@
               "optimization": {
                 "scripts": true,
                 "styles": true,
-                "fonts": false
+                "fonts": true
               },
               "budgets": [
                 {
@@ -75,7 +80,8 @@
                 }
               ],
               "outputHashing": "all",
-              "sourceMap": false
+              "sourceMap": false,
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,
