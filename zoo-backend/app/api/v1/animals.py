@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -16,6 +16,8 @@ from app.core.dependencies import (
 )
 
 from app.crud import animal as crud_animal
+from app.crud import audit as crud_audit
+from app.core.enums import AuditLogType
 from app.schemas.animal import (
     EspecieCreate, EspecieUpdate, EspecieOut,
     HabitatCreate, HabitatUpdate, HabitatOut,
@@ -32,11 +34,26 @@ router = APIRouter()
 # ---Especies ---
 
 @router.post("/species/", response_model=EspecieOut, tags=["Especies"], status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_species_create_permission)])
-def create_especie(especie_in: EspecieCreate, db: Session = Depends(get_db)):
+def create_especie(
+    especie_in: EspecieCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     db_especie = crud_animal.get_especie_by_nombre_cientifico(db, nombre_cientifico=especie_in.nombre_cientifico)
     if db_especie:
         raise HTTPException(status_code=400, detail="Ya existe una especie con este nombre cientifico")
-    return crud_animal.create_especie(db, especie_in)
+    
+    new_especie = crud_animal.create_especie(db, especie_in)
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="especie_created",
+        log_type=AuditLogType.APPLICATION,
+        action="Creación de especie",
+        detail=f"Nombre: {especie_in.nombre_cientifico}",
+        user_id=current_user.id
+    )
+    return new_especie
 
 @router.get("/species/", response_model=Page[EspecieOut], tags=["Especies"])
 def list_especies(db: Session = Depends(get_db)):
@@ -50,27 +67,76 @@ def get_especie(especie_id: int, db: Session = Depends(get_db)):
     return db_especie
 
 @router.put("/species/{especie_id}", response_model=EspecieOut, tags=["Especies"], dependencies=[Depends(require_species_create_permission)])
-def update_especie(especie_id: int, especie_in: EspecieUpdate, db: Session = Depends(get_db)):
+def update_especie(
+    especie_id: int, 
+    especie_in: EspecieUpdate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     db_especie = crud_animal.get_especie(db, especie_id)
     if not db_especie:
         raise HTTPException(status_code=404, detail="Especie no encontrada")
-    return crud_animal.update_especie(db, especie=db_especie, especie_in=especie_in)
+    
+    updated_especie = crud_animal.update_especie(db, especie=db_especie, especie_in=especie_in)
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="especie_updated",
+        log_type=AuditLogType.APPLICATION,
+        action="Actualización de especie",
+        detail=f"ID: {especie_id}, Nombre: {db_especie.nombre_cientifico}",
+        user_id=current_user.id
+    )
+    return updated_especie
 
 @router.delete("/species/{especie_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Especies"], dependencies=[Depends(require_species_create_permission)])
-def delete_especie(especie_id: int, db: Session = Depends(get_db)):
+def delete_especie(
+    especie_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
+    db_especie = crud_animal.get_especie(db, especie_id)
+    if not db_especie:
+        raise HTTPException(status_code=404, detail="Especie no encontrada")
+    
     deleted_especie = crud_animal.delete_especie(db, especie_id)
     if not deleted_especie:
         raise HTTPException(status_code=404, detail="Especie no encontrada")
+    
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="especie_deleted",
+        log_type=AuditLogType.APPLICATION,
+        action="Eliminación de especie",
+        detail=f"ID: {especie_id}",
+        user_id=current_user.id
+    )
     return None
 
 # --- Habitats ---
 
 @router.post("/habitats/", response_model=HabitatOut, tags=["Habitats"], status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_habitats_create_permission)])
-def create_habitat(habitat_in: HabitatCreate, db: Session = Depends(get_db)):
+def create_habitat(
+    habitat_in: HabitatCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     db_habitat = crud_animal.get_habitat_by_nombre(db, nombre=habitat_in.nombre_habitat)
     if db_habitat:
         raise HTTPException(status_code=400, detail="Ya existe un habitat con este nombre")
-    return crud_animal.create_habitat(db, habitat_in)
+    
+    new_habitat = crud_animal.create_habitat(db, habitat_in)
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="habitat_created",
+        log_type=AuditLogType.APPLICATION,
+        action="Creación de hábitat",
+        detail=f"Nombre: {habitat_in.nombre_habitat}",
+        user_id=current_user.id
+    )
+    return new_habitat
 
 @router.get("/habitats/", response_model=Page[HabitatOut], tags=["Habitats"])
 def list_habitats(db: Session = Depends(get_db)):
@@ -84,24 +150,72 @@ def get_habitat(habitat_id: int, db: Session = Depends(get_db)):
     return db_habitat
 
 @router.put("/habitats/{habitat_id}", response_model=HabitatOut, tags=["Habitats"], dependencies=[Depends(require_habitats_create_permission)])
-def update_habitat(habitat_id: int, habitat_in: HabitatUpdate, db: Session = Depends(get_db)):
+def update_habitat(
+    habitat_id: int, 
+    habitat_in: HabitatUpdate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     db_habitat = crud_animal.get_habitat(db, habitat_id)
     if not db_habitat:
         raise HTTPException(status_code=404, detail="Habitat no encontrado")
-    return crud_animal.update_habitat(db, habitat=db_habitat, habitat_in=habitat_in)
+    
+    updated_habitat = crud_animal.update_habitat(db, habitat=db_habitat, habitat_in=habitat_in)
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="habitat_updated",
+        log_type=AuditLogType.APPLICATION,
+        action="Actualización de hábitat",
+        detail=f"ID: {habitat_id}, Nombre: {db_habitat.nombre_habitat}",
+        user_id=current_user.id
+    )
+    return updated_habitat
 
 @router.delete("/habitats/{habitat_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Habitats"], dependencies=[Depends(require_habitats_create_permission)])
-def delete_habitat(habitat_id: int, db: Session = Depends(get_db)):
+def delete_habitat(
+    habitat_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
+    db_habitat = crud_animal.get_habitat(db, habitat_id)
+    if not db_habitat:
+        raise HTTPException(status_code=404, detail="Habitat no encontrado")
+        
     deleted_habitat = crud_animal.delete_habitat(db, habitat_id)
     if not deleted_habitat:
         raise HTTPException(status_code=404, detail="Habitat no encontrado")
+    
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="habitat_deleted",
+        log_type=AuditLogType.APPLICATION,
+        action="Eliminación de hábitat",
+        detail=f"ID: {habitat_id}",
+        user_id=current_user.id
+    )
     return None
 
 #animals
 @router.post("/animals/", response_model=AnimalOut, tags=["Animales"], status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_animals_create_permission)])
-def create_animal(animal_in: AnimalCreate, db: Session = Depends(get_db)):
+def create_animal(
+    animal_in: AnimalCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     try:
-        return crud_animal.create_animal(db, animal_in)
+        new_animal = crud_animal.create_animal(db, animal_in)
+        background_tasks.add_task(
+            crud_audit.create_audit_log,
+            event="animal_created",
+            log_type=AuditLogType.APPLICATION,
+            action="Creación de animal",
+            detail=f"Nombre: {animal_in.nombre}, ID: {new_animal.id_animal}",
+            user_id=current_user.id
+        )
+        return new_animal
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -130,20 +244,53 @@ def get_animal(animal_id: int, db: Session = Depends(get_db), current_user: Opti
     return db_animal
 
 @router.put("/animals/{animal_id}", response_model=AnimalOut, tags=["Animales"], dependencies=[Depends(require_animals_create_permission)])
-def update_animal(animal_id: int, animal_in: AnimalUpdate, db: Session = Depends(get_db)):
+def update_animal(
+    animal_id: int, 
+    animal_in: AnimalUpdate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     db_animal = crud_animal.get_animal(db, animal_id)
     if not db_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
     try:
-        return crud_animal.update_animal(db, animal=db_animal, animal_in=animal_in)
+        updated_animal = crud_animal.update_animal(db, animal=db_animal, animal_in=animal_in)
+        background_tasks.add_task(
+            crud_audit.create_audit_log,
+            event="animal_updated",
+            log_type=AuditLogType.APPLICATION,
+            action="Actualización de animal",
+            detail=f"ID: {animal_id}, Nombre: {db_animal.nombre}",
+            user_id=current_user.id
+        )
+        return updated_animal
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/animals/{animal_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Animales"], dependencies=[Depends(require_animals_create_permission)])
-def delete_animal(animal_id: int, db: Session = Depends(get_db)):
+def delete_animal(
+    animal_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
+    db_animal = crud_animal.get_animal(db, animal_id)
+    if not db_animal:
+        raise HTTPException(status_code=404, detail="Animal no encontrado")
+
     deleted_animal = crud_animal.delete_animal(db, animal_id)
     if not deleted_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
+    
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="animal_deleted",
+        log_type=AuditLogType.APPLICATION,
+        action="Eliminación de animal",
+        detail=f"ID: {animal_id}",
+        user_id=current_user.id
+    )
     return None
 
 # --- Media ---
@@ -157,7 +304,8 @@ def upload_animal_media(
 
     tipo_medio: bool = Form(...),
     titulo_media_animal: str = Form(...),
-    descripcion_media_animal: Optional[str] = Form(None)
+    descripcion_media_animal: Optional[str] = Form(None),
+    background_tasks: BackgroundTasks = BackgroundTasks()
 ):
     db_animal = crud_animal.get_animal(db, animal_id)
     if not db_animal:
@@ -178,15 +326,30 @@ def upload_animal_media(
         raise e
         
     #3 Guardar en la base de datos
-    return crud_animal.add_media_to_animal(
+    new_media = crud_animal.add_media_to_animal(
         db=db,
         animal_id=animal_id,
         media_in=media_in,
         upload_result=upload_result
     )
+    
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="animal_media_uploaded",
+        log_type=AuditLogType.APPLICATION,
+        action="Subida de media para animal",
+        detail=f"Animal ID: {animal_id}, Titulo: {titulo_media_animal}",
+        user_id=current_user.id
+    )
+    return new_media
 
 @router.delete("/media/animal/{media_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Media"])
-def delete_animal_media_file(media_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_animal_management_permission)):
+def delete_animal_media_file(
+    media_id: int, 
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(require_animal_management_permission),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     db_media = crud_animal.get_media_animal(db, media_id) 
     if not db_media:
         raise HTTPException(status_code=404, detail="Archivo multimedia no encontrado")
@@ -195,6 +358,15 @@ def delete_animal_media_file(media_id: int, db: Session = Depends(get_db), curre
         delete_from_cloudinary(db_media.public_id)
         
     crud_animal.delete_media_animal(db, media_id) 
+    
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="animal_media_deleted",
+        log_type=AuditLogType.APPLICATION,
+        action="Eliminación de media de animal",
+        detail=f"Media ID: {media_id}",
+        user_id=current_user.id
+    )
     
     return None
 
@@ -219,7 +391,8 @@ def upload_habitat_media(
     file: UploadFile = File(...),
     tipo_medio: bool = Form(...),
     titulo_media_habitat: str = Form(...),
-    descripcion_media_habitat: Optional[str] = Form(None)
+    descripcion_media_habitat: Optional[str] = Form(None),
+    background_tasks: BackgroundTasks = BackgroundTasks()
 ):
     db_habitat = crud_animal.get_habitat(db, habitat_id)
     if not db_habitat:
@@ -237,15 +410,30 @@ def upload_habitat_media(
     except HTTPException as e:
         raise e
         
-    return crud_animal.add_media_to_habitat(
+    new_media = crud_animal.add_media_to_habitat(
         db=db, 
         habitat_id=habitat_id, 
         media_in=media_in, 
         upload_result=upload_result
     )
+    
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="habitat_media_uploaded",
+        log_type=AuditLogType.APPLICATION,
+        action="Subida de media para hábitat",
+        detail=f"Hábitat ID: {habitat_id}, Titulo: {titulo_media_habitat}",
+        user_id=current_user.id
+    )
+    return new_media
 
 @router.delete("/media/habitat/{media_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Media"])
-def delete_habitat_media_file(media_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_habitats_create_permission)):
+def delete_habitat_media_file(
+    media_id: int, 
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(require_habitats_create_permission),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
     db_media = crud_animal.get_media_habitat(db, media_id)
     if not db_media:
         raise HTTPException(status_code=404, detail="Archivo multimedia no encontrado")
@@ -254,6 +442,15 @@ def delete_habitat_media_file(media_id: int, db: Session = Depends(get_db), curr
         delete_from_cloudinary(db_media.public_id)
         
     crud_animal.delete_media_habitat(db, media_id) 
+    
+    background_tasks.add_task(
+        crud_audit.create_audit_log,
+        event="habitat_media_deleted",
+        log_type=AuditLogType.APPLICATION,
+        action="Eliminación de media de hábitat",
+        detail=f"Media ID: {media_id}",
+        user_id=current_user.id
+    )
     return None
 
 @router.get("/habitats/{habitat_id}/media", response_model=Page[MediaOutHabitat], tags=["Habitats", "Media"])

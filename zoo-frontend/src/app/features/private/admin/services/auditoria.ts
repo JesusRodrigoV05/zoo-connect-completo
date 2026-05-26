@@ -17,10 +17,23 @@ export class AuditoriaService {
     page: number,
     size: number,
     type: "application" | "security" = "security",
+    filters?: {
+      dateFrom?: string;
+      dateTo?: string;
+      search?: string;
+      userId?: number;
+    }
   ): Observable<PaginatedResponse<Auditoria>> {
-    const params = new HttpParams()
+    let params = new HttpParams()
       .set("page", page.toString())
       .set("size", size.toString());
+
+    if (filters) {
+      if (filters.dateFrom) params = params.set("date_from", filters.dateFrom);
+      if (filters.dateTo) params = params.set("date_to", filters.dateTo);
+      if (filters.search) params = params.set("search", filters.search);
+      if (filters.userId) params = params.set("user_id", filters.userId.toString());
+    }
 
     return this.http.get<PaginatedResponse<Auditoria>>(`${this.auditUrl}/${type}`, {
       params,
