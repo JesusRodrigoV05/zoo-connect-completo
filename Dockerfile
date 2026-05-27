@@ -1,7 +1,7 @@
 FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /app/frontend
 COPY zoo-frontend/package*.json ./
-RUN npm ci
+RUN npm install
 COPY zoo-frontend/ ./
 RUN npm run build -- --configuration production
 

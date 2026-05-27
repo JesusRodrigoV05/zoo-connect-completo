@@ -43,9 +43,11 @@ class ResetPasswordRequest(BaseModel):
 class EmailVerificationRequest(BaseModel):
     phone_number: str
     code: str
+    recaptcha_token: Optional[str] = None
 
 class ResendVerificationRequest(BaseModel):
-    email: EmailStr
+    phone_number: str
+    recaptcha_token: Optional[str] = None
 
 # 2fa
 class LoginStep2Response(BaseModel):

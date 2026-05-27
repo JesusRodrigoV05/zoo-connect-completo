@@ -118,12 +118,12 @@ async def register(
     db: Session = Depends(get_db),
 ):
     # 0. Verificar reCAPTCHA v2 server-side si esta requerido por entorno.
-    if settings.REQUIRE_RECAPTCHA and not user_in.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    if user_in.recaptcha_token:
+    if settings.REQUIRE_RECAPTCHA:
+        if not user_in.recaptcha_token:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificacion de seguridad requerida.",
+            )
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(user_in.recaptcha_token, client_ip)
         if not is_valid_recaptcha(recaptcha_result):
@@ -253,13 +253,29 @@ async def register(
 @router.post("/verify-email", status_code=status.HTTP_200_OK)
 @router.post("/verify-phone", status_code=status.HTTP_200_OK)
 async def verify_email(
+    request: Request,
     body: EmailVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    logger.debug(f"Intentando verificar email: {body.email} con código: {body.code}")
-    success = crud_user.verify_user_email(db, email=body.email, code=body.code)
-    if not success:
-        logger.warning(f"Fallo de verificación de email para {body.email}: código incorrecto o usuario no encontrado")
+    if settings.REQUIRE_RECAPTCHA:
+        if not body.recaptcha_token:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificacion de seguridad requerida.",
+            )
+        client_ip = request.client.host if request.client else None
+        recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
+        if not is_valid_recaptcha(recaptcha_result):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            )
+
+    user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
+    is_code_valid = bool(user) and crud_user.verify_sms_otp(
+        db, user, body.code, "verify_phone"
+    )
+    if not is_code_valid or not crud_user.mark_phone_verified(db, phone_number=body.phone_number):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Codigo SMS invalido o usuario no encontrado.",
@@ -270,15 +286,27 @@ async def verify_email(
 @router.post("/resend-verification", status_code=status.HTTP_200_OK)
 @router.post("/resend-phone-verification", status_code=status.HTTP_200_OK)
 async def resend_verification(
+    request: Request,
     body: ResendVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    logger.info(f"DEBUG: Solicitud de reenvío para {body.email}")
-    user = crud_user.resend_verification_code(db, email=body.email)
-    if not user:
-        logger.info(f"DEBUG: No se pudo reenviar código para {body.email} (no existe o ya verificado)")
-        # Por seguridad, no decimos si el email existe o no si ya está verificado
-        return {"message": "Si la cuenta existe y no está verificada, se ha enviado un nuevo código."}
+    if settings.REQUIRE_RECAPTCHA:
+        if not body.recaptcha_token:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificacion de seguridad requerida.",
+            )
+        client_ip = request.client.host if request.client else None
+        recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
+        if not is_valid_recaptcha(recaptcha_result):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            )
+
+    user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
+    if not user or user.phone_verified:
+        return {"message": "Si la cuenta existe y no esta verificada, se ha enviado un nuevo codigo."}
 
     try:
         code = crud_user.create_sms_otp(db, user, "verify_phone")
@@ -307,17 +335,17 @@ async def login(
     cache: Redis = Depends(get_cache_client),
 ):
     # 0. Verificar reCAPTCHA v2 server-side si esta requerido por entorno.
-    if settings.REQUIRE_RECAPTCHA and not payload.recaptcha_token:
-        background_tasks.add_task(
-            crud_audit.create_audit_log,
-            event=AuditEvent.LOGIN_FAILURE,
-            attempted_email=payload.identifier,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    if payload.recaptcha_token:
+    if settings.REQUIRE_RECAPTCHA:
+        if not payload.recaptcha_token:
+            background_tasks.add_task(
+                crud_audit.create_audit_log,
+                event=AuditEvent.LOGIN_FAILURE,
+                attempted_email=payload.identifier,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verificacion de seguridad requerida.",
+            )
         client_ip = request.client.host if request.client else None
         recaptcha_result = await verify_recaptcha(payload.recaptcha_token, client_ip)
         if not is_valid_recaptcha(recaptcha_result):

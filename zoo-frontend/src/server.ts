@@ -15,7 +15,13 @@ import { environment } from '@env';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const allowedHosts = (
+  process.env['NG_ALLOWED_HOSTS'] || 'localhost,127.0.0.1'
+)
+  .split(',')
+  .map((host) => host.trim())
+  .filter(Boolean);
+const angularApp = new AngularNodeAppEngine({ allowedHosts });
 const backendInternalUrl =
   process.env['BACKEND_INTERNAL_URL'] || 'http://127.0.0.1:8000/zooconnect';
 
