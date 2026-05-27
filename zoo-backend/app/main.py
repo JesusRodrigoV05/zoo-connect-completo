@@ -89,6 +89,9 @@ SENSITIVE_PREFIXES = (
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
+    if request.method == "OPTIONS":
+        return await call_next(request)
+        
     response = await call_next(request)
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"
