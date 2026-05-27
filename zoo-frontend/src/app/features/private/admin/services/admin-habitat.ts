@@ -29,7 +29,7 @@ export class AdminHabitat {
       const backendRequest = HabitatAdapter.toCreateRequest(habitatData);
 
       return this.http
-        .post<HabitatBackendResponse>(this.habitatUrl, backendRequest)
+        .post<HabitatBackendResponse>(`${this.habitatUrl}/`, backendRequest)
         .pipe(
           map((response) => HabitatAdapter.toFrontend(response)),
           catchError((error) => {
@@ -66,7 +66,7 @@ export class AdminHabitat {
       .set("size", validSize.toString());
 
     return this.http
-      .get<PaginatedResponse<HabitatBackendResponse>>(this.habitatUrl, {
+      .get<PaginatedResponse<HabitatBackendResponse>>(`${this.habitatUrl}/`, {
         params,
       })
       .pipe(

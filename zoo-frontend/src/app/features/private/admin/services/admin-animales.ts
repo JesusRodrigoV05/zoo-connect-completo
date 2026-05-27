@@ -23,7 +23,7 @@ export class AdminAnimales {
   createAnimal(animalData: CreateAnimal): Observable<Animal> {
     const request = AnimalAdapter.toCreateRequest(animalData);
     return this.http
-      .post<BackendAnimalResponse>(this.animalesUrl, request)
+      .post<BackendAnimalResponse>(`${this.animalesUrl}/`, request)
       .pipe(map((animal) => AnimalAdapter.fromBackend(animal)));
   }
 
@@ -45,7 +45,7 @@ export class AdminAnimales {
       .set("size", validSize.toString());
 
     return this.http
-      .get<PaginatedResponse<BackendAnimalResponse>>(this.animalesUrl, {
+      .get<PaginatedResponse<BackendAnimalResponse>>(`${this.animalesUrl}/`, {
         params,
       })
       .pipe(

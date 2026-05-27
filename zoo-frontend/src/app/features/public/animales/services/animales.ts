@@ -29,7 +29,7 @@ export class GetAnimales {
       .set("size", validSize.toString());
 
     return this.http
-      .get<PaginatedResponse<BackendAnimalResponse>>(this.animalesUrl, {
+      .get<PaginatedResponse<BackendAnimalResponse>>(`${this.animalesUrl}/`, {
         params,
       })
       .pipe(

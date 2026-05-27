@@ -39,7 +39,7 @@ export class AdminEspecies {
       .set("size", validSize.toString());
 
     return this.http
-      .get<PaginatedResponse<EspecieApiResponse>>(this.especiesUrl, { params })
+      .get<PaginatedResponse<EspecieApiResponse>>(`${this.especiesUrl}/`, { params })
       .pipe(
         map((response) => ({
           ...response,
@@ -69,7 +69,7 @@ export class AdminEspecies {
     const request = EspecieAdapter.toCreateRequest(especieData);
 
     return this.http
-      .post<EspecieApiResponse>(this.especiesUrl, request)
+      .post<EspecieApiResponse>(`${this.especiesUrl}/`, request)
       .pipe(map((response) => EspecieAdapter.fromApi(response)));
   }
 
