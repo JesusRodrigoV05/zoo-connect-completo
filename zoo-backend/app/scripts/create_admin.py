@@ -47,17 +47,17 @@ def create_default_admin():
         ensure_permissions_catalog(db)
         ensure_role_permissions(db)
 
+        # Eliminar usuarios admin obsoletos a solicitud del usuario
+        for obsolete_username in ["admin.admin.primary", "soporte.admin.tecnico"]:
+            obsolete_user = db.query(User).filter(User.id == obsolete_username).first()
+            if obsolete_user:
+                print(f"   - Eliminando usuario obsoleto: {obsolete_username}")
+                db.delete(obsolete_user)
+        db.commit()
+
         print("5. Creando Usuarios de Sistema...")
         
-        # Lista de usuarios a crear
         usuarios_seed = [
-            {
-                "email": settings.DEFAULT_ADMIN_EMAIL,
-                "username": "admin.admin.primary",
-                "phone_number": "+59173089827",
-                "password": settings.DEFAULT_ADMIN_PASSWORD,
-                "role": "administrador"
-            },
             {
                 "email": "jose.alvarado@zooconnect.qzz.io",
                 "username": "jose.admin.alvarado",
@@ -85,13 +85,6 @@ def create_default_admin():
                 "phone_number": "+59165136063",
                 "password": "User_Visitor_Pass_99!",
                 "role": "visitante"
-            },
-            {
-                "email": "soporte@zooconnect.qzz.io",
-                "username": "soporte.admin.tecnico",
-                "phone_number": "+59160659997",
-                "password": "Support_Zoo_Connect_2026*",
-                "role": "administrador"
             }
         ]
 
