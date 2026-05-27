@@ -167,9 +167,20 @@ async def register(
     if existing_user:
         logger.debug(f"Usuario ya existe: email={existing_user.email}, username={existing_user.username}, verificado={existing_user.email_verified}")
         if not existing_user.email_verified:
-            # Si ya existe y no está verificado, lanzamos ACCOUNT_UNVERIFIED
-            # No importa si el conflicto es por email o username, si no está verificado
-            # le permitimos intentar verificar esa cuenta existente.
+            logger.info(f"Reenviando correo de verificación a {existing_user.email}")
+            try:
+                await email_service.send_verification_email(
+                    email_to=existing_user.email,
+                    code=existing_user.verification_code,
+                    username=existing_user.username
+                )
+                logger.info(f"Correo de verificación reenviado a {existing_user.email}")
+            except Exception as e:
+                logger.error(
+                    f"Error reenviando correo de verificación a {existing_user.email}: {str(e)}",
+                    exc_info=True
+                )
+
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={

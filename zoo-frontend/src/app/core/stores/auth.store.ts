@@ -90,8 +90,23 @@ export const AuthStore = signalStore(
       };
 
       const handleError = (error: any, context: string): string => {
-        console.error(`Error en ${context}:`, error);
         let errorMessage = `Error en ${context}`;
+
+        if (error?.status === 400 && context === 'register') {
+          const detail = error.error?.detail;
+          if (detail?.status === 'ACCOUNT_UNVERIFIED') {
+            const email = detail?.email || '';
+            toastService.showSuccess(
+              'Cuenta creada',
+              'Revisá tu email para verificar tu cuenta.',
+            );
+            router.navigate(['/verify-email'], { queryParams: { email } });
+            patchState(store, { loading: false });
+            return '';
+          }
+        }
+
+        console.error(`Error en ${context}:`, error);
         if (typeof error === 'string') {
           errorMessage = error;
         } else if (error?.status === 401) {
@@ -111,13 +126,6 @@ export const AuthStore = signalStore(
         } else if (error?.status === 403 && context === 'login') {
           errorMessage = error.error?.detail || 'Cuenta bloqueada temporalmente, intente más tarde';
         } else if (error?.status === 400 && context === 'register') {
-          const detail = error.error?.detail;
-          if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
-            const email = detail?.email || '';
-            router.navigate(['/verify-email'], { queryParams: { email } });
-            patchState(store, { loading: false }); // Asegurar que el loading se apague
-            return '';
-          }
           errorMessage = error.error?.message?.includes('email')
             ? 'Este email ya está registrado. Intente con otro email'
             : 'Datos de registro inválidos';
