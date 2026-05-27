@@ -27,10 +27,10 @@ export class EncuestaService {
 
   private apiUrl = environment.apiUrl;
   private surveysUrl = `${this.apiUrl}/surveys`;
-  private encuestasUrl = `${this.surveysUrl}/surveys`;
+  private encuestasUrl = `${this.surveysUrl}/surveys/`;
 
-  private participationsUrl = `${this.surveysUrl}/participations`;
-  private responsesUrl = `${this.surveysUrl}/responses`;
+  private participationsUrl = `${this.surveysUrl}/participations/`;
+  private responsesUrl = `${this.surveysUrl}/responses/`;
 
   getSurveys(skip: number = 0, limit: number = 10): Observable<Encuesta[]> {
     return this.http

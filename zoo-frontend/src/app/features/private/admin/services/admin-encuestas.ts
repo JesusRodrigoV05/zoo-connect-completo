@@ -51,7 +51,7 @@ export class AdminEncuestas {
 
   private apiUrl = environment.apiUrl;
   private surveysUrl = `${this.apiUrl}/surveys`;
-  private encuestasUrl = `${this.surveysUrl}/surveys`;
+  private encuestasUrl = `${this.surveysUrl}/surveys/`;
   private preguntasUrl = `${this.surveysUrl}/surveys/preguntas`;
   private opcionesUrl = `${this.surveysUrl}/surveys/opciones`;
 
