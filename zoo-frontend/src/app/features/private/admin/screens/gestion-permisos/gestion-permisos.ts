@@ -174,12 +174,7 @@ export default class GestionPermisos {
         next: (roles) => {
           this.roles.set(roles);
           this.dirtyRoles.set({});
-          if (!this.tourPrompted) {
-            this.tourPrompted = true;
-            afterNextRender(() => {
-              this.onboarding.startTourIfFirstVisit("admin-permisos-osi");
-            });
-          }
+
         },
         error: () => {
           this.toast.showError(

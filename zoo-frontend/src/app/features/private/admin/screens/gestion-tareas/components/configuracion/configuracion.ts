@@ -52,9 +52,7 @@ export default class Configuracion implements OnInit {
 
   ngOnInit() {
     this.store.loadItems();
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-tareas-configuracion");
-    });
+
   }
 
   protected startGuidedTour(): void {

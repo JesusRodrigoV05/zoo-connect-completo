@@ -48,12 +48,7 @@ export default class ListaEncuestas {
 
   private loadSurveys(): void {
     this.surveys$ = this.surveyService.getAllSurveys();
-    if (!this.tourPrompted) {
-      this.tourPrompted = true;
-      afterNextRender(() => {
-        this.onboarding.startTourIfFirstVisit("admin-encuestas-lista");
-      });
-    }
+
   }
   private zooToast = inject(ShowToast);
 

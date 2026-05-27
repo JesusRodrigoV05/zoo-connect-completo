@@ -68,9 +68,7 @@ export default class ListaHabitats {
   );
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-habitat-lista");
-    });
+
 
     effect(() => {
       const page = this.currentPage();

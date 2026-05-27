@@ -11,6 +11,7 @@ import { PaginatorModule } from "primeng/paginator";
 import { finalize } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ShowToast } from "@app/shared/services";
+import { MainContainer } from "@app/shared/components/main-container";
 import { AdminRolesService, RoleItem } from "../../services/admin-roles";
 
 @Component({
@@ -25,6 +26,7 @@ import { AdminRolesService, RoleItem } from "../../services/admin-roles";
     TooltipModule,
     FormsModule,
     PaginatorModule,
+    MainContainer,
   ],
   templateUrl: "./gestion-roles.html",
   styleUrl: "./gestion-roles.scss",

@@ -51,9 +51,7 @@ export default class ListaUnidad implements OnInit {
   ];
 
   ngOnInit() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-inventario-unidad-lista");
-    });
+
 
     this.store.loadItems();
   }

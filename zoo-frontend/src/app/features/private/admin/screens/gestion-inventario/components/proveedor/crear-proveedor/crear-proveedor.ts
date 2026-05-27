@@ -79,9 +79,7 @@ export default class CrearProveedor implements OnInit {
       this.providerId.set(+id);
       this.loadProvider(+id);
     } else {
-      afterNextRender(() => {
-        this.onboarding.startTourIfFirstVisit("admin-inventario-proveedor-crear");
-      });
+
     }
   }
 

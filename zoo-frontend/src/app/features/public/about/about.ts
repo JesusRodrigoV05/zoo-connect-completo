@@ -18,8 +18,6 @@ export default class About {
   private readonly onboarding = inject(OnboardingService);
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("public-acerca-de");
-    });
+
   }
 }

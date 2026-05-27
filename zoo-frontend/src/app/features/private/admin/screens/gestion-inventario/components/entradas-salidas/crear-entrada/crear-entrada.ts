@@ -76,9 +76,7 @@ export default class CrearEntrada implements OnInit {
 
     this.addProducto();
 
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-inventario-entrada-crear");
-    });
+
   }
 
   protected startGuidedTour(): void {

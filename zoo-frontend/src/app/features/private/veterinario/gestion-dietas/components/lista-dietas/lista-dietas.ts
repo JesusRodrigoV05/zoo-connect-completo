@@ -83,11 +83,7 @@ export default class ListaDietas {
 
   ngOnInit() {
     this.store.loadDietas();
-    afterNextRender(() => {
-      if (this.tourPrompted) return;
-      this.tourPrompted = true;
-      this.onboarding.startTourIfFirstVisit("vet-dietas-lista");
-    });
+
   }
 
   startGuidedTour() {

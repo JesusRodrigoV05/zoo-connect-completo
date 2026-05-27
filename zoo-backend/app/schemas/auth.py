@@ -28,15 +28,13 @@ class TokenResponse(BaseModel):
 from app.core.password_policy import validate_password_strength_func
 
 class ForgotPasswordRequest(BaseModel):
-    identifier: str
-    recaptcha_token: Optional[str] = None
+    email: EmailStr
 
 
 class ResetPasswordRequest(BaseModel):
     identifier: str
     code: str
     new_password: str
-    recaptcha_token: Optional[str] = None
 
     @validator("new_password")
     def validate_password_strength(cls, v):
@@ -45,11 +43,9 @@ class ResetPasswordRequest(BaseModel):
 class EmailVerificationRequest(BaseModel):
     phone_number: str
     code: str
-    recaptcha_token: Optional[str] = None
 
 class ResendVerificationRequest(BaseModel):
-    phone_number: str
-    recaptcha_token: Optional[str] = None
+    email: EmailStr
 
 # 2fa
 class LoginStep2Response(BaseModel):
@@ -65,7 +61,6 @@ TOTPCodem = Annotated[
 class TOTPLoginRequest(BaseModel):
     session_token: str
     code: TOTPCodem
-    recaptcha_token: Optional[str] = None
 
 class MustChangePasswordResponse(BaseModel):
     status: str = "must_change_password"

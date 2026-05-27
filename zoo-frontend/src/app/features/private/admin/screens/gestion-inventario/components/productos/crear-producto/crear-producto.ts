@@ -105,9 +105,7 @@ export default class CrearProducto implements OnInit {
       this.productId.set(+id);
       this.loadProductData(+id);
     } else {
-      afterNextRender(() => {
-        this.onboarding.startTourIfFirstVisit("admin-inventario-producto-crear");
-      });
+
     }
   }
 

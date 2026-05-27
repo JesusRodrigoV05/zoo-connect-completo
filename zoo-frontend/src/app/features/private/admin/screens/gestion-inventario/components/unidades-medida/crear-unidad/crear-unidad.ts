@@ -77,9 +77,7 @@ export default class CrearUnidad implements OnInit {
       this.unidadId.set(+id);
       this.loadData(+id);
     } else {
-      afterNextRender(() => {
-        this.onboarding.startTourIfFirstVisit("admin-inventario-unidad-crear");
-      });
+
     }
   }
 

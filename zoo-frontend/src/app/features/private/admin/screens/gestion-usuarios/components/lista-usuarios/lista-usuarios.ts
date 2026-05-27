@@ -65,12 +65,7 @@ export default class ListaUsuarios {
       .subscribe({
         next: (response) => {
           this.userData.set(response);
-          if (!this.tourPrompted) {
-            this.tourPrompted = true;
-            afterNextRender(() => {
-              this.onboarding.startTourIfFirstVisit("admin-usuarios-lista");
-            });
-          }
+
         },
         error: (err) => {
           console.error("Error al cargar usuarios:", err);

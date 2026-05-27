@@ -67,6 +67,10 @@ app = FastAPI(
     description="API para la gestion de un zoologico",
     version="5.0.0",
 )
+
+# Log de orígenes permitidos para depuración en Render
+logger.info("Configurando CORS con orígenes: %s", settings.CORS_ORIGINS)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -89,9 +93,10 @@ SENSITIVE_PREFIXES = (
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
+    # Optimización para CORS preflight
     if request.method == "OPTIONS":
         return await call_next(request)
-        
+
     response = await call_next(request)
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"

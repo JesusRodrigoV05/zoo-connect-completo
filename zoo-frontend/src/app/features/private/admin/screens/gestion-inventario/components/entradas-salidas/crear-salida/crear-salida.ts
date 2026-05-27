@@ -99,9 +99,7 @@ export default class CrearSalida implements OnInit {
 
     this.addProducto();
 
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-inventario-salida-crear");
-    });
+
   }
 
   protected startGuidedTour(): void {

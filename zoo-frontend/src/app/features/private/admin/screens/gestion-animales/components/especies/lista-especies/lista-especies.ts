@@ -75,9 +75,7 @@ export default class ListaEspecies {
   );
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-especies-lista");
-    });
+
 
     effect(() => {
       const page = this.currentPage();

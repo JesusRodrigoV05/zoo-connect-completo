@@ -100,11 +100,7 @@ export default class MisTareas {
   ngOnInit() {
     this.cargarTareas();
 
-    afterNextRender(() => {
-      if (this.tourPrompted) return;
-      this.tourPrompted = true;
-      this.onboarding.startTourIfFirstVisit("cuidador-mis-tareas");
-    });
+
   }
 
   startGuidedTour() {

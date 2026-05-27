@@ -97,9 +97,7 @@ export default class CrearHabitat {
   });
 
   ngOnInit(): void {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-habitat-crear");
-    });
+
 
     const id = this.route.snapshot.paramMap.get("id");
     if (id) {

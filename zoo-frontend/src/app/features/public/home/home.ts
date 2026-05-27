@@ -32,9 +32,7 @@ export default class Home {
   private readonly onboarding = inject(OnboardingService);
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("public-inicio");
-    });
+
   }
 
   protected onSubmitContact(): void {

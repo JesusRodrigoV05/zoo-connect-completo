@@ -11,8 +11,6 @@ class Settings(BaseSettings):
         env_file=".env", case_sensitive=True, extra="ignore"
     )
 
-    # heredando de basesettings indicamos que no sea un basenormal y que lea automaticamente las varibles de entorno
-    # del .en
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
@@ -23,6 +21,7 @@ class Settings(BaseSettings):
         "http://localhost:4200",
         "https://vercel-zoo-connect.vercel.app",
         "https://vercel-zoo-connect-git-main-mfjm0265-7988s-projects.vercel.app",
+        "https://zoo-connect-completo.vercel.app",
     ]
     DEFAULT_ADMIN_EMAIL: str
     DEFAULT_ADMIN_PASSWORD: str
@@ -85,8 +84,14 @@ class Settings(BaseSettings):
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: str | List[str]):
+    def assemble_cors_origins(cls, v: Union[str, List[str]]):
         if isinstance(v, str):
+            if v.startswith("[") and v.endswith("]"):
+                try:
+                    import json
+                    return json.loads(v)
+                except Exception:
+                    pass
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
 

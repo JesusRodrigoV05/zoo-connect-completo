@@ -78,9 +78,7 @@ export default class ListaAnimales {
   );
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-animales-lista");
-    });
+
 
     effect(() => {
       const page = this.currentPage();

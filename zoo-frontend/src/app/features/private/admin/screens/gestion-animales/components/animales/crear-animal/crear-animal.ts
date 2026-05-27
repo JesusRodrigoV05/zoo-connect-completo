@@ -119,9 +119,7 @@ export default class CrearAnimal implements OnInit {
   });
 
   ngOnInit(): void {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-animales-crear");
-    });
+
 
     this.especieStore.loadEspecies();
     this.habitatStore.loadHabitats();
