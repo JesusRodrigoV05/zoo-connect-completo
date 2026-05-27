@@ -1,0 +1,38 @@
+{
+  "$schema": "https://railway.app/schema.json",
+  "build": {
+    "builder": "dockerfile",
+    "context": "."
+  },
+  "deploy": {
+    "restartPolicyType": "on_failure",
+    "restartPolicyMaxRetries": 5,
+    "startCommand": "cd zoo-backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+  },
+  "environment": {
+    "DATABASE_URL": {
+      "description": "PostgreSQL Connection String",
+      "value": "postgresql+psycopg2://postgres:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+    },
+    "SECRET_KEY": {
+      "description": "JWT Secret Key",
+      "generator": "random"
+    },
+    "REDIS_HOST": {
+      "description": "Redis Hostname",
+      "value": "${REDIS_HOST}"
+    },
+    "REDIS_PORT": {
+      "description": "Redis Port",
+      "value": "6379"
+    },
+    "FRONTEND_URL": {
+      "description": "Frontend URL for CORS and redirects",
+      "value": "https://zoo-connect-completo.vercel.app"
+    },
+    "FRONTEND_RESET_PASSWORD_URL": {
+      "description": "Password reset link",
+      "value": "https://zoo-connect-completo.vercel.app/reset-password"
+    }
+  }
+}

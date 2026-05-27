@@ -1,0 +1,60 @@
+services:
+  - type: web
+    name: zoo-connect-backend
+    env: python
+    plan: standard
+    branch: main
+    buildCommand: cd zoo-backend && pip install -r requirements.txt
+    startCommand: cd zoo-backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    staticPublicPath: media
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zoo-postgres
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "100"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "5"
+      - key: MEDIA_DIR
+        value: ./media
+      - key: CORS_ORIGINS
+        value: >
+          ["https://zoo-connect-completo.vercel.app",
+           "https://zoo-connect-vercel.vercel.app",
+           "https://www.zoo-connect-completo.vercel.app"]
+      - key: FRONTEND_RESET_PASSWORD_URL
+        value: https://zoo-connect-completo.vercel.app/reset-password
+      - key: REDIS_HOST
+        fromService:
+          name: zoo-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: zoo-redis
+          property: port
+      - key: REDIS_DB
+        value: "0"
+      - key: FRONTEND_URL
+        value: https://zoo-connect-completo.vercel.app
+      - key: MAIL_FROM
+        sync: false
+      - key: POSTMARK_SERVER_TOKEN
+        sync: false
+      - key: RECAPTCHA_SECRET_KEY
+        sync: false
+
+  - type: pserv
+    name: zoo-postgres
+    plan: free
+    ipAllowList: []
+    postgresSQLVersion: "15"
+
+  - type: redis
+    name: zoo-redis
+    plan: free
+    ipAllowList: []

@@ -1,17 +1,67 @@
 {
   "version": 2,
   "framework": "angular",
-  "buildCommand": "npm run build",
+  "projectSettings": {
+    "framework": "@angular/cli",
+    "sourceFilesOutsideRootDirectory": false
+  },
+  "buildCommand": "npm run build -- --configuration production",
   "outputDirectory": "dist/zoo-connect-web/browser",
+  "serverlessFunctionRegion": "sfo1",
   "functions": {
     "api/index.js": {
+      "maxDuration": 60,
       "includeFiles": "dist/zoo-connect-web/**"
     }
   },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.js"
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/:path*",
+      "destination": "/api?path=:path*"
+    },
+    {
+      "source": "/:path*",
       "destination": "/api"
+    }
+  ],
+  "env": {
+    "BACKEND_URL": "@backend_url_prod"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
     }
   ]
 }
