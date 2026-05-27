@@ -1,0 +1,201 @@
+.risk-page {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.risk-header > button {
+  flex: 0 0 auto;
+}
+
+.risk-header h1,
+.help-panel h2 {
+  margin: 0.25rem 0 0.5rem;
+}
+
+.risk-header p,
+.help-panel p {
+  margin: 0;
+  color: var(--text-secondary, #667085);
+  max-width: 56rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  margin: 0;
+  color: var(--primary-color, #0f766e);
+}
+
+.help-panel {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1fr) auto auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(5, 3.4rem);
+  grid-template-rows: repeat(5, 2.4rem);
+  position: relative;
+  border: 1px solid #111827;
+}
+
+.axis-label {
+  position: absolute;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.y-axis {
+  left: -5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.x-axis {
+  left: 50%;
+  bottom: -1.35rem;
+  transform: translateX(-50%);
+}
+
+.heat-cell {
+  display: grid;
+  place-items: center;
+  border: 1px solid #111827;
+  font-weight: 700;
+}
+
+.legend {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.legend-item {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.table-shell {
+  overflow: auto;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #fff;
+}
+
+.loading-state {
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-secondary, #667085);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.risk-table {
+  width: 100%;
+  min-width: 2200px;
+  border-collapse: collapse;
+}
+
+.risk-table th,
+.risk-table td {
+  border: 1px solid #1d4ed8;
+  padding: 0.55rem;
+  vertical-align: middle;
+}
+
+.risk-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #8fd14f;
+  color: #111827;
+  text-align: center;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.risk-table thead tr:first-child th:nth-child(n + 9) {
+  background: #f8b500;
+}
+
+.risk-table textarea,
+.risk-table input,
+.risk-table select {
+  width: 100%;
+  min-width: 4.5rem;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  border-radius: 0.35rem;
+  padding: 0.45rem;
+  font: inherit;
+  background: #fff;
+}
+
+.risk-table textarea {
+  min-width: 12rem;
+  resize: vertical;
+}
+
+.risk-table select {
+  min-width: 8rem;
+}
+
+.number-cell,
+.score-cell,
+.level-cell {
+  text-align: center;
+  font-weight: 700;
+}
+
+.risk-bajo,
+.legend-item.bajo {
+  background: #00b050;
+}
+
+.risk-moderado,
+.legend-item.moderado {
+  background: #ffff00;
+}
+
+.risk-alto,
+.legend-item.alto {
+  background: #ed7d31;
+}
+
+.risk-extremo,
+.legend-item.extremo {
+  background: #ff0000;
+  color: #fff;
+}
+
+.risk-verifique-valores {
+  background: #e5e7eb;
+}
+
+@media (max-width: 900px) {
+  .help-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .heatmap {
+    margin-left: 4rem;
+  }
+}

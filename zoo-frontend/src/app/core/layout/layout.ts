@@ -62,6 +62,14 @@ export default class Layout {
       });
     }
 
+    if (this.hasPermission('risk_matrix_access')) {
+      items.push({
+        text: 'Matriz de Riesgos',
+        icon: 'pi pi-exclamation-triangle',
+        route: this.authStore.isOsi() ? '/osi/matriz-riesgos' : '/admin/matriz-riesgos',
+      });
+    }
+
     const animalsChildren: NavigationItem[] = [
       this.hasPermission('animals_list_species') && {
         text: 'Lista de Especies',
