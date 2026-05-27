@@ -16,6 +16,8 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+const backendInternalUrl =
+  process.env['BACKEND_INTERNAL_URL'] || 'http://127.0.0.1:8000/zooconnect';
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -39,8 +41,7 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const baseUrl = process.env['BACKEND_INTERNAL_URL'] || environment.apiUrl;
-    const backendRealUrl = baseUrl + '/auth/me';
+    const backendRealUrl = backendInternalUrl + '/auth/me';
     const validationResponse = await fetch(backendRealUrl, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -55,6 +56,60 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 };
+
+app.get('/healthz', (_req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+app.use('/zooconnect', async (req: Request, res: Response) => {
+  const targetUrl = new URL(req.originalUrl, backendInternalUrl.replace(/\/zooconnect\/?$/, ''));
+  const headers = new Headers();
+
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (value === undefined) {
+      continue;
+    }
+
+    if (['host', 'connection', 'content-length'].includes(key.toLowerCase())) {
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        headers.append(key, item);
+      }
+    } else {
+      headers.set(key, value);
+    }
+  }
+
+  try {
+    const backendResponse = await fetch(targetUrl, {
+      method: req.method,
+      headers,
+      body: ['GET', 'HEAD'].includes(req.method) ? undefined : req,
+      duplex: 'half',
+    } as RequestInit & { duplex: 'half' });
+
+    res.status(backendResponse.status);
+    backendResponse.headers.forEach((value, key) => {
+      if (!['content-encoding', 'transfer-encoding', 'connection'].includes(key.toLowerCase())) {
+        res.setHeader(key, value);
+      }
+    });
+
+    if (!backendResponse.body) {
+      res.end();
+      return;
+    }
+
+    const buffer = Buffer.from(await backendResponse.arrayBuffer());
+    res.send(buffer);
+  } catch (error) {
+    console.error('Backend proxy error:', error);
+    res.status(502).json({ error: 'Backend no disponible' });
+  }
+});
 
 app.get('/api/weather', requireAuth, async (req, res, next) => {
   const city = (req.query['city'] as string) || 'La Paz';

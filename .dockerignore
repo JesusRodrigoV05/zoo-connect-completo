@@ -1,0 +1,17 @@
+.git
+.qodo
+.ruff_cache
+conductor
+docs
+md-seg
+**/.env
+**/.env.*
+**/node_modules
+**/dist
+**/.angular
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.venv
+**/venv
+zoo-backend/media

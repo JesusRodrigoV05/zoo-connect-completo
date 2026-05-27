@@ -16,13 +16,10 @@ def job_wrapper_generar_tareas():
     lock = None
     
     try:
-        #Conectar con redis
-        redis_client = redis.Redis(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            db=settings.REDIS_DB,
+        redis_client = redis.Redis.from_url(
+            settings.redis_connection_url,
             decode_responses=True
-        )        
+        )
 
         lock = redis_client.lock(SCHEDULER_LOCK_KEY, timeout=LOCK_TIMEOUT_SECONDS)
         

@@ -76,7 +76,7 @@ export default class ForgotPassword {
       this.isSending.set(true);
 
       this.restorePasswordService
-        .forgotPassword(this.forgotForm.value.email!)
+        .forgotPassword(this.forgotForm.value.identifier!)
         .pipe(finalize(() => this.isSending.set(false)))
         .subscribe({
           next: (response) => {

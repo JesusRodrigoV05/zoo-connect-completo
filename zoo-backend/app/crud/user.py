@@ -171,6 +171,7 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
         email_verified=False,
         phone_verified=False,
         role_id=role_id,
+        must_change_password=False,
         password_changed_at=datetime.now(timezone.utc),
     )
 

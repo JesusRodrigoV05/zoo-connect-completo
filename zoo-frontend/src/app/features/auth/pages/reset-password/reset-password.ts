@@ -156,42 +156,49 @@ export default class ResetPassword {
     this.formSubmitted.set(true);
 
     if (!this.resetForm.valid) {
-      this.toastService.showError("Error", "Por favor, completa todos los campos correctamente");
+      this.toastService.showError(
+        "Error",
+        "Por favor, completa todos los campos correctamente",
+      );
       return;
     }
 
     if (!this.isPasswordStrong()) {
-      this.toastService.showError("Contraseña Insegura", "La contraseña debe cumplir con todos los requisitos.");
+      this.toastService.showError(
+        "Contraseña Insegura",
+        "La contraseña debe cumplir con todos los requisitos.",
+      );
       return;
     }
 
-    if (this.token()) {
-      this.isResetting.set(true);
+    this.isResetting.set(true);
 
-      this.restorePasswordService
-        .resetPassword(this.token(), this.resetForm.value.password!)
-        .pipe(finalize(() => this.isResetting.set(false)))
-        .subscribe({
-          next: (response: any) => {
-            if (response.access_token) {
-              this.authStore.setTokens(response.access_token);
-              this.authStore.loadUserProfile().then(() => {
-                this.router.navigate(["/inicio"]);
-              });
-            } else {
-              this.toastService.showSuccess("Éxito", response.msg);
-              this.router.navigate(["/login"]);
-            }
-          },
-          error: (error) => {
-            let errorMessage = "Error al restablecer contraseña";
-            if (error.status === 400) {
-              errorMessage = error.error?.detail || "Token inválido o expirado";
-            } else if (error.status === 404) {
-              errorMessage = "Usuario no encontrado";
-            }
-            this.toastService.showError("Error", errorMessage);
-          },
-        });
+    const { identifier, code, password } = this.resetForm.value;
+
+    this.restorePasswordService
+      .resetPassword(identifier!, code!, password!)
+      .pipe(finalize(() => this.isResetting.set(false)))
+      .subscribe({
+        next: (response: any) => {
+          if (response.access_token) {
+            this.authStore.setTokens(response.access_token);
+            this.authStore.loadUserProfile().then(() => {
+              this.router.navigate(["/inicio"]);
+            });
+          } else {
+            this.toastService.showSuccess("Éxito", response.msg);
+            this.router.navigate(["/login"]);
+          }
+        },
+        error: (error) => {
+          let errorMessage = "Error al restablecer contraseña";
+          if (error.status === 400) {
+            errorMessage = error.error?.detail || "Token inválido o expirado";
+          } else if (error.status === 404) {
+            errorMessage = "Usuario no encontrado";
+          }
+          this.toastService.showError("Error", errorMessage);
+        },
+      });
   }
 }

@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 try:
     pool = redis.ConnectionPool.from_url(
-        settings.REDIS_URL,
+        settings.redis_connection_url,
         decode_responses=True
     )
     
@@ -16,7 +16,7 @@ try:
     logger.info("Conectado a Redis")
 
 except Exception as e:
-    logger.error("No se pudo conectar a Redis en %s", settings.REDIS_URL)
+    logger.error("No se pudo conectar a Redis en %s", settings.redis_connection_url)
     logger.debug("Detalle: %s", e)
     cache_client = None
 

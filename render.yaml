@@ -1,0 +1,95 @@
+services:
+  - type: web
+    name: zoo-connect
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: BACKEND_INTERNAL_URL
+        value: http://127.0.0.1:8000/zooconnect
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zoo-connect-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: zoo-connect-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: TOTP_ENCRYPTION_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 100
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 5
+      - key: MEDIA_DIR
+        value: /app/backend/media
+      - key: CORS_ORIGINS
+        value: https://zoo-connect.onrender.com
+      - key: FRONTEND_RESET_PASSWORD_URL
+        value: https://zoo-connect.onrender.com/reset-password
+      - key: REDIS_DB
+        value: 0
+      - key: TIMEZONE
+        value: America/La_Paz
+      - key: DEFAULT_ADMIN_EMAIL
+        sync: false
+      - key: DEFAULT_ADMIN_PASSWORD
+        sync: false
+      - key: DEFAULT_ADMIN_PHONE
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: POSTMARK_SERVER_TOKEN
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_SERVER
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_STARTTLS
+        sync: false
+      - key: MAIL_SSL_TLS
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: MAIL_FROM_NAME
+        value: ZooConnect
+      - key: RECAPTCHA_SECRET_KEY
+        sync: false
+      - key: RECAPTCHA_SITE_KEY
+        sync: false
+      - key: REQUIRE_RECAPTCHA
+        value: true
+      - key: TEXTBEE_API_BASE_URL
+        value: https://api.textbee.dev/api/v1
+      - key: TEXTBEE_API_KEY
+        sync: false
+      - key: TEXTBEE_DEVICE_ID
+        sync: false
+      - key: SMS_OTP_EXPIRE_MINUTES
+        value: 10
+      - key: WEATHER_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+
+  - type: keyvalue
+    name: zoo-connect-redis
+    ipAllowList: []
+
+databases:
+  - name: zoo-connect-db
+    databaseName: zooconnect
+    user: zooconnect
