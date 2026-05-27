@@ -3,8 +3,8 @@ export const environment = {
   //marca: "ZooConnect",
   marca: "ZooConnect",
   // apiUrl: "http://localhost:8000/zooconnect",
-  apiUrl: "http://100.54.132.159:8000/zooconnect",
-  // apiUrl:"https://zoo-connect-completo.onrender.com/zooconnect",
+  // apiUrl: "http://100.54.132.159:8000/zooconnect",
+  apiUrl:"https://zoo-connect-completo.onrender.com/zooconnect",
   // apiUrl:"https://zoo-connect-completo.onrender.com/zooconnect",
   //apiUrl: "https://zoo-connect-backend2.onrender.com/zooc
   // ReCAPTCHA v2 Site Key (visible widget) - Obtener en https://www.google.com/recaptcha/admin
