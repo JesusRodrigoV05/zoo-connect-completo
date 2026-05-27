@@ -16,6 +16,13 @@ const osiRoutes: Routes = [
       import("../admin/screens/gestion-permisos/gestion-permisos"),
   },
   {
+    path: "matriz-riesgos",
+    title: "Matriz de Riesgos",
+    data: { requiredPermissions: ["risk_matrix_access"] },
+    loadComponent: () =>
+      import("./screens/matriz-riesgos/matriz-riesgos"),
+  },
+  {
     path: "",
     redirectTo: "dashboard",
     pathMatch: "full",

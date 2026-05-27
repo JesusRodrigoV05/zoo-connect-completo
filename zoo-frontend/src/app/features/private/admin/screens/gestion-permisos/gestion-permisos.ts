@@ -105,6 +105,7 @@ const STANDALONE_COLUMNS: StandaloneAccessColumn[] = [
   { key: "medical-tasks", label: "Mis Tareas (Médico)", permissionCodes: ["medical_my_tasks", "manage_veterinary_module"] },
   { key: "medical-diets", label: "Gestión de Dietas", permissionCodes: ["medical_diets", "manage_veterinary_module"] },
   { key: "medical-records", label: "Historiales Clínicos", permissionCodes: ["medical_clinical_records", "manage_veterinary_module"] },
+  { key: "risk-matrix", label: "Matriz de Riesgos", permissionCodes: ["risk_matrix_access"] },
 ];
 
 @Component({

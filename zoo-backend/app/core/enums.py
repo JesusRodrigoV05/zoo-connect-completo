@@ -50,6 +50,7 @@ class PermissionCode(str, Enum):
     AUDIT_APPLICATION_LOGS = "audit_application_logs"
     AUDIT_SECURITY_LOGS = "audit_security_logs"
     AUDIT_USER_LOGS = "audit_user_logs"
+    RISK_MATRIX_ACCESS = "risk_matrix_access"
     CAREGIVER_MY_TASKS = "caregiver_my_tasks"
     MEDICAL_MY_TASKS = "medical_my_tasks"
     MEDICAL_DIETS = "medical_diets"

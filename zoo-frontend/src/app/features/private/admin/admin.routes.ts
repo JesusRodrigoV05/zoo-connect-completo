@@ -199,6 +199,12 @@ export default [
     loadComponent: () => import("./screens/gestion-permisos/gestion-permisos"),
   },
   {
+    path: "matriz-riesgos",
+    title: "Matriz de Riesgos",
+    data: { requiredPermissions: ["risk_matrix_access"] },
+    loadComponent: () => import("../osi/screens/matriz-riesgos/matriz-riesgos"),
+  },
+  {
     path: "roles/crear",
     title: "Crear Rol",
     data: { requiredPermissions: ["manage_permissions"] },

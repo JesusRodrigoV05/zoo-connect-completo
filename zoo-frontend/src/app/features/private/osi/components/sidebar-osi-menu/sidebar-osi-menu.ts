@@ -27,5 +27,10 @@ export class SidebarOsiMenu {
       icon: "pi pi-shield",
       route: "/osi/roles-accesos",
     },
+    {
+      text: "Matriz de Riesgos",
+      icon: "pi pi-exclamation-triangle",
+      route: "/osi/matriz-riesgos",
+    },
   ]);
 }
