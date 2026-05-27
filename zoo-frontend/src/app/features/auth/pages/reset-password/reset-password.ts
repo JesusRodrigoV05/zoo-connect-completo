@@ -69,10 +69,10 @@ export default class ResetPassword implements OnInit, OnDestroy {
 
   protected readonly isResetting = signal(false);
   protected readonly formSubmitted = signal(false);
-  protected readonly token = signal<string>("");
-
   protected readonly resetForm = this.fb.group(
     {
+      identifier: ["", [Validators.required]],
+      code: ["", [Validators.required, Validators.minLength(4)]],
       password: ["", [Validators.required, Validators.minLength(12)]],
       confirmPassword: ["", [Validators.required]],
     },
@@ -98,14 +98,7 @@ export default class ResetPassword implements OnInit, OnDestroy {
   protected useCustomCaptcha = false;
   protected customCaptchaToken: string | null = null;
 
-  constructor() {
-    this.token.set(this.route.snapshot.queryParams["token"] || "");
-
-    if (!this.token()) {
-      this.toastService.showError("Error", "Token no válido");
-      this.router.navigate(["/login"]);
-    }
-  }
+  constructor() {}
 
   async ngOnInit() {
     const pwControl = this.resetForm.get('password');
@@ -236,11 +229,15 @@ export default class ResetPassword implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.token()) {
-      this.isResetting.set(true);
+    this.isResetting.set(true);
 
-      this.restorePasswordService
-        .resetPassword(this.token(), this.resetForm.value.password!, captchaToken)
+    this.restorePasswordService
+        .resetPassword(
+          this.resetForm.value.identifier!,
+          this.resetForm.value.code!,
+          this.resetForm.value.password!,
+          captchaToken,
+        )
         .pipe(finalize(() => this.isResetting.set(false)))
         .subscribe({
           next: (response: any) => {
@@ -273,7 +270,6 @@ export default class ResetPassword implements OnInit, OnDestroy {
             }
           },
         });
-    }
   }
 
   onCustomCaptchaChange(verified: boolean): void {}

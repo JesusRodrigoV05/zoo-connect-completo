@@ -27,7 +27,7 @@ def get_application_logs(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
     search: Optional[str] = None,
-    user_id: Optional[int] = None,
+    user_id: Optional[str] = None,
 ):
     return paginate(
         crud_audit.get_audit_logs_by_type_query(
@@ -52,7 +52,7 @@ def get_security_logs(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
     search: Optional[str] = None,
-    user_id: Optional[int] = None,
+    user_id: Optional[str] = None,
 ):
     return paginate(
         crud_audit.get_audit_logs_by_type_query(

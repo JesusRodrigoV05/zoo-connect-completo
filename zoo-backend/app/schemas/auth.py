@@ -6,7 +6,7 @@ from datetime import datetime
 import re
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    identifier: str
     password: str
     recaptcha_token: Optional[str] = None
 
@@ -28,12 +28,13 @@ class TokenResponse(BaseModel):
 from app.core.password_policy import validate_password_strength_func
 
 class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
+    identifier: str
     recaptcha_token: Optional[str] = None
 
 
 class ResetPasswordRequest(BaseModel):
-    token: str
+    identifier: str
+    code: str
     new_password: str
     recaptcha_token: Optional[str] = None
 
@@ -42,12 +43,12 @@ class ResetPasswordRequest(BaseModel):
         return validate_password_strength_func(v)
 
 class EmailVerificationRequest(BaseModel):
-    email: EmailStr
+    phone_number: str
     code: str
     recaptcha_token: Optional[str] = None
 
 class ResendVerificationRequest(BaseModel):
-    email: EmailStr
+    phone_number: str
     recaptcha_token: Optional[str] = None
 
 # 2fa
@@ -74,7 +75,7 @@ class MustChangePasswordResponse(BaseModel):
 # Password History
 class PasswordHistoryOut(BaseModel):
     id: int
-    user_id: int
+    user_id: str
     password_hash: str
     created_at: datetime
 

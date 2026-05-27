@@ -1,21 +1,24 @@
 export interface LoginRequest {
-  email: string;
+  identifier: string;
   password: string;
   recaptcha_token?: string;
 }
 
 export interface RegisterRequest {
-  email: string;
+  email?: string;
   username: string;
+  phone_number: string;
   password?: string;
   generate_password?: boolean;
   recaptcha_token?: string;
 }
 
 export interface RegisterResponse {
-  id: number;
+  id: string;
   email: string;
   username: string;
+  phone_number?: string | null;
+  phone_verified?: boolean;
   photo_url: string | null;
   is_active: boolean;
   role_id: number;
@@ -36,11 +39,12 @@ export interface VerifyLogin2FARequest {
 }
 
 export interface ForgotPasswordRequest {
-  email: string;
+  identifier: string;
 }
 
 export interface ResetPasswordRequest {
-  token: string;
+  identifier: string;
+  code: string;
   new_password: string;
 }
 

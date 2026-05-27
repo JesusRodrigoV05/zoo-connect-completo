@@ -9,7 +9,7 @@ export interface Receta {
 
   generaTarea: boolean;
   cron?: string;
-  usuarioAsignadoId?: number;
+  usuarioAsignadoId?: string;
   usuarioAsignadoNombre?: string;
 
   producto: {
@@ -36,7 +36,7 @@ export interface RecetaForm {
 
   generarTarea: boolean;
   frecuenciaCron?: string;
-  usuarioAsignadoId?: number;
+  usuarioAsignadoId?: string;
 
   productoId: number;
   unidadMedidaId: number;
@@ -50,7 +50,7 @@ export interface RecetaResponse {
   instrucciones_administracion: string;
   generar_tarea_automatica: boolean;
   frecuencia_cron: string;
-  usuario_asignado_id: number;
+  usuario_asignado_id: string;
   created_at: string;
 
   producto?: {
@@ -65,7 +65,7 @@ export interface RecetaResponse {
     abreviatura: string;
   };
   usuario_asignado?: {
-    id: number;
+    id: string;
     username: string;
   };
 }

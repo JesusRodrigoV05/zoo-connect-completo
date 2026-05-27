@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     ]
     DEFAULT_ADMIN_EMAIL: str
     DEFAULT_ADMIN_PASSWORD: str
+    DEFAULT_ADMIN_PHONE: str = "+10000000001"
     #
     CLOUDINARY_CLOUD_NAME: str
     CLOUDINARY_API_KEY: str
@@ -63,6 +64,9 @@ class Settings(BaseSettings):
     RECAPTCHA_SITE_KEY: str = "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx"
     RECAPTCHA_VERIFY_URL: str = "https://www.google.com/recaptcha/api/siteverify"
     REQUIRE_RECAPTCHA: bool = True
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_VERIFY_SERVICE_SID: str = ""
     #
     #
     # Políticas de histórico de contraseñas por rol

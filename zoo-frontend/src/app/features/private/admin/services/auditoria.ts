@@ -21,7 +21,7 @@ export class AuditoriaService {
       dateFrom?: string;
       dateTo?: string;
       search?: string;
-      userId?: number;
+      userId?: string;
     }
   ): Observable<PaginatedResponse<Auditoria>> {
     let params = new HttpParams()

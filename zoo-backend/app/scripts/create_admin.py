@@ -53,53 +53,63 @@ def create_default_admin():
         usuarios_seed = [
             {
                 "email": settings.DEFAULT_ADMIN_EMAIL,
-                "username": "admin_primary",
+                "username": "admin.admin.primary",
+                "phone_number": settings.DEFAULT_ADMIN_PHONE,
                 "password": settings.DEFAULT_ADMIN_PASSWORD,
                 "role": "administrador"
             },
             {
-                "email": "admin@zooconnect.com",
-                "username": "admin_legacy",
+                "email": "jose.alvarado@zooconnect.qzz.io",
+                "username": "jose.admin.alvarado",
+                "phone_number": "+10000000002",
                 "password": "AdminZ0o_2026_SecurePass!",
                 "role": "administrador"
             },
             {
-                "email": "juan.cuidador@zooconnect.com",
-                "username": "juan_cuida",
+                "email": "juan.perez@zooconnect.qzz.io",
+                "username": "juan.cuidador.perez",
+                "phone_number": "+10000000003",
                 "password": "Cuidador_2026_Safe#88",
                 "role": "cuidador"
             },
             {
-                "email": "ana.vet@zooconnect.com",
-                "username": "ana_veterinaria",
+                "email": "ana.garcia@zooconnect.qzz.io",
+                "username": "ana.vet.garcia",
+                "phone_number": "+10000000004",
                 "password": "Vet_Secure_Access_2026$",
                 "role": "veterinario"
             },
             {
                 "email": "visita1@gmail.com",
-                "username": "visitante_pro",
+                "username": "visita.visitante.demo",
+                "phone_number": "+10000000005",
                 "password": "User_Visitor_Pass_99!",
                 "role": "visitante"
             },
             {
-                "email": "soporte@zooconnect.com",
-                "username": "soporte_tecnico",
+                "email": "soporte@zooconnect.qzz.io",
+                "username": "soporte.admin.tecnico",
+                "phone_number": "+10000000006",
                 "password": "Support_Zoo_Connect_2026*",
                 "role": "administrador"
             }
         ]
 
         for u_data in usuarios_seed:
-            user_exists = db.query(User).filter(User.email == u_data["email"]).first()
+            user_exists = db.query(User).filter(User.id == u_data["username"]).first()
             if not user_exists:
                 role = db.query(Role).filter(Role.name == u_data["role"]).first()
                 if role:
                     print(f"   + Creando usuario: {u_data['username']}")
                     db.add(User(
+                        id=u_data["username"],
                         email=u_data["email"],
                         username=u_data["username"],
+                        phone_number=u_data["phone_number"],
                         hashed_password=get_password_hash(u_data["password"]),
                         is_active=True,
+                        email_verified=True,
+                        phone_verified=True,
                         must_change_password=True,
                         role_id=role.id
                     ))
@@ -107,15 +117,19 @@ def create_default_admin():
         print("6. Verificando usuario OSI...")
         osi_role = db.query(Role).filter(Role.name == "osi").first()
         if osi_role:
-            osi_email = "osi@zconnect.com"
-            osi_user = db.query(User).filter(User.email == osi_email).first()
+            osi_email = "osi@zooconnect.qzz.io"
+            osi_user = db.query(User).filter(User.id == "oscar.osi.seguridad").first()
             if not osi_user:
                 print("   + Creando usuario OSI de prueba")
                 db.add(User(
+                    id="oscar.osi.seguridad",
                     email=osi_email,
-                    username="osi",
+                    username="oscar.osi.seguridad",
+                    phone_number="+10000000007",
                     hashed_password=get_password_hash("Osi_Secure_Change_2026!"),
                     is_active=True,
+                    email_verified=True,
+                    phone_verified=True,
                     must_change_password=True,
                     role_id=osi_role.id,
                 ))

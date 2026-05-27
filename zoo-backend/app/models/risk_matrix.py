@@ -1,4 +1,4 @@
-from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Integer, Text, func
+from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -44,8 +44,8 @@ class RiskMatrixEntry(Base):
     frequency = Column(Text, nullable=False, default="M")
     residual_probability = Column(Integer, nullable=False, default=1)
     residual_impact = Column(Integer, nullable=False, default=1)
-    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
-    updated_by_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    created_by_id = Column(String(120), ForeignKey("users.id"), nullable=True, index=True)
+    updated_by_id = Column(String(120), ForeignKey("users.id"), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime(timezone=True),

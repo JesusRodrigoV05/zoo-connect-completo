@@ -59,7 +59,7 @@ export default class Tablero {
     this.isAssignModalOpen.set(true);
   }
 
-  confirmAssignment(userId: number) {
+  confirmAssignment(userId: string) {
     if (this.selectedTaskId()) {
       this.store.assignTask({
         tareaId: this.selectedTaskId()!,

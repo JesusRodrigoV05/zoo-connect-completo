@@ -105,7 +105,7 @@ class EntradaInventario(Base):
 
     id_entrada_inventario = Column(Integer, primary_key=True, index=True)
     fecha_entrada = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    usuario_id = Column(String(120), ForeignKey("users.id"), nullable=False)
     proveedor_id = Column(Integer, ForeignKey("proveedores.id_proveedor"), nullable=False)
 
     usuario = relationship("User", back_populates="entradas_inventario")
@@ -134,7 +134,7 @@ class Salida(Base):
     id_salida = Column(Integer, primary_key=True, index=True)
     fecha_salida = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     tipo_salida_id = Column(Integer, ForeignKey("tipo_salidas.id_tipo_salida"), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    usuario_id = Column(String(120), ForeignKey("users.id"), nullable=False)
 
     usuario = relationship("User", back_populates="salidas_inventario")
     tipo_salida = relationship("TipoSalida", back_populates="salidas")

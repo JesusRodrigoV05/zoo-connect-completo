@@ -7,6 +7,8 @@ from starlette import status
 from typing import List, Optional
 import secrets
 import string
+import re
+import unicodedata
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +36,33 @@ def _get_visitante_role_id(db: Session) -> int:
     return role.id
 
 
-def get_user(db: Session, user_id: int) -> Optional[User]:
+def normalize_user_id(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value.strip().lower())
+    ascii_value = normalized.encode("ascii", "ignore").decode("ascii")
+    ascii_value = re.sub(r"[^a-z0-9]+", ".", ascii_value).strip(".")
+    ascii_value = re.sub(r"\.+", ".", ascii_value)
+    parts = ascii_value.split(".")
+    if len(parts) == 3:
+        role_aliases = {
+            "administrador": "admin",
+            "administrator": "admin",
+            "admin": "admin",
+            "cuidador": "cuidador",
+            "caregiver": "cuidador",
+            "veterinario": "vet",
+            "veterinaria": "vet",
+            "veterinary": "vet",
+            "vet": "vet",
+            "visitante": "visitante",
+            "visitor": "visitante",
+            "osi": "osi",
+        }
+        parts[1] = role_aliases.get(parts[1], parts[1])
+        ascii_value = ".".join(parts)
+    return ascii_value
+
+
+def get_user(db: Session, user_id: str) -> Optional[User]:
     """
     Obtiene un usuario por su ID
     """
@@ -54,6 +82,26 @@ def get_user_by_email(db: Session, email: str) -> User | None:
         .filter(User.email == normalized_email)
         .first()
     )
+
+
+def get_user_by_phone(db: Session, phone_number: str) -> User | None:
+    return (
+        db.query(User)
+        .options(joinedload(User.role))
+        .filter(User.phone_number == phone_number.strip())
+        .first()
+    )
+
+
+def get_user_by_identifier(db: Session, identifier: str) -> User | None:
+    normalized_identifier = identifier.strip().lower()
+    query = db.query(User).options(joinedload(User.role))
+    if normalized_identifier.startswith("+"):
+        return query.filter(User.phone_number == normalized_identifier).first()
+    return query.filter(
+        (User.id == normalized_identifier)
+        | (User.username == normalized_identifier)
+    ).first()
 
 
 def get_user_by_username(db: Session, username: str) -> User | None:
@@ -110,15 +158,17 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
     role_id = _get_visitante_role_id(db)
     
     # Generar código de 6 dígitos
-    verification_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+    user_id = normalize_user_id(user_in.username)
 
     user = User(
+        id=user_id,
         email=user_in.email,
-        username=user_in.username,
+        username=user_id,
+        phone_number=user_in.phone_number,
         hashed_password=hashed_password,
-        is_active=False,  # Inactivo hasta verificar por email
+        is_active=False,
         email_verified=False,
-        verification_code=verification_code,
+        phone_verified=False,
         role_id=role_id,
         password_changed_at=datetime.now(timezone.utc),
     )
@@ -139,12 +189,17 @@ def create_public_user(db: Session, user_in: UserCreate) -> User:
 
 def create_user_by_admin(db: Session, user_in: AdminUserCreate) -> User:
     hashed_password = get_password_hash(user_in.password)
+    user_id = normalize_user_id(user_in.username)
 
     user = User(
+        id=user_id,
         email=user_in.email,
-        username=user_in.username,
+        username=user_id,
+        phone_number=user_in.phone_number,
         hashed_password=hashed_password,
         is_active=user_in.is_active,
+        email_verified=True,
+        phone_verified=True,
         role_id=user_in.role_id,
         password_changed_at=datetime.now(timezone.utc),
     )
@@ -167,6 +222,8 @@ def update_user_by_admin(
     db: Session, db_user_to_update: User, user_in: AdminUserUpdate
 ) -> User:
     update_data = user_in.model_dump(exclude_unset=True)
+    if "username" in update_data and update_data["username"]:
+        update_data["username"] = normalize_user_id(update_data["username"])
     for field, value in update_data.items():
         setattr(db_user_to_update, field, value)
 
@@ -183,7 +240,7 @@ def update_user_by_admin(
     return db_user_to_update
 
 
-def delete_user_by_admin(db: Session, user_id_to_delete: int) -> Optional[User]:
+def delete_user_by_admin(db: Session, user_id_to_delete: str) -> Optional[User]:
     db_user = db.query(User).filter(User.id == user_id_to_delete).first()
     if not db_user:
         return None
@@ -258,6 +315,17 @@ def verify_user_email(db: Session, email: str, code: str) -> bool:
         return True
 
     return False
+
+
+def mark_phone_verified(db: Session, phone_number: str) -> bool:
+    user = get_user_by_phone(db, phone_number=phone_number)
+    if not user:
+        return False
+    user.phone_verified = True
+    user.is_active = True
+    db.add(user)
+    db.commit()
+    return True
 
 def resend_verification_code(db: Session, email: str) -> Optional[User]:
     """
@@ -366,7 +434,7 @@ def is_password_in_history(db: Session, user: User, new_password: str) -> bool:
     return False
 
 
-def get_password_history(db: Session, user_id: int, limit: int = 10) -> list:
+def get_password_history(db: Session, user_id: str, limit: int = 10) -> list:
     """Obtiene el histórico de contraseñas de un usuario."""
     return (
         db.query(PasswordHistory)

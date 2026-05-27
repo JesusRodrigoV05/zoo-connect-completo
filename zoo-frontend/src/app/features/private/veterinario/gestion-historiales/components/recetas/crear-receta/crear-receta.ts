@@ -87,7 +87,7 @@ export class CrearReceta {
 
     generarTarea: [false],
     frecuenciaCron: [""],
-    usuarioAsignadoId: [null as number | null],
+    usuarioAsignadoId: [null as string | null],
   });
 
   constructor() {

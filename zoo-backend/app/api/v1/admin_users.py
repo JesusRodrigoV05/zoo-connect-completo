@@ -34,7 +34,7 @@ router = APIRouter()
     summary="Obtener histórico de contraseñas de un usuario",
 )
 def get_user_password_history(
-    user_id: int,
+    user_id: str,
     limit: int = Query(10, description="Número máximo de registros a retornar"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
@@ -49,7 +49,7 @@ def get_user_password_history(
             db, current_user.id, [PermissionCode.MANAGE_USERS.value]
         )
 
-    if not is_admin and int(current_user.id) != int(user_id):
+    if not is_admin and current_user.id != user_id:
         logger.warning(f"Permiso denegado: Usuario {current_user.id} intentó ver historial de {user_id}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -79,7 +79,7 @@ def get_user_password_history(
     summary="Limpiar histórico de contraseñas de un usuario",
 )
 def clear_user_password_history(
-    user_id: int, 
+    user_id: str, 
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
@@ -147,7 +147,7 @@ def admin_list_users(
     response_model=UserOut,
     dependencies=[Depends(require_permission(PermissionCode.MANAGE_USERS))]
 )
-def admin_get_user(user_id: int, db: Session = Depends(get_db)):
+def admin_get_user(user_id: str, db: Session = Depends(get_db)):
     user = crud_user.get_user(db=db, user_id=user_id)
     if not user:
         raise HTTPException(
@@ -162,7 +162,7 @@ def admin_get_user(user_id: int, db: Session = Depends(get_db)):
     dependencies=[Depends(require_permission(PermissionCode.MANAGE_USERS))]
 )
 def admin_create_user(user_in: AdminUserCreate, db: Session = Depends(get_db)):
-    if crud_user.get_user_by_email(db, user_in.email):
+    if user_in.email and crud_user.get_user_by_email(db, user_in.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Email ya registrado"
         )
@@ -174,7 +174,7 @@ def admin_create_user(user_in: AdminUserCreate, db: Session = Depends(get_db)):
     dependencies=[Depends(require_permission(PermissionCode.MANAGE_USERS))]
 )
 def admin_update_user(
-    user_id: int, user_in: AdminUserUpdate, db: Session = Depends(get_db)
+    user_id: str, user_in: AdminUserUpdate, db: Session = Depends(get_db)
 ):
     user_db = crud_user.get_user(db, user_id)
     if not user_db:
@@ -190,7 +190,7 @@ def admin_update_user(
     response_model=UserOut,
     dependencies=[Depends(require_permission(PermissionCode.MANAGE_USERS))]
 )
-def admin_delete_user(user_id: int, db: Session = Depends(get_db)):
+def admin_delete_user(user_id: str, db: Session = Depends(get_db)):
     user_db = crud_user.get_user(db, user_id)
     if not user_db:
         raise HTTPException(

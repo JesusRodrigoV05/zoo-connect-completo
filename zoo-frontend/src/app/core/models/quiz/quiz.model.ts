@@ -9,14 +9,14 @@ export interface Trivia {
   fecha: string;
   cantidadPreguntas: number;
   dificultad: DificultadTrivia | string;
-  usuarioId: number;
+  usuarioId: string;
 }
 
 export type CreateTrivia = Omit<Trivia, "id" | "usuarioId">;
 
 export interface ParticipacionTrivia {
   id: number;
-  usuarioId: number;
+  usuarioId: string;
   aciertos: number;
   fecha: string;
   triviaId: number;

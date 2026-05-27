@@ -21,12 +21,16 @@ def make_session():
 
 
 def create_user(db, role):
+    user_id = "prueba.admin.rol"
     user = User(
         email="role-user@zooconnect.com",
-        username="role-user",
+        id=user_id,
+        username=user_id,
         hashed_password="not-used",
         role_id=role.id,
         is_active=True,
+        email_verified=True,
+        phone_verified=True,
     )
     db.add(user)
     db.commit()
@@ -55,9 +59,6 @@ def test_effective_permissions_are_inherited_from_role_only():
 
     db.add(RolePermission(role_id=role.id, permission_id=dashboard.id, allowed=True))
     user = create_user(db, role)
-    db.add(UserPermission(user_id=user.id, permission_id=users.id, allowed=True))
-    db.commit()
-
     assert crud_permission.get_effective_permission_codes(db, user.id) == [
         PermissionCode.VIEW_ADMIN_DASHBOARD.value
     ]

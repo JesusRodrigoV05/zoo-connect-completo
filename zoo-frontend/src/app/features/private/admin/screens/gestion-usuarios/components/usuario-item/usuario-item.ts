@@ -26,7 +26,7 @@ import { firstValueFrom } from "rxjs";
 })
 export class UsuarioItem {
   readonly usuario = input.required<Usuario>();
-  readonly loggedInUserId = input<number | undefined>();
+  readonly loggedInUserId = input<string | undefined>();
   readonly isAuthLoading = input<boolean>(true);
 
   private readonly router = inject(Router);
@@ -35,9 +35,9 @@ export class UsuarioItem {
 
   protected readonly isSelf = computed(() => {
     const currentUserId = this.loggedInUserId();
-    const usuarioId = Number(this.usuario().id);
+    const usuarioId = this.usuario().id;
 
-    if (currentUserId === undefined || currentUserId === 0) {
+    if (!currentUserId) {
       return false;
     }
 
@@ -45,7 +45,7 @@ export class UsuarioItem {
   });
 
   protected editUser(): void {
-    const userId = Number(this.usuario().id);
+    const userId = this.usuario().id;
     this.router.navigate(["/admin/usuarios/editar", userId]);
   }
 
@@ -59,7 +59,7 @@ export class UsuarioItem {
     }
     try {
       const usuario = this.usuario();
-      const userId = Number(usuario.id);
+      const userId = usuario.id;
       const updatedUser = { ...usuario, activo: !usuario.activo };
 
       await firstValueFrom(

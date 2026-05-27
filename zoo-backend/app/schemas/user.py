@@ -8,8 +8,9 @@ from app.core.password_policy import validate_password_strength_func
 
 
 class UserBase(BaseModel):
-    email: EmailStr
+    email: Optional[EmailStr] = None
     username: str
+    phone_number: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -51,9 +52,11 @@ class UserUpdateProfile(BaseModel):
 
 
 class UserOut(BaseModel):
-    id: int
-    email: EmailStr
+    id: str
+    email: Optional[EmailStr] = None
     username: str
+    phone_number: Optional[str] = None
+    phone_verified: bool = False
     is_active: bool
     is_admin: bool = False
     role_id: int
@@ -66,9 +69,11 @@ class UserOut(BaseModel):
 
 # pagination
 class UserOutWithRole(BaseModel):
-    id: int
-    email: EmailStr
+    id: str
+    email: Optional[EmailStr] = None
     username: str
+    phone_number: Optional[str] = None
+    phone_verified: bool = False
     is_active: bool
     is_admin: bool
     role_id: int

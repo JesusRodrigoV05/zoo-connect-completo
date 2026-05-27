@@ -85,7 +85,7 @@ def list_users_with_permissions(
 
 
 @router.get("/users/{user_id}", response_model=UserPermissionMatrixItem)
-def get_user_permissions(user_id: int, db: Session = Depends(get_db)):
+def get_user_permissions(user_id: str, db: Session = Depends(get_db)):
     user = crud_permission.get_users_with_permissions_query(db).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
@@ -94,7 +94,7 @@ def get_user_permissions(user_id: int, db: Session = Depends(get_db)):
 
 @router.put("/users/{user_id}", response_model=UserPermissionMatrixItem)
 def update_user_permissions(
-    user_id: int,
+    user_id: str,
     payload: List[UserPermissionToggle] = Body(default_factory=list),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),

@@ -1,6 +1,6 @@
 export interface PasswordHistoryEntry {
   id: number;
-  user_id: number;
+  user_id: string;
   password_hash: string;
   created_at: string;
 }

@@ -11,7 +11,7 @@ export interface TriviaApiResponse {
   fecha_trivia: string;
   cantidad_preguntas: number;
   dificultad: string;
-  usuario_id: number;
+  usuario_id: string;
 }
 
 export interface CreateTriviaRequest {
@@ -24,7 +24,7 @@ export type UpdateTriviaRequest = Partial<CreateTriviaRequest>;
 
 export interface ParticipacionApiResponse {
   id_participacion_trivia: number;
-  usuario_id: number;
+  usuario_id: string;
   aciertos: number;
   fecha_trivia: string;
   trivia_id: number;

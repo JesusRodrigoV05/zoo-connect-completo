@@ -60,7 +60,7 @@ export default class VerifyEmail implements OnInit, OnDestroy {
   private readonly ngZone = inject(NgZone);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  protected readonly email = signal<string>(this.route.snapshot.queryParams['email'] || '');
+  protected readonly email = signal<string>(this.route.snapshot.queryParams['phone'] || '');
   protected readonly isLoading = this.authStore.loading;
   protected readonly isResending = signal<boolean>(false);
   protected readonly resendCooldown = signal<number>(0);
@@ -120,7 +120,7 @@ export default class VerifyEmail implements OnInit, OnDestroy {
       const token = this.useCustomCaptcha ? this.customCaptchaToken : this.recaptchaToken;
       await firstValueFrom(
         this.http.post<{message: string}>(`${environment.apiUrl}/auth/resend-verification`, {
-          email: this.email(),
+          phone_number: this.email(),
           recaptcha_token: token,
         })
       );
@@ -159,7 +159,7 @@ export default class VerifyEmail implements OnInit, OnDestroy {
     }
 
     if (!this.email()) {
-      this.toastService.showError("Error", "No se encontró el correo electrónico para verificar.");
+      this.toastService.showError("Error", "No se encontro el telefono para verificar.");
       return;
     }
 

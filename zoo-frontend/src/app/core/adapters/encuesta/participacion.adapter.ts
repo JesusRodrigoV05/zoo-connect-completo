@@ -7,7 +7,7 @@ import {
 export interface BackendParticipacionResponse {
   id_participacion: number;
   encuesta_id: number;
-  usuario_id: number;
+  usuario_id: string;
   fecha_participacion: string;
   completada: boolean;
   respuestas: BackendRespuestaResponse[];

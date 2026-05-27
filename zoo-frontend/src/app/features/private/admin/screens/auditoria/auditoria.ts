@@ -120,7 +120,7 @@ export default class Auditoria {
           search: search || undefined,
           dateFrom,
           dateTo,
-          userId: userId ? Number(userId) : undefined
+          userId: userId || undefined
         }
       );
     }),

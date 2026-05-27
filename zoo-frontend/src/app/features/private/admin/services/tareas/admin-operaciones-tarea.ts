@@ -49,7 +49,7 @@ export class AdminOperacionesTarea {
     );
   }
 
-  assignTask(tareaId: number, usuarioId: number): Observable<Tarea> {
+  assignTask(tareaId: number, usuarioId: string): Observable<Tarea> {
     return this.http
       .put<any>(`${this.apiUrl}/${tareaId}/asignar`, {
         usuario_asignado_id: usuarioId,

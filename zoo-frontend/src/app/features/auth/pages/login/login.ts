@@ -44,7 +44,7 @@ export default class Login implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
 
   loginForm: FormGroup = this.fb.group({
-    email: ["", [Validators.required, Validators.email]],
+    email: ["", [Validators.required]],
     password: ["", [Validators.required, Validators.minLength(5)]],
   });
 

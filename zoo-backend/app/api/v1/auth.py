@@ -36,6 +36,7 @@ from app.schemas.auth import (
 )
 
 from app.core import email_service
+from app.core import sms_service
 from app.core.password_utils import generate_strong_password
 
 # 2fa
@@ -95,9 +96,9 @@ def _get_role_claim(user: User) -> str | None:
 
 def _issue_tokens_for_user(user, db: Session):
     extra_claims = {"role": _get_role_claim(user)} if _get_role_claim(user) else None
-    access_token = create_access_token(subject=user.email, extra_claims=extra_claims)
+    access_token = create_access_token(subject=user.id, extra_claims=extra_claims)
 
-    rt = create_refresh_token(subject=user.email)
+    rt = create_refresh_token(subject=user.id)
     crud_token.create_refresh_token_record(
         db,
         user_id=user.id,
@@ -156,17 +157,31 @@ async def register(
         user_in_with_password = UserCreate(**data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    if not user_in_with_password.phone_number:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El telefono es requerido para verificar la cuenta por SMS.",
+        )
 
-    # Verificar si el usuario ya existe (por email o username)
-    logger.debug(f"Iniciando registro para email: {user_in_with_password.email}, username: {user_in_with_password.username}")
-    existing_user_email = crud_user.get_user_by_email(db, email=user_in_with_password.email)
+    user_in_with_password.username = crud_user.normalize_user_id(user_in_with_password.username)
+    logger.debug("Iniciando registro para username: %s", user_in_with_password.username)
+    existing_user_email = (
+        crud_user.get_user_by_email(db, email=user_in_with_password.email)
+        if user_in_with_password.email
+        else None
+    )
     existing_user_username = crud_user.get_user_by_username(db, username=user_in_with_password.username)
+    existing_user_phone = (
+        crud_user.get_user_by_phone(db, phone_number=user_in_with_password.phone_number)
+        if user_in_with_password.phone_number
+        else None
+    )
     
-    existing_user = existing_user_email or existing_user_username
+    existing_user = existing_user_email or existing_user_username or existing_user_phone
 
     if existing_user:
-        logger.debug(f"Usuario ya existe: email={existing_user.email}, username={existing_user.username}, verificado={existing_user.email_verified}")
-        if not existing_user.email_verified:
+        logger.debug("Usuario ya existe: id=%s, verificado=%s", existing_user.id, existing_user.phone_verified)
+        if not existing_user.phone_verified:
             # Si ya existe y no está verificado, lanzamos ACCOUNT_UNVERIFIED
             # No importa si el conflicto es por email o username, si no está verificado
             # le permitimos intentar verificar esa cuenta existente.
@@ -174,12 +189,12 @@ async def register(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={
                     "status": "ACCOUNT_UNVERIFIED",
-                    "email": existing_user.email
+                    "phone_number": existing_user.phone_number
                 },
             )
         else:
             # Si ya está verificado, es un conflicto normal (409)
-            conflict_detail = "Email ya registrado" if existing_user_email else "Nombre de usuario ya en uso"
+            conflict_detail = "Usuario, telefono o email ya registrado"
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=conflict_detail,
@@ -187,31 +202,34 @@ async def register(
 
     try:
         user = crud_user.create_public_user(db=db, user_in=user_in_with_password)
-        logger.info(f"Usuario creado exitosamente: id={user.id}, email={user.email}, code={user.verification_code}")
+        logger.info("Usuario creado exitosamente: id=%s", user.id)
     except Exception as e:
         logger.error(f"Error al crear usuario en BD: {str(e)}")
         raise e
 
-    # 2. Enviar correo de verificación (no bloqueante para registro)
+    # 2. Enviar SMS de verificacion.
     try:
-        logger.debug(f"Intentando enviar correo de verificación a {user.email}")
-        await email_service.send_verification_email(
-            email_to=user.email, code=user.verification_code, username=user.username
-        )
-        logger.info(f"Correo de verificación enviado a {user.email}")
+        logger.debug("Intentando enviar SMS de verificacion a %s", user.phone_number)
+        await sms_service.start_phone_verification(user.phone_number)
+        logger.info("SMS de verificacion enviado a %s", user.phone_number)
     except Exception as e:
-        # Log del error pero no bloqueamos el registro
         logger.error(
-            f"Error crítico enviando correo de verificacion a {user.email}: {str(e)}",
+            "Error enviando SMS de verificacion a %s: %s",
+            user.phone_number,
+            str(e),
             exc_info=True
         )
-        # El usuario queda registrado pero sin verificar (puede reenviar después)
-        # NOTA: He eliminado el segundo bloque except Exception que era redundante y causaba confusión.
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No se pudo enviar el SMS de verificacion.",
+        )
 
     return {
         "id": user.id,
         "email": user.email,
         "username": user.username,
+        "phone_number": user.phone_number,
+        "phone_verified": user.phone_verified,
         "is_active": user.is_active,
         "is_admin": user.is_admin,
         "role_id": user.role_id,
@@ -221,6 +239,7 @@ async def register(
 
 
 @router.post("/verify-email", status_code=status.HTTP_200_OK)
+@router.post("/verify-phone", status_code=status.HTTP_200_OK)
 async def verify_email(
     request: Request,
     body: EmailVerificationRequest,
@@ -236,22 +255,21 @@ async def verify_email(
     if not is_valid_recaptcha(recaptcha_result):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            detail="Verificacion de seguridad fallida. Intenta nuevamente.",
         )
 
-    logger.debug(f"Intentando verificar email: {body.email} con código: {body.code}")
-    success = crud_user.verify_user_email(db, email=body.email, code=body.code)
+    is_code_valid = await sms_service.check_phone_verification(body.phone_number, body.code)
+    success = is_code_valid and crud_user.mark_phone_verified(db, phone_number=body.phone_number)
     if not success:
-        logger.warning(f"Fallo de verificación de email para {body.email}: código incorrecto o usuario no encontrado")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Código de verificación inválido o usuario no encontrado.",
+            detail="Codigo SMS invalido o usuario no encontrado.",
         )
-    logger.info(f"Email verificado exitosamente para {body.email}")
-    return {"message": "Email verificado exitosamente. Ahora puedes iniciar sesión."}
+    return {"message": "Telefono verificado exitosamente. Ahora puedes iniciar sesion."}
 
 
 @router.post("/resend-verification", status_code=status.HTTP_200_OK)
+@router.post("/resend-phone-verification", status_code=status.HTTP_200_OK)
 async def resend_verification(
     request: Request,
     body: ResendVerificationRequest,
@@ -267,29 +285,23 @@ async def resend_verification(
     if not is_valid_recaptcha(recaptcha_result):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            detail="Verificacion de seguridad fallida. Intenta nuevamente.",
         )
 
-    logger.info(f"DEBUG: Solicitud de reenvío para {body.email}")
-    user = crud_user.resend_verification_code(db, email=body.email)
-    if not user:
-        logger.info(f"DEBUG: No se pudo reenviar código para {body.email} (no existe o ya verificado)")
-        # Por seguridad, no decimos si el email existe o no si ya está verificado
-        return {"message": "Si la cuenta existe y no está verificada, se ha enviado un nuevo código."}
+    user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
+    if not user or user.phone_verified:
+        return {"message": "Si la cuenta existe y no esta verificada, se ha enviado un nuevo codigo."}
 
-    logger.info(f"DEBUG: Código a enviar para {user.email}: {user.verification_code}")
     try:
-        await email_service.send_verification_email(
-            email_to=user.email, code=user.verification_code, username=user.username
-        )
-    except Exception as e:
-        logger.error(f"Error reenviando verificación: {str(e)}")
+        await sms_service.start_phone_verification(user.phone_number)
+    except Exception:
+        logger.exception("Error reenviando SMS de verificacion")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo enviar el correo de verificación.",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No se pudo enviar el SMS de verificacion.",
         )
 
-    return {"message": "Código de verificación reenviado exitosamente."}
+    return {"message": "Codigo SMS reenviado exitosamente."}
 
 
 # rate limiting
@@ -310,7 +322,7 @@ async def login(
         background_tasks.add_task(
             crud_audit.create_audit_log,
             event=AuditEvent.LOGIN_FAILURE,
-            attempted_email=payload.email,
+            attempted_email=payload.identifier,
         )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -323,7 +335,7 @@ async def login(
             background_tasks.add_task(
                 crud_audit.create_audit_log,
                 event=AuditEvent.LOGIN_FAILURE,
-                attempted_email=payload.email,
+                attempted_email=payload.identifier,
             )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -340,19 +352,19 @@ async def login(
         )
 
     # paso 1
-    logger.debug(f"DEBUG LOGIN: Intentando login para: {payload.email}")
-    user = crud_user.get_user_by_email(db, payload.email)
+    logger.debug(f"DEBUG LOGIN: Intentando login para: {payload.identifier}")
+    user = crud_user.get_user_by_identifier(db, payload.identifier)
     # paso 2 manejar el usuario no encontrado
     if not user:
-        logger.debug(f"DEBUG LOGIN: Usuario no encontrado en BD: {payload.email}")
+        logger.debug(f"DEBUG LOGIN: Usuario no encontrado en BD: {payload.identifier}")
         background_tasks.add_task(
             crud_audit.create_audit_log,
             # db,
             event=AuditEvent.LOGIN_FAILURE,
-            attempted_email=payload.email,
+            attempted_email=payload.identifier,
         )
         # Incrementamos nuestro contador
-        await policia.increment_login_failure(payload.email, cache)
+        await policia.increment_login_failure(payload.identifier, cache)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
         )
@@ -378,26 +390,26 @@ async def login(
             attempted_email=user.email,
         )
 
-        await policia.increment_login_failure(user.email, cache)
+        await policia.increment_login_failure(user.id, cache)
 
-        failures = await policia.get_login_failures(user.email, cache)
+        failures = await policia.get_login_failures(user.id, cache)
         if failures >= policia.MAX_FAILED_ATTEMPTS:
             background_tasks.add_task(policia.lock_account, user_id=user.id)
-            await policia.clear_login_failures(user.email, cache)
+            await policia.clear_login_failures(user.id, cache)
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
         )
     # contraseña correcta vemos si esta verificado
     logger.debug(f"DEBUG LOGIN: Verificando email_verified para {user.email}: {user.email_verified}")
-    if not user.email_verified:
+    if not user.phone_verified:
         logger.info(f"Intento de login para usuario no verificado: {user.email}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "status": "ACCOUNT_UNVERIFIED",
-                "email": user.email,
-                "message": "Tu cuenta no ha sido verificada. Por favor, verifica tu correo."
+                "phone_number": user.phone_number,
+                "message": "Tu cuenta no ha sido verificada. Por favor, verifica tu telefono."
             },
         )
 
@@ -408,10 +420,10 @@ async def login(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario inactivo. Contacte al administrador."
         )
     # limpiadmor contadores redis
-    await policia.clear_login_failures(user.email, cache)
+    await policia.clear_login_failures(user.id, cache)
     # comprobamos 2fa (antes que must_change_password)
     if user.is_totp_enabled:
-        session_token = create_2fa_session_token(subject=user.email)
+        session_token = create_2fa_session_token(subject=user.id)
         return LoginStep2Response(session_token=session_token)
     # comprobamos si debe cambiar contraseña
     if user.must_change_password:
@@ -480,7 +492,7 @@ async def verify_login_2fa(
         raise credentials_exception
 
     # 2. Obtener el usuario
-    user = crud_user.get_user_by_email(db, email)
+    user = crud_user.get_user(db, email)
     if not user or not user.is_active or not user.is_totp_enabled:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario no válido para 2FA"
@@ -518,7 +530,7 @@ async def verify_login_2fa(
         attempted_email=user.email,
     )
 
-    await policia.clear_login_failures(user.email, cache)
+    await policia.clear_login_failures(user.id, cache)
 
     if user.must_change_password:
         reset_token = crud_token.create_password_reset_token(db, user.id)
@@ -549,7 +561,7 @@ def refresh_token(body: TokenRefreshRequest, db: Session = Depends(get_db)):
 
     crud_token.revoke_refresh_token_by_jti(db, jti)
 
-    user = crud_user.get_user_by_email(db, sub)
+    user = crud_user.get_user(db, sub)
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
@@ -581,7 +593,7 @@ def refresh_token(
         raise HTTPException(status_code=401, detail="Refresh token inalido")
 
     crud_token.revoke_refresh_token_by_jti(db, jti)
-    user = crud_user.get_user_by_email(db, sub)
+    user = crud_user.get_user(db, sub)
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
@@ -653,7 +665,6 @@ def read_users_me(
 async def forgot_password(
     request: Request,
     body: ForgotPasswordRequest,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
 
@@ -667,31 +678,23 @@ async def forgot_password(
     if not is_valid_recaptcha(recaptcha_result):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
+            detail="Verificacion de seguridad fallida. Intenta nuevamente.",
         )
 
-    user = crud_user.get_user_by_email(db, email=body.email)
+    user = crud_user.get_user_by_identifier(db, identifier=body.identifier)
+    if user and user.phone_number:
+        await sms_service.start_phone_verification(user.phone_number)
 
-    if user:
-        token = crud_token.create_password_reset_token(db, user_id=user.id)
-
-        background_tasks.add_task(
-            email_service.send_password_reset_email,
-            email_to=user.email,
-            token=token,
-            username=user.username,
-        )
-
-    return {"msg": "Se envio un enlace de recupracion"}
+    return {"msg": "Si la cuenta existe, se envio un codigo SMS de recuperacion"}
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
 async def reset_password(
     request: Request,
-    body: ResetPasswordRequest, 
+    body: ResetPasswordRequest,
+    response: Response,
     db: Session = Depends(get_db)
 ):
-    # 0. Verificar reCAPTCHA v2 server-side si esta requerido por entorno.
     if settings.REQUIRE_RECAPTCHA and not body.recaptcha_token:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -703,27 +706,29 @@ async def reset_password(
         if not is_valid_recaptcha(recaptcha_result):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verificación de seguridad fallida. Intenta nuevamente.",
+                detail="Verificacion de seguridad fallida. Intenta nuevamente.",
             )
 
-    user = crud_token.get_user_by_reset_token(db, token=body.token)
-
-    if not user:
+    user = crud_user.get_user_by_identifier(db, identifier=body.identifier)
+    if not user or not user.phone_number:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El token es invaslido o ha expirado",
+            detail="Usuario no encontrado",
         )
 
-    # Verificar que la nueva contraseña no esté en el histórico
+    if not await sms_service.check_phone_verification(user.phone_number, body.code):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Codigo SMS invalido",
+        )
+
     if crud_user.is_password_in_history(db, user, body.new_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No puedes reutilizar una contraseña que ya has usado anteriormente",
+            detail="No puedes reutilizar una contrasena que ya has usado anteriormente",
         )
 
     crud_user.update_password(db, db_user=user, new_password=body.new_password)
-
-    crud_token.delete_reset_token(db, token=body.token)
 
     if user.must_change_password:
         user.must_change_password = False
@@ -731,13 +736,13 @@ async def reset_password(
         db.commit()
 
         if user.is_totp_enabled:
-            return {"msg": "Contraseña actualizada exitosamente. Inicia sesión nuevamente."}
+            return {"msg": "Contrasena actualizada exitosamente. Inicia sesion nuevamente."}
 
         access_token, refresh_token = _issue_tokens_for_user(user, db)
         set_refresh_cookie(response, refresh_token)
         return TokenResponse(access_token=access_token, token_type="bearer")
 
-    return {"msg": "Contraseña actualizada exitosamente"}
+    return {"msg": "Contrasena actualizada exitosamente"}
 
 
 # put user

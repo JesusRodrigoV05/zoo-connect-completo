@@ -48,7 +48,7 @@ export class PasswordHistoryComponent implements OnInit {
       return;
     }
     
-    this.authService.getPasswordHistory(Number(userId), 10).subscribe({
+    this.authService.getPasswordHistory(userId, 10).subscribe({
       next: (history) => {
         this.passwordHistory.set(history);
         this.loading.set(false);
@@ -69,7 +69,7 @@ export class PasswordHistoryComponent implements OnInit {
     const userId = this.authStore.usuario()?.id;
     if (!userId) return;
     
-    this.authService.clearPasswordHistory(Number(userId)).subscribe({
+    this.authService.clearPasswordHistory(userId).subscribe({
       next: () => {
         this.passwordHistory.set([]);
       },

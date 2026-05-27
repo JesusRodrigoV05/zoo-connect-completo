@@ -72,7 +72,7 @@ export default class CrearUsuario implements OnInit {
       this.pageTitle = "Crear Actualizar Usuario";
       this.buttonText = "Guardar Cambios";
 
-      this.adminUsuarios.getUserById(parseInt(id)).subscribe((user) => {
+      this.adminUsuarios.getUserById(id).subscribe((user) => {
         this.usuarioForm.patchValue({
           email: user.email,
           username: user.username,
@@ -80,7 +80,7 @@ export default class CrearUsuario implements OnInit {
         });
       });
       this.usuarioForm.get("email")?.disable();
-      if (this.currentUserId == parseInt(id)) {
+      if (this.currentUserId === id) {
         this.usuarioForm.get("rol")?.disable();
       }
     } else {
@@ -180,7 +180,7 @@ export default class CrearUsuario implements OnInit {
           });
       } else {
         const idParam = this.route.snapshot.paramMap.get("id");
-        const userId = idParam ? parseInt(idParam) : 0;
+        const userId = idParam || "";
 
         if (!userId) {
           this.isLoading.set(false);

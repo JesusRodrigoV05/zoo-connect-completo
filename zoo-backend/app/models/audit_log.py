@@ -11,7 +11,7 @@ class AuditLog(Base):
     action = Column(String(160), nullable=True)
     detail = Column(Text, nullable=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String(120), ForeignKey("users.id"), nullable=True)
     attempted_email = Column(String(200), nullable=True, index=True)
 
     user = relationship("User")

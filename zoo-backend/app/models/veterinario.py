@@ -32,7 +32,7 @@ class HistorialMedico(Base):
     id_historial = Column(Integer, primary_key=True, index=True)
     
     animal_id = Column(Integer, ForeignKey("animals.id_animal"), nullable=False, index=True)
-    veterinario_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    veterinario_id = Column(String(120), ForeignKey("users.id"), nullable=False, index=True)
     tipo_atencion_id = Column(Integer, ForeignKey("tipo_atencion.id_tipo_atencion"), nullable=False)
 
     fecha_atencion = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -111,7 +111,7 @@ class RecetaMedica(Base):
     generar_tarea_automatica = Column(Boolean, default=False, nullable=False)
     frecuencia_cron = Column(String(100), nullable=True)
     
-    usuario_asignado_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    usuario_asignado_id = Column(String(120), ForeignKey("users.id"), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 

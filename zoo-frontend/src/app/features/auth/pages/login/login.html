@@ -22,8 +22,8 @@
         <div class="auth-content">
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <zoo-form-field
-              label="Usuario"
-              type="email"
+              label="Usuario o telefono"
+              type="text"
               [control]="email"
               [errorMessage]="getEmailError()"
             />

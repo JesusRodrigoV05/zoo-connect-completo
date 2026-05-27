@@ -73,6 +73,7 @@ export default class Signup implements OnInit, OnDestroy {
     {
       email: ["", [Validators.required, Validators.email]],
       username: ["", [Validators.required, Validators.minLength(3)]],
+      phoneNumber: ["", [Validators.required, Validators.pattern("^\\+[1-9]\\d{7,14}$")]],
       password: ["", [Validators.minLength(12)]],
       confirmPassword: ["", [Validators.required]],
     },
@@ -187,15 +188,15 @@ export default class Signup implements OnInit, OnDestroy {
       return;
     }
 
-    const { email, username } = this.signupForm.value;
+    const { email, username, phoneNumber } = this.signupForm.value;
     const password = this.signupForm.value.password;
 
     try {
-      const res = await this.authStore.register(email, username, password, this.generatePassword, token);
+      const res = await this.authStore.register(email, username, phoneNumber, password, this.generatePassword, token);
       if (res && res.generated_password) {
         this.generatedPassword = res.generated_password as string;
       } else {
-        await this.router.navigate(['/verify-email'], { queryParams: { email } });
+        await this.router.navigate(['/verify-email'], { queryParams: { phone: phoneNumber } });
       }
     } catch (e) {
       // Resetear reCAPTCHA después del intento
@@ -237,6 +238,9 @@ export default class Signup implements OnInit, OnDestroy {
   }
   get username() {
     return this.signupForm.get("username") as FormControl;
+  }
+  get phoneNumber() {
+    return this.signupForm.get("phoneNumber") as FormControl;
   }
   get password() {
     return this.signupForm.get("password") as FormControl;
@@ -316,6 +320,15 @@ export default class Signup implements OnInit, OnDestroy {
       if (control.errors["required"]) return "El usuario es requerido";
       if (control.errors["minlength"])
         return "El usuario debe tener al menos 3 caracteres";
+    }
+    return null;
+  }
+
+  protected getPhoneError(): string | null {
+    const control = this.phoneNumber;
+    if (control?.errors && control?.touched) {
+      if (control.errors["required"]) return "El telefono es requerido";
+      if (control.errors["pattern"]) return "Usa formato internacional, ej. +59170000000";
     }
     return null;
   }

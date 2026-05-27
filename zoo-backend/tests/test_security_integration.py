@@ -32,7 +32,7 @@ def test_protected_endpoint_returns_403_without_required_permission(monkeypatch)
     client = TestClient(test_app)
 
     test_app.dependency_overrides[dependencies.get_current_active_user] = lambda: SimpleNamespace(
-        id=1,
+        id="usuario.admin.prueba",
         is_active=True,
         is_admin=False,
     )
@@ -70,10 +70,13 @@ def test_user_access_is_granted_by_role_permission():
 
     user = User(
         email="role-access@zooconnect.com",
-        username="role-access",
+        id="acceso.admin.prueba",
+        username="acceso.admin.prueba",
         hashed_password="not-used",
         role_id=role.id,
         is_active=True,
+        email_verified=True,
+        phone_verified=True,
     )
     db.add(user)
     db.add(RolePermission(role_id=role.id, permission_id=permission.id, allowed=True))
@@ -87,10 +90,13 @@ def test_revoked_refresh_token_is_not_valid():
     db = make_session()
     user = User(
         email="refresh@zooconnect.com",
-        username="refresh",
+        id="refresh.visitante.prueba",
+        username="refresh.visitante.prueba",
         hashed_password="not-used",
         role_id=1,
         is_active=True,
+        email_verified=True,
+        phone_verified=True,
     )
     role = Role(id=1, name="visitante")
     db.add(role)
@@ -116,14 +122,24 @@ def test_account_locked_until_future_is_rejected():
     assert policia.is_account_locked(user) is True
 
 
-def test_invalid_2fa_session_token_returns_401():
+def test_invalid_2fa_session_token_returns_401(monkeypatch):
     test_app = FastAPI()
     test_app.include_router(auth.router, prefix="/zooconnect/auth")
     client = TestClient(test_app)
 
+    async def fake_verify_recaptcha(token, client_ip=None):
+        return {"success": True}
+
+    monkeypatch.setattr(auth, "verify_recaptcha", fake_verify_recaptcha)
+    monkeypatch.setattr(auth, "is_valid_recaptcha", lambda result: True)
+
     response = client.post(
         "/zooconnect/auth/2fa/verify-login",
-        json={"session_token": "invalid-token", "code": "123456"},
+        json={
+            "session_token": "invalid-token",
+            "code": "123456",
+            "recaptcha_token": "test-token",
+        },
     )
 
     assert response.status_code == 401

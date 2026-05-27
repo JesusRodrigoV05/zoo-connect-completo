@@ -10,7 +10,7 @@ import secrets
 
 def create_refresh_token_record(
     db: Session,
-    user_id: int,
+    user_id: str,
     jti: str,
     expires_at: datetime,
     device_info: Optional[str] = None
@@ -49,7 +49,7 @@ def is_refresh_token_valid(db: Session, jti: str) -> bool:
     return token.expires_at > datetime.now(timezone.utc)
 
 #funciones reset token
-def create_password_reset_token(db: Session, user_id: int) -> str:
+def create_password_reset_token(db: Session, user_id: str) -> str:
     """
     Crea, guarda y devuelve un nuevo token de reseteo de contraseña
     """

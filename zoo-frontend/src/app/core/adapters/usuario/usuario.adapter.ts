@@ -2,9 +2,11 @@ import { UpdateProfileRequest } from "@models/usuario";
 import { Usuario, RolId } from "../../models/usuario/usuario.model";
 
 export interface UsuarioBackendResponse {
-  id: number;
-  email: string;
+  id: string;
+  email: string | null;
   username: string;
+  phone_number?: string | null;
+  phone_verified?: boolean;
   photo_url: string | null;
   is_active: boolean;
   role_id: number;
@@ -13,8 +15,9 @@ export interface UsuarioBackendResponse {
 }
 
 export interface CreateUsuarioRequest {
-  email: string;
+  email?: string;
   username: string;
+  phone_number?: string;
   password: string;
   role_id: number;
 }
@@ -36,9 +39,11 @@ export interface BackendUpdateProfileRequest {
 export class UsuarioAdapter {
   static fromBackend(backendUser: UsuarioBackendResponse): Usuario {
     return {
-      id: backendUser.id.toString(),
-      email: backendUser.email,
+      id: backendUser.id,
+      email: backendUser.email || "",
       username: backendUser.username,
+      phoneNumber: backendUser.phone_number ?? null,
+      phoneVerified: backendUser.phone_verified ?? false,
       fotoUrl: backendUser.photo_url || "",
       activo: backendUser.is_active,
       rol: {
@@ -161,8 +166,8 @@ export class UsuarioAdapter {
   static isValidBackendResponse(obj: any): obj is UsuarioBackendResponse {
     return (
       obj &&
-      typeof obj.id === "number" &&
-      typeof obj.email === "string" &&
+      typeof obj.id === "string" &&
+      (obj.email === null || typeof obj.email === "string") &&
       typeof obj.username === "string" &&
       (obj.photo_url === null || typeof obj.photo_url === "string") &&
       typeof obj.is_active === "boolean" &&

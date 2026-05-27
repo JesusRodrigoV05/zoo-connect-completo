@@ -141,7 +141,7 @@ def list_permissions(db: Session) -> List[Permission]:
     return db.query(Permission).filter(Permission.is_active.is_(True)).order_by(Permission.module, Permission.name).all()
 
 
-def _load_user_with_permissions(db: Session, user_id: int) -> User:
+def _load_user_with_permissions(db: Session, user_id: str) -> User:
     user = (
         db.query(User)
         .options(
@@ -156,7 +156,7 @@ def _load_user_with_permissions(db: Session, user_id: int) -> User:
     return user
 
 
-def get_effective_permission_entries(db: Session, user_id: int) -> List[dict]:
+def get_effective_permission_entries(db: Session, user_id: str) -> List[dict]:
     user = _load_user_with_permissions(db, user_id)
     entries: Dict[str, dict] = {}
 
@@ -175,11 +175,11 @@ def get_effective_permission_entries(db: Session, user_id: int) -> List[dict]:
     return list(entries.values())
 
 
-def get_effective_permission_codes(db: Session, user_id: int) -> List[str]:
+def get_effective_permission_codes(db: Session, user_id: str) -> List[str]:
     return [entry["permission"].code for entry in get_effective_permission_entries(db, user_id) if entry["allowed"]]
 
 
-def user_has_permissions(db: Session, user_id: int, required_permissions: Iterable[str]) -> bool:
+def user_has_permissions(db: Session, user_id: str, required_permissions: Iterable[str]) -> bool:
     effective = set(get_effective_permission_codes(db, user_id))
     return all(permission in effective for permission in required_permissions)
 
@@ -195,7 +195,7 @@ def get_users_with_permissions_query(db: Session):
     )
 
 
-def replace_user_permissions(db: Session, user_id: int, permissions_payload: List[dict]) -> User:
+def replace_user_permissions(db: Session, user_id: str, permissions_payload: List[dict]) -> User:
     _load_user_with_permissions(db, user_id)
 
     db.query(UserPermission).filter(UserPermission.user_id == user_id).delete()

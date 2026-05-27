@@ -36,7 +36,7 @@ def create_audit_log(
     log_type: AuditLogType | str | None = None,
     action: Optional[str] = None,
     detail: Optional[str] = None,
-    user_id: Optional[int] = None,
+    user_id: Optional[str] = None,
     attempted_email: Optional[str] = None
 ) -> None:
     db: Session = SessionLocal()
@@ -75,7 +75,7 @@ def get_audit_logs_by_type_query(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
     search: Optional[str] = None,
-    user_id: Optional[int] = None
+    user_id: Optional[str] = None
 ) -> Query:
     query = (
         db.query(AuditLog)

@@ -14,7 +14,7 @@
       <div class="auth-form-container">
         <div class="auth-header">
           <app-logo-image [size]="150" />
-          <h1>Verifica tu correo</h1>
+          <h1>Verifica tu telefono</h1>
           <p class="subtitle">Ingresa el código de 6 dígitos enviado a <strong>{{ email() }}</strong></p>
         </div>
 
@@ -82,7 +82,7 @@
               @if (resendCooldown() > 0) {
                 <span class="text-muted">Reenviar en {{ getCooldownMessage() }}</span>
               }
-              o revisa tu carpeta de spam.
+              o verifica que el telefono sea correcto.
             </p>
           </div>
 

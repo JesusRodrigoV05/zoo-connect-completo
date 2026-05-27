@@ -13,7 +13,7 @@ class Encuesta(Base):
     descripcion = Column("descripcion", Text, nullable=False)
     fecha_inicio = Column("fecha_inicio", DateTime(timezone=True), nullable=False)
     fecha_fin = Column("fecha_fin", DateTime(timezone=True), nullable=True)
-    usuario_creador_id = Column("usuario_creador_id", Integer, ForeignKey("users.id"), nullable=False)
+    usuario_creador_id = Column("usuario_creador_id", String(120), ForeignKey("users.id"), nullable=False)
     is_active = Column("is_active", Boolean, nullable=False, default=True)
 
     usuario_creador = relationship("User", back_populates="encuestas_creadas")
@@ -63,7 +63,7 @@ class ParticipacionEncuesta(Base):
 
     id_participacion = Column("id_participacion", Integer, primary_key=True)
     encuesta_id = Column("encuesta_id", Integer, ForeignKey("encuestas.id_encuesta"), nullable=False)
-    usuario_id = Column("usuario_id", Integer, ForeignKey("users.id"), nullable=False)
+    usuario_id = Column("usuario_id", String(120), ForeignKey("users.id"), nullable=False)
     fecha_participacion = Column("fecha_participacion", DateTime(timezone=True), nullable=False)
     completada = Column("completada", Boolean, nullable=False, default=False)
     

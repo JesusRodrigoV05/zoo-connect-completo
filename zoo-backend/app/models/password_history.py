@@ -9,7 +9,7 @@ class PasswordHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        String(120), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     password_hash = Column(String(200), nullable=False)
     created_at = Column(

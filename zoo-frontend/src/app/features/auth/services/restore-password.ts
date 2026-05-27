@@ -11,16 +11,17 @@ export class RestorePassword {
   private readonly apiUrl = `${environment.apiUrl}`;
   private readonly authUrl = `${this.apiUrl}/auth`;
 
-  forgotPassword(email: string, recaptchaToken?: string): Observable<{ msg: string }> {
+  forgotPassword(identifier: string, recaptchaToken?: string): Observable<{ msg: string }> {
     return this.http.post<{ msg: string }>(`${this.authUrl}/forgot-password`, {
-      email,
+      identifier,
       recaptcha_token: recaptchaToken,
     });
   }
 
-  resetPassword(token: string, newPassword: string, recaptchaToken?: string): Observable<{ msg?: string; access_token?: string; token_type?: string }> {
+  resetPassword(identifier: string, code: string, newPassword: string, recaptchaToken?: string): Observable<{ msg?: string; access_token?: string; token_type?: string }> {
     return this.http.post<{ msg?: string; access_token?: string; token_type?: string }>(`${this.authUrl}/reset-password`, {
-      token,
+      identifier,
+      code,
       new_password: newPassword,
       recaptcha_token: recaptchaToken
     });

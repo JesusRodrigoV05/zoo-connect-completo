@@ -11,7 +11,7 @@ class OnboardingTourProgress(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user_id = Column(String(120), ForeignKey("users.id"), nullable=False, index=True)
     tour_key = Column(String(120), nullable=False, index=True)
     completed = Column(Boolean, nullable=False, default=False)
     completed_at = Column(DateTime(timezone=True), nullable=True)

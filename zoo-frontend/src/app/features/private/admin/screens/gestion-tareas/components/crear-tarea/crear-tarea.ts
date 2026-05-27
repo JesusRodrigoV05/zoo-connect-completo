@@ -90,7 +90,7 @@ export class CrearTarea {
     descripcion: ["", [Validators.required]],
     tipoTareaId: [null as number | null, [Validators.required]],
     fechaProgramada: [new Date(), [Validators.required]],
-    usuarioAsignadoId: [null as number | null],
+    usuarioAsignadoId: [null as string | null],
     lugarSeleccionado: [null as LugarOption | null],
   });
 
@@ -170,9 +170,7 @@ export class CrearTarea {
       descripcion: val.descripcion!,
       fechaProgramada: this.formatDate(val.fechaProgramada!),
       tipoTareaId: val.tipoTareaId!,
-      usuarioAsignadoId: val.usuarioAsignadoId
-        ? Number(val.usuarioAsignadoId)
-        : undefined,
+      usuarioAsignadoId: val.usuarioAsignadoId || undefined,
       animalId:
         selectedLugar?.tipo === "animal" ? selectedLugar.value! : undefined,
       habitatId:

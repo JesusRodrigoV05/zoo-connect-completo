@@ -18,7 +18,7 @@ export interface PermissionState extends PermissionCatalogItem {
 }
 
 export interface PermissionMatrixUser {
-  id: number;
+  id: string;
   email: string;
   username: string;
   is_active: boolean;
@@ -72,7 +72,7 @@ export class AdminPermissionsService {
   }
 
   updateUserPermissions(
-    userId: number,
+    userId: string,
     permissions: UpdatePermissionPayload[],
   ): Observable<PermissionMatrixUser> {
     return this.http.put<PermissionMatrixUser>(

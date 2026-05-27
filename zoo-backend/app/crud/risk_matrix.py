@@ -13,7 +13,7 @@ def list_entries(db: Session) -> List[RiskMatrixEntry]:
 def create_entry(
     db: Session,
     entry_in: RiskMatrixEntryCreate,
-    user_id: int | None = None,
+    user_id: str | None = None,
 ) -> RiskMatrixEntry:
     entry = RiskMatrixEntry(
         **entry_in.model_dump(),
@@ -29,7 +29,7 @@ def create_entry(
 def replace_entries(
     db: Session,
     entries_in: Iterable[RiskMatrixEntryCreate],
-    user_id: int | None = None,
+    user_id: str | None = None,
 ) -> List[RiskMatrixEntry]:
     db.query(RiskMatrixEntry).delete()
 
@@ -51,7 +51,7 @@ def update_entry(
     db: Session,
     entry_id: int,
     entry_in: RiskMatrixEntryUpdate,
-    user_id: int | None = None,
+    user_id: str | None = None,
 ) -> RiskMatrixEntry | None:
     entry = db.query(RiskMatrixEntry).filter(RiskMatrixEntry.id == entry_id).first()
     if not entry:

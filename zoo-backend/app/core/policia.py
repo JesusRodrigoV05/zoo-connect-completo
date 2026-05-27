@@ -20,9 +20,9 @@ FAILED_ATTEMPTS_TTL_SECONDS = 300
 FAILED_LOGIN_PREFIX = "failed_login:"
 
 
-def _get_redis_key(email: str) -> str:
+def _get_redis_key(identifier: str) -> str:
     """Generar clave redis"""
-    return f"{FAILED_LOGIN_PREFIX}{email.lower().strip()}"
+    return f"{FAILED_LOGIN_PREFIX}{identifier.lower().strip()}"
 
 
 async def increment_login_failure(
@@ -76,7 +76,7 @@ async def clear_login_failures(
     await cache.delete(key)
 
 
-def lock_account(user_id: int) -> None:
+def lock_account(user_id: str) -> None:
     """
     Escribe el bloqueo oficial
     """

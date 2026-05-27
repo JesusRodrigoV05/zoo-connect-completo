@@ -17,7 +17,7 @@ import { AdminUsuarios } from "@app/features/private/admin/services/admin-usuari
 
 interface CaretakerOption {
   label: string;
-  value: number;
+  value: string;
 }
 
 @Component({
@@ -29,14 +29,14 @@ interface CaretakerOption {
 })
 export class AsignarTarea {
   visible = input.required<boolean>();
-  onConfirm = output<number>();
+  onConfirm = output<string>();
   onCancel = output<void>();
 
   private adminUsuarios = inject(AdminUsuarios);
 
   usuarios = signal<Usuario[]>([]);
   loadingUsuarios = signal(false);
-  selectedUserId = signal<number | null>(null);
+  selectedUserId = signal<string | null>(null);
 
   constructor() {
     effect(() => {

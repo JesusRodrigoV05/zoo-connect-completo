@@ -38,7 +38,7 @@ export interface Tarea {
   descripcion: string;
   fechaProgramada: string;
   tipoTarea?: TipoTarea;
-  usuarioAsignadoId?: number;
+  usuarioAsignadoId?: string;
   usuarioAsignado?: Usuario;
   animalId?: number;
   animal?: Animal;
@@ -54,7 +54,7 @@ export interface CreateTareaManual {
   descripcion: string;
   fechaProgramada: string;
   tipoTareaId: number;
-  usuarioAsignadoId?: number;
+  usuarioAsignadoId?: string;
   animalId?: number;
   habitatId?: number;
 }

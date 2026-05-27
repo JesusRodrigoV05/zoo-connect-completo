@@ -13,8 +13,10 @@ export interface Rol {
 
 export interface Usuario {
     id: string,
-    email: string, 
+    email: string,
     username: string,
+    phoneNumber?: string | null,
+    phoneVerified?: boolean,
     fotoUrl: string,
     activo: boolean,
     rol: Rol,

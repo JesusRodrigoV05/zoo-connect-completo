@@ -25,7 +25,7 @@ export interface DetalleEntrada {
 export interface EntradaInventario {
   id: number;
   fecha: string;
-  usuarioId: number;
+  usuarioId: string;
   usuario?: Usuario;
   proveedorId?: number;
   proveedor?: Proveedor;
@@ -56,7 +56,7 @@ export interface SalidaInventario {
   fecha: string;
   tipoSalidaId: number;
   tipoSalida?: TipoSalida;
-  usuarioId: number;
+  usuarioId: string;
   usuario?: Usuario;
   detalles: DetalleSalida[];
 }

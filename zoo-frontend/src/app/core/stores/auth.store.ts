@@ -57,7 +57,7 @@ export const AuthStore = signalStore(
     isOsi: computed(() => usuario()?.rol.id === RolId.OSI),
     isVisitante: computed(() => usuario()?.rol.id === RolId.VISITANTE),
     permissions: computed(() => usuario()?.permisos ?? []),
-    userId: computed(() => parseInt(usuario()?.id ?? "0")),
+    userId: computed(() => usuario()?.id ?? ""),
   })),
   withMethods(
     (
@@ -102,8 +102,8 @@ export const AuthStore = signalStore(
         } else if (error?.status === 400 && context === 'login') {
           const detail = error.error?.detail;
           if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
-            const email = detail?.email || '';
-            router.navigate(['/verify-email'], { queryParams: { email } });
+            const phone = detail?.phone_number || '';
+            router.navigate(['/verify-email'], { queryParams: { phone } });
             patchState(store, { loading: false });
             return '';
           }
@@ -113,8 +113,8 @@ export const AuthStore = signalStore(
         } else if (error?.status === 400 && context === 'register') {
           const detail = error.error?.detail;
           if (detail?.status === 'ACCOUNT_UNVERIFIED' || detail === 'ACCOUNT_UNVERIFIED') {
-            const email = detail?.email || '';
-            router.navigate(['/verify-email'], { queryParams: { email } });
+            const phone = detail?.phone_number || '';
+            router.navigate(['/verify-email'], { queryParams: { phone } });
             patchState(store, { loading: false }); // Asegurar que el loading se apague
             return '';
           }
@@ -153,7 +153,7 @@ export const AuthStore = signalStore(
       };
 
       const methods = {
-        async login(email: string, password: string, recaptchaToken?: string) {
+        async login(identifier: string, password: string, recaptchaToken?: string) {
           patchState(store, {
             loading: true,
             error: null,
@@ -164,7 +164,7 @@ export const AuthStore = signalStore(
             const encryptedPassword = await encryptionService.encrypt(password);
             
             const loginResponse: LoginResponse = await firstValueFrom(
-              authService.login(email, encryptedPassword, recaptchaToken),
+              authService.login(identifier, encryptedPassword, recaptchaToken),
             );
 
             if (
@@ -236,6 +236,7 @@ export const AuthStore = signalStore(
         async register(
           email: string,
           username: string,
+          phoneNumber: string,
           password?: string,
           generate_password: boolean = false,
           recaptchaToken?: string,
@@ -248,7 +249,7 @@ export const AuthStore = signalStore(
             }
 
             const response: RegisterResponse = await firstValueFrom(
-              authService.register(email, username, finalPassword, generate_password, recaptchaToken),
+              authService.register(email, username, phoneNumber, finalPassword, generate_password, recaptchaToken),
             );
             patchState(store, { loading: false });
             toastService.showSuccess(
@@ -263,10 +264,10 @@ export const AuthStore = signalStore(
           }
         },
 
-        async verifyEmail(email: string, code: string, recaptchaToken?: string): Promise<void> {
+        async verifyEmail(phoneNumber: string, code: string, recaptchaToken?: string): Promise<void> {
           patchState(store, { loading: true, error: null });
           try {
-            await firstValueFrom(authService.verifyEmail(email, code, recaptchaToken));
+            await firstValueFrom(authService.verifyEmail(phoneNumber, code, recaptchaToken));
             patchState(store, { loading: false });
             toastService.showSuccess(
               '¡Éxito!',

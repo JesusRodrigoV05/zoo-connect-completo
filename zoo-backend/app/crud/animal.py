@@ -234,13 +234,13 @@ def get_all_media_habitats(db: Session) -> Query:
 
 # --- Animales Favoritos ---
 
-def get_favorite(db: Session, user_id: int, animal_id: int) -> Optional[AnimalFavorito]:
+def get_favorite(db: Session, user_id: str, animal_id: int) -> Optional[AnimalFavorito]:
     return db.query(AnimalFavorito).filter(
         AnimalFavorito.usuario_id == user_id,
         AnimalFavorito.animal_id == animal_id
     ).first()
 
-def add_animal_to_favorites(db: Session, user_id: int, favorite_in: AnimalFavoritoCreate) -> AnimalFavorito:
+def add_animal_to_favorites(db: Session, user_id: str, favorite_in: AnimalFavoritoCreate) -> AnimalFavorito:
 
     animal = get_animal(db, favorite_in.animal_id)
     if not animal:
@@ -257,7 +257,7 @@ def add_animal_to_favorites(db: Session, user_id: int, favorite_in: AnimalFavori
     db.refresh(db_favorite)
     return db_favorite
 
-def remove_animal_from_favorites(db: Session, user_id: int, animal_id: int) -> bool:
+def remove_animal_from_favorites(db: Session, user_id: str, animal_id: int) -> bool:
     db_favorite = get_favorite(db, user_id, animal_id)
     if db_favorite:
         db.delete(db_favorite)
@@ -265,7 +265,7 @@ def remove_animal_from_favorites(db: Session, user_id: int, animal_id: int) -> b
         return True
     return False
 
-def list_user_favorites(db: Session, user_id: int) -> Query:
+def list_user_favorites(db: Session, user_id: str) -> Query:
     return (
         db.query(AnimalFavorito)
         .options(
