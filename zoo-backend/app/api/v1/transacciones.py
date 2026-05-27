@@ -43,7 +43,7 @@ def create_entrada_inventario_endpoint(
         event="inventory_entry_created",
         log_type=AuditLogType.APPLICATION,
         action="Creación de entrada de inventario",
-        detail=f"Entrada ID: {entrada.id}, Proveedor ID: {entrada.proveedor_id}",
+        detail=f"Entrada ID: {entrada.id_entrada_inventario}, Proveedor ID: {entrada.proveedor_id}",
         user_id=current_user.id
     )
     return entrada
@@ -83,7 +83,7 @@ def create_salida_inventario_endpoint(
         event="inventory_exit_created",
         log_type=AuditLogType.APPLICATION,
         action="Creación de salida de inventario",
-        detail=f"Salida ID: {salida.id}, Tipo Salida ID: {salida.tipo_salida_id}",
+        detail=f"Salida ID: {salida.id_salida}, Tipo Salida ID: {salida.tipo_salida_id}",
         user_id=current_user.id
     )
     return salida
@@ -189,7 +189,7 @@ def delete_tipo_salida(
         event="inventory_exit_type_deleted",
         log_type=AuditLogType.APPLICATION,
         action="Eliminación de tipo de salida",
-        detail=f"ID: {db_obj.id}",
+        detail=f"ID: {db_obj.id_tipo_salida}",
         user_id=current_user.id
     )
     return deleted_tipo
