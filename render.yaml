@@ -32,7 +32,7 @@ services:
       - key: MEDIA_DIR
         value: /app/backend/media
       - key: CORS_ORIGINS
-        value: https://zoo-connect.onrender.com
+        value: '["https://zoo-connect.onrender.com"]'
       - key: FRONTEND_RESET_PASSWORD_URL
         value: https://zoo-connect.onrender.com/reset-password
       - key: REDIS_DB
