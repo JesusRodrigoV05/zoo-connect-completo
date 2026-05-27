@@ -37,25 +37,13 @@
               }
             </div>
 
-            @if (useCustomCaptcha) {
-              <app-custom-captcha
-                (verifiedChange)="onCustomCaptchaChange($event)"
-                (tokenChange)="onCustomTokenChange($event)"
-              ></app-custom-captcha>
-            } @else {
-              <div id="recaptcha-verify" class="recaptcha-container"></div>
-            }
-            @if (recaptchaError()) {
-              <small class="p-error recaptcha-error">Por favor, verifica que no eres un robot.</small>
-            }
-
             <div class="auth-button-container">
               <p-button
                 type="submit"
                 label="Verificar Cuenta"
                 severity="primary"
                 [rounded]="true"
-                [disabled]="isLoading() || (!recaptchaToken && !customCaptchaToken)"
+                [disabled]="isLoading()"
                 styleClass="auth-button"
                 fluid
               >

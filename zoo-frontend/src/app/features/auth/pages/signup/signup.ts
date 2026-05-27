@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, NgZone, ChangeDetectorRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -7,7 +7,7 @@ import {
   Validators,
   FormControl,
 } from "@angular/forms";
-import { RouterLink } from "@angular/router";
+import { RouterLink, Router } from "@angular/router";
 import { AuthStore } from "@stores/auth.store";
 import { Loader } from "@app/shared/components/loader";
 import { ButtonModule } from "primeng/button";
@@ -19,21 +19,16 @@ import { InputTextModule } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
 import { MessageModule } from "primeng/message";
 import { Auth } from "../../services";
-import { UpdateProfileRequest } from "@models/usuario";
-import { Router } from "@angular/router";
-
 import { ToggleButtonModule } from "primeng/togglebutton";
 import { ToastModule } from "primeng/toast";
-import { MessageService } from "primeng/api";
 import { ShowToast } from "@app/shared/services";
-import { RecaptchaService } from "@app/core/services/recaptcha.service";
-import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-captcha";
+import { ZooCaptcha } from "@app/shared/components/zoo-captcha/zoo-captcha";
 import { evaluatePasswordStrength } from "@app/shared/utils/password-strength";
 
 @Component({
   selector: "app-signup",
   standalone: true,
-   imports: [
+  imports: [
     ReactiveFormsModule,
     FormsModule,
     RouterLink,
@@ -49,25 +44,22 @@ import { evaluatePasswordStrength } from "@app/shared/utils/password-strength";
     MessageModule,
     ToggleButtonModule,
     ToastModule,
-    CustomCaptcha,
+    ZooCaptcha,
   ],
-  providers: [MessageService],
   templateUrl: "./signup.html",
   styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Signup implements OnInit, OnDestroy {
+export default class Signup implements OnInit {
   protected readonly authStore = inject(AuthStore);
   authService = inject(Auth);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly toastService = inject(ShowToast);
-  private readonly recaptchaService = inject(RecaptchaService);
-  private readonly ngZone = inject(NgZone);
-  private readonly cdr = inject(ChangeDetectorRef);
 
   protected readonly isLoading = this.authStore.loading;
   protected readonly error = this.authStore.error;
+  protected readonly captchaToken = signal<string | null>(null);
 
   protected readonly signupForm: FormGroup = this.fb.group(
     {
@@ -80,7 +72,6 @@ export default class Signup implements OnInit, OnDestroy {
     { validators: this.passwordMatchValidator },
   );
 
-  // Password rules + strength
   protected rules = {
     length: false,
     uppercase: false,
@@ -96,9 +87,6 @@ export default class Signup implements OnInit, OnDestroy {
   protected generatedPassword: string | null = null;
   protected generatePassword = false;
   protected showTips = false;
-  protected recaptchaToken: string | null = null;
-  protected useCustomCaptcha = false;
-  protected customCaptchaToken: string | null = null;
 
   protected isPasswordStrong(): boolean {
     if (this.generatePassword) return true;
@@ -113,59 +101,11 @@ export default class Signup implements OnInit, OnDestroy {
     this.strengthClass = result.class;
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     const pwControl = this.signupForm.get('password');
     if (pwControl) {
       pwControl.valueChanges.subscribe((v: string) => this.onPasswordChange(v || ''));
     }
-
-    // Determinar si usar widget de reCAPTCHA o fallback propio
-    this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
-
-    if (!this.useCustomCaptcha) {
-      this.initRecaptchaWithRetry();
-    }
-  }
-
-  /**
-   * Intenta renderizar reCAPTCHA esperando a que el elemento esté en el DOM.
-   * Esto es necesario porque el formulario está dentro de un bloque @defer.
-   */
-  private async initRecaptchaWithRetry(attempts = 0) {
-    const elementId = 'recaptcha-signup';
-    const element = document.getElementById(elementId);
-
-    if (element) {
-      try {
-        await this.recaptchaService.render(elementId, (token: string) => {
-          // Usamos ngZone.run para que Angular detecte el cambio inmediatamente
-          // y el botón se habilite sin tener que hacer click fuera.
-          this.ngZone.run(() => {
-            this.recaptchaToken = token;
-            this.cdr.detectChanges(); // Forzamos la detección de cambios inmediata
-          });
-        });
-      } catch (err) {
-        console.error('Error renderizando reCAPTCHA:', err);
-        this.ngZone.run(() => {
-          this.useCustomCaptcha = true;
-          this.cdr.markForCheck();
-        });
-      }
-    } else if (attempts < 20) {
-      // Reintentar cada 200ms por un máximo de 4 segundos
-      setTimeout(() => this.initRecaptchaWithRetry(attempts + 1), 200);
-    } else {
-      console.warn('No se encontró el elemento reCAPTCHA tras varios intentos, usando fallback.');
-      this.ngZone.run(() => {
-        this.useCustomCaptcha = true;
-        this.cdr.markForCheck();
-      });
-    }
-  }
-
-  ngOnDestroy() {
-    this.recaptchaService.reset();
   }
 
   protected async submitForm(): Promise<void> {
@@ -181,8 +121,7 @@ export default class Signup implements OnInit, OnDestroy {
       }
     }
 
-    // Verificar que el usuario haya completado el CAPTCHA
-    const token = this.useCustomCaptcha ? this.customCaptchaToken : this.recaptchaToken;
+    const token = this.captchaToken();
     if (!token) {
       this.toastService.showWarning("Verificación requerida", "Por favor, verifica que no eres un robot.");
       return;
@@ -199,12 +138,6 @@ export default class Signup implements OnInit, OnDestroy {
         await this.router.navigate(['/verify-email'], { queryParams: { phone: phoneNumber } });
       }
     } catch (e) {
-      // Resetear reCAPTCHA después del intento
-      if (!this.useCustomCaptcha) {
-        this.recaptchaService.reset();
-        this.recaptchaToken = null;
-        await this.ngOnInit();
-      }
     }
   }
 
@@ -266,7 +199,6 @@ export default class Signup implements OnInit, OnDestroy {
     }
   }
 
-  // Password tips for memorable passwords
   protected passwordTips = [
     {
       title: "Usa una canción favorita",
@@ -353,17 +285,5 @@ export default class Signup implements OnInit, OnDestroy {
       return "Las contraseñas no coinciden";
     }
     return null;
-  }
-
-  protected recaptchaError(): boolean {
-    return this.signupForm.touched && !this.recaptchaToken && !this.customCaptchaToken;
-  }
-
-  onCustomCaptchaChange(verified: boolean): void {
-    // Handled by token change
-  }
-
-  onCustomTokenChange(token: string): void {
-    this.customCaptchaToken = token;
   }
 }

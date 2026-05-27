@@ -65,9 +65,7 @@ export class CrearTipoTarea {
         const item = this.editingItem();
 
         if (!item) {
-          setTimeout(() => {
-            this.onboarding.startTourIfFirstVisit("admin-tareas-tipo-crear");
-          }, 220);
+
         }
 
         if (item) {

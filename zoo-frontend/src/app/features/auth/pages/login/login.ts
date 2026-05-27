@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, NgZone, ChangeDetectorRef } from "@angular/core";
+import { Component, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -14,14 +14,12 @@ import { CardModule } from "primeng/card";
 import { RouterLink } from "@angular/router";
 import { NgOptimizedImage } from "@angular/common";
 import { LogoImage } from "@app/shared/components";
-import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-captcha";
-import { environment } from "@env";
-import { RecaptchaService } from "@app/core/services/recaptcha.service";
+import { ZooCaptcha } from "@app/shared/components/zoo-captcha/zoo-captcha";
 
 @Component({
   selector: "app-login",
   standalone: true,
-   imports: [
+  imports: [
     ReactiveFormsModule,
     RouterLink,
     Loader,
@@ -30,18 +28,15 @@ import { RecaptchaService } from "@app/core/services/recaptcha.service";
     CardModule,
     NgOptimizedImage,
     LogoImage,
-    CustomCaptcha,
+    ZooCaptcha,
   ],
   templateUrl: "./login.html",
   styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Login implements OnInit, OnDestroy {
+export default class Login {
   protected readonly authStore = inject(AuthStore);
   private readonly fb = inject(FormBuilder);
-  private readonly recaptchaService = inject(RecaptchaService);
-  private readonly ngZone = inject(NgZone);
-  private readonly cdr = inject(ChangeDetectorRef);
 
   loginForm: FormGroup = this.fb.group({
     email: ["", [Validators.required]],
@@ -50,70 +45,11 @@ export default class Login implements OnInit, OnDestroy {
 
   loading = this.authStore.loading;
   error = this.authStore.error;
-  recaptchaToken: string | null = null;
-  useCustomCaptcha = false;
-  customCaptchaToken: string | null = null;
-
-  async ngOnInit() {
-    this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
-
-    if (!this.useCustomCaptcha) {
-      this.initRecaptchaWithRetry();
-    }
-  }
-
-  /**
-   * Intenta renderizar reCAPTCHA esperando a que el elemento esté en el DOM.
-   * Esto es necesario porque el formulario está dentro de un bloque @defer.
-   */
-  private async initRecaptchaWithRetry(attempts = 0) {
-    const elementId = 'recaptcha-login';
-    const element = document.getElementById(elementId);
-
-    if (element) {
-      try {
-        await this.recaptchaService.render(elementId, (token: string) => {
-          // Usamos ngZone.run para que Angular detecte el cambio inmediatamente
-          this.ngZone.run(() => {
-            this.recaptchaToken = token;
-            this.cdr.detectChanges(); // Forzamos la detección de cambios inmediata
-          });
-        });
-      } catch (err) {
-        console.error('Error rendering reCAPTCHA:', err);
-        this.ngZone.run(() => {
-          this.useCustomCaptcha = true;
-          this.cdr.markForCheck();
-        });
-      }
-    } else if (attempts < 20) {
-      // Reintentar cada 200ms por un máximo de 4 segundos
-      setTimeout(() => this.initRecaptchaWithRetry(attempts + 1), 200);
-    } else {
-      console.warn('No se encontró el elemento reCAPTCHA tras varios intentos, usando fallback.');
-      this.ngZone.run(() => {
-        this.useCustomCaptcha = true;
-        this.cdr.markForCheck();
-      });
-    }
-  }
-
-  ngOnDestroy() {
-    this.recaptchaService.reset();
-  }
-
-  onCustomCaptchaChange(verified: boolean): void {
-    // Handled by child component
-  }
-
-  onCustomTokenChange(token: string): void {
-    this.customCaptchaToken = token;
-  }
+  protected readonly captchaToken = signal<string | null>(null);
 
   async onSubmit() {
     if (this.loginForm.valid) {
-      const token = this.useCustomCaptcha ? this.customCaptchaToken : this.recaptchaToken;
-
+      const token = this.captchaToken();
       if (!token) {
         this.authStore.clearError();
         this.loginForm.markAllAsTouched();
@@ -122,12 +58,6 @@ export default class Login implements OnInit, OnDestroy {
 
       const { email, password } = this.loginForm.value;
       await this.authStore.login(email, password, token);
-
-      if (!this.useCustomCaptcha) {
-        this.recaptchaService.reset();
-        this.recaptchaToken = null;
-        await this.ngOnInit();
-      }
     } else {
       this.markFormGroupTouched();
     }
@@ -169,9 +99,5 @@ export default class Login implements OnInit, OnDestroy {
         return "La contraseña debe tener al menos 12 caracteres";
     }
     return null;
-  }
-
-  recaptchaError(): boolean {
-    return this.loginForm.touched && !this.recaptchaToken && !this.customCaptchaToken;
   }
 }

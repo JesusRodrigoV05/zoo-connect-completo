@@ -114,7 +114,6 @@ def create_default_admin():
                         hashed_password=get_password_hash(u_data["password"]),
                         is_active=True,
                         email_verified=True,
-                        phone_verified=True,
                         must_change_password=True,
                         role_id=role.id
                     ))
@@ -134,7 +133,6 @@ def create_default_admin():
                     hashed_password=get_password_hash("Osi_Secure_Change_2026!"),
                     is_active=True,
                     email_verified=True,
-                    phone_verified=True,
                     must_change_password=True,
                     role_id=osi_role.id,
                 ))

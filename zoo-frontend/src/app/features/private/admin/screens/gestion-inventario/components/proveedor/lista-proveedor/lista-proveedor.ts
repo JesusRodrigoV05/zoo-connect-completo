@@ -51,9 +51,7 @@ export default class ListaProveedor implements OnInit {
   ];
 
   ngOnInit() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-inventario-proveedor-lista");
-    });
+
 
     this.store.loadItems();
   }

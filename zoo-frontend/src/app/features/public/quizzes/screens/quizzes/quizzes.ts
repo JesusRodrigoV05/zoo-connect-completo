@@ -60,9 +60,7 @@ export default class Quizzes {
   isLoading = signal(false);
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("public-quizzes");
-    });
+
   }
 
   protected startGuidedTour(): void {

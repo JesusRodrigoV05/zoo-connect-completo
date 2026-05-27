@@ -40,9 +40,7 @@ export default class Planificador {
 
   ngOnInit() {
     this.store.loadItems();
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-tareas-planificador");
-    });
+
   }
 
   protected startGuidedTour(): void {

@@ -11,8 +11,6 @@ class Settings(BaseSettings):
         env_file=".env", case_sensitive=True, extra="ignore"
     )
 
-    # heredando de basesettings indicamos que no sea un basenormal y que lea automaticamente las varibles de entorno
-    # del .en
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str = "HS256"

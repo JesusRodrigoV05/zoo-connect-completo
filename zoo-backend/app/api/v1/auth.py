@@ -180,11 +180,22 @@ async def register(
     existing_user = existing_user_email or existing_user_username or existing_user_phone
 
     if existing_user:
-        logger.debug("Usuario ya existe: id=%s, verificado=%s", existing_user.id, existing_user.phone_verified)
-        if not existing_user.phone_verified:
-            # Si ya existe y no está verificado, lanzamos ACCOUNT_UNVERIFIED
-            # No importa si el conflicto es por email o username, si no está verificado
-            # le permitimos intentar verificar esa cuenta existente.
+        logger.debug(f"Usuario ya existe: email={existing_user.email}, username={existing_user.username}, verificado={existing_user.email_verified}")
+        if not existing_user.email_verified:
+            logger.info(f"Reenviando correo de verificación a {existing_user.email}")
+            try:
+                await email_service.send_verification_email(
+                    email_to=existing_user.email,
+                    code=existing_user.verification_code,
+                    username=existing_user.username
+                )
+                logger.info(f"Correo de verificación reenviado a {existing_user.email}")
+            except Exception as e:
+                logger.error(
+                    f"Error reenviando correo de verificación a {existing_user.email}: {str(e)}",
+                    exc_info=True
+                )
+
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={
@@ -242,28 +253,13 @@ async def register(
 @router.post("/verify-email", status_code=status.HTTP_200_OK)
 @router.post("/verify-phone", status_code=status.HTTP_200_OK)
 async def verify_email(
-    request: Request,
     body: EmailVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad fallida. Intenta nuevamente.",
-        )
-
-    user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
-    is_code_valid = bool(user) and crud_user.verify_sms_otp(
-        db, user, body.code, "verify_phone"
-    )
-    if not is_code_valid or not crud_user.mark_phone_verified(db, phone_number=body.phone_number):
+    logger.debug(f"Intentando verificar email: {body.email} con código: {body.code}")
+    success = crud_user.verify_user_email(db, email=body.email, code=body.code)
+    if not success:
+        logger.warning(f"Fallo de verificación de email para {body.email}: código incorrecto o usuario no encontrado")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Codigo SMS invalido o usuario no encontrado.",
@@ -274,26 +270,15 @@ async def verify_email(
 @router.post("/resend-verification", status_code=status.HTTP_200_OK)
 @router.post("/resend-phone-verification", status_code=status.HTTP_200_OK)
 async def resend_verification(
-    request: Request,
     body: ResendVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad fallida. Intenta nuevamente.",
-        )
-
-    user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
-    if not user or user.phone_verified:
-        return {"message": "Si la cuenta existe y no esta verificada, se ha enviado un nuevo codigo."}
+    logger.info(f"DEBUG: Solicitud de reenvío para {body.email}")
+    user = crud_user.resend_verification_code(db, email=body.email)
+    if not user:
+        logger.info(f"DEBUG: No se pudo reenviar código para {body.email} (no existe o ya verificado)")
+        # Por seguridad, no decimos si el email existe o no si ya está verificado
+        return {"message": "Si la cuenta existe y no está verificada, se ha enviado un nuevo código."}
 
     try:
         code = crud_user.create_sms_otp(db, user, "verify_phone")
@@ -462,26 +447,12 @@ async def login(
 # 2fA
 @router.post("/2fa/verify-login", response_model=Union[TokenResponse, MustChangePasswordResponse])
 async def verify_login_2fa(
-    request: Request,
     body: TOTPLoginRequest,
     response: Response,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
-        )
-
     # verficamos token y codigo 2fa
 
     credentials_exception = HTTPException(
@@ -675,59 +646,20 @@ def read_users_me(
 # endpoints reset password
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
 async def forgot_password(
-    request: Request,
     body: ForgotPasswordRequest,
     db: Session = Depends(get_db),
 ):
-
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad fallida. Intenta nuevamente.",
-        )
-
-    user = crud_user.get_user_by_identifier(db, identifier=body.identifier)
-    if user and user.phone_number:
-        code = crud_user.create_sms_otp(db, user, "reset_password")
-        await sms_service.send_otp(user.phone_number, code, "reset_password")
+    user = crud_user.get_user_by_email(db, email=body.email)
 
     return {"msg": "Si la cuenta existe, se envio un codigo SMS de recuperacion"}
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
 async def reset_password(
-    request: Request,
-    body: ResetPasswordRequest,
-    response: Response,
+    body: ResetPasswordRequest, 
     db: Session = Depends(get_db)
 ):
-    if settings.REQUIRE_RECAPTCHA and not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    if body.recaptcha_token:
-        client_ip = request.client.host if request.client else None
-        recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-        if not is_valid_recaptcha(recaptcha_result):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verificacion de seguridad fallida. Intenta nuevamente.",
-            )
-
-    user = crud_user.get_user_by_identifier(db, identifier=body.identifier)
-    if not user or not user.phone_number:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Usuario no encontrado",
-        )
+    user = crud_token.get_user_by_reset_token(db, token=body.token)
 
     if not crud_user.verify_sms_otp(db, user, body.code, "reset_password"):
         raise HTTPException(

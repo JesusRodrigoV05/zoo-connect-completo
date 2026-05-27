@@ -132,9 +132,7 @@ export default class Dashboard implements OnInit {
   };
 
   ngOnInit(): void {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-dashboard");
-    });
+
   }
 
   onFilterChange(event: "clase" | "familia" | "orden" | "filo") {

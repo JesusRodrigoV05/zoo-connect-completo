@@ -123,12 +123,7 @@ export default class CrearEncuesta implements OnInit {
       this.loadEncuestaData(this.encuestaId);
     }
 
-    if (!this.tourPrompted) {
-      this.tourPrompted = true;
-      afterNextRender(() => {
-        this.onboarding.startTourIfFirstVisit("admin-encuestas-crear");
-      });
-    }
+
   }
 
   private loadEncuestaData(id: string): void {

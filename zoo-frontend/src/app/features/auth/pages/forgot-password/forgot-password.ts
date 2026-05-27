@@ -3,10 +3,6 @@ import {
   Component,
   inject,
   signal,
-  OnInit,
-  OnDestroy,
-  NgZone,
-  ChangeDetectorRef,
 } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
@@ -21,8 +17,6 @@ import { MessageModule } from "primeng/message";
 import { NgTemplateOutlet } from "@angular/common";
 import { Loader } from "@app/shared/components/loader";
 import { LogoImage } from "@app/shared/components";
-import { CustomCaptcha } from "@app/shared/components/custom-captcha/custom-captcha";
-import { RecaptchaService } from "@app/core/services/recaptcha.service";
 
 @Component({
   selector: "app-forgot-password",
@@ -37,20 +31,16 @@ import { RecaptchaService } from "@app/core/services/recaptcha.service";
     RouterLink,
     Loader,
     LogoImage,
-    CustomCaptcha,
   ],
   templateUrl: "./forgot-password.html",
   styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class ForgotPassword implements OnInit, OnDestroy {
+export default class ForgotPassword {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly restorePasswordService = inject(RestorePassword);
   private readonly toastService = inject(ShowToast);
-  private readonly recaptchaService = inject(RecaptchaService);
-  private readonly ngZone = inject(NgZone);
-  private readonly cdr = inject(ChangeDetectorRef);
 
   protected readonly isSending = signal(false);
   protected readonly formSubmitted = signal(false);
@@ -58,45 +48,6 @@ export default class ForgotPassword implements OnInit, OnDestroy {
   protected readonly forgotForm = this.fb.group({
     identifier: ["", [Validators.required]],
   });
-
-  protected recaptchaToken: string | null = null;
-  protected useCustomCaptcha = false;
-  protected customCaptchaToken: string | null = null;
-
-  async ngOnInit() {
-    this.useCustomCaptcha = this.recaptchaService.shouldUseCustomFallback();
-    if (!this.useCustomCaptcha) {
-      await this.initRecaptcha();
-    }
-  }
-
-  private async initRecaptcha() {
-    try {
-      await this.recaptchaService.render('recaptcha-forgot', (token: string) => {
-        this.ngZone.run(() => {
-          this.recaptchaToken = token;
-          this.cdr.detectChanges();
-        });
-      });
-    } catch (err) {
-      console.error('Error rendering reCAPTCHA:', err);
-      this.ngZone.run(() => {
-        this.useCustomCaptcha = true;
-        this.cdr.markForCheck();
-      });
-    }
-  }
-
-  ngOnDestroy() {
-    this.recaptchaService.reset();
-  }
-
-  onCustomCaptchaChange(verified: boolean): void {
-  }
-
-  onCustomTokenChange(token: string): void {
-    this.customCaptchaToken = token;
-  }
 
   protected isInvalid(fieldName: string): boolean {
     const field = this.forgotForm.get(fieldName);
@@ -122,16 +73,10 @@ export default class ForgotPassword implements OnInit, OnDestroy {
     this.formSubmitted.set(true);
 
     if (this.forgotForm.valid) {
-      const token = this.useCustomCaptcha ? this.customCaptchaToken : this.recaptchaToken;
-      if (!token) {
-        this.toastService.showError("Error", "Por favor, completa la verificación de seguridad.");
-        return;
-      }
-
       this.isSending.set(true);
 
       this.restorePasswordService
-        .forgotPassword(this.forgotForm.value.identifier!, token)
+        .forgotPassword(this.forgotForm.value.email!)
         .pipe(finalize(() => this.isSending.set(false)))
         .subscribe({
           next: (response) => {
@@ -156,9 +101,5 @@ export default class ForgotPassword implements OnInit, OnDestroy {
         "Por favor, ingresa tu usuario o telefono",
       );
     }
-  }
-
-  protected recaptchaError(): boolean {
-    return this.formSubmitted() && !this.recaptchaToken && !this.customCaptchaToken;
   }
 }

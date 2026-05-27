@@ -8,12 +8,13 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { finalize } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ShowToast } from "@app/shared/services";
+import { MainContainer } from "@app/shared/components/main-container";
 import { AdminRolesService } from "../../../../services/admin-roles";
 
 @Component({
   selector: "app-crear-rol",
   standalone: true,
-  imports: [CommonModule, ButtonModule, InputTextModule, FormsModule],
+  imports: [CommonModule, ButtonModule, InputTextModule, FormsModule, MainContainer],
   templateUrl: "./crear-rol.html",
   styleUrl: "./crear-rol.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,

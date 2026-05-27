@@ -36,9 +36,7 @@ export default class Animales {
 
   constructor() {
     this.loadAnimals();
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("public-animales");
-    });
+
   }
 
   protected startGuidedTour(): void {

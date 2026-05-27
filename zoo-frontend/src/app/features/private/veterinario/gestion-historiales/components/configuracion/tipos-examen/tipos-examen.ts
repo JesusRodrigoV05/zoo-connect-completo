@@ -55,11 +55,7 @@ export default class TiposExamen {
   });
 
   constructor() {
-    afterNextRender(() => {
-      if (this.tourPrompted) return;
-      this.tourPrompted = true;
-      this.onboarding.startTourIfFirstVisit("vet-tipos-examen-lista");
-    });
+
   }
 
   startGuidedTour() {

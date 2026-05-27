@@ -56,9 +56,7 @@ export default class ListaProducto implements OnInit {
   ];
 
   ngOnInit() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-inventario-producto-lista");
-    });
+
 
     this.store.setPage(1, 100);
 

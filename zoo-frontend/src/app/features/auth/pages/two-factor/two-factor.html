@@ -43,23 +43,11 @@
               </p>
             </div>
 
-            @if (useCustomCaptcha) {
-              <app-custom-captcha
-                (verifiedChange)="onCustomCaptchaChange($event)"
-                (tokenChange)="onCustomTokenChange($event)"
-              ></app-custom-captcha>
-            } @else {
-              <div id="recaptcha-2fa" class="recaptcha-container"></div>
-            }
-            @if (recaptchaError()) {
-              <small class="p-error recaptcha-error">Por favor, verifica que no eres un robot.</small>
-            }
-
             <div class="auth-button-container">
               <p-button
                 type="submit"
                 [rounded]="true"
-                [disabled]="verifyForm.invalid || isVerifying() || (!recaptchaToken && !customCaptchaToken)"
+                [disabled]="verifyForm.invalid || isVerifying()"
                 styleClass="auth-button"
                 fluid
               >

@@ -96,9 +96,7 @@ export default class CrearEspecie implements OnInit {
   });
 
   ngOnInit(): void {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-especies-crear");
-    });
+
 
     const idParam = this.route.snapshot.paramMap.get("id");
     if (idParam) {

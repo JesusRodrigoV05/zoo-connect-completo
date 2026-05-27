@@ -98,18 +98,7 @@
               </p-floatlabel>
             </div>
 
-            <!-- Widget visible de reCAPTCHA v2 o fallback propio -->
-            @if (useCustomCaptcha) {
-              <app-custom-captcha
-                (verifiedChange)="onCustomCaptchaChange($event)"
-                (tokenChange)="onCustomTokenChange($event)"
-              ></app-custom-captcha>
-            } @else {
-              <div id="recaptcha-signup" class="recaptcha-container"></div>
-            }
-            @if (recaptchaError()) {
-            <small class="p-error recaptcha-error">Por favor, verifica que no eres un robot.</small>
-            }
+            <zoo-captcha (tokenChange)="captchaToken.set($event)" />
 
             @if (!generatePassword) {
             <div class="field suggestion-action">
@@ -208,7 +197,7 @@
                 type="submit"
                 severity="primary"
                 [rounded]="true"
-                [disabled]="isLoading() || (!generatePassword && !isPasswordStrong()) || (!recaptchaToken && !customCaptchaToken)"
+                [disabled]="isLoading() || (!generatePassword && !isPasswordStrong()) || !captchaToken()"
                 styleClass="login-button w-full"
                 fluid
               >

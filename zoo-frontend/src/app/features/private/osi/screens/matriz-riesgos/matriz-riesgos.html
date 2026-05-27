@@ -60,6 +60,12 @@
         <p>Cargando matriz de riesgos...</p>
       </div>
     } @else {
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+      <span class="legend-item bajo">Bajo: {{ riskSummary()["Bajo"] }}</span>
+      <span class="legend-item moderado">Moderado: {{ riskSummary()["Moderado"] }}</span>
+      <span class="legend-item alto">Alto: {{ riskSummary()["Alto"] }}</span>
+      <span class="legend-item extremo">Extremo: {{ riskSummary()["Extremo"] }}</span>
+    </div>
     <div class="table-shell">
       <table class="risk-table">
         <thead>
@@ -190,7 +196,7 @@
                   [text]="true"
                   pTooltip="Eliminar fila"
                   tooltipPosition="top"
-                  (click)="removeRow(row.id)"
+                  (click)="confirmRemoveRow(row.id)"
                 ></button>
               </td>
             </tr>
@@ -200,4 +206,6 @@
     </div>
     }
   </section>
+
+  <p-confirmDialog />
 </zoo-main-container>
