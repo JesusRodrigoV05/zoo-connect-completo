@@ -180,19 +180,16 @@ async def register(
     existing_user = existing_user_email or existing_user_username or existing_user_phone
 
     if existing_user:
-        logger.debug(f"Usuario ya existe: email={existing_user.email}, username={existing_user.username}, verificado={existing_user.email_verified}")
-        if not existing_user.email_verified:
-            logger.info(f"Reenviando correo de verificación a {existing_user.email}")
+        logger.debug(f"Usuario ya existe: email={existing_user.email}, username={existing_user.username}, verificado={existing_user.phone_verified}")
+        if not existing_user.phone_verified:
+            logger.info(f"Reenviando SMS de verificación a {existing_user.phone_number}")
             try:
-                await email_service.send_verification_email(
-                    email_to=existing_user.email,
-                    code=existing_user.verification_code,
-                    username=existing_user.username
-                )
-                logger.info(f"Correo de verificación reenviado a {existing_user.email}")
+                code = crud_user.create_sms_otp(db, existing_user, "verify_phone")
+                await sms_service.send_otp(existing_user.phone_number, code, "verify_phone")
+                logger.info(f"SMS de verificación reenviado a {existing_user.phone_number}")
             except Exception as e:
                 logger.error(
-                    f"Error reenviando correo de verificación a {existing_user.email}: {str(e)}",
+                    f"Error reenviando SMS de verificación a {existing_user.phone_number}: {str(e)}",
                     exc_info=True
                 )
 
