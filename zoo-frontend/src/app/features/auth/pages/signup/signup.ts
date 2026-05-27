@@ -71,8 +71,14 @@ export default class Signup implements OnInit, OnDestroy {
 
   protected readonly signupForm: FormGroup = this.fb.group(
     {
-      email: ["", [Validators.required, Validators.email]],
-      username: ["", [Validators.required, Validators.minLength(3)]],
+      email: ["", [Validators.email]],
+      username: [
+        "",
+        [
+          Validators.required,
+          Validators.pattern("^[a-zA-Z0-9]+\\.(admin|cuidador|vet|visitante|osi)\\.[a-zA-Z0-9]+$"),
+        ],
+      ],
       phoneNumber: ["", [Validators.required, Validators.pattern("^\\+[1-9]\\d{7,14}$")]],
       password: ["", [Validators.minLength(12)]],
       confirmPassword: ["", [Validators.required]],
@@ -318,8 +324,8 @@ export default class Signup implements OnInit, OnDestroy {
     const control = this.username;
     if (control?.errors && control?.touched) {
       if (control.errors["required"]) return "El usuario es requerido";
-      if (control.errors["minlength"])
-        return "El usuario debe tener al menos 3 caracteres";
+      if (control.errors["pattern"])
+        return "El formato debe ser nombre.rol.apellido (ej. juan.visitante.perez)";
     }
     return null;
   }
