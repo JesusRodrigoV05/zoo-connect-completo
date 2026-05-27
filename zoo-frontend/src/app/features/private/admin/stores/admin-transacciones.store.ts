@@ -86,7 +86,8 @@ export const TransaccionesStore = signalStore(
                   }));
                 },
                 error: (err: any) => {
-                  toast.showError("Error", "No se pudo registrar la entrada");
+                  const errorMsg = err.error?.detail || err.message || "No se pudo registrar la entrada";
+                  toast.showError("Error", errorMsg);
                   patchState(store, { isSaving: false, error: err.message });
                 },
               }),
@@ -126,13 +127,15 @@ export const TransaccionesStore = signalStore(
                     "Registrado",
                     "Salida de inventario confirmada",
                   );
+                  router.navigate(["/admin/inventario/transacciones/"]);
                   patchState(store, (state) => ({
                     salidas: [nueva, ...state.salidas],
                     isSaving: false,
                   }));
                 },
                 error: (err: any) => {
-                  toast.showError("Error", "No se pudo registrar la salida");
+                  const errorMsg = err.error?.detail || err.message || "No se pudo registrar la salida";
+                  toast.showError("Error", errorMsg);
                   patchState(store, { isSaving: false, error: err.message });
                 },
               }),
