@@ -6,7 +6,7 @@ from app.models.role import Role
 from app.models.user import User
 from app.core.security import get_password_hash
 from app.crud.permission import ensure_permissions_catalog, ensure_role_permissions
-
+from sqlalchemy import or_
 from app.core.config import settings
 
 def create_default_admin():
@@ -96,7 +96,12 @@ def create_default_admin():
         ]
 
         for u_data in usuarios_seed:
-            user_exists = db.query(User).filter(User.id == u_data["username"]).first()
+            user_exists = db.query(User).filter(
+                or_(
+                    User.id == u_data["username"],
+                    User.email == u_data["email"]
+                )
+            ).first()
             if not user_exists:
                 role = db.query(Role).filter(Role.name == u_data["role"]).first()
                 if role:
