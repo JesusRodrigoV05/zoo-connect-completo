@@ -38,6 +38,9 @@ def list_roles(
     size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
+    admins = db.query(User).filter(User.role_id == 1).all()
+    logger.warning("DEBUG ADMINS COUNT: %d, USERS: %s", len(admins), [u.id for u in admins])
+
     query = db.query(Role).order_by(Role.id)
 
     if search:
