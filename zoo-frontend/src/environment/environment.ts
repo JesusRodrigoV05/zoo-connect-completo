@@ -6,5 +6,5 @@ export const environment = {
   apiUrl:"https://zoo-connect-completo.onrender.com/zooconnect",
   //apiUrl: "https://zoo-connect-backend2.onrender.com/zooc
   // ReCAPTCHA v2 Site Key (visible widget) - Obtener en https://www.google.com/recaptcha/admin
-  recaptchaSiteKey: "6LemotEsAAAAAAPdcpfXaAdb2PfK93wKdGZownBh",
+  recaptchaSiteKey: "6Ld6h_4sAAAAALfm8CYVAY_QkGJ-e44FB-PXGs-3",
 };
