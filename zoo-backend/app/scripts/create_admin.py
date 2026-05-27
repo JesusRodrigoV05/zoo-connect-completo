@@ -48,10 +48,16 @@ def create_default_admin():
         ensure_role_permissions(db)
 
         # Eliminar usuarios admin obsoletos a solicitud del usuario
+        from sqlalchemy import text
         for obsolete_username in ["admin.admin.primary", "soporte.admin.tecnico"]:
             obsolete_user = db.query(User).filter(User.id == obsolete_username).first()
             if obsolete_user:
-                print(f"   - Eliminando usuario obsoleto: {obsolete_username}")
+                print(f"   - Eliminando registros relacionados de: {obsolete_username}")
+                db.execute(text("DELETE FROM refresh_tokens WHERE user_id = :uid"), {"uid": obsolete_username})
+                db.execute(text("DELETE FROM password_history WHERE user_id = :uid"), {"uid": obsolete_username})
+                db.execute(text("DELETE FROM password_reset_tokens WHERE user_id = :uid"), {"uid": obsolete_username})
+                db.execute(text("DELETE FROM user_permissions WHERE user_id = :uid"), {"uid": obsolete_username})
+                db.execute(text("DELETE FROM onboarding_tour_progress WHERE user_id = :uid"), {"uid": obsolete_username})
                 db.delete(obsolete_user)
         db.commit()
 
