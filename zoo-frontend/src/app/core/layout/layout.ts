@@ -11,6 +11,7 @@ import { RouterOutlet } from '@angular/router';
 import { AuthStore } from '@stores/auth.store';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 import {
   NavigationItem,
   SidebarMenu,
@@ -23,6 +24,7 @@ import {
     Footer,
     RouterOutlet,
     ButtonModule,
+    TooltipModule,
     DrawerModule,
     SidebarMenu,
   ],
@@ -33,6 +35,14 @@ import {
 export default class Layout {
   protected authStore = inject(AuthStore);
   protected drawerVisible = signal(false);
+
+  protected readonly navTooltip = computed(() => {
+    if (this.authStore.isAdmin()) return 'Abrir panel de administración';
+    if (this.authStore.isVeterinario()) return 'Abrir panel médico';
+    if (this.authStore.isCuidador()) return 'Abrir panel cuidador';
+    if (this.authStore.isOsi()) return 'Abrir panel OSI';
+    return 'Abrir menú';
+  });
 
   puedo = computed<boolean>(() => !this.authStore.isVisitante());
 
@@ -237,7 +247,7 @@ export default class Layout {
         route: '/admin/audit/aplicacion',
       },
       this.hasPermission('audit_security_logs') && {
-        text: 'Log de Seguridad OSI',
+        text: 'Log de Seguridad',
         icon: 'pi pi-shield',
         route: '/admin/audit/seguridad',
       },
@@ -252,19 +262,33 @@ export default class Layout {
       });
     }
 
-    if (this.hasPermission('caregiver_my_tasks')) {
-      items.push({
-        text: 'Mis tareas',
-        icon: 'pi pi-check-square',
-        route: '/cuidador/mis-tareas',
-      });
-    }
+    const hasCaregiverTasks = this.hasPermission('caregiver_my_tasks');
+    const hasMedicalTasks = this.hasPermission('medical_my_tasks');
 
-    if (this.hasPermission('medical_my_tasks')) {
+    if (hasCaregiverTasks || hasMedicalTasks) {
+      const misTareasChildren: NavigationItem[] = [];
+
+      if (hasCaregiverTasks) {
+        misTareasChildren.push({
+          text: 'Cuidador',
+          icon: 'pi pi-user',
+          route: '/cuidador/mis-tareas',
+        });
+      }
+
+      if (hasMedicalTasks) {
+        misTareasChildren.push({
+          text: 'Veterinario',
+          icon: 'pi pi-user-md',
+          route: '/vet/mis-tareas',
+        });
+      }
+
       items.push({
         text: 'Mis Tareas',
         icon: 'pi pi-check-square',
-        route: '/vet/mis-tareas',
+        route: this.firstAllowedRoute(misTareasChildren, '/cuidador/mis-tareas'),
+        children: misTareasChildren,
       });
     }
 

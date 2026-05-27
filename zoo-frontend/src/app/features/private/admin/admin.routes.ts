@@ -188,7 +188,7 @@ export default [
   },
   {
     path: "audit/seguridad",
-    title: "Log de Seguridad OSI",
+    title: "Log de Seguridad",
     data: { requiredPermissions: ["audit_security_logs"], logType: "security" },
     loadComponent: () => import("./screens/auditoria/auditoria"),
   },

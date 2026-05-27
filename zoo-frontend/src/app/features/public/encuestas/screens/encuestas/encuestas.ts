@@ -31,9 +31,7 @@ export default class Encuestas {
   protected surveys$ = this.surveyService.getSurveys();
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("public-encuestas");
-    });
+
   }
 
   protected startGuidedTour(): void {

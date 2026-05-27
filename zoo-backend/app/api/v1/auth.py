@@ -222,23 +222,9 @@ async def register(
 
 @router.post("/verify-email", status_code=status.HTTP_200_OK)
 async def verify_email(
-    request: Request,
     body: EmailVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
-        )
-
     logger.debug(f"Intentando verificar email: {body.email} con código: {body.code}")
     success = crud_user.verify_user_email(db, email=body.email, code=body.code)
     if not success:
@@ -253,23 +239,9 @@ async def verify_email(
 
 @router.post("/resend-verification", status_code=status.HTTP_200_OK)
 async def resend_verification(
-    request: Request,
     body: ResendVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
-        )
-
     logger.info(f"DEBUG: Solicitud de reenvío para {body.email}")
     user = crud_user.resend_verification_code(db, email=body.email)
     if not user:
@@ -440,26 +412,12 @@ async def login(
 # 2fA
 @router.post("/2fa/verify-login", response_model=Union[TokenResponse, MustChangePasswordResponse])
 async def verify_login_2fa(
-    request: Request,
     body: TOTPLoginRequest,
     response: Response,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     cache: Redis = Depends(get_cache_client),
 ):
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
-        )
-
     # verficamos token y codigo 2fa
 
     credentials_exception = HTTPException(
@@ -651,25 +609,10 @@ def read_users_me(
 # endpoints reset password
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
 async def forgot_password(
-    request: Request,
     body: ForgotPasswordRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-
-    if not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    client_ip = request.client.host if request.client else None
-    recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-    if not is_valid_recaptcha(recaptcha_result):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificación de seguridad fallida. Intenta nuevamente.",
-        )
-
     user = crud_user.get_user_by_email(db, email=body.email)
 
     if user:
@@ -687,25 +630,9 @@ async def forgot_password(
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
 async def reset_password(
-    request: Request,
     body: ResetPasswordRequest, 
     db: Session = Depends(get_db)
 ):
-    # 0. Verificar reCAPTCHA v2 server-side si esta requerido por entorno.
-    if settings.REQUIRE_RECAPTCHA and not body.recaptcha_token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Verificacion de seguridad requerida.",
-        )
-    if body.recaptcha_token:
-        client_ip = request.client.host if request.client else None
-        recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-        if not is_valid_recaptcha(recaptcha_result):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verificación de seguridad fallida. Intenta nuevamente.",
-            )
-
     user = crud_token.get_user_by_reset_token(db, token=body.token)
 
     if not user:

@@ -83,14 +83,7 @@ export default class CrearHistorial implements OnInit {
       this.configStore.loadCatalogs();
     }
 
-    if (!this.tourPrompted) {
-      this.tourPrompted = true;
-      afterNextRender(() => {
-        setTimeout(() => {
-          this.onboarding.startTourIfFirstVisit("vet-historiales-crear");
-        }, 500);
-      });
-    }
+
   }
 
   cargarAnimales() {

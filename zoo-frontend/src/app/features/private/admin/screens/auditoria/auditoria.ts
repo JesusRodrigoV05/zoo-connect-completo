@@ -73,7 +73,7 @@ export default class Auditoria {
   );
 
   protected readonly title = computed(() =>
-    this.logType() === "security" ? "Log de Seguridad OSI" : "Log de Aplicación",
+    this.logType() === "security" ? "Log de Seguridad" : "Log de Aplicación",
   );
   
   protected readonly subtitle = computed(() =>
@@ -133,12 +133,7 @@ export default class Auditoria {
   });
 
   constructor() {
-    if (!this.tourPrompted) {
-      this.tourPrompted = true;
-      afterNextRender(() => {
-        this.onboarding.startTourIfFirstVisit('admin-auditoria-lista');
-      });
-    }
+
   }
 
   protected auditorias = computed(() => this.auditoriaResponse().items);

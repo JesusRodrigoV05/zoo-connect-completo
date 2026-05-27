@@ -51,9 +51,7 @@ export default class ListaTipos implements OnInit {
   layout: "list" | "grid" = "list";
 
   ngOnInit() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-inventario-tipo-lista");
-    });
+
 
     this.store.loadItems();
   }

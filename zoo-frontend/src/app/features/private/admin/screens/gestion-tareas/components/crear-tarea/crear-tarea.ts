@@ -100,9 +100,7 @@ export class CrearTarea {
         untracked(() => {
           this.loadCatalogos();
           this.loadAllUsers();
-          setTimeout(() => {
-            this.onboarding.startTourIfFirstVisit("admin-tareas-crear-manual");
-          }, 220);
+
           this.form.reset({
             fechaProgramada: new Date(),
             lugarSeleccionado: this.lugares()[0],

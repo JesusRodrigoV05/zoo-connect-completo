@@ -125,11 +125,7 @@ export default class CrearDieta implements OnInit {
       this.loadDietaData(+id);
     } else {
       this.addDetalle();
-      afterNextRender(() => {
-        if (this.tourPrompted) return;
-        this.tourPrompted = true;
-        this.onboarding.startTourIfFirstVisit("vet-dietas-crear");
-      });
+
     }
   }
 

@@ -36,19 +36,7 @@
               [showPasswordToggle]="true"
             />
 
-            <!-- Widget de reCAPTCHA v2 (visible) o fallback propio -->
-            @if (useCustomCaptcha) {
-              <app-custom-captcha
-                (verifiedChange)="onCustomCaptchaChange($event)"
-                (tokenChange)="onCustomTokenChange($event)"
-              ></app-custom-captcha>
-            } @else {
-              <div id="recaptcha-login" class="recaptcha-container"></div>
-            }
-
-            @if (recaptchaError()) {
-              <small class="p-error recaptcha-error">Por favor, verifica que no eres un robot.</small>
-            }
+            <zoo-captcha (tokenChange)="captchaToken.set($event)" />
 
             <div class="auth-link-container right-aligned">
               <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a>
@@ -60,7 +48,7 @@
                 label="Iniciar Sesión"
                 severity="primary"
                 [rounded]="true"
-                [disabled]="loading() || (!recaptchaToken && !customCaptchaToken)"
+                [disabled]="loading() || !captchaToken()"
                 styleClass="auth-button"
                 fluid
               >

@@ -49,9 +49,7 @@ export default class Historial implements OnInit {
   protected activeTab = signal<"entradas" | "salidas">("entradas");
 
   ngOnInit() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-inventario-historial");
-    });
+
 
     this.loadData();
   }

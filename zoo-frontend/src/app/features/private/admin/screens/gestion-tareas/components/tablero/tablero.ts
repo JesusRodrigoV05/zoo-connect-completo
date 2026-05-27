@@ -41,9 +41,7 @@ export default class Tablero {
   isCreateModalOpen = signal(false);
 
   constructor() {
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit("admin-tareas-operaciones");
-    });
+
   }
 
   ngOnInit() {

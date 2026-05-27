@@ -55,14 +55,7 @@ export default class ListaHistoriales {
   ];
 
   ngOnInit(): void {
-    if (!this.tourPrompted) {
-      this.tourPrompted = true;
-      afterNextRender(() => {
-        setTimeout(() => {
-          this.onboarding.startTourIfFirstVisit("vet-historiales-lista");
-        }, 500);
-      });
-    }
+
   }
 
   goToDetail(id: number) {

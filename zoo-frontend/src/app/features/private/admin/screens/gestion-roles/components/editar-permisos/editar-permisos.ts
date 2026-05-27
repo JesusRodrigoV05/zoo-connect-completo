@@ -8,13 +8,14 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { finalize } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ShowToast } from "@app/shared/services";
+import { MainContainer } from "@app/shared/components/main-container";
 import { AdminRolesService, RoleDetail, RolePermissionState, RolePermissionToggle } from "../../../../services/admin-roles";
 import { PermissionCatalogItem } from "../../../../services/permissions";
 
 @Component({
   selector: "app-editar-permisos",
   standalone: true,
-  imports: [CommonModule, ButtonModule, CheckboxModule, FormsModule],
+  imports: [CommonModule, ButtonModule, CheckboxModule, FormsModule, MainContainer],
   templateUrl: "./editar-permisos.html",
   styleUrl: "./editar-permisos.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,

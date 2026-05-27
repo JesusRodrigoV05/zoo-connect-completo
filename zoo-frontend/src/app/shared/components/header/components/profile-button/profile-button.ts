@@ -56,38 +56,6 @@ export class ProfileButton {
           },
         },
         {
-          label: 'Panel de Administración',
-          icon: 'pi pi-shield',
-          command: () => {
-            this.router.navigate(['/admin']);
-          },
-          visible: this.isAdmin(),
-        },
-        {
-          label: 'Panel Veterinario',
-          icon: 'pi pi-shield',
-          command: () => {
-            this.router.navigate(['/vet']);
-          },
-          visible: this.isVet(),
-        },
-        {
-          label: 'Panel Cuidador',
-          icon: 'pi pi-shield',
-          command: () => {
-            this.router.navigate(['/cuidador']);
-          },
-          visible: this.isCuidador(),
-        },
-        {
-          label: 'Panel de OSI',
-          icon: 'pi pi-shield',
-          command: () => {
-            this.router.navigate(['/osi']);
-          },
-          visible: this.isOsi(),
-        },
-        {
           separator: true,
         },
         {

@@ -90,9 +90,7 @@ export default class CrearUsuario implements OnInit {
       this.buttonText = "Crear";
     }
 
-    afterNextRender(() => {
-      this.onboarding.startTourIfFirstVisit(this.tourKey);
-    });
+
   }
 
   protected startGuidedTour(): void {

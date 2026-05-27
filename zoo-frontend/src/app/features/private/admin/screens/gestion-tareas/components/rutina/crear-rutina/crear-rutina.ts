@@ -157,9 +157,7 @@ export default class CrearRutina {
       this.loadItemData(+idParam);
     } else {
       this.initializeDefaultForm();
-      afterNextRender(() => {
-        this.onboarding.startTourIfFirstVisit("admin-tareas-rutina-crear");
-      });
+
     }
   }
 

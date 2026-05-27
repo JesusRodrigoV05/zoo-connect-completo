@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { ButtonModule } from "primeng/button";
 import { TooltipModule } from "primeng/tooltip";
+import { ConfirmDialog } from "primeng/confirmdialog";
+import { ConfirmationService } from "primeng/api";
 import { MainContainer } from "@app/shared/components/main-container";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { finalize } from "rxjs";
@@ -34,7 +36,6 @@ interface RiskRow {
   frequency: string;
   residualProbability: number;
   residualImpact: number;
-  residualRisk: number;
 }
 
 const CONTROL_TYPES: RiskOption[] = [
@@ -75,7 +76,7 @@ const TREATMENTS_BY_LEVEL: Record<RiskLevel, string[]> = {
 @Component({
   selector: "app-matriz-riesgos",
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, MainContainer],
+  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, ConfirmDialog, MainContainer],
   templateUrl: "./matriz-riesgos.html",
   styleUrl: "./matriz-riesgos.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -83,6 +84,7 @@ const TREATMENTS_BY_LEVEL: Record<RiskLevel, string[]> = {
 export default class MatrizRiesgos {
   private readonly service = inject(RiskMatrixService);
   private readonly toast = inject(ShowToast);
+  private readonly confirmService = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly controlTypes = CONTROL_TYPES;
@@ -92,6 +94,15 @@ export default class MatrizRiesgos {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly rows = signal<RiskRow[]>(this.defaultRows());
+
+  protected readonly riskSummary = computed(() => {
+    const counts: Record<string, number> = { Bajo: 0, Moderado: 0, Alto: 0, Extremo: 0 };
+    for (const row of this.rows()) {
+      const level = this.riskLevel(this.inherentRisk(row));
+      if (level in counts) counts[level]++;
+    }
+    return counts;
+  });
 
   constructor() {
     this.loadRows();
@@ -117,6 +128,12 @@ export default class MatrizRiesgos {
   }
 
   protected saveRows(): void {
+    const invalid = this.rows().some((row) => !row.asset.trim() || !row.threat.trim());
+    if (invalid) {
+      this.toast.showWarning("Validación", "Completá activo y amenaza en todas las filas antes de guardar");
+      return;
+    }
+
     this.saving.set(true);
     this.service
       .replaceAll(this.rows().map((row) => this.toPayload(row)))
@@ -151,7 +168,6 @@ export default class MatrizRiesgos {
       frequency: "PT",
       residualProbability: 1,
       residualImpact: 2,
-      residualRisk: 2,
     },
     {
       id: 2,
@@ -167,7 +183,6 @@ export default class MatrizRiesgos {
       frequency: "D",
       residualProbability: 2,
       residualImpact: 2,
-      residualRisk: 4,
     },
   ];
   }
@@ -226,20 +241,25 @@ export default class MatrizRiesgos {
         frequency: "M",
         residualProbability: 1,
         residualImpact: 1,
-        residualRisk: 1,
       },
     ]);
   }
 
-  protected removeRow(rowId: number): void {
-    this.rows.update((rows) => rows.filter((row) => row.id !== rowId));
+  protected confirmRemoveRow(rowId: number): void {
+    this.confirmService.confirm({
+      message: "¿Estás seguro de eliminar esta fila de la matriz de riesgos?",
+      header: "Confirmar eliminación",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => this.rows.update((rows) => rows.filter((r) => r.id !== rowId)),
+    });
   }
 
   protected syncTreatment(row: RiskRow): void {
-    const treatments = this.treatmentsFor(row);
-    if (!treatments.includes(row.treatment)) {
-      row.treatment = treatments[0] ?? "";
-    }
+    this.rows.update((rows) => {
+      const treatments = TREATMENTS_BY_LEVEL[this.riskLevel(this.normalizedScore(row.probability, row.impact))];
+      const treatment = treatments.includes(row.treatment) ? row.treatment : (treatments[0] ?? "");
+      return rows.map((r) => (r.id === row.id ? { ...r, treatment } : r));
+    });
   }
 
   private normalizedScore(probability: number, impact: number): number {
@@ -261,7 +281,6 @@ export default class MatrizRiesgos {
       frequency: entry.frequency,
       residualProbability: entry.residual_probability,
       residualImpact: entry.residual_impact,
-      residualRisk: entry.residual_probability * entry.residual_impact,
     };
   }
 
