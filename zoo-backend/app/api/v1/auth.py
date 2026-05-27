@@ -210,7 +210,8 @@ async def register(
     # 2. Enviar SMS de verificacion.
     try:
         logger.debug("Intentando enviar SMS de verificacion a %s", user.phone_number)
-        await sms_service.start_phone_verification(user.phone_number)
+        code = crud_user.create_sms_otp(db, user, "verify_phone")
+        await sms_service.send_otp(user.phone_number, code, "verify_phone")
         logger.info("SMS de verificacion enviado a %s", user.phone_number)
     except Exception as e:
         logger.error(
@@ -258,9 +259,11 @@ async def verify_email(
             detail="Verificacion de seguridad fallida. Intenta nuevamente.",
         )
 
-    is_code_valid = await sms_service.check_phone_verification(body.phone_number, body.code)
-    success = is_code_valid and crud_user.mark_phone_verified(db, phone_number=body.phone_number)
-    if not success:
+    user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
+    is_code_valid = bool(user) and crud_user.verify_sms_otp(
+        db, user, body.code, "verify_phone"
+    )
+    if not is_code_valid or not crud_user.mark_phone_verified(db, phone_number=body.phone_number):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Codigo SMS invalido o usuario no encontrado.",
@@ -293,7 +296,8 @@ async def resend_verification(
         return {"message": "Si la cuenta existe y no esta verificada, se ha enviado un nuevo codigo."}
 
     try:
-        await sms_service.start_phone_verification(user.phone_number)
+        code = crud_user.create_sms_otp(db, user, "verify_phone")
+        await sms_service.send_otp(user.phone_number, code, "verify_phone")
     except Exception:
         logger.exception("Error reenviando SMS de verificacion")
         raise HTTPException(
@@ -423,6 +427,12 @@ async def login(
     await policia.clear_login_failures(user.id, cache)
     # comprobamos 2fa (antes que must_change_password)
     if user.is_totp_enabled:
+        if user.phone_number:
+            try:
+                code = crud_user.create_sms_otp(db, user, "login_2fa")
+                await sms_service.send_otp(user.phone_number, code, "login_2fa")
+            except Exception:
+                logger.exception("Error enviando SMS OTP para 2FA")
         session_token = create_2fa_session_token(subject=user.id)
         return LoginStep2Response(session_token=session_token)
     # comprobamos si debe cambiar contraseña
@@ -507,6 +517,8 @@ async def verify_login_2fa(
             is_code_valid = crud_2fa.verify_totp_code(secret, body.code)
         except Exception:
             is_code_valid = False
+        if not is_code_valid:
+            is_code_valid = crud_user.verify_sms_otp(db, user, body.code, "login_2fa")
     else:
         is_code_valid = crud_2fa.validate_backup_code(db, user, body.code)
 
@@ -683,7 +695,8 @@ async def forgot_password(
 
     user = crud_user.get_user_by_identifier(db, identifier=body.identifier)
     if user and user.phone_number:
-        await sms_service.start_phone_verification(user.phone_number)
+        code = crud_user.create_sms_otp(db, user, "reset_password")
+        await sms_service.send_otp(user.phone_number, code, "reset_password")
 
     return {"msg": "Si la cuenta existe, se envio un codigo SMS de recuperacion"}
 
@@ -716,7 +729,7 @@ async def reset_password(
             detail="Usuario no encontrado",
         )
 
-    if not await sms_service.check_phone_verification(user.phone_number, body.code):
+    if not crud_user.verify_sms_otp(db, user, body.code, "reset_password"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Codigo SMS invalido",

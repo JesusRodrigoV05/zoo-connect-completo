@@ -1,5 +1,6 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+import secrets
 from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
@@ -325,6 +326,43 @@ def mark_phone_verified(db: Session, phone_number: str) -> bool:
     user.is_active = True
     db.add(user)
     db.commit()
+    return True
+
+
+def create_sms_otp(db: Session, user: User, purpose: str) -> str:
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    user.sms_otp_code = code
+    user.sms_otp_purpose = purpose
+    user.sms_otp_expires_at = datetime.now(timezone.utc) + timedelta(
+        minutes=settings.SMS_OTP_EXPIRE_MINUTES
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return code
+
+
+def verify_sms_otp(db: Session, user: User, code: str, purpose: str) -> bool:
+    now = datetime.now(timezone.utc)
+    expires_at = user.sms_otp_expires_at
+    if expires_at and expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    is_valid = (
+        user.sms_otp_code == code
+        and user.sms_otp_purpose == purpose
+        and expires_at is not None
+        and expires_at >= now
+    )
+    if not is_valid:
+        return False
+
+    user.sms_otp_code = None
+    user.sms_otp_purpose = None
+    user.sms_otp_expires_at = None
+    db.add(user)
+    db.commit()
+    db.refresh(user)
     return True
 
 def resend_verification_code(db: Session, email: str) -> Optional[User]:

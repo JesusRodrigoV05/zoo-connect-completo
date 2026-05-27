@@ -64,9 +64,10 @@ class Settings(BaseSettings):
     RECAPTCHA_SITE_KEY: str = "6Lcxxxxxxxxxxxxxxxxxxxxxxxxx"
     RECAPTCHA_VERIFY_URL: str = "https://www.google.com/recaptcha/api/siteverify"
     REQUIRE_RECAPTCHA: bool = True
-    TWILIO_ACCOUNT_SID: str = ""
-    TWILIO_AUTH_TOKEN: str = ""
-    TWILIO_VERIFY_SERVICE_SID: str = ""
+    TEXTBEE_API_BASE_URL: str = "https://api.textbee.dev/api/v1"
+    TEXTBEE_API_KEY: str = ""
+    TEXTBEE_DEVICE_ID: str = ""
+    SMS_OTP_EXPIRE_MINUTES: int = 10
     #
     #
     # Políticas de histórico de contraseñas por rol

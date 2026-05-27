@@ -109,6 +109,9 @@ def upgrade() -> None:
         ALTER TABLE users ALTER COLUMN username TYPE varchar(120);
         ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number varchar(25);
         ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_verified boolean NOT NULL DEFAULT false;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS sms_otp_code varchar(10);
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS sms_otp_purpose varchar(32);
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS sms_otp_expires_at timestamp with time zone;
         UPDATE users SET email_verified = true WHERE is_active = true;
         UPDATE users SET phone_verified = true WHERE is_active = true;
         ALTER TABLE users ADD CONSTRAINT users_pkey PRIMARY KEY (id);

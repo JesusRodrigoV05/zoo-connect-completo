@@ -25,6 +25,9 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     email_verified = Column(Boolean, default=False, nullable=False)
     verification_code = Column(String(10), nullable=True)
+    sms_otp_code = Column(String(10), nullable=True)
+    sms_otp_purpose = Column(String(32), nullable=True)
+    sms_otp_expires_at = Column(DateTime(timezone=True), nullable=True)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     photo_url = Column(String(2048), nullable=True) #estandar
 
