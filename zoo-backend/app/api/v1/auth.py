@@ -304,7 +304,17 @@ async def resend_verification(
                 detail="Verificación de seguridad fallida. Intenta nuevamente.",
             )
 
-    user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
+    identifier = body.phone_number or body.email
+    if not identifier:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Telefono o email requerido.",
+        )
+
+    user = crud_user.get_user_by_phone(db, phone_number=identifier)
+    if not user:
+        user = crud_user.get_user_by_email(db, email=identifier)
+
     if not user or user.phone_verified:
         return {"message": "Si la cuenta existe y no esta verificada, se ha enviado un nuevo codigo."}
 

@@ -46,7 +46,8 @@ class EmailVerificationRequest(BaseModel):
     recaptcha_token: Optional[str] = None
 
 class ResendVerificationRequest(BaseModel):
-    phone_number: str
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
     recaptcha_token: Optional[str] = None
 
 # 2fa
