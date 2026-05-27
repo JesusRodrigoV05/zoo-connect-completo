@@ -257,19 +257,7 @@ async def verify_email(
     body: EmailVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    if settings.REQUIRE_RECAPTCHA:
-        if not body.recaptcha_token:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verificacion de seguridad requerida.",
-            )
-        client_ip = request.client.host if request.client else None
-        recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-        if not is_valid_recaptcha(recaptcha_result):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verificación de seguridad fallida. Intenta nuevamente.",
-            )
+
 
     user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
     is_code_valid = bool(user) and crud_user.verify_sms_otp(
@@ -290,19 +278,7 @@ async def resend_verification(
     body: ResendVerificationRequest,
     db: Session = Depends(get_db),
 ):
-    if settings.REQUIRE_RECAPTCHA:
-        if not body.recaptcha_token:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verificacion de seguridad requerida.",
-            )
-        client_ip = request.client.host if request.client else None
-        recaptcha_result = await verify_recaptcha(body.recaptcha_token, client_ip)
-        if not is_valid_recaptcha(recaptcha_result):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verificación de seguridad fallida. Intenta nuevamente.",
-            )
+
 
     identifier = body.phone_number or body.email
     if not identifier:
