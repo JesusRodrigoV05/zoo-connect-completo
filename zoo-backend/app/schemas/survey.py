@@ -119,7 +119,7 @@ class ParticipacionUpdate(BaseModel):
 
 class ParticipacionOut(ParticipacionBase):
     id_participacion: int
-    usuario_id: int
+    usuario_id: str
     fecha_participacion: datetime
     completada: bool
     respuestas: List[RespuestaOut] = []

@@ -31,7 +31,7 @@ class EntradaInventarioOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id_entrada_inventario: int
     fecha_entrada: datetime
-    usuario_id: int
+    usuario_id: str
     proveedor_id: int
 
     usuario: UserOut

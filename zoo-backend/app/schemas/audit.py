@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 class AuditLogUser(BaseModel):
-    id: int
+    id: str
     username: str
     email: EmailStr
 

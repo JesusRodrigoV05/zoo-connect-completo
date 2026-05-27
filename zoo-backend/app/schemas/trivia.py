@@ -12,7 +12,7 @@ class TriviaCreate(TriviaBase):
 
 class TriviaOut(TriviaBase):
     id_trivia: int
-    usuario_id: int
+    usuario_id: str
     class Config:
         from_attributes = True
 
@@ -23,7 +23,7 @@ class ParticipacionTriviaCreate(BaseModel):
 
 class ParticipacionTriviaOut(BaseModel):
     id_participacion_trivia: int
-    usuario_id: int
+    usuario_id: str
     aciertos: int
     fecha_trivia: datetime
     trivia_id: int
