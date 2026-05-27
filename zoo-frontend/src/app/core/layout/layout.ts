@@ -262,8 +262,8 @@ export default class Layout {
       });
     }
 
-    const hasCaregiverTasks = this.hasPermission('caregiver_my_tasks');
-    const hasMedicalTasks = this.hasPermission('medical_my_tasks');
+    const hasCaregiverTasks = this.hasPermission('manage_tasks') && this.hasPermission('caregiver_my_tasks');
+    const hasMedicalTasks = this.hasPermission('manage_veterinary_module') && this.hasPermission('medical_my_tasks');
 
     if (hasCaregiverTasks || hasMedicalTasks) {
       const misTareasChildren: NavigationItem[] = [];
@@ -292,7 +292,7 @@ export default class Layout {
       });
     }
 
-    if (this.hasPermission('medical_diets')) {
+    if (this.hasPermission('manage_veterinary_module') && this.hasPermission('medical_diets')) {
       items.push({
         text: 'Gestión de Dietas',
         icon: 'pi pi-apple',
@@ -301,7 +301,7 @@ export default class Layout {
       });
     }
 
-    if (this.hasPermission('medical_clinical_records')) {
+    if (this.hasPermission('manage_veterinary_module') && this.hasPermission('medical_clinical_records')) {
       items.push({
         text: 'Historiales Clínicos',
         icon: 'pi pi-clipboard',
