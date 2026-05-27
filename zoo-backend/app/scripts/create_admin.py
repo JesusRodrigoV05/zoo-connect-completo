@@ -53,6 +53,11 @@ def create_default_admin():
             obsolete_user = db.query(User).filter(User.id == obsolete_username).first()
             if obsolete_user:
                 print(f"   - Eliminando registros relacionados de: {obsolete_username}")
+                # Nullify foreign keys in nullable tables
+                db.execute(text("UPDATE audit_logs SET user_id = NULL WHERE user_id = :uid"), {"uid": obsolete_username})
+                db.execute(text("UPDATE risk_matrix_entries SET created_by_id = NULL WHERE created_by_id = :uid"), {"uid": obsolete_username})
+                db.execute(text("UPDATE risk_matrix_entries SET updated_by_id = NULL WHERE updated_by_id = :uid"), {"uid": obsolete_username})
+                # Delete child rows
                 db.execute(text("DELETE FROM refresh_tokens WHERE user_id = :uid"), {"uid": obsolete_username})
                 db.execute(text("DELETE FROM password_history WHERE user_id = :uid"), {"uid": obsolete_username})
                 db.execute(text("DELETE FROM password_reset_tokens WHERE user_id = :uid"), {"uid": obsolete_username})
