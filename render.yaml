@@ -1,6 +1,7 @@
 services:
   - type: web
     name: zoo-connect
+    plan: free
     runtime: docker
     dockerfilePath: ./Dockerfile
     healthCheckPath: /healthz
@@ -89,9 +90,11 @@ services:
 
   - type: keyvalue
     name: zoo-connect-redis
+    plan: free
     ipAllowList: []
 
 databases:
   - name: zoo-connect-db
+    plan: free
     databaseName: zooconnect
     user: zooconnect
