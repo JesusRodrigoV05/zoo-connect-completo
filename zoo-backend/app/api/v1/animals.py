@@ -212,7 +212,7 @@ def create_animal(
             event="animal_created",
             log_type=AuditLogType.APPLICATION,
             action="Creación de animal",
-            detail=f"Nombre: {animal_in.nombre}, ID: {new_animal.id_animal}",
+            detail=f"Nombre: {animal_in.nombre_animal}, ID: {new_animal.id_animal}",
             user_id=current_user.id
         )
         return new_animal
@@ -261,7 +261,7 @@ def update_animal(
             event="animal_updated",
             log_type=AuditLogType.APPLICATION,
             action="Actualización de animal",
-            detail=f"ID: {animal_id}, Nombre: {db_animal.nombre}",
+            detail=f"ID: {animal_id}, Nombre: {db_animal.nombre_animal}",
             user_id=current_user.id
         )
         return updated_animal
