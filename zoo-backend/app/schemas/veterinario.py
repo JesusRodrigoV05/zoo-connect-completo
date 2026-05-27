@@ -52,7 +52,7 @@ class RecetaMedicaBase(BaseModel):
     generar_tarea_automatica: bool = False
     frecuencia_cron: Optional[str] = None 
     
-    usuario_asignado_id: Optional[int] = None
+    usuario_asignado_id: Optional[str] = None
 
     @model_validator(mode='after')
     def check_cron_logic(self):
@@ -71,7 +71,7 @@ class RecetaMedicaUpdate(BaseModel):
     instrucciones_administracion: Optional[str] = None
     generar_tarea_automatica: Optional[bool] = None
     frecuencia_cron: Optional[str] = None
-    usuario_asignado_id: Optional[int] = None
+    usuario_asignado_id: Optional[str] = None
 
 class RecetaMedicaOut(RecetaMedicaBase):
     model_config = ConfigDict(from_attributes=True)

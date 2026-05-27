@@ -59,7 +59,8 @@ export const TiposTareaStore = signalStore(
                   }));
                 },
                 error: (err: any) => {
-                  toast.showError("Error", "No se pudo crear el tipo");
+                  const errorMsg = err.error?.detail || err.message || "No se pudo crear el tipo";
+                  toast.showError("Error", errorMsg);
                   patchState(store, { isSaving: false, error: err.message });
                 },
               }),
@@ -87,7 +88,8 @@ export const TiposTareaStore = signalStore(
                   }));
                 },
                 error: (err: any) => {
-                  toast.showError("Error", "No se pudo actualizar");
+                  const errorMsg = err.error?.detail || err.message || "No se pudo actualizar";
+                  toast.showError("Error", errorMsg);
                   patchState(store, { isSaving: false, error: err.message });
                 },
               }),

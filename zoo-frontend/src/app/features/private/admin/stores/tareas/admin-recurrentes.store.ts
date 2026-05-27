@@ -91,10 +91,8 @@ export const RecurrentesStore = signalStore(
                   }));
                 },
                 error: (err: any) => {
-                  toast.showError(
-                    "Error",
-                    "No se pudo crear la tarea recurrente",
-                  );
+                  const errorMsg = err.error?.detail || err.message || "No se pudo crear la tarea recurrente";
+                  toast.showError("Error", errorMsg);
                   patchState(store, { isSaving: false, error: err.message });
                 },
               }),
@@ -125,7 +123,8 @@ export const RecurrentesStore = signalStore(
                   }));
                 },
                 error: (err: any) => {
-                  toast.showError("Error", "No se pudo actualizar");
+                  const errorMsg = err.error?.detail || err.message || "No se pudo actualizar";
+                  toast.showError("Error", errorMsg);
                   patchState(store, { isSaving: false, error: err.message });
                 },
               }),

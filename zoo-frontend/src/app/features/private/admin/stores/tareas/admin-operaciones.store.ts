@@ -209,11 +209,9 @@ export const TareasPendientesStore = signalStore(
                   }
                 },
                 error: (err: any) => {
-                  toast.showError(
-                    "Error",
-                    err?.error?.message || "No se pudo crear la tarea",
-                  );
-                  patchState(store, { error: err?.error?.message });
+                  const errorMsg = err?.error?.detail || err?.error?.message || err?.message || "No se pudo crear la tarea";
+                  toast.showError("Error", errorMsg);
+                  patchState(store, { error: errorMsg });
                 },
               }),
               tap(() => patchState(store, { creatingManual: false })),

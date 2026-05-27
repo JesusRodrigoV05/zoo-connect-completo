@@ -78,7 +78,7 @@ class TareaOut(TareaBase):
 
 class TareaCreate(TareaBase):
     tipo_tarea_id: int
-    usuario_asignado_id: Optional[int] = None
+    usuario_asignado_id: Optional[str] = None
     animal_id: Optional[int] = None
     habitat_id: Optional[int] = None
 
@@ -96,7 +96,7 @@ class TareaOut(TareaBase):
     tarea_recurrente_id: Optional[int] = None
 
 class TareaAssign(BaseModel):
-    usuario_asignado_id: int
+    usuario_asignado_id: str
 
 class TareaSimpleCompletar(BaseModel):
     notas_completacion: Optional[str] = None
