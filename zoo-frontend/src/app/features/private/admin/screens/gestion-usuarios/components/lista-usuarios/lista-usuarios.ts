@@ -43,6 +43,9 @@ export default class ListaUsuarios {
   protected error = signal<string | null>(null);
   protected loggedInUserId = computed(() => this.authStore.userId());
   protected isAuthLoading = computed(() => this.authStore.loading());
+  protected readonly canCreateUsers = computed(() =>
+    this.authStore.hasPermission("users_create"),
+  );
 
   constructor() {
     effect(() => {

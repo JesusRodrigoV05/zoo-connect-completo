@@ -26,14 +26,16 @@
         (onClick)="store.loadDashboard()"
       />
 
-      <p-button
-        label="Crear Tarea Manual"
-        icon="pi pi-plus"
-        severity="success"
-        [rounded]="true"
-        styleClass="tour-operaciones-create-btn"
-        (onClick)="isCreateModalOpen.set(true)"
-      />
+      @if (canCreateTasks()) {
+        <p-button
+          label="Crear Tarea Manual"
+          icon="pi pi-plus"
+          severity="success"
+          [rounded]="true"
+          styleClass="tour-operaciones-create-btn"
+          (onClick)="isCreateModalOpen.set(true)"
+        />
+      }
     </div>
   </header>
 

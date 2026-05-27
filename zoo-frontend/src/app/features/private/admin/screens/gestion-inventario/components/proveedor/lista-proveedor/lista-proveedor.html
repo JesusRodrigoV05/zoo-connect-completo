@@ -23,14 +23,16 @@
         pTooltip="Recargar"
         styleClass="tour-provider-refresh-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Nuevo Proveedor"
-        [rounded]="true"
-        severity="primary"
-        styleClass="tour-provider-new-btn"
-        routerLink="../crear"
-      />
+      @if (canCreateSuppliers()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Nuevo Proveedor"
+          [rounded]="true"
+          severity="primary"
+          styleClass="tour-provider-new-btn"
+          routerLink="../crear"
+        />
+      }
     </div>
   </div>
 
@@ -108,12 +110,14 @@
       <div class="empty-state">
         <i class="pi pi-users empty-icon"></i>
         <p>No hay proveedores registrados.</p>
-        <p-button
-          label="Registrar Primero"
-          icon="pi pi-plus"
-          [rounded]="true"
-          routerLink="../crear"
-        />
+        @if (canCreateSuppliers()) {
+          <p-button
+            label="Registrar Primero"
+            icon="pi pi-plus"
+            [rounded]="true"
+            routerLink="../crear"
+          />
+        }
       </div>
     </ng-template>
   </p-dataview>

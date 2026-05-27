@@ -23,14 +23,16 @@
         pTooltip="Recargar"
         styleClass="tour-unit-refresh-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Nueva Unidad"
-        [rounded]="true"
-        severity="primary"
-        styleClass="tour-unit-new-btn"
-        routerLink="../crear"
-      />
+      @if (canCreateUnits()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Nueva Unidad"
+          [rounded]="true"
+          severity="primary"
+          styleClass="tour-unit-new-btn"
+          routerLink="../crear"
+        />
+      }
     </div>
   </div>
 
@@ -108,12 +110,14 @@
       <div class="empty-state">
         <i class="pi pi-box empty-icon"></i>
         <p>No hay unidades registradas.</p>
-        <p-button
-          label="Registrar Primera"
-          icon="pi pi-plus"
-          [rounded]="true"
-          routerLink="../crear"
-        />
+        @if (canCreateUnits()) {
+          <p-button
+            label="Registrar Primera"
+            icon="pi pi-plus"
+            [rounded]="true"
+            routerLink="../crear"
+          />
+        }
       </div>
     </ng-template>
   </p-dataview>

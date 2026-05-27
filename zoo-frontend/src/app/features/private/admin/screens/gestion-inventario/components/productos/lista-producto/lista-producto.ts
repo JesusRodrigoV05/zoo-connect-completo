@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   signal,
+  computed,
   afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -21,6 +22,7 @@ import { ShowToast } from "@app/shared/services";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { GenerarReportes } from "@app/shared/services/generar-reportes";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "app-lista-producto",
@@ -43,17 +45,23 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 export default class ListaProducto implements OnInit {
   readonly store = inject(ProductStore);
   readonly router = inject(Router);
+  readonly authStore = inject(AuthStore);
   private confirm = inject(ZooConfirmationService);
   private toast = inject(ShowToast);
   private reportesService = inject(GenerarReportes);
   private onboarding = inject(OnboardingService);
 
   isDownloading = signal(false);
+  isAlertsMode = signal(false);
 
   layoutOptions = [
     { icon: "pi pi-list", value: "list" },
     { icon: "pi pi-table", value: "grid" },
   ];
+
+  protected readonly canCreateProducts = computed(() =>
+    this.authStore.hasPermission("inventory_create_product"),
+  );
 
   ngOnInit() {
 
@@ -91,6 +99,18 @@ export default class ListaProducto implements OnInit {
 
   editProduct(id: number) {
     this.router.navigate(["admin/inventario/editar", id]);
+  }
+
+  mostrarTodosLosProductos() {
+    this.isAlertsMode.set(false);
+    this.store.setPage(1, 100);
+    this.store.loadProducts();
+  }
+
+  mostrarAlertas() {
+    this.isAlertsMode.set(true);
+    this.store.setPage(1, 100);
+    this.store.loadStockAlerts();
   }
 
   descargarReporteKardex() {

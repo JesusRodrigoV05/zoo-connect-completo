@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   OnInit,
+  computed,
   afterNextRender,
 } from "@angular/core";
 import { ButtonModule } from "primeng/button";
@@ -18,6 +19,7 @@ import { ConfirmationService } from "primeng/api";
 import { TiposProductoStore } from "@app/features/private/admin/stores/admin-tipo-productos.store";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "app-lista-tipos",
@@ -40,6 +42,7 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 export default class ListaTipos implements OnInit {
   readonly store = inject(TiposProductoStore);
   readonly router = inject(Router);
+  readonly authStore = inject(AuthStore);
   confirmation = inject(ZooConfirmationService);
   private readonly onboarding = inject(OnboardingService);
 
@@ -49,6 +52,10 @@ export default class ListaTipos implements OnInit {
   ];
 
   layout: "list" | "grid" = "list";
+
+  protected readonly canCreateTypes = computed(() =>
+    this.authStore.hasPermission("manage_inventory"),
+  );
 
   ngOnInit() {
 

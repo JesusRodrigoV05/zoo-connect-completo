@@ -4,6 +4,7 @@ import {
   Component,
   afterNextRender,
   inject,
+  computed,
 } from "@angular/core";
 import { AdminEncuestas } from "@app/features/private/admin/services/admin-encuestas";
 import { Loader } from "@app/shared/components";
@@ -17,6 +18,7 @@ import { ConfirmPopupModule } from "primeng/confirmpopup";
 import { ShowToast } from "@app/shared/services";
 import { Observable } from "rxjs";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "zoo-lista-encuestas",
@@ -37,10 +39,15 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 export default class ListaEncuestas {
   private surveyService = inject(AdminEncuestas);
   router = inject(Router);
+  readonly authStore = inject(AuthStore);
   private confirmationService = inject(ConfirmationService);
   private readonly onboarding = inject(OnboardingService);
   private tourPrompted = false;
   protected surveys$!: Observable<Encuesta[]>;
+
+  protected readonly canCreateSurveys = computed(() =>
+    this.authStore.hasPermission("surveys_create"),
+  );
 
   ngOnInit(): void {
     this.loadSurveys();

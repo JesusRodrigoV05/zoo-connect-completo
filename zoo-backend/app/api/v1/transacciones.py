@@ -4,7 +4,7 @@ from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 from app.db.session import get_db
-from app.core.dependencies import require_animal_management_permission, require_admin_user, get_current_active_user
+from app.core.dependencies import require_animal_management_permission, require_admin_user, get_current_active_user, require_inventory_read_permission
 from app.models.user import User
 
 from app.crud import transacciones as crud_transacciones
@@ -115,7 +115,7 @@ def list_salidas_inventario(
 @router.get("/alertas-stock", response_model=Page[schemas_inv.ProductoOut])
 def list_productos_con_stock_bajo(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_animal_management_permission)
+    current_user: User = Depends(require_inventory_read_permission)
 ):
     query = crud_inventario.get_productos_con_stock_bajo_query(db)
     return paginate(query)

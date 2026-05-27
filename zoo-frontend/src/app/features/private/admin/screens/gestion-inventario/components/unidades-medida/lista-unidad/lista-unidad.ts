@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   OnInit,
+  computed,
   afterNextRender,
 } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
@@ -18,6 +19,7 @@ import { UnidadItem } from "../unidad-item/unidad-item";
 import { UnidadesMedidaStore } from "@app/features/private/admin/stores/admin-unidades-medida.store";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "app-lista-unidad",
@@ -39,6 +41,7 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 })
 export default class ListaUnidad implements OnInit {
   readonly store = inject(UnidadesMedidaStore);
+  readonly authStore = inject(AuthStore);
   confirmation = inject(ZooConfirmationService);
   private router = inject(Router);
   private readonly onboarding = inject(OnboardingService);
@@ -49,6 +52,10 @@ export default class ListaUnidad implements OnInit {
     { icon: "pi pi-list", value: "list" },
     { icon: "pi pi-table", value: "grid" },
   ];
+
+  protected readonly canCreateUnits = computed(() =>
+    this.authStore.hasPermission("manage_inventory"),
+  );
 
   ngOnInit() {
 

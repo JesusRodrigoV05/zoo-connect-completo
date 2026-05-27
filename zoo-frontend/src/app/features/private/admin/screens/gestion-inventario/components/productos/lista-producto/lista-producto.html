@@ -4,7 +4,7 @@
 
   <div class="header-actions tour-product-list-header">
     <div class="title-row flex align-items-center gap-2">
-      <h2>Inventario General</h2>
+      <h2>{{ isAlertsMode() ? 'Alertas de Stock' : 'Inventario General' }}</h2>
       <p-button
         label="Tour guiado"
         icon="pi pi-question-circle"
@@ -12,6 +12,15 @@
         [rounded]="true"
         (onClick)="startGuidedTour()"
       />
+      @if (isAlertsMode()) {
+        <p-button
+          label="Volver al Inventario"
+          icon="pi pi-arrow-left"
+          [rounded]="true"
+          severity="secondary"
+          (onClick)="mostrarTodosLosProductos()"
+        />
+      }
     </div>
     <div class="buttons">
       <p-button
@@ -25,28 +34,31 @@
       />
       <p-button
         label="Alertas"
-        (onClick)="store.loadStockAlerts()"
+        (onClick)="isAlertsMode() ? mostrarTodosLosProductos() : mostrarAlertas()"
         [rounded]="true"
         pTooltip="Alertas"
         styleClass="tour-product-alerts-btn"
+        [severity]="isAlertsMode() ? 'warning' : 'secondary'"
       />
       <p-button
         variant="text"
-        (onClick)="store.loadProducts()"
+        (onClick)="isAlertsMode() ? store.loadStockAlerts() : store.loadProducts()"
         icon="pi pi-refresh"
         severity="danger"
         [rounded]="true"
         pTooltip="Recargar"
         styleClass="tour-product-refresh-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Nuevo Producto"
-        [rounded]="true"
-        severity="primary"
-        styleClass="tour-product-new-btn"
-        routerLink="../crear"
-      />
+      @if (canCreateProducts()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Nuevo Producto"
+          [rounded]="true"
+          severity="primary"
+          styleClass="tour-product-new-btn"
+          routerLink="../crear"
+        />
+      }
     </div>
   </div>
 
@@ -59,7 +71,7 @@
     <p>{{ store.error() }}</p>
     <p-button
       label="Reintentar"
-      (onClick)="store.loadProducts()"
+      (onClick)="isAlertsMode() ? store.loadStockAlerts() : store.loadProducts()"
       severity="danger"
       [rounded]="true"
     />
@@ -124,13 +136,26 @@
     <ng-template #empty>
       <div class="empty-state">
         <i class="bx bx-box empty-icon"></i>
-        <p>No hay productos registrados.</p>
-        <p-button
-          label="Registrar Primero"
-          icon="pi pi-plus"
-          [rounded]="true"
-          routerLink="../crear"
-        />
+        @if (isAlertsMode()) {
+          <p>No hay productos con stock bajo.</p>
+          <p-button
+            label="Volver al Inventario"
+            icon="pi pi-arrow-left"
+            [rounded]="true"
+            severity="secondary"
+            (onClick)="mostrarTodosLosProductos()"
+          />
+        } @else {
+          <p>No hay productos registrados.</p>
+          @if (canCreateProducts()) {
+            <p-button
+              label="Registrar Primero"
+              icon="pi pi-plus"
+              [rounded]="true"
+              routerLink="../crear"
+            />
+          }
+        }
       </div>
     </ng-template>
   </p-dataview>

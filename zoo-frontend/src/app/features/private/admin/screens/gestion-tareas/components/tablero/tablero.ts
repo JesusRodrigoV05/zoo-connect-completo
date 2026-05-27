@@ -4,6 +4,7 @@ import {
   Component,
   inject,
   signal,
+  computed,
 } from "@angular/core";
 import { TaskInbox } from "../task-inbox/task-inbox";
 import { TaskRadar } from "../task-radar/task-radar";
@@ -15,6 +16,7 @@ import { SplitterModule } from "primeng/splitter";
 import { TareasPendientesStore } from "@app/features/private/admin/stores/tareas/admin-operaciones.store";
 import { CrearTarea } from "../crear-tarea/crear-tarea";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "zoo-tablero",
@@ -34,11 +36,16 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 })
 export default class Tablero {
   readonly store = inject(TareasPendientesStore);
+  readonly authStore = inject(AuthStore);
   private readonly onboarding = inject(OnboardingService);
 
   isAssignModalOpen = signal(false);
   selectedTaskId = signal<number | null>(null);
   isCreateModalOpen = signal(false);
+
+  protected readonly canCreateTasks = computed(() =>
+    this.authStore.hasPermission("tasks_operations_board"),
+  );
 
   constructor() {
 

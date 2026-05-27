@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   signal,
+  computed,
   afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -20,6 +21,7 @@ import { TiposSalidaStore } from "@app/features/private/admin/stores/admin-tipo-
 import { DatePicker } from "primeng/datepicker";
 import { RouterLink } from "@angular/router";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "app-historial",
@@ -41,12 +43,17 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 })
 export default class Historial implements OnInit {
   readonly transactionStore = inject(TransaccionesStore);
+  readonly authStore = inject(AuthStore);
   private readonly onboarding = inject(OnboardingService);
 
   protected dateRange = signal<Date[] | null>(null);
   protected searchTerm = signal("");
 
   protected activeTab = signal<"entradas" | "salidas">("entradas");
+
+  protected readonly canManageInventory = computed(() =>
+    this.authStore.hasPermission("manage_inventory"),
+  );
 
   ngOnInit() {
 

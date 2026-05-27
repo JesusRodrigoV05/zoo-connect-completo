@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   OnInit,
+  computed,
   afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -18,6 +19,7 @@ import { ProveedoresStore } from "@app/features/private/admin/stores/admin-prove
 import { ConfirmationService } from "primeng/api";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "app-lista-proveedor",
@@ -40,6 +42,7 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 export default class ListaProveedor implements OnInit {
   readonly store = inject(ProveedoresStore);
   readonly router = inject(Router);
+  readonly authStore = inject(AuthStore);
 
   confirmation = inject(ZooConfirmationService);
   private readonly onboarding = inject(OnboardingService);
@@ -49,6 +52,10 @@ export default class ListaProveedor implements OnInit {
     { icon: "pi pi-list", value: "list" },
     { icon: "pi pi-table", value: "grid" },
   ];
+
+  protected readonly canCreateSuppliers = computed(() =>
+    this.authStore.hasPermission("inventory_create_supplier"),
+  );
 
   ngOnInit() {
 

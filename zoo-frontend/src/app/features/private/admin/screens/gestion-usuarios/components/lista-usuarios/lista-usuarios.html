@@ -20,14 +20,16 @@
         [rounded]="true"
         styleClass="tour-users-refresh-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Crear Usuario"
-        [rounded]="true"
-        severity="primary"
-        styleClass="tour-users-create-btn"
-        routerLink="/admin/usuarios/crear"
-      />
+      @if (canCreateUsers()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Crear Usuario"
+          [rounded]="true"
+          severity="primary"
+          styleClass="tour-users-create-btn"
+          routerLink="/admin/usuarios/crear"
+        />
+      }
     </div>
   </div>
   @if(loading() && !userData()){

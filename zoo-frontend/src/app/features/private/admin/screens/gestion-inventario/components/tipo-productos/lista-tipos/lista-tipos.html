@@ -23,14 +23,16 @@
         pTooltip="Recargar"
         styleClass="tour-type-refresh-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Nuevo Tipo"
-        [rounded]="true"
-        severity="primary"
-        styleClass="tour-type-new-btn"
-        routerLink="../crear"
-      />
+      @if (canCreateTypes()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Nuevo Tipo"
+          [rounded]="true"
+          severity="primary"
+          styleClass="tour-type-new-btn"
+          routerLink="../crear"
+        />
+      }
     </div>
   </div>
 
@@ -108,12 +110,14 @@
       <div class="empty-state">
         <i class="pi pi-tags empty-icon"></i>
         <p>No hay tipos registrados.</p>
-        <p-button
-          label="Registrar Primero"
-          icon="pi pi-plus"
-          [rounded]="true"
-          routerLink="../crear"
-        />
+        @if (canCreateTypes()) {
+          <p-button
+            label="Registrar Primero"
+            icon="pi pi-plus"
+            [rounded]="true"
+            routerLink="../crear"
+          />
+        }
       </div>
     </ng-template>
   </p-dataview>

@@ -7,22 +7,24 @@
 
     <div class="actions-block">
       <div class="create-buttons">
-        <p-button
-          label="Nueva Entrada"
-          icon="pi pi-arrow-down"
-          severity="success"
-          [rounded]="true"
-          styleClass="tour-historial-new-entry-btn"
-          routerLink="../../transacciones/crear-entrada"
-        />
-        <p-button
-          label="Nueva Salida"
-          icon="pi pi-arrow-up"
-          severity="warn"
-          [rounded]="true"
-          styleClass="tour-historial-new-exit-btn"
-          routerLink="../../transacciones/crear-salida"
-        />
+        @if (canManageInventory()) {
+          <p-button
+            label="Nueva Entrada"
+            icon="pi pi-arrow-down"
+            severity="success"
+            [rounded]="true"
+            styleClass="tour-historial-new-entry-btn"
+            routerLink="../../transacciones/crear-entrada"
+          />
+          <p-button
+            label="Nueva Salida"
+            icon="pi pi-arrow-up"
+            severity="warn"
+            [rounded]="true"
+            styleClass="tour-historial-new-exit-btn"
+            routerLink="../../transacciones/crear-salida"
+          />
+        }
         <p-button
           label="Tour guiado"
           icon="pi pi-question-circle"
