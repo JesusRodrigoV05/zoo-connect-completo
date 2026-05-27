@@ -37,7 +37,7 @@ class PreguntaEncuesta(Base):
 
     id_pregunta = Column("id_pregunta", Integer, primary_key=True, autoincrement=True)
     encuesta_id = Column("encuesta_id", Integer, ForeignKey("encuestas.id_encuesta"), nullable=False)
-    texto_pregunta = Column("texto_pregunta", String(100), nullable=False)
+    texto_pregunta = Column("texto_pregunta", String(255), nullable=False)
     es_opcion_unica = Column("es_opcion_unica", Boolean, nullable=False, default=False)
     orden = Column("orden", Integer, nullable=True)
     
