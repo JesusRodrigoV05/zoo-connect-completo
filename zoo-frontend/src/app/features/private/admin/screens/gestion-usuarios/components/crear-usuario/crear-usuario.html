@@ -69,7 +69,7 @@
           <p-select
             id="rol"
             formControlName="rol"
-            [options]="roleOptions"
+            [options]="roleOptions()"
             optionLabel="label"
             optionValue="value"
             [pTooltip]="usuarioForm.get('rol')?.disabled ? 'No puedes editar tu propio rol' : ''"

@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  computed,
 } from "@angular/core";
 import { Validators, FormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { MessageModule } from "primeng/message";
@@ -22,10 +23,11 @@ import { Usuario, RolId } from "@app/core/models/usuario";
 import { AuthStore } from "@stores/auth.store";
 import { TooltipModule } from "primeng/tooltip";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AdminRolesService } from "@app/features/private/admin/services/admin-roles";
 
 interface RoleOption {
   label: string;
-  value: RolId;
+  value: number;
 }
 
 @Component({
@@ -51,6 +53,7 @@ export default class CrearUsuario implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
   private readonly adminUsuarios = inject(AdminUsuarios);
+  private readonly adminRoles = inject(AdminRolesService);
   private readonly authStore = inject(AuthStore);
   private readonly onboarding = inject(OnboardingService);
   private currentUserId = this.authStore.userId();
@@ -90,20 +93,39 @@ export default class CrearUsuario implements OnInit {
       this.buttonText = "Crear";
     }
 
-
+    this.loadRoles();
   }
 
   protected startGuidedTour(): void {
     this.onboarding.startTour(this.tourKey);
   }
 
-  protected readonly roleOptions: RoleOption[] = [
+  private readonly defaultRoles: RoleOption[] = [
     { label: "Administrador", value: RolId.ADMIN },
     { label: "OSI", value: RolId.OSI },
     { label: "Veterinario", value: RolId.VETERINARIO },
     { label: "Cuidador", value: RolId.CUIDADOR },
     { label: "Visitante", value: RolId.VISITANTE },
   ];
+  protected readonly roleOptions = signal<RoleOption[]>(this.defaultRoles);
+
+  private loadRoles(): void {
+    this.adminRoles.getRoles(1, 100).subscribe({
+      next: (response) => {
+        const dynamicOptions: RoleOption[] = response.items.map((role) => ({
+          label: role.name,
+          value: role.id,
+        }));
+        if (dynamicOptions.length > 0) {
+          this.roleOptions.set(dynamicOptions);
+        }
+      },
+      error: (err) => {
+        console.warn("Could not load dynamic roles, falling back to default roles list:", err);
+        this.roleOptions.set(this.defaultRoles);
+      }
+    });
+  }
 
   protected readonly usuarioForm = this.fb.group({
     email: ["", [Validators.required, Validators.email]],
@@ -219,8 +241,8 @@ export default class CrearUsuario implements OnInit {
     this.router.navigate(["/admin/usuarios/lista"]);
   }
 
-  private getRoleName(roleId: RolId): string {
-    const role = this.roleOptions.find((r) => r.value === roleId);
+  private getRoleName(roleId: number): string {
+    const role = this.roleOptions().find((r) => r.value === roleId);
     return role?.label || "";
   }
 }
