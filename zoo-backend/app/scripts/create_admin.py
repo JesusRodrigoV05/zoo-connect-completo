@@ -54,42 +54,42 @@ def create_default_admin():
             {
                 "email": settings.DEFAULT_ADMIN_EMAIL,
                 "username": "admin.admin.primary",
-                "phone_number": settings.DEFAULT_ADMIN_PHONE,
+                "phone_number": "+59173089827",
                 "password": settings.DEFAULT_ADMIN_PASSWORD,
                 "role": "administrador"
             },
             {
                 "email": "jose.alvarado@zooconnect.qzz.io",
                 "username": "jose.admin.alvarado",
-                "phone_number": "+10000000002",
+                "phone_number": "+59167140089",
                 "password": "AdminZ0o_2026_SecurePass!",
                 "role": "administrador"
             },
             {
                 "email": "juan.perez@zooconnect.qzz.io",
                 "username": "juan.cuidador.perez",
-                "phone_number": "+10000000003",
+                "phone_number": "+59169818363",
                 "password": "Cuidador_2026_Safe#88",
                 "role": "cuidador"
             },
             {
                 "email": "ana.garcia@zooconnect.qzz.io",
                 "username": "ana.vet.garcia",
-                "phone_number": "+10000000004",
+                "phone_number": "+59175240093",
                 "password": "Vet_Secure_Access_2026$",
                 "role": "veterinario"
             },
             {
                 "email": "visita1@gmail.com",
                 "username": "visita.visitante.demo",
-                "phone_number": "+10000000005",
+                "phone_number": "+59165136063",
                 "password": "User_Visitor_Pass_99!",
                 "role": "visitante"
             },
             {
                 "email": "soporte@zooconnect.qzz.io",
                 "username": "soporte.admin.tecnico",
-                "phone_number": "+10000000006",
+                "phone_number": "+59160659997",
                 "password": "Support_Zoo_Connect_2026*",
                 "role": "administrador"
             }
@@ -114,7 +114,8 @@ def create_default_admin():
                         hashed_password=get_password_hash(u_data["password"]),
                         is_active=True,
                         email_verified=True,
-                        must_change_password=True,
+                        phone_verified=True,
+                        must_change_password=False,
                         role_id=role.id
                     ))
 
@@ -129,11 +130,12 @@ def create_default_admin():
                     id="oscar.osi.seguridad",
                     email=osi_email,
                     username="oscar.osi.seguridad",
-                    phone_number="+10000000007",
+                    phone_number="+59167156187",
                     hashed_password=get_password_hash("Osi_Secure_Change_2026!"),
                     is_active=True,
                     email_verified=True,
-                    must_change_password=True,
+                    phone_verified=True,
+                    must_change_password=False,
                     role_id=osi_role.id,
                 ))
 
