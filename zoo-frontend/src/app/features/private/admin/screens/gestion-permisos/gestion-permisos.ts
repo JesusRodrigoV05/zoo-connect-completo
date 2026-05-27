@@ -101,6 +101,7 @@ const ACCESS_GROUPS: AccessGroup[] = [
 
 const STANDALONE_COLUMNS: StandaloneAccessColumn[] = [
   { key: "dashboard", label: "Dashboard", permissionCodes: ["view_admin_dashboard"] },
+  { key: "roles", label: "Roles", permissionCodes: ["manage_permissions"] },
   { key: "caregiver-tasks", label: "Mis tareas (Cuidador)", permissionCodes: ["caregiver_my_tasks", "manage_tasks"] },
   { key: "medical-tasks", label: "Mis Tareas (Médico)", permissionCodes: ["medical_my_tasks", "manage_veterinary_module"] },
   { key: "medical-diets", label: "Gestión de Dietas", permissionCodes: ["medical_diets", "manage_veterinary_module"] },
