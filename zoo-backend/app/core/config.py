@@ -21,6 +21,7 @@ class Settings(BaseSettings):
         "http://localhost:4200",
         "https://vercel-zoo-connect.vercel.app",
         "https://vercel-zoo-connect-git-main-mfjm0265-7988s-projects.vercel.app",
+        "https://zoo-connect-completo.vercel.app",
     ]
     DEFAULT_ADMIN_EMAIL: str
     DEFAULT_ADMIN_PASSWORD: str
