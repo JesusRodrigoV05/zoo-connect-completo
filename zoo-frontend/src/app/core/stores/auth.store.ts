@@ -95,12 +95,12 @@ export const AuthStore = signalStore(
         if (error?.status === 400 && context === 'register') {
           const detail = error.error?.detail;
           if (detail?.status === 'ACCOUNT_UNVERIFIED') {
-            const email = detail?.email || '';
+            const phone = detail?.phone_number || '';
             toastService.showSuccess(
               'Cuenta creada',
-              'Revisá tu email para verificar tu cuenta.',
+              'Revisá tu celular para verificar tu cuenta.',
             );
-            router.navigate(['/verify-email'], { queryParams: { email } });
+            router.navigate(['/verify-email'], { queryParams: { phone } });
             patchState(store, { loading: false });
             return '';
           }
