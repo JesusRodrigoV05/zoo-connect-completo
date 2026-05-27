@@ -87,14 +87,6 @@
       background: transparent;
     }
 
-    /*
-       * El .p-dataview-content suelto ya no es necesario
-       * porque sus estilos están en los bloques de arriba.
-       */
-
-    /*
-       * El resto de tus estilos (paginator, etc.) están perfectos
-       */
     .p-paginator {
       background: var(--p-surface-card);
       border-top: 1px solid var(--p-surface-border);

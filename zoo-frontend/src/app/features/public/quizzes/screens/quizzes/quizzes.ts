@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   inject,
@@ -18,6 +19,7 @@ import { SelectModule } from "primeng/select";
 import { AuthStore } from "@stores/auth.store";
 import { RouterLink } from "@angular/router";
 import { MainContainer } from "@app/shared/components/main-container";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-quizzes",
@@ -39,6 +41,7 @@ import { MainContainer } from "@app/shared/components/main-container";
 export default class Quizzes {
   private quizService = inject(GenerateQuiz);
   private toast = inject(ShowToast);
+  private readonly onboarding = inject(OnboardingService);
   readonly authStore = inject(AuthStore);
 
   config = {
@@ -55,6 +58,14 @@ export default class Quizzes {
 
   generatedQuiz = signal<GeneratedQuiz | null>(null);
   isLoading = signal(false);
+
+  constructor() {
+
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("public-quizzes");
+  }
 
   createQuiz() {
     this.isLoading.set(true);

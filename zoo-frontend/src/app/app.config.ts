@@ -3,7 +3,7 @@ import {
   inject,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
-  provideZonelessChangeDetection,
+  provideZonelessChangeDetection, isDevMode,
 } from "@angular/core";
 import {
   provideRouter,
@@ -12,11 +12,11 @@ import {
   withInMemoryScrolling,
   withViewTransitions,
 } from "@angular/router";
-
 import { routes } from "./app.routes";
 import {
   provideClientHydration,
   withEventReplay,
+  withHttpTransferCacheOptions,
   withIncrementalHydration,
 } from "@angular/platform-browser";
 import {
@@ -30,9 +30,8 @@ import { provideAnimationsAsync } from "@angular/platform-browser/animations/asy
 import { ConfirmationService, MessageService } from "primeng/api";
 import ZooPreset from "../theme/zoo-preset";
 import { AuthStore } from "@stores/auth.store";
-import { ShowToast } from "./shared/services";
 import { CustomTitleStrategy } from "./core/services/custom-title-strategy";
-import { provideCloudinaryLoader } from "@angular/common";
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -45,7 +44,7 @@ export const appConfig: ApplicationConfig = {
       withViewTransitions(),
       withInMemoryScrolling({ scrollPositionRestoration: "top" }),
     ),
-    provideClientHydration(withEventReplay(), withIncrementalHydration()),
+    provideClientHydration(withEventReplay(), withIncrementalHydration(), withHttpTransferCacheOptions({ includePostRequests: false })),
     providePrimeNG({
       theme: {
         preset: ZooPreset,
@@ -60,10 +59,12 @@ export const appConfig: ApplicationConfig = {
     ConfirmationService,
     provideAppInitializer(async () => {
       const authStore = inject(AuthStore);
-      const toastService = inject(ShowToast);
 
       return authStore.initializeAuth().then(() => {});
     }),
-    { provide: TitleStrategy, useClass: CustomTitleStrategy },
+    { provide: TitleStrategy, useClass: CustomTitleStrategy }, provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
   ],
 };

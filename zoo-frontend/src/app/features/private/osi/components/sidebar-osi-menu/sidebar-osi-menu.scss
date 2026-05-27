@@ -1,0 +1,43 @@
+.osi-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 100vh;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  border-radius: 50px;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+  color: var(--p-text-muted-color);
+  text-decoration: none;
+
+  i {
+    font-size: 1.25rem;
+    min-width: 1.25rem;
+  }
+
+  span {
+    flex-grow: 1;
+    font-weight: 500;
+  }
+
+  &.active,
+  &:hover {
+    background: var(--p-highlight-background);
+    color: var(--p-highlight-color);
+
+    i {
+      color: var(--p-highlight-color);
+    }
+  }
+}

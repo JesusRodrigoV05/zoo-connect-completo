@@ -9,14 +9,22 @@
       <ng-template #content let-activateCallback="activateCallback">
         <p-card class="crear-form-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
+            <div class="card-header tour-habitat-step1-header">
               <h2>{{ pageTitle() }}</h2>
               <p class="subtitle">Paso 1: Ingresa los datos del hábitat</p>
+              <p-button
+                type="button"
+                label="Tour guiado"
+                icon="pi pi-question-circle"
+                severity="contrast"
+                [rounded]="true"
+                (click)="startGuidedTour()"
+              />
             </div>
           </ng-template>
 
           <form [formGroup]="habitatForm" class="form">
-            <div class="form-section">
+            <div class="form-section tour-habitat-step1-section">
               <h4>Información del Hábitat</h4>
               <div class="form-grid">
                 <div class="field">
@@ -133,12 +141,20 @@
       <ng-template #content let-activateCallback="activateCallback">
         <p-card class="crear-form-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
+            <div class="card-header tour-habitat-step2-header">
               <h2>Subir Imágenes</h2>
               <p class="subtitle">
                 Paso 2: Añade imágenes para
                 <strong>{{ habitatForm.value.nombre }}</strong>
               </p>
+              <p-button
+                type="button"
+                label="Tour guiado"
+                icon="pi pi-question-circle"
+                severity="contrast"
+                [rounded]="true"
+                (click)="startGuidedTour()"
+              />
             </div>
           </ng-template>
 
@@ -182,7 +198,7 @@
           <hr class="form-separator" />
           }
 
-          <div class="form-section">
+          <div class="form-section tour-habitat-step2-section">
             <h4>
               @if (isEditMode()) { Añadir Nuevas Imágenes } @else { Galería de
               Imágenes }

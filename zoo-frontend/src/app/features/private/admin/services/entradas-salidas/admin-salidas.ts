@@ -22,10 +22,10 @@ export class AdminSalidas {
     size: number = 50,
   ): Observable<PaginatedResponse<SalidaInventario>> {
     const params = new HttpParams().set("page", page).set("size", size);
-    return this.http.get<any>(this.salidasUrl, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(this.salidasUrl, { params }).pipe(
       map((res) => ({
         ...res,
-        items: res.items.map((i: any) => SalidaAdapter.fromBackend(i)),
+        items: res.items.map((i) => SalidaAdapter.fromBackend(i)),
       })),
     );
   }

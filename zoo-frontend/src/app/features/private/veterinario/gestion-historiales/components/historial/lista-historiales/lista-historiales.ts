@@ -1,12 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  afterNextRender,
   inject,
   signal,
 } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { TableModule } from "primeng/table";
+import { TableModule, TablePageEvent } from "primeng/table";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { CheckboxModule } from "primeng/checkbox";
@@ -17,6 +18,7 @@ import { HistorialItem } from "../historial-item/historial-item";
 import { HistorialesListaStore } from "@app/features/private/veterinario/stores/historiales/historiales.store";
 import { GenerarReportes } from "@app/shared/services/generar-reportes";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-historiales",
@@ -39,6 +41,8 @@ import { ShowToast } from "@app/shared/services";
 export default class ListaHistoriales {
   readonly store = inject(HistorialesListaStore);
   private router = inject(Router);
+  private onboarding = inject(OnboardingService);
+  private tourPrompted = false;
 
   private reportesService = inject(GenerarReportes);
   private toast = inject(ShowToast);
@@ -50,11 +54,15 @@ export default class ListaHistoriales {
     { label: "Finalizado (Cerrado)", value: false },
   ];
 
+  ngOnInit(): void {
+
+  }
+
   goToDetail(id: number) {
     this.router.navigate(["/vet/historiales/", id]);
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: TablePageEvent) {
     const page = event.first / event.rows + 1;
     this.store.updatePagination(page, event.rows);
   }
@@ -86,5 +94,9 @@ export default class ListaHistoriales {
         this.toast.showError("Error", "No se pudo descargar la ficha.");
       },
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("vet-historiales-lista");
   }
 }

@@ -28,10 +28,10 @@ export class AdminProveedores {
       .set("size", size)
       .set("include_inactive", includeInactive);
 
-    return this.http.get<any>(this.inventoryUrl, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(this.inventoryUrl, { params }).pipe(
       map((response) => ({
         ...response,
-        items: response.items.map((item: any) =>
+        items: response.items.map((item) =>
           ProveedorAdapter.fromBackend(item),
         ),
       })),

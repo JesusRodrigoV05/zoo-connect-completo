@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   inject,
@@ -17,6 +18,7 @@ import { ConfiguracionStore } from "@app/features/private/veterinario/stores/his
 import { TipoExamen } from "@app/features/private/veterinario/models/historiales/veterinario-config.model";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { TipoExamenItem } from "../tipo-examen-item";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-tipos-examen",
@@ -38,8 +40,10 @@ import { TipoExamenItem } from "../tipo-examen-item";
 })
 export default class TiposExamen {
   readonly store = inject(ConfiguracionStore);
+  private readonly onboarding = inject(OnboardingService);
   private fb = inject(FormBuilder);
   confirmation = inject(ZooConfirmationService);
+  private tourPrompted = false;
 
   dialogVisible = signal(false);
   isEditing = signal(false);
@@ -49,6 +53,18 @@ export default class TiposExamen {
     nombre: ["", [Validators.required, Validators.minLength(3)]],
     descripcion: ["", [Validators.maxLength(255)]],
   });
+
+  constructor() {
+
+  }
+
+  startGuidedTour() {
+    this.onboarding.startTour("vet-tipos-examen-lista");
+  }
+
+  startFormTour() {
+    this.onboarding.startTour("vet-tipos-examen-crear");
+  }
 
   openCreate() {
     this.isEditing.set(false);

@@ -13,7 +13,7 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "prefix": "zoo",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -46,6 +46,11 @@
                 "glob": "**/*",
                 "input": "public/logos",
                 "output": "/assets/logos"
+              },
+              {
+                "glob": "robots.txt",
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": ["src/styles.scss", "node_modules/aos/dist/aos.css"],
@@ -60,24 +65,23 @@
               "optimization": {
                 "scripts": true,
                 "styles": true,
-                "fonts": {
-                  "inline": true
-                }
+                "fonts": true
               },
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "950kB",
                   "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kB",
-                  "maximumError": "10kB"
+                  "maximumWarning": "9kB",
+                  "maximumError": "12kB"
                 }
               ],
               "outputHashing": "all",
-              "sourceMap": false
+              "sourceMap": false,
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,
@@ -118,5 +122,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

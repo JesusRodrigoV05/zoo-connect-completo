@@ -1,6 +1,8 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   effect,
   inject,
@@ -26,6 +28,8 @@ import { finalize } from "rxjs";
 import { NgClass } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "zoo-lista-animales",
@@ -53,6 +57,8 @@ export default class ListaAnimales {
   private readonly destroyRef = inject(DestroyRef);
   private readonly toastService = inject(ShowToast);
   private confirmation = inject(ZooConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
+  private readonly authStore = inject(AuthStore);
 
   protected readonly currentPage = signal(1);
   protected readonly pageSize = signal(10);
@@ -67,13 +73,22 @@ export default class ListaAnimales {
 
   protected readonly layout = signal<"list" | "grid">("list");
   protected readonly options = ["list", "grid"];
+  protected readonly canCreateAnimals = computed(() =>
+    this.authStore.hasPermission("animals_create_animals"),
+  );
 
   constructor() {
+
+
     effect(() => {
       const page = this.currentPage();
       const size = this.pageSize();
       this.loadAnimales(page, size);
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-animales-lista");
   }
 
   protected loadAnimales(page: number, size: number): void {

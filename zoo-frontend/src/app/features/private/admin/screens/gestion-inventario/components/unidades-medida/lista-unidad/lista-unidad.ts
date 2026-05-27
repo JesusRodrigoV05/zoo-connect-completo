@@ -3,12 +3,13 @@ import {
   Component,
   inject,
   OnInit,
+  afterNextRender,
 } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { ButtonModule } from "primeng/button";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { PaginatorModule } from "primeng/paginator";
 import { ConfirmationService } from "primeng/api";
@@ -16,6 +17,7 @@ import { Loader } from "@app/shared/components";
 import { UnidadItem } from "../unidad-item/unidad-item";
 import { UnidadesMedidaStore } from "@app/features/private/admin/stores/admin-unidades-medida.store";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-unidad",
@@ -39,6 +41,7 @@ export default class ListaUnidad implements OnInit {
   readonly store = inject(UnidadesMedidaStore);
   confirmation = inject(ZooConfirmationService);
   private router = inject(Router);
+  private readonly onboarding = inject(OnboardingService);
 
   layout: "list" | "grid" = "list";
 
@@ -48,10 +51,16 @@ export default class ListaUnidad implements OnInit {
   ];
 
   ngOnInit() {
+
+
     this.store.loadItems();
   }
 
-  onPageChange(event: any) {
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-unidad-lista");
+  }
+
+  onPageChange(event: DataViewPageEvent) {
     const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }

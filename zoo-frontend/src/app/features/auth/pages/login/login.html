@@ -1,7 +1,7 @@
-<div class="login-page-container">
-  <p-card class="login-card">
-    <div class="card-content">
-      <div class="login-image-container">
+<div class="auth-page-container">
+  <p-card class="auth-card auth-card-wide">
+    <div class="auth-card-content">
+      <div class="auth-image-container">
         <img
           ngSrc="/assets/images/login.png"
           alt="Imagen de un tigre"
@@ -11,19 +11,19 @@
         />
       </div>
 
-      <div class="login-form-container">
-        <div class="login-header">
+      <div class="auth-form-container">
+        <div class="auth-header">
           <app-logo-image [size]="150" />
           <h1>¡Bienvenido a {{ authStore.nombreMarca() }}!</h1>
           <p class="subtitle">Inicia sesión para continuar</p>
         </div>
 
         @defer(on viewport; prefetch on idle; hydrate on viewport) {
-        <div class="login-content">
+        <div class="auth-content">
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <zoo-form-field
-              label="Usuario"
-              type="email"
+              label="Usuario o telefono"
+              type="text"
               [control]="email"
               [errorMessage]="getEmailError()"
             />
@@ -36,18 +36,20 @@
               [showPasswordToggle]="true"
             />
 
-            <div class="forgot-password-link">
+            <zoo-captcha (tokenChange)="captchaToken.set($event)" />
+
+            <div class="auth-link-container right-aligned">
               <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a>
             </div>
 
-            <div class="button-container">
+            <div class="auth-button-container">
               <p-button
                 type="submit"
                 label="Iniciar Sesión"
                 severity="primary"
                 [rounded]="true"
-                [disabled]="loading()"
-                styleClass="login-button"
+                [disabled]="loading() || !captchaToken()"
+                styleClass="auth-button"
                 fluid
               >
                 @if (loading()) {
@@ -59,13 +61,15 @@
               </p-button>
             </div>
           </form>
-          <p class="signup-link">
-            ¿No tienes una cuenta?
-            <a routerLink="/signup">Crea una cuenta</a>
-          </p>
+          <div class="auth-link-container">
+            <p>
+              ¿No tienes una cuenta?
+              <a routerLink="/signup">Crea una cuenta</a>
+            </p>
+          </div>
         </div>
         } @placeholder {
-        <div class="login-placeholder">
+        <div class="auth-placeholder">
           <p>Cargando formulario...</p>
         </div>
         }

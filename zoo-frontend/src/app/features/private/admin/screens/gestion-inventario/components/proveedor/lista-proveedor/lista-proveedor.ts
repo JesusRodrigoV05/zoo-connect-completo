@@ -3,19 +3,21 @@ import {
   Component,
   inject,
   OnInit,
+  afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { Loader } from "@app/shared/components";
 import { ButtonModule } from "primeng/button";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { PaginatorModule } from "primeng/paginator";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { ProveedorItem } from "../proveedor-item/proveedor-item";
 import { ProveedoresStore } from "@app/features/private/admin/stores/admin-proveedores.store";
 import { ConfirmationService } from "primeng/api";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-proveedor",
@@ -40,6 +42,7 @@ export default class ListaProveedor implements OnInit {
   readonly router = inject(Router);
 
   confirmation = inject(ZooConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
 
   layout: "list" | "grid" = "list";
   layoutOptions = [
@@ -48,10 +51,16 @@ export default class ListaProveedor implements OnInit {
   ];
 
   ngOnInit() {
+
+
     this.store.loadItems();
   }
 
-  onPageChange(event: any) {
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-proveedor-lista");
+  }
+
+  onPageChange(event: DataViewPageEvent) {
     const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }

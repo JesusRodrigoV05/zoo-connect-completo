@@ -7,9 +7,10 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 
 from app.db.session import get_db
 from app.core.dependencies import (
-    require_admin_user, 
     get_current_active_user, 
-    require_task_management_permission
+    require_task_config_permission,
+    require_task_operations_permission,
+    require_task_planner_permission,
 )
 from app.models.user import User
 
@@ -51,7 +52,7 @@ def get_today():
 
 #Gestion tipos tare
 
-@router.post("/tipos", response_model=schemas_tarea.TipoTareaOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_admin_user)])
+@router.post("/tipos", response_model=schemas_tarea.TipoTareaOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_task_config_permission)])
 def create_tipo_tarea(
     tipo_tarea_in: schemas_tarea.TipoTareaCreate,
     db: Session = Depends(get_db),
@@ -70,7 +71,7 @@ def list_tipos_tarea_all(
     query = crud_tarea.get_tipos_tarea_query(db, include_inactive)
     return query.all()
 
-@router.put("/tipos/{id}", response_model=schemas_tarea.TipoTareaOut, dependencies=[Depends(require_admin_user)])
+@router.put("/tipos/{id}", response_model=schemas_tarea.TipoTareaOut, dependencies=[Depends(require_task_config_permission)])
 def update_tipo_tarea(
     id: int,
     tipo_tarea_in: schemas_tarea.TipoTareaUpdate,
@@ -79,7 +80,7 @@ def update_tipo_tarea(
 ):
     return crud_tarea.update_tipo_tarea(db, db_obj, tipo_tarea_in)
 
-@router.delete("/tipos/{id}", response_model=schemas_tarea.TipoTareaOut, dependencies=[Depends(require_admin_user)])
+@router.delete("/tipos/{id}", response_model=schemas_tarea.TipoTareaOut, dependencies=[Depends(require_task_config_permission)])
 def soft_delete_tipo_tarea(
     db_obj: models_tarea.TipoTarea = Depends(_get_tipo_tarea_or_404),
     db: Session = Depends(get_db),
@@ -89,14 +90,14 @@ def soft_delete_tipo_tarea(
 
 #Gestion tareas recurrentes
 
-@router.post("/recurrentes", response_model=schemas_tarea.TareaRecurrenteOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_admin_user)])
+@router.post("/recurrentes", response_model=schemas_tarea.TareaRecurrenteOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_task_planner_permission)])
 def create_tarea_recurrente(
     tarea_in: schemas_tarea.TareaRecurrenteCreate,
     db: Session = Depends(get_db),
 ):
     return crud_tarea.create_tarea_recurrente(db, tarea_in)
 
-@router.get("/recurrentes", response_model=Page[schemas_tarea.TareaRecurrenteOut], dependencies=[Depends(require_admin_user)])
+@router.get("/recurrentes", response_model=Page[schemas_tarea.TareaRecurrenteOut], dependencies=[Depends(require_task_planner_permission)])
 def list_tareas_recurrentes(
     include_inactive: bool = False,
     db: Session = Depends(get_db),
@@ -104,13 +105,13 @@ def list_tareas_recurrentes(
     query = crud_tarea.get_tareas_recurrentes_query(db, include_inactive)
     return paginate(query)
 
-@router.get("/recurrentes/{id}", response_model=schemas_tarea.TareaRecurrenteOut, dependencies=[Depends(require_admin_user)])
+@router.get("/recurrentes/{id}", response_model=schemas_tarea.TareaRecurrenteOut, dependencies=[Depends(require_task_planner_permission)])
 def get_tarea_recurrente(
     db_obj: models_tarea.TareaRecurrente = Depends(_get_tarea_recurrente_or_404),
 ):
     return db_obj
 
-@router.put("/recurrentes/{id}", response_model=schemas_tarea.TareaRecurrenteOut, dependencies=[Depends(require_admin_user)])
+@router.put("/recurrentes/{id}", response_model=schemas_tarea.TareaRecurrenteOut, dependencies=[Depends(require_task_planner_permission)])
 def update_tarea_recurrente(
     id: int,
     tarea_in: schemas_tarea.TareaRecurrenteUpdate,
@@ -119,7 +120,7 @@ def update_tarea_recurrente(
 ):
     return crud_tarea.update_tarea_recurrente(db, db_obj, tarea_in)
 
-@router.delete("/recurrentes/{id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_admin_user)])
+@router.delete("/recurrentes/{id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_task_planner_permission)])
 def delete_tarea_recurrente(
     db_obj: models_tarea.TareaRecurrente = Depends(_get_tarea_recurrente_or_404),
     db: Session = Depends(get_db),
@@ -130,12 +131,13 @@ def delete_tarea_recurrente(
 
 #Gestion de tareas
 
-@router.post("/", response_model=schemas_tarea.TareaOut, dependencies=[Depends(require_admin_user)])
+@router.post("/", response_model=schemas_tarea.TareaOut, dependencies=[Depends(require_task_operations_permission)])
 def create_tarea_manual(
     tarea_in: schemas_tarea.TareaCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
-    return crud_tarea.create_tarea_manual(db, tarea_in)
+    return crud_tarea.create_tarea_manual(db, tarea_in, current_user)
 
 @router.get("/mis-tareas", response_model=Page[schemas_tarea.TareaOut])
 def list_mis_tareas(
@@ -152,14 +154,14 @@ def list_mis_tareas(
     )
     return paginate(query)
 
-@router.get("/sin-asignar", response_model=Page[schemas_tarea.TareaOut], dependencies=[Depends(require_admin_user)])
+@router.get("/sin-asignar", response_model=Page[schemas_tarea.TareaOut], dependencies=[Depends(require_task_operations_permission)])
 def list_tareas_sin_asignar(
     db: Session = Depends(get_db),
 ):
     query = crud_tarea.get_tareas_query(db, is_completed=False, sin_asignar=True)
     return paginate(query)
 
-@router.get("/asignadas-hoy", response_model=Page[schemas_tarea.TareaOut], dependencies=[Depends(require_admin_user)])
+@router.get("/asignadas-hoy", response_model=Page[schemas_tarea.TareaOut], dependencies=[Depends(require_task_operations_permission)])
 def list_tareas_asignadas_hoy(
     fecha: Annotated[date, Depends(get_today)],
     db: Session = Depends(get_db),
@@ -167,14 +169,15 @@ def list_tareas_asignadas_hoy(
     query = crud_tarea.get_tareas_query(db, fecha_programada=fecha)
     return paginate(query)
 
-@router.put("/{id_tarea}/asignar", response_model=schemas_tarea.TareaOut, dependencies=[Depends(require_admin_user)])
+@router.put("/{id_tarea}/asignar", response_model=schemas_tarea.TareaOut, dependencies=[Depends(require_task_operations_permission)])
 def assign_tarea(
     body: schemas_tarea.TareaAssign,
     db_tarea: models_tarea.Tarea = Depends(_get_tarea_or_404),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     db_usuario = _get_cuidador_or_404(body.usuario_asignado_id, db)
-    return crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario)
+    return crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario, current_user=current_user)
 
 
 #Ejecuion tareas
@@ -188,6 +191,8 @@ def completar_tarea_simple(
 ):
     if db_tarea.usuario_asignado_id is None:
         raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aun")
+    if db_tarea.usuario_asignado_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No puedes completar una tarea que no te fue asignada")
     
     return crud_tarea.completar_tarea_simple(
         db=db,
@@ -205,6 +210,8 @@ def completar_tarea_alimentacion(
 ):
     if db_tarea.usuario_asignado_id is None:
          raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aún")
+    if db_tarea.usuario_asignado_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No puedes completar una tarea que no te fue asignada")
         
     return crud_tarea.completar_tarea_alimentacion(
         db=db,
@@ -223,6 +230,10 @@ def complete_task_tratamiento(
     tarea = crud_tarea.get_tarea(db, id_tarea)
     if not tarea:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    if tarea.usuario_asignado_id is None:
+        raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aun")
+    if tarea.usuario_asignado_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No puedes completar una tarea que no te fue asignada")
 
     return crud_tarea.completar_tarea_tratamiento(
         db=db, 

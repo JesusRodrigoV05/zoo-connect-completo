@@ -1,7 +1,17 @@
-<div class="view-container fade-in">
+<div class="view-container fade-in tour-cuidador-mis-tareas-header">
   <div class="view-header">
     <div class="header-content">
-      <h2>Gestión de Tareas</h2>
+      <div class="header-title-row tour-cuidador-mis-tareas-title-row">
+        <h2>Gestión de Tareas</h2>
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          styleClass="tour-cuidador-mis-tareas-tour-btn"
+          (onClick)="startGuidedTour()"
+        />
+      </div>
       <p>Administra tus actividades diarias y registros de alimentación.</p>
     </div>
 
@@ -12,7 +22,7 @@
         (onChange)="onFilterChange($event)"
         optionLabel="label"
         optionValue="value"
-        styleClass="custom-select-button"
+        styleClass="custom-select-button tour-cuidador-mis-tareas-filtro"
       >
       </p-selectButton>
     </div>
@@ -22,26 +32,26 @@
     <p-table
       [value]="store.tareas()"
       [loading]="store.loading()"
-      styleClass="p-datatable-striped"
+      styleClass="p-datatable-striped tour-cuidador-mis-tareas-table"
       responsiveLayout="scroll"
       [rowHover]="true"
     >
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 5%">#</th>
-          <th style="width: 25%">Tarea / Actividad</th>
-          <th style="width: 30%">Descripción</th>
-          <th style="width: 15%">Fecha Límite</th>
-          <th style="width: 10%">Estado</th>
-          <th style="width: 15%; text-align: center">Acciones</th>
+          <th class="tour-cuidador-mis-tareas-col-numero col-w5">#</th>
+          <th class="tour-cuidador-mis-tareas-col-tarea col-w25">Tarea/Actividad</th>
+          <th class="tour-cuidador-mis-tareas-col-descripcion col-w30">Descripción</th>
+          <th class="tour-cuidador-mis-tareas-col-fecha col-w15">Fecha Límite</th>
+          <th class="tour-cuidador-mis-tareas-col-estado col-w10">Estado</th>
+          <th class="text-center tour-cuidador-mis-tareas-col-acciones col-w15">Acciones</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-tarea let-i="rowIndex">
         <tr>
-          <td class="row-index">{{ i + 1 }}</td>
+          <td class="row-index tour-cuidador-mis-tareas-col-numero">{{ i + 1 }}</td>
 
-          <td>
+          <td class="tour-cuidador-mis-tareas-col-tarea">
             <div class="task-info">
               <span class="task-title">{{ tarea.titulo }}</span>
               @if (tarea.tipoTarea?.titulo?.toLowerCase()?.includes('aliment'))
@@ -54,16 +64,16 @@
             </div>
           </td>
 
-          <td class="task-description">{{ tarea.descripcion }}</td>
+          <td class="task-description tour-cuidador-mis-tareas-col-descripcion">{{ tarea.descripcion }}</td>
 
-          <td>
+          <td class="tour-cuidador-mis-tareas-col-fecha">
             <div class="date-display">
               <i class="pi pi-calendar"></i>
               <span>{{ tarea.fechaProgramada | date:'mediumDate' }}</span>
             </div>
           </td>
 
-          <td>
+          <td class="tour-cuidador-mis-tareas-col-estado">
             <p-tag
               [value]="tarea.isCompleted ? 'Completada' : 'Pendiente'"
               [severity]="getSeverity(tarea.isCompleted)"
@@ -71,13 +81,14 @@
             ></p-tag>
           </td>
 
-          <td class="actions-cell">
+          <td class="actions-cell tour-cuidador-mis-tareas-col-acciones">
             @if (!tarea.isCompleted) { @if (esTareaDeVerReceta(tarea)) {
             <p-button
               label="Ver Receta"
               icon="pi pi-eye"
               [rounded]="true"
               class="p-button-info p-button-sm action-btn"
+              styleClass="tour-cuidador-mis-tareas-ver-receta"
               (click)="verReceta(tarea)"
               disabled]="store.saving()"
             />
@@ -88,6 +99,7 @@
               icon="pi pi-play"
               [rounded]="true"
               class="p-button-outlined p-button-sm action-btn"
+              styleClass="tour-cuidador-mis-tareas-ejecutar"
               (click)="abrirCompletar(tarea)"
               [disabled]="store.saving()"
             />
@@ -126,7 +138,7 @@
   [header]="esTareaAlimentacion() ? 'Registro de Alimentación' : 'Confirmar Tarea'"
   [(visible)]="displayDialog"
   [modal]="true"
-  styleClass="custom-dialog-diet"
+  styleClass="custom-dialog-diet tour-cuidador-mis-tareas-dialog"
   [draggable]="false"
   [resizable]="false"
 >
@@ -191,6 +203,7 @@
         [(ngModel)]="observaciones"
         rows="3"
         placeholder="Escribe cualquier novedad..."
+        class="tour-cuidador-mis-tareas-observaciones"
       ></textarea>
     </div>
   </div>
@@ -202,12 +215,14 @@
         icon="pi pi-times"
         class="p-button-text"
         [rounded]="true"
+        styleClass="tour-cuidador-mis-tareas-cancelar"
         (click)="displayDialog.set(false)"
       />
       <p-button
         [label]="esTareaAlimentacion() ? 'Registrar' : 'Confirmar'"
         icon="pi pi-check"
         class="p-button-primary"
+        styleClass="tour-cuidador-mis-tareas-confirmar"
         (click)="confirmarCompletar()"
         [loading]="store.saving()"
         [rounded]="true"

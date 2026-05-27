@@ -105,7 +105,11 @@
 }
 
 @media (max-width: 768px) {
-  .contact-section {
+.map-iframe {
+  border: 0;
+}
+
+.contact-section {
     padding: 2rem 1rem;
   }
 

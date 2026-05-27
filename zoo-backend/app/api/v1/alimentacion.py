@@ -50,7 +50,7 @@ def get_dieta(
 ):
     return db_obj
 
-@router.put("/dietas/{id}", response_model=schemas_dieta.DietaOut, dependencies=[Depends(require_admin_user := require_animal_management_permission)]) 
+@router.put("/dietas/{id}", response_model=schemas_dieta.DietaOut, dependencies=[Depends(require_animal_management_permission)])
 def update_dieta(
     id: int,
     dieta_in: schemas_dieta.DietaUpdate,

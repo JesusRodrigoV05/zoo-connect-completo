@@ -6,7 +6,7 @@ import {
   PLATFORM_ID,
 } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
-import { AuthStore } from "./core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { isPlatformBrowser } from "@angular/common";
 import { ScrollTopModule } from "primeng/scrolltop";
 import { Toast } from "primeng/toast";

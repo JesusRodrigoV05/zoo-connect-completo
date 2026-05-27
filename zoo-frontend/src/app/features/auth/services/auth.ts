@@ -7,6 +7,7 @@ import {
   LoginResponse,
   LogoutResponse,
   RegisterRequest,
+  RegisterResponse,
   ResetPasswordRequest,
   TokenResponse,
   UpdateProfileRequest,
@@ -31,16 +32,23 @@ export class Auth {
   register(
     email: string,
     username: string,
-    password: string,
-  ): Observable<Usuario> {
-    const registerData: RegisterRequest = { email, username, password };
-    return this.http
-      .post<UsuarioBackendResponse>(`${this.authUrl}/register`, registerData)
-      .pipe(map((backendUser) => UsuarioAdapter.fromBackend(backendUser)));
+    phoneNumber: string,
+    password?: string,
+    generate_password: boolean = false,
+    recaptchaToken?: string,
+  ): Observable<RegisterResponse> {
+    const registerData: RegisterRequest = { email, username, phone_number: phoneNumber };
+    if (password !== undefined) registerData.password = password;
+    if (generate_password) registerData.generate_password = true;
+    if (recaptchaToken) registerData.recaptcha_token = recaptchaToken;
+    return this.http.post<RegisterResponse>(`${this.authUrl}/register`, registerData);
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    const loginData: LoginRequest = { email, password };
+  login(identifier: string, password: string, recaptchaToken?: string): Observable<LoginResponse> {
+    const loginData: LoginRequest = { identifier, password };
+    if (recaptchaToken) {
+      loginData.recaptcha_token = recaptchaToken;
+    }
     return this.http.post<LoginResponse>(`${this.authUrl}/login`, loginData);
   }
 
@@ -83,19 +91,40 @@ export class Auth {
       .pipe(map((backendUser) => UsuarioAdapter.fromBackend(backendUser)));
   }
 
-  forgotPassword(email: string): Observable<string> {
-    const requestData: ForgotPasswordRequest = { email };
+  forgotPassword(identifier: string): Observable<string> {
+    const requestData: ForgotPasswordRequest = { identifier };
     return this.http.post<string>(
       `${this.authUrl}/forgot-password`,
       requestData,
     );
   }
 
-  resetPassword(token: string, new_password: string): Observable<string> {
-    const requestData: ResetPasswordRequest = { token, new_password };
+  resetPassword(identifier: string, code: string, new_password: string): Observable<string> {
+    const requestData: ResetPasswordRequest = { identifier, code, new_password };
     return this.http.post<string>(
       `${this.authUrl}/reset-password`,
       requestData,
+    );
+  }
+
+  verifyEmail(phoneNumber: string, code: string, recaptchaToken?: string): Observable<any> {
+    return this.http.post<any>(`${this.authUrl}/verify-phone`, {
+      phone_number: phoneNumber,
+      code,
+      recaptcha_token: recaptchaToken,
+    });
+  }
+
+  getPasswordHistory(userId: string, limit: number = 10): Observable<Array<{id: number, user_id: string, password_hash: string, created_at: string}>> {
+    return this.http.get<Array<{id: number, user_id: string, password_hash: string, created_at: string}>>(
+      `${environment.apiUrl}/admin_users/users/${userId}/password-history`,
+      { params: { limit: limit.toString() } }
+    );
+  }
+
+  clearPasswordHistory(userId: string): Observable<{msg: string}> {
+    return this.http.delete<{msg: string}>(
+      `${environment.apiUrl}/admin_users/users/${userId}/password-history`
     );
   }
 }

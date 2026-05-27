@@ -1,7 +1,16 @@
 @defer(on viewport; prefetch on idle; hydrate on viewport){
 <div class="list-page-container">
-  <div class="header-actions">
-    <h2>Gestión de Usuarios</h2>
+  <div class="header-actions tour-users-header">
+    <div class="title-row flex align-items-center gap-2">
+      <h2>Gestión de Usuarios</h2>
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
+    </div>
     <div class="buttons">
       <p-button
         variant="text"
@@ -9,12 +18,14 @@
         icon="pi pi-refresh"
         severity="danger"
         [rounded]="true"
+        styleClass="tour-users-refresh-btn"
       />
       <p-button
         icon="pi pi-plus"
         label="Crear Usuario"
         [rounded]="true"
         severity="primary"
+        styleClass="tour-users-create-btn"
         routerLink="/admin/usuarios/crear"
       />
     </div>
@@ -37,6 +48,7 @@
 
   } @else if (userData()) { @let response = userData()!;
   <p-dataview
+    styleClass="tour-users-dataview"
     #dv
     [value]="response.items"
     [paginator]="true"
@@ -51,7 +63,7 @@
   >
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ response.total }} usuarios</span>
+        <span class="tour-users-total">Total: {{ response.total }} usuarios</span>
         <span>Página {{ response.page }}</span>
       </div>
     </ng-template>
@@ -71,6 +83,7 @@
           label="Crear Primer Usuario"
           [rounded]="true"
           severity="primary"
+          styleClass="tour-users-create-btn"
           routerLink="/admin/usuarios/crear"
         />
       </div>

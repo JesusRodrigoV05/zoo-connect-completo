@@ -73,7 +73,7 @@ export class AdminUsuarios {
       );
   }
 
-  getUserById(id: number): Observable<Usuario> {
+  getUserById(id: string): Observable<Usuario> {
     return this.http
       .get<UsuarioBackendResponse>(`${this.usuariosUrl}/${id}`)
       .pipe(
@@ -113,7 +113,7 @@ export class AdminUsuarios {
   }
 
   updateUser(
-    id: number,
+    id: string,
     userData: Partial<Omit<Usuario, "id" | "creadoEn">> & { password?: string },
   ): Observable<Usuario> {
     try {
@@ -145,7 +145,7 @@ export class AdminUsuarios {
   /**
    * Elimina un usuario
    */
-  deleteUser(id: number): Observable<Usuario> {
+  deleteUser(id: string): Observable<Usuario> {
     return this.http
       .delete<UsuarioBackendResponse>(`${this.usuariosUrl}/${id}`)
       .pipe(
@@ -164,14 +164,14 @@ export class AdminUsuarios {
   /**
    * Activa o desactiva un usuario
    */
-  toggleUserStatus(id: number, activo: boolean): Observable<Usuario> {
+  toggleUserStatus(id: string, activo: boolean): Observable<Usuario> {
     return this.updateUser(id, { activo });
   }
 
   /**
    * Cambia el rol de un usuario
    */
-  changeUserRole(id: number, rol: Usuario["rol"]): Observable<Usuario> {
+  changeUserRole(id: string, rol: Usuario["rol"]): Observable<Usuario> {
     return this.updateUser(id, { rol });
   }
 
@@ -283,8 +283,8 @@ export class AdminUsuarios {
       throw new Error("El nombre de usuario debe tener al menos 2 caracteres");
     }
 
-    if (userData.password && userData.password.trim().length < 6) {
-      throw new Error("La contraseña debe tener al menos 6 caracteres");
+    if (userData.password && userData.password.trim().length < 12) {
+      throw new Error("La contraseña debe tener al menos 12 caracteres");
     }
 
     return true;

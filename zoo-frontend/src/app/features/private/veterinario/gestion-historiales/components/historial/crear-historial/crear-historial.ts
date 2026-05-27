@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  afterNextRender,
   inject,
   OnInit,
   signal,
@@ -26,6 +27,7 @@ import { VetHistoriales } from "@app/features/private/veterinario/services/histo
 import { ConfiguracionStore } from "@app/features/private/veterinario/stores/historiales/configuracion.store";
 import { HistorialesListaStore } from "@app/features/private/veterinario/stores/historiales/historiales.store";
 import { Animal } from "@models/animales";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-crear-historial",
@@ -51,6 +53,8 @@ export default class CrearHistorial implements OnInit {
   private animalesService = inject(AdminAnimales);
   private historialService = inject(VetHistoriales);
   private messageService = inject(MessageService);
+  private onboarding = inject(OnboardingService);
+  private tourPrompted = false;
 
   readonly configStore = inject(ConfiguracionStore);
   readonly listaStore = inject(HistorialesListaStore);
@@ -78,6 +82,8 @@ export default class CrearHistorial implements OnInit {
     if (this.configStore.tiposAtencion().length === 0) {
       this.configStore.loadCatalogs();
     }
+
+
   }
 
   cargarAnimales() {
@@ -147,5 +153,9 @@ export default class CrearHistorial implements OnInit {
 
   regresar() {
     this.router.navigate(["../"], { relativeTo: this.route });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("vet-historiales-crear");
   }
 }

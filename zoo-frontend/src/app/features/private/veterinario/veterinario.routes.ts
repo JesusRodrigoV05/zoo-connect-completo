@@ -8,6 +8,7 @@ export default [
   },
   {
     path: "dietas",
+    data: { requiredPermissions: ["medical_diets"] },
     loadComponent: () => import("./gestion-dietas/gestion-dietas"),
     children: [
       {
@@ -36,10 +37,12 @@ export default [
   {
     path: "mis-tareas",
     title: "Mis Tareas",
+    data: { requiredPermissions: ["medical_my_tasks"] },
     loadComponent: () => import("./mis-tareas/mis-tareas"),
   },
   {
     path: "historiales",
+    data: { requiredPermissions: ["medical_clinical_records"] },
     loadComponent: () => import("./gestion-historiales/gestion-historiales"),
     children: [
       {
@@ -81,6 +84,7 @@ export default [
   {
     path: "historiales/:id",
     title: "Detalle Historial",
+    data: { requiredPermissions: ["medical_clinical_records"] },
     loadComponent: () =>
       import("./gestion-historiales/components/historial/detalle-historial/detalle-historial"),
   },

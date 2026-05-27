@@ -2,10 +2,19 @@
 <div class="list-page-container">
   <p-confirmDialog />
 
-  <div class="header-actions">
+  <div class="header-actions tour-config-tipos-header">
     <div>
-      <h2>Configuración de Tipos</h2>
-      <p style="margin: 0; color: var(--p-text-muted-color)">
+      <div class="title-row flex align-items-center gap-2">
+        <h2>Configuración de Tipos</h2>
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          (onClick)="startGuidedTour()"
+        />
+      </div>
+      <p class="section-description">
         Diccionario de actividades
       </p>
     </div>
@@ -16,12 +25,14 @@
           icon="pi pi-refresh"
           [text]="true"
           severity="secondary"
+          styleClass="tour-config-tipos-refresh-btn"
           (onClick)="store.loadItems()"
         />
         <p-button
           label="Nuevo Tipo"
           icon="pi pi-plus"
           [rounded]="true"
+          styleClass="tour-config-tipos-new-btn"
           (onClick)="openCreate()"
         />
       </div>
@@ -31,7 +42,12 @@
   @if(store.loading() && store.items().length === 0){
   <zoo-loader />
   } @else {
-  <p-dataview #dv [value]="store.items()" [layout]="layout">
+  <p-dataview
+    styleClass="tour-config-tipos-list"
+    #dv
+    [value]="store.items()"
+    [layout]="layout"
+  >
     <ng-template pTemplate="header">
       <div class="dataview-header">
         <span>{{ store.items().length }} tipos registrados</span>

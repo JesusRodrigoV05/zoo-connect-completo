@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { Component, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   FormControl,
 } from "@angular/forms";
-import { AuthStore } from "@app/core/stores/auth.store";
+import { AuthStore } from "@stores/auth.store";
 import { Loader } from "@app/shared/components/loader";
 import { FormField } from "@app/shared/components/form-field";
 import { ButtonModule } from "primeng/button";
@@ -14,22 +14,24 @@ import { CardModule } from "primeng/card";
 import { RouterLink } from "@angular/router";
 import { NgOptimizedImage } from "@angular/common";
 import { LogoImage } from "@app/shared/components";
-import { environment } from "@env";
+import { ZooCaptcha } from "@app/shared/components/zoo-captcha/zoo-captcha";
 
 @Component({
   selector: "app-login",
+  standalone: true,
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     Loader,
     FormField,
     ButtonModule,
     CardModule,
-    RouterLink,
     NgOptimizedImage,
     LogoImage,
+    ZooCaptcha,
   ],
   templateUrl: "./login.html",
-  styleUrl: "./login.scss",
+  styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Login {
@@ -37,17 +39,25 @@ export default class Login {
   private readonly fb = inject(FormBuilder);
 
   loginForm: FormGroup = this.fb.group({
-    email: ["", [Validators.required, Validators.email]],
-    password: ["", [Validators.required, Validators.minLength(6)]],
+    email: ["", [Validators.required]],
+    password: ["", [Validators.required, Validators.minLength(5)]],
   });
 
   loading = this.authStore.loading;
   error = this.authStore.error;
+  protected readonly captchaToken = signal<string | null>(null);
 
   async onSubmit() {
     if (this.loginForm.valid) {
+      const token = this.captchaToken();
+      if (!token) {
+        this.authStore.clearError();
+        this.loginForm.markAllAsTouched();
+        return;
+      }
+
       const { email, password } = this.loginForm.value;
-      await this.authStore.login(email, password);
+      await this.authStore.login(email, password, token);
     } else {
       this.markFormGroupTouched();
     }
@@ -86,7 +96,7 @@ export default class Login {
       if (passwordControl.errors["required"])
         return "La contraseña es requerida";
       if (passwordControl.errors["minlength"])
-        return "La contraseña debe tener al menos 6 caracteres";
+        return "La contraseña debe tener al menos 12 caracteres";
     }
     return null;
   }

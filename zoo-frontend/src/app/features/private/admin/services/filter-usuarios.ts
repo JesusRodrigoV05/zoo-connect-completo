@@ -106,7 +106,7 @@ export class FilterUsuarios {
       );
   }
 
-  private mapToSelectOption(usuario: any): UserSelectOption {
+  private mapToSelectOption(usuario: Usuario): UserSelectOption {
     return {
       id: usuario.id,
       label: `${usuario.username} (${usuario.email})`,

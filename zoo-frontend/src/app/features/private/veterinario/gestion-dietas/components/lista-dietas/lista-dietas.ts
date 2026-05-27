@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   inject,
@@ -11,7 +12,7 @@ import { Router, RouterLink } from "@angular/router";
 import { Loader } from "@app/shared/components";
 import { ButtonModule } from "primeng/button";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { PaginatorModule } from "primeng/paginator";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { InputTextModule } from "primeng/inputtext";
@@ -21,6 +22,7 @@ import { ConfirmationService } from "primeng/api";
 import { DietaItem } from "../dieta-item";
 import { AlimentacionStore } from "../../../stores/alimentacion.store";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-dietas",
@@ -45,8 +47,10 @@ import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-se
 })
 export default class ListaDietas {
   readonly store = inject(AlimentacionStore);
+  private readonly onboarding = inject(OnboardingService);
   private readonly router = inject(Router);
   private readonly confirmation = inject(ZooConfirmationService);
+  private tourPrompted = false;
 
   protected readonly layout = signal<"list" | "grid">("list");
   protected readonly searchTerm = signal("");
@@ -79,6 +83,11 @@ export default class ListaDietas {
 
   ngOnInit() {
     this.store.loadDietas();
+
+  }
+
+  startGuidedTour() {
+    this.onboarding.startTour("vet-dietas-lista");
   }
 
   onSearch() {
@@ -94,7 +103,7 @@ export default class ListaDietas {
     this.store.setPage(page, size);
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: DataViewPageEvent) {
     const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }

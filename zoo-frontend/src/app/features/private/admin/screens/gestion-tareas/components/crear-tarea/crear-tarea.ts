@@ -24,6 +24,7 @@ import { TareasPendientesStore } from "@app/features/private/admin/stores/tareas
 import { CreateTareaManual } from "@app/features/private/admin/models/tareas/tarea.model";
 import { NgClass } from "@angular/common";
 import { AdminUsuarios } from "@app/features/private/admin/services/admin-usuarios";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 interface LugarOption {
   label: string;
@@ -56,6 +57,7 @@ export class CrearTarea {
   private adminUsuarios = inject(AdminUsuarios);
   private animalesService = inject(AdminAnimales);
   private habitatService = inject(AdminHabitat);
+  private onboarding = inject(OnboardingService);
 
   usuarios = signal<Usuario[]>([]);
   loadingUsuarios = signal(false);
@@ -88,7 +90,7 @@ export class CrearTarea {
     descripcion: ["", [Validators.required]],
     tipoTareaId: [null as number | null, [Validators.required]],
     fechaProgramada: [new Date(), [Validators.required]],
-    usuarioAsignadoId: [null as number | null],
+    usuarioAsignadoId: [null as string | null],
     lugarSeleccionado: [null as LugarOption | null],
   });
 
@@ -98,6 +100,7 @@ export class CrearTarea {
         untracked(() => {
           this.loadCatalogos();
           this.loadAllUsers();
+
           this.form.reset({
             fechaProgramada: new Date(),
             lugarSeleccionado: this.lugares()[0],
@@ -105,6 +108,10 @@ export class CrearTarea {
         });
       }
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-tareas-crear-manual");
   }
 
   private loadCatalogos() {
@@ -161,9 +168,7 @@ export class CrearTarea {
       descripcion: val.descripcion!,
       fechaProgramada: this.formatDate(val.fechaProgramada!),
       tipoTareaId: val.tipoTareaId!,
-      usuarioAsignadoId: val.usuarioAsignadoId
-        ? Number(val.usuarioAsignadoId)
-        : undefined,
+      usuarioAsignadoId: val.usuarioAsignadoId || undefined,
       animalId:
         selectedLugar?.tipo === "animal" ? selectedLugar.value! : undefined,
       habitatId:

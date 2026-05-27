@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { SplitterLayout } from '../../components/splitter-layout';
 import { MenuButton } from '../../models';
 import { MainContainer } from '@app/shared/components/main-container';
 import { NavMenuGestion } from '../../components/nav-menu-gestion';
+import { SplitterLayout } from '@core/layout/splitter-layout';
 
 @Component({
   selector: 'app-gestion-usuarios',
@@ -28,6 +28,7 @@ export default class GestionUsuarios {
       texto: 'Crear Usuario',
       descripcion: 'Agregar nuevo usuario al sistema',
       ruta: '/admin/usuarios/crear',
+      permisos: ['users_create'],
       exacto: false,
     },
     {
@@ -35,6 +36,7 @@ export default class GestionUsuarios {
       texto: 'Lista de Usuarios',
       descripcion: 'Ver y gestionar usuarios existentes',
       ruta: '/admin/usuarios',
+      permisos: ['users_list'],
       exacto: true,
     },
   ];

@@ -4,7 +4,6 @@ import { ChangeDetectionStrategy, Component } from "@angular/core";
   selector: "app-servicios",
   imports: [],
   templateUrl: "./servicios.html",
-  styleUrl: "./servicios.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Servicios {}

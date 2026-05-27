@@ -1,13 +1,26 @@
 <p-card styleClass="ajustes-card">
-  <ng-template pTemplate="title"> Preferencias de Notificación </ng-template>
+  <ng-template pTemplate="title">
+    <div class="flex align-items-center gap-2">
+      <span class="tour-settings-notifications-header">Preferencias de Notificación</span>
+      <p-button
+        icon="pi pi-question-circle"
+        severity="help"
+        [rounded]="true"
+        [text]="true"
+        (click)="startGuidedTour()"
+        pTooltip="Ver tour de notificaciones"
+        size="small"
+      />
+    </div>
+  </ng-template>
   <ng-template pTemplate="subtitle">
     Elige cómo y cuándo quieres recibir notificaciones.
   </ng-template>
 
   <div class="settings-section">
-    <h3 class="section-title">Canales de Notificación</h3>
+    <h3 class="section-title tour-settings-channels-section">Canales de Notificación</h3>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-push">
       <div class="setting-info">
         <h4>Notificaciones Push</h4>
         <p>Recibe notificaciones en tiempo real en tu navegador</p>
@@ -18,7 +31,7 @@
       />
     </div>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-email">
       <div class="setting-info">
         <h4>Notificaciones por Correo</h4>
         <p>Recibe actualizaciones importantes en tu email</p>
@@ -29,7 +42,7 @@
       />
     </div>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-telegram">
       <div class="setting-info">
         <h4>Notificaciones por Telegram</h4>
         <p>Recibe alertas directamente en Telegram</p>
@@ -40,7 +53,7 @@
       />
     </div>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-whatsapp">
       <div class="setting-info">
         <h4>Notificaciones por WhatsApp</h4>
         <p>Recibe mensajes importantes en WhatsApp</p>
@@ -53,9 +66,9 @@
   </div>
 
   <div class="settings-section">
-    <h3 class="section-title">Tipos de Notificación</h3>
+    <h3 class="section-title tour-settings-types-section">Tipos de Notificación</h3>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-new-events">
       <div class="setting-info">
         <h4>Nuevos Eventos</h4>
         <p>Recibe notificaciones sobre nuevos eventos del zoológico</p>
@@ -66,7 +79,7 @@
       />
     </div>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-animal-updates">
       <div class="setting-info">
         <h4>Actualizaciones de Animales</h4>
         <p>Notificaciones sobre nuevos animales o actualizaciones</p>
@@ -77,7 +90,7 @@
       />
     </div>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-quiz-surveys">
       <div class="setting-info">
         <h4>Quizzes y Encuestas</h4>
         <p>Avisos sobre nuevos quizzes y encuestas disponibles</p>
@@ -88,7 +101,7 @@
       />
     </div>
 
-    <div class="setting-item">
+    <div class="setting-item tour-settings-zoo-news">
       <div class="setting-info">
         <h4>Noticias del Zoo</h4>
         <p>Mantente informado sobre las últimas noticias</p>

@@ -1,0 +1,147 @@
+<zoo-main-container>
+  <section class="permissions-page">
+    <header class="permissions-header">
+      <div class="permissions-title-block">
+        <div class="permissions-osi-row">
+          <p class="eyebrow">Administracion de accesos</p>
+          <p-button
+            label="Tour guiado"
+            icon="pi pi-question-circle"
+            severity="contrast"
+            [rounded]="true"
+            (onClick)="startGuidedTour()"
+          />
+        </div>
+        <h1 class="tour-permissions-title">Matriz de Roles</h1>
+        <p>
+          Define que funcionalidades puede usar cada rol. Las subfunciones solo se habilitan cuando la cabecera esta activa.
+        </p>
+      </div>
+
+      <div class="actions tour-permissions-actions">
+        <input
+          class="tour-permissions-search"
+          pInputText
+          type="text"
+          [value]="search()"
+          (input)="onSearchChange(($any($event.target)).value)"
+          placeholder="Buscar por rol"
+        />
+        <button
+          class="tour-permissions-refresh-btn"
+          pButton
+          type="button"
+          label="Recargar"
+          icon="pi pi-refresh"
+          (click)="loadMatrix()"
+        ></button>
+      </div>
+    </header>
+
+    @if (loading()) {
+      <div class="loading-state">
+        <p>Preparando matriz de permisos por rol...</p>
+      </div>
+    } @else {
+      <div class="table-shell tour-permissions-table-shell">
+        <table class="permissions-table tour-permissions-table">
+          <thead>
+            <tr>
+              <th class="tour-permissions-col-role" rowspan="2">Rol</th>
+              <th rowspan="2">Usuarios</th>
+              @for (column of standaloneColumns; track column.key) {
+                <th class="tour-permissions-col-permission" rowspan="2">
+                  <span>{{ column.label }}</span>
+                </th>
+              }
+              @for (group of accessGroups; track group.key) {
+                <th class="tour-permissions-col-permission permission-group-header" [attr.colspan]="group.children.length">
+                  <span>{{ group.label }}</span>
+                </th>
+              }
+              <th class="tour-permissions-col-actions" rowspan="2">Acciones</th>
+            </tr>
+            <tr>
+              @for (group of accessGroups; track group.key) {
+                @for (subColumn of group.children; track subColumn.key) {
+                  <th class="tour-permissions-col-permission permission-subheader">
+                    <span>{{ subColumn.label }}</span>
+                  </th>
+                }
+              }
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (role of filteredRoles(); track role.id) {
+              <tr class="group-toggle-row">
+                <td class="tour-permissions-col-role" [attr.rowspan]="2">
+                  <p-tag [value]="role.name" severity="info"></p-tag>
+                </td>
+                <td [attr.rowspan]="2">
+                  <span>{{ role.user_count }} usuario(s)</span>
+                </td>
+                @for (column of standaloneColumns; track column.key) {
+                  <td class="permission-cell tour-permissions-col-permission" [attr.rowspan]="2">
+                    <label>
+                      <input
+                        type="checkbox"
+                        [checked]="isStandaloneAllowed(role, column)"
+                        (change)="toggleStandalone(role.id, column, ($any($event.target)).checked)"
+                      />
+                    </label>
+                  </td>
+                }
+                @for (group of accessGroups; track group.key) {
+                  <td class="permission-cell permission-group-toggle" [attr.colspan]="group.children.length">
+                    <label>
+                      <input
+                        type="checkbox"
+                        [checked]="isGroupEnabled(role, group)"
+                        (change)="toggleGroup(role.id, group, ($any($event.target)).checked)"
+                      />
+                      <span>Habilitar {{ group.label }}</span>
+                    </label>
+                  </td>
+                }
+                <td class="actions-cell tour-permissions-col-actions" [attr.rowspan]="2">
+                  <button
+                    class="tour-permissions-save-btn"
+                    pButton
+                    type="button"
+                    label="Guardar"
+                    icon="pi pi-save"
+                    [disabled]="!dirtyRoles()[role.id] || savingRoleId() === role.id"
+                    (click)="saveRolePermissions(role)"
+                  ></button>
+                </td>
+              </tr>
+              <tr>
+                @for (group of accessGroups; track group.key) {
+                  @for (subColumn of group.children; track subColumn.key) {
+                    <td class="permission-cell tour-permissions-col-permission">
+                      <label>
+                        <input
+                          type="checkbox"
+                          [disabled]="!isGroupEnabled(role, group)"
+                          [checked]="isSubColumnAllowed(role, subColumn)"
+                          (change)="toggleSubColumn(role.id, subColumn, ($any($event.target)).checked)"
+                        />
+                      </label>
+                    </td>
+                  }
+                }
+              </tr>
+            } @empty {
+              <tr>
+                <td [attr.colspan]="leafColumnCount() + 3">
+                  No hay roles para mostrar.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</zoo-main-container>

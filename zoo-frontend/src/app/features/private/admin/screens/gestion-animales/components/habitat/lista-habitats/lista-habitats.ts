@@ -1,6 +1,8 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   effect,
   inject,
@@ -23,6 +25,8 @@ import { FormsModule } from "@angular/forms";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { NgClass } from "@angular/common";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "zoo-lista-habitats",
@@ -47,6 +51,8 @@ export default class ListaHabitats {
   private destroyRef = inject(DestroyRef);
   toastService = inject(ShowToast);
   confirmation = inject(ZooConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
+  private readonly authStore = inject(AuthStore);
 
   protected currentPage = signal(1);
   protected pageSize = signal(10);
@@ -57,13 +63,22 @@ export default class ListaHabitats {
 
   protected readonly layout = signal<"list" | "grid">("list");
   protected readonly options: ("list" | "grid")[] = ["list", "grid"];
+  protected readonly canCreateHabitats = computed(() =>
+    this.authStore.hasPermission("animals_create_habitats"),
+  );
 
   constructor() {
+
+
     effect(() => {
       const page = this.currentPage();
       const size = this.pageSize();
       this.loadHabitats(page, size);
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-habitat-lista");
   }
 
   protected navigateToCreate(): void {

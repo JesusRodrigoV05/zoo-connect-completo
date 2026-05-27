@@ -33,7 +33,7 @@ import { LogoImage } from "@app/shared/components";
     LogoImage,
   ],
   templateUrl: "./forgot-password.html",
-  styleUrl: "./forgot-password.scss",
+  styleUrl: "../../auth.styles.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ForgotPassword {
@@ -46,7 +46,7 @@ export default class ForgotPassword {
   protected readonly formSubmitted = signal(false);
 
   protected readonly forgotForm = this.fb.group({
-    email: ["", [Validators.required, Validators.email]],
+    identifier: ["", [Validators.required]],
   });
 
   protected isInvalid(fieldName: string): boolean {
@@ -62,10 +62,7 @@ export default class ForgotPassword {
 
     if (field?.errors) {
       if (field.errors["required"]) {
-        return "El correo electrónico es requerido";
-      }
-      if (field.errors["email"]) {
-        return "Ingresa un correo electrónico válido";
+        return "El usuario o telefono es requerido";
       }
     }
 
@@ -83,16 +80,16 @@ export default class ForgotPassword {
         .pipe(finalize(() => this.isSending.set(false)))
         .subscribe({
           next: (response) => {
-            this.toastService.showSuccess("Correo Enviado", response.msg);
-            this.router.navigate(["/login"]);
+            this.toastService.showSuccess("Codigo enviado", response.msg);
+            this.router.navigate(["/reset-password"]);
           },
           error: (error) => {
-            let errorMessage = "Error al enviar correo de recuperación";
+            let errorMessage = "Error al enviar codigo de recuperacion";
 
             if (error.status === 404) {
-              errorMessage = "No existe una cuenta con este correo electrónico";
+              errorMessage = "No existe una cuenta con ese usuario o telefono";
             } else if (error.status === 400) {
-              errorMessage = "Correo electrónico inválido";
+              errorMessage = "Usuario o telefono invalido";
             }
 
             this.toastService.showError("Error", errorMessage);
@@ -101,7 +98,7 @@ export default class ForgotPassword {
     } else {
       this.toastService.showError(
         "Error",
-        "Por favor, ingresa un correo electrónico válido",
+        "Por favor, ingresa tu usuario o telefono",
       );
     }
   }

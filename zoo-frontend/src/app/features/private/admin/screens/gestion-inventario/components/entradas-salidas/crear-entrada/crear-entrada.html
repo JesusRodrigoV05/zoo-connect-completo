@@ -1,14 +1,23 @@
 <div class="form-container">
   <p-card styleClass="entry-card">
     <ng-template pTemplate="header">
-      <div class="card-header">
-        <h2>Registrar Entrada</h2>
+      <div class="card-header tour-entrada-header">
+        <div class="card-header-row">
+          <h2>Registrar Entrada</h2>
+          <p-button
+            label="Tour guiado"
+            icon="pi pi-question-circle"
+            severity="contrast"
+            [rounded]="true"
+            (onClick)="startGuidedTour()"
+          />
+        </div>
         <p class="subtitle">Ingreso de nuevos productos al almacén</p>
       </div>
     </ng-template>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
-      <div class="form-section">
+      <div class="form-section tour-entrada-proveedor-section">
         <h4>Datos del Proveedor</h4>
         <div class="field">
           <p-floatlabel>
@@ -33,7 +42,7 @@
         </div>
       </div>
 
-      <div class="form-section mt-4">
+      <div class="form-section mt-4 tour-entrada-products-section">
         <div class="flex justify-between align-items-center mb-3">
           <h4>Productos a Ingresar</h4>
           <p-button
@@ -41,19 +50,20 @@
             icon="pi pi-plus"
             size="small"
             [outlined]="true"
+            styleClass="tour-entrada-add-row-btn"
             (onClick)="addProducto()"
           />
         </div>
 
         <div formArrayName="detalles">
-          <p-table [value]="detalles.controls" styleClass="p-datatable-sm">
+          <p-table [value]="detalles.controls" styleClass="p-datatable-sm tour-entrada-table">
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 30%">Producto *</th>
-                <th style="width: 15%">Cantidad *</th>
-                <th style="width: 20%">Lote</th>
-                <th style="width: 20%">Vencimiento</th>
-                <th style="width: 5%"></th>
+                <th class="tour-entrada-col-producto col-w30">Producto *</th>
+                <th class="tour-entrada-col-cantidad col-w15">Cantidad *</th>
+                <th class="tour-entrada-col-lote col-w20">Lote</th>
+                <th class="tour-entrada-col-vencimiento col-w20">Vencimiento</th>
+                <th class="col-w5"></th>
               </tr>
             </ng-template>
 
@@ -69,7 +79,7 @@
                     placeholder="Seleccionar..."
                     appendTo="body"
                     fluid
-                    styleClass="w-full table-input"
+                    styleClass="w-full table-input tour-entrada-producto-select"
                   />
                 </td>
                 <td>
@@ -80,7 +90,7 @@
                     buttonLayout="horizontal"
                     inputStyleClass="w-full text-center p-1"
                     fluid
-                    class="compact-number"
+                    class="compact-number tour-entrada-cantidad-input"
                   />
                 </td>
                 <td>
@@ -88,7 +98,7 @@
                     pInputText
                     formControlName="lote"
                     placeholder="Opcional"
-                    class="w-full p-2"
+                    class="w-full p-2 tour-entrada-lote-input"
                     fluid
                   />
                 </td>
@@ -98,7 +108,7 @@
                     appendTo="body"
                     dateFormat="yy-mm-dd"
                     placeholder="YYYY-MM-DD"
-                    styleClass="w-full table-date"
+                    styleClass="w-full table-date tour-entrada-vencimiento-input"
                     fluid
                   />
                 </td>
@@ -123,6 +133,7 @@
           icon="pi pi-times"
           [text]="true"
           severity="secondary"
+          styleClass="tour-entrada-cancel-btn"
           (onClick)="onCancel()"
           [disabled]="isProcessing()"
         />
@@ -132,6 +143,7 @@
           type="submit"
           [loading]="isProcessing()"
           [rounded]="true"
+          styleClass="tour-entrada-submit-btn"
         />
       </div>
     </form>

@@ -15,13 +15,19 @@ import re
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(120), primary_key=True, index=True)
     #unique=True
-    email = Column(String(200), unique=True, index=True, nullable=False)
-    username = Column(String(100), unique=True, nullable=False)
+    email = Column(String(200), unique=True, index=True, nullable=True)
+    username = Column(String(120), unique=True, nullable=False)
+    phone_number = Column(String(25), unique=True, index=True, nullable=True)
+    phone_verified = Column(Boolean, default=False, nullable=False)
     hashed_password = Column(String(200), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     email_verified = Column(Boolean, default=False, nullable=False)
+    verification_code = Column(String(10), nullable=True)
+    sms_otp_code = Column(String(10), nullable=True)
+    sms_otp_purpose = Column(String(32), nullable=True)
+    sms_otp_expires_at = Column(DateTime(timezone=True), nullable=True)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     photo_url = Column(String(2048), nullable=True) #estandar
 
@@ -30,11 +36,14 @@ class User(Base):
     totp_secret = Column(String(255), nullable=True)
     #redis
     locked_until = Column(DateTime(timezone=True), nullable=True)
+    must_change_password = Column(Boolean, default=True, nullable=False)
+    password_changed_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     role = relationship("Role", back_populates="users")
+    user_permissions = relationship("UserPermission", back_populates="user", cascade="all, delete-orphan")
     encuestas_creadas = relationship("Encuesta", back_populates="usuario_creador")
     participaciones_encuestas = relationship("ParticipacionEncuesta", back_populates="usuario")
     trivias_creadas = relationship("Trivia", back_populates="usuario")
@@ -53,6 +62,7 @@ class User(Base):
     #veterinario
     historiales_creados = relationship("HistorialMedico", back_populates="veterinario")
     recetas_asignadas = relationship("RecetaMedica", back_populates="usuario_asignado")
+    onboarding_tours = relationship("OnboardingTourProgress", back_populates="user", cascade="all, delete-orphan")
     #Pruebas
     #propeidades hibridas
     @hybrid_property
@@ -73,7 +83,7 @@ class User(Base):
     @validates('email')
     def validate_and_normalize_email(self, key, email_address):
         if not email_address:
-            raise ValueError("El email no puede estar vacio")
+            return None
               
         normalized_email = email_address.lower().strip()
 
@@ -86,9 +96,8 @@ class User(Base):
         if not username:
             raise ValueError("El nombre de usuario no puede estar vacio")
 
-        normalized_username = username.strip()
-        #solo alfanumerico
-        #if not re.match("^[a-zA-Z0-9_.-]+$", normalized_username):
-        #     raise ValueError("El nombre de usuario solo puede contener letras, numeros, _, . y -")
+        normalized_username = username.strip().lower()
+        if not re.match(r"^[a-z0-9]+\.(admin|cuidador|vet|visitante|osi)\.[a-z0-9]+$", normalized_username):
+             raise ValueError("El ID de usuario debe usar el formato nombre.rol.apellido")
 
         return normalized_username

@@ -12,7 +12,8 @@ import { AdminEncuestas } from "@app/features/private/admin/services/admin-encue
 import { ChartModule } from "primeng/chart";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { switchMap } from "rxjs";
-
+import type { TooltipItem } from "chart.js";
+ 
 type SupportedChartType = "bar" | "pie" | "doughnut" | "line";
 
 @Component({
@@ -93,7 +94,7 @@ export default class EncuestaStats {
             },
             tooltip: {
               callbacks: {
-                label: (context: any) => ` ${context.raw} respuestas`,
+                label: (context: TooltipItem<SupportedChartType>) => ` ${context.raw} respuestas`,
               },
             },
           },

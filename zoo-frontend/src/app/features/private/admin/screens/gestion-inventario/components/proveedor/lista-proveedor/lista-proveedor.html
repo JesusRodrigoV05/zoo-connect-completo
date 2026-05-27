@@ -2,8 +2,17 @@
 <div class="list-page-container">
   <p-confirmDialog />
 
-  <div class="header-actions">
-    <h2>Gestión de Proveedores</h2>
+  <div class="header-actions tour-provider-list-header">
+    <div class="title-row flex align-items-center gap-2">
+      <h2>Gestión de Proveedores</h2>
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
+    </div>
     <div class="buttons">
       <p-button
         variant="text"
@@ -12,12 +21,14 @@
         severity="danger"
         [rounded]="true"
         pTooltip="Recargar"
+        styleClass="tour-provider-refresh-btn"
       />
       <p-button
         icon="pi pi-plus"
         label="Nuevo Proveedor"
         [rounded]="true"
         severity="primary"
+        styleClass="tour-provider-new-btn"
         routerLink="../crear"
       />
     </div>
@@ -39,6 +50,7 @@
   </div>
   } @else {
   <p-dataview
+    styleClass="tour-provider-dataview"
     #dv
     [value]="store.items()"
     [paginator]="true"
@@ -53,9 +65,10 @@
   >
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ store.total() }} proveedores</span>
+        <span class="tour-provider-total">Total: {{ store.total() }} proveedores</span>
 
         <p-selectButton
+          styleClass="tour-provider-layout"
           [options]="layoutOptions"
           [(ngModel)]="layout"
           optionLabel="icon"
@@ -93,7 +106,7 @@
 
     <ng-template #empty>
       <div class="empty-state">
-        <i class="pi pi-users" style="font-size: 3rem"></i>
+        <i class="pi pi-users empty-icon"></i>
         <p>No hay proveedores registrados.</p>
         <p-button
           label="Registrar Primero"

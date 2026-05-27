@@ -14,7 +14,7 @@ export interface Historial {
   fechaAtencion: Date;
   abierto: boolean;
 
-  veterinario?: { id: number; nombre: string; email: string };
+  veterinario?: { id: string; nombre: string; email: string };
   animal?: { id: number; nombre: string; especie: string; foto?: string };
   tipoAtencion?: TipoAtencion;
 
@@ -50,7 +50,7 @@ export interface HistorialResponse {
   fecha_atencion: string;
   estado: boolean;
 
-  veterinario?: { id: number; username: string; email: string };
+  veterinario?: { id: string; username: string; email: string };
   animal?: {
     id_animal: number;
     nombre_animal: string;

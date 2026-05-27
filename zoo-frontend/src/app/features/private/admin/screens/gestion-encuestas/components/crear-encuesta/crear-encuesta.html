@@ -1,15 +1,24 @@
 @defer (on viewport; prefetch on idle; hydrate on viewport) {
 <p-card class="crear-usuario-card">
   <ng-template pTemplate="header">
-    <div class="card-header">
-      <h2>{{ pageTitle }}</h2>
+    <div class="card-header tour-encuesta-create-header">
+      <div class="card-header-row">
+        <h2>{{ pageTitle }}</h2>
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          (onClick)="startGuidedTour()"
+        />
+      </div>
       <p class="subtitle">Ingresa los datos de la nueva encuesta</p>
     </div>
   </ng-template>
 
   <form [formGroup]="encuestaForm" (ngSubmit)="onSubmit()" class="usuario-form">
     <div class="form-grid">
-      <div class="field full-width">
+      <div class="field full-width tour-encuesta-campo-titulo">
         <p-floatlabel variant="on">
           <input id="titulo" pInputText type="text" formControlName="titulo" />
           <label for="titulo">Título</label>
@@ -22,7 +31,7 @@
         }
       </div>
 
-      <div class="field full-width">
+      <div class="field full-width tour-encuesta-campo-descripcion">
         <p-floatlabel variant="on">
           <textarea
             pTextarea
@@ -41,7 +50,7 @@
         }
       </div>
 
-      <div class="field">
+      <div class="field tour-encuesta-campo-fecha-inicio">
         <p-floatlabel variant="on">
           <p-datepicker
             inputId="fecha-inicio"
@@ -62,7 +71,7 @@
         }
       </div>
 
-      <div class="field">
+      <div class="field tour-encuesta-campo-fecha-fin">
         <p-floatlabel variant="on">
           <p-datepicker
             inputId="fecha-fin"
@@ -83,7 +92,7 @@
         }
       </div>
 
-      <div class="field full-width">
+      <div class="field full-width tour-encuesta-seccion-preguntas">
         <div class="section-header">
           <h4>Preguntas</h4>
           <span class="section-counter">
@@ -158,7 +167,7 @@
           [rounded]="true"
           severity="secondary"
           [outlined]="true"
-          styleClass="mt-3"
+          styleClass="mt-3 tour-encuesta-add-question-btn"
         />
       </div>
     </div>
@@ -168,6 +177,7 @@
         label="Cancelar"
         [rounded]="true"
         severity="secondary"
+        styleClass="tour-encuesta-cancel-btn"
         (onClick)="onCancel()"
         [disabled]="isCreating()"
       />
@@ -176,6 +186,7 @@
         [label]="isCreating() ? 'Guardando...' : buttonText"
         [rounded]="true"
         severity="primary"
+        styleClass="tour-encuesta-submit-btn"
         [loading]="isCreating()"
         [disabled]="(formSubmitted() && encuestaForm.invalid) || isCreating()"
       />

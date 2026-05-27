@@ -13,6 +13,9 @@ class AuditLogUser(BaseModel):
 class AuditLogOut(BaseModel):
     id: int
     event: str
+    log_type: str = "security"
+    action: Optional[str] = None
+    detail: Optional[str] = None
     timestamp: datetime
     attempted_email: Optional[str] = None
 

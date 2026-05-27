@@ -1,7 +1,15 @@
 <div class="quiz-page-wrapper">
   @if (!generatedQuiz() && !isLoading()) {
-  <section class="intro-section">
-    <h1>Centro de Trivias</h1>
+  <section class="intro-section tour-public-quizzes-header">
+    <div class="title-row">
+      <h1>Centro de Trivias</h1>
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-compass"
+        styleClass="p-button-sm p-button-rounded p-button-outlined"
+        (onClick)="startGuidedTour()"
+      />
+    </div>
     <p>
       Configura tu reto y pon a prueba tus conocimientos sobre la naturaleza.
     </p>
@@ -10,7 +18,7 @@
   <p-card styleClass="config-card">
     @if (authStore.isAuthenticated()) {
     <div class="form-grid">
-      <div class="field-col">
+      <div class="field-col tour-public-quizzes-difficulty">
         <label>Dificultad</label>
         <p-select
           fluid
@@ -22,7 +30,7 @@
         />
       </div>
 
-      <div class="field-col">
+      <div class="field-col tour-public-quizzes-questions">
         <label>Preguntas</label>
         <p-inputNumber
           fluid
@@ -35,7 +43,7 @@
         />
       </div>
 
-      <div class="actions">
+      <div class="actions tour-public-quizzes-generate">
         <p-button
           label="Generar Desafío"
           [rounded]="true"
@@ -56,7 +64,14 @@
         progreso y convertirte en un experto de la naturaleza.
       </p>
 
-      <div class="invite-actions">
+      <div class="tour-public-quizzes-difficulty">
+        <strong>Dificultad:</strong> inicia sesion para seleccionar el nivel del reto.
+      </div>
+      <div class="tour-public-quizzes-questions">
+        <strong>Preguntas:</strong> inicia sesion para ajustar la cantidad del desafio.
+      </div>
+
+      <div class="invite-actions tour-public-quizzes-generate">
         <p-button
           label="Comenzar Aventura"
           [rounded]="true"

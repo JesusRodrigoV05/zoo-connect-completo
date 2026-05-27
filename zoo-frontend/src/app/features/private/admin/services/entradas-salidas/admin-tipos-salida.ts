@@ -27,10 +27,10 @@ export class AdminTiposSalida {
       .set("page", page)
       .set("size", size)
       .set("include_inactive", includeInactive);
-    return this.http.get<any>(this.tiposSalidaUrl, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(this.tiposSalidaUrl, { params }).pipe(
       map((res) => ({
         ...res,
-        items: res.items.map((i: any) => TipoSalidaAdapter.fromBackend(i)),
+        items: res.items.map((i) => TipoSalidaAdapter.fromBackend(i)),
       })),
     );
   }

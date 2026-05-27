@@ -191,8 +191,6 @@ export const ProductStore = signalStore(
             return service.getStockAlertProducts(page(), size()).pipe(
               tapResponse({
                 next: (response) => {
-                  console.log("Alertas recibidas:", response.items);
-                  console.log("Total encontradas:", response.total);
                   patchState(store, {
                     products: response.items,
                     total: response.total,

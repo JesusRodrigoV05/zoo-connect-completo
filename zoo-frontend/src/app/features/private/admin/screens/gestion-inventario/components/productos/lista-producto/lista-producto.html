@@ -2,8 +2,17 @@
 <div class="list-page-container">
   <p-confirmDialog />
 
-  <div class="header-actions">
-    <h2>Inventario General</h2>
+  <div class="header-actions tour-product-list-header">
+    <div class="title-row flex align-items-center gap-2">
+      <h2>Inventario General</h2>
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
+    </div>
     <div class="buttons">
       <p-button
         icon="pi pi-file"
@@ -12,12 +21,14 @@
         [rounded]="true"
         severity="primary"
         pTooltip="Generar Reporte"
+        styleClass="tour-product-report-btn"
       />
       <p-button
         label="Alertas"
         (onClick)="store.loadStockAlerts()"
         [rounded]="true"
         pTooltip="Alertas"
+        styleClass="tour-product-alerts-btn"
       />
       <p-button
         variant="text"
@@ -26,12 +37,14 @@
         severity="danger"
         [rounded]="true"
         pTooltip="Recargar"
+        styleClass="tour-product-refresh-btn"
       />
       <p-button
         icon="pi pi-plus"
         label="Nuevo Producto"
         [rounded]="true"
         severity="primary"
+        styleClass="tour-product-new-btn"
         routerLink="../crear"
       />
     </div>
@@ -53,6 +66,7 @@
   </div>
   } @else {
   <p-dataview
+    styleClass="tour-product-dataview"
     #dv
     [value]="store.products()"
     [paginator]="true"
@@ -70,6 +84,7 @@
         <span>Total: {{ store.total() }} productos</span>
 
         <p-selectbutton
+          styleClass="tour-product-layout"
           [options]="layoutOptions"
           [ngModel]="store.layout()"
           (ngModelChange)="store.setLayout($event)"
@@ -85,7 +100,7 @@
     </ng-template>
 
     <ng-template #list let-items>
-      @for (product of items; track product.id_producto) {
+      @for (product of items; track product.id) {
       <zoo-producto-item
         [product]="product"
         layout="list"
@@ -96,7 +111,7 @@
     </ng-template>
 
     <ng-template #grid let-items>
-      @for (product of items; track product.id_producto) {
+      @for (product of items; track product.id) {
       <zoo-producto-item
         [product]="product"
         layout="grid"
@@ -108,7 +123,7 @@
 
     <ng-template #empty>
       <div class="empty-state">
-        <i class="bx bx-box" style="font-size: 3rem"></i>
+        <i class="bx bx-box empty-icon"></i>
         <p>No hay productos registrados.</p>
         <p-button
           label="Registrar Primero"

@@ -2,28 +2,40 @@
   <app-hero-section />
 
   @defer (on viewport) {
-  <app-carousel />
+  <div class="tour-public-home-gallery">
+    <app-carousel />
+  </div>
   } @placeholder {
-  <div style="height: 400px; background: var(--p-surface-ground)"></div>
+  <div class="placeholder placeholder--carousel"></div>
   } @defer (on viewport) {
-  <app-services-section />
+  <div class="tour-public-home-programs">
+    <app-services-section />
+  </div>
   } @placeholder {
-  <div style="height: 300px"></div>
+  <div class="placeholder placeholder--services"></div>
   } @defer (on viewport) {
-  <app-noticias-section />
+  <div class="tour-public-home-news">
+    <app-noticias-section />
+  </div>
   } @placeholder {
-  <div style="height: 400px"></div>
+  <div class="placeholder placeholder--news"></div>
   } @defer (on viewport) {
-  <app-weather-section />
+  <div class="tour-public-home-weather">
+    <app-weather-section />
+  </div>
   } @placeholder {
-  <div style="height: 200px"></div>
+  <div class="placeholder placeholder--weather"></div>
   } @defer (on viewport) {
-  <app-contact-section (submitContact)="onSubmitContact()" />
+  <div class="tour-public-home-contact">
+    <app-contact-section (submitContact)="onSubmitContact()" />
+  </div>
   } @placeholder {
-  <div style="height: 500px"></div>
+  <div class="placeholder placeholder--contact"></div>
   } @defer (on viewport) {
-  <app-social-section />
+  <div class="tour-public-home-social">
+    <app-social-section />
+  </div>
   } @placeholder {
-  <div style="height: 100px"></div>
+  <div class="placeholder placeholder--social"></div>
   }
 </div>

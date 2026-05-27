@@ -3,6 +3,7 @@ from app.db.session import SessionLocal
 from app.models.tarea import TipoTarea
 from app.models.inventario import TipoSalida
 from app.models.role import Role
+from app.crud.permission import ensure_permissions_catalog, ensure_role_permissions
 
 def init_db():
     db = SessionLocal()
@@ -14,7 +15,8 @@ def init_db():
             {"id": 1, "name": "administrador"},
             {"id": 2, "name": "visitante"},
             {"id": 3, "name": "cuidador"},
-            {"id": 4, "name": "veterinario"}
+            {"id": 4, "name": "veterinario"},
+            {"id": 5, "name": "osi"}
         ]
 
         for rol in roles_basicos:
@@ -63,6 +65,10 @@ def init_db():
                 descripcion_tipo_salida="Salida automática por aplicación de medicamentos",
                 is_active=True
             ))
+
+        print("4. Verificando Permisos...")
+        ensure_permissions_catalog(db)
+        ensure_role_permissions(db)
 
         db.commit()
         print("--- Datos cargados exitosamente ---")

@@ -1,6 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  afterNextRender,
+  inject,
+} from "@angular/core";
 import { ButtonModule } from "primeng/button";
-import { TableModule } from "primeng/table";
+import { TableModule, TableLazyLoadEvent } from "primeng/table";
 import { TooltipModule } from "primeng/tooltip";
 import { RecurrentesStore } from "@app/features/private/admin/stores/tareas/admin-recurrentes.store";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
@@ -9,6 +14,7 @@ import { ConfirmationService, MessageService } from "primeng/api";
 import { RutinaItem } from "../rutina-item";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { Router, RouterLink } from "@angular/router";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-planificador",
@@ -30,12 +36,18 @@ export default class Planificador {
   readonly store = inject(RecurrentesStore);
   private readonly confirm = inject(ZooConfirmationService);
   private readonly router = inject(Router);
+  private readonly onboarding = inject(OnboardingService);
 
   ngOnInit() {
     this.store.loadItems();
+
   }
 
-  onPageChange(event: any) {
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-tareas-planificador");
+  }
+
+  onPageChange(event: TableLazyLoadEvent) {
     const page = (event.first ?? 0) / (event.rows ?? 10) + 1;
     const size = event.rows ?? 10;
     this.store.setPage(page, size);

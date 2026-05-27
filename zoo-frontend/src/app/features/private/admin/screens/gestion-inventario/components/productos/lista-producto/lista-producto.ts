@@ -4,13 +4,14 @@ import {
   inject,
   OnInit,
   signal,
+  afterNextRender,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { Loader } from "@app/shared/components";
 import { ButtonModule } from "primeng/button";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { PaginatorModule } from "primeng/paginator";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { ProductoItem } from "../producto-item";
@@ -19,6 +20,7 @@ import { ConfirmationService } from "primeng/api";
 import { ShowToast } from "@app/shared/services";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
 import { GenerarReportes } from "@app/shared/services/generar-reportes";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-producto",
@@ -44,6 +46,7 @@ export default class ListaProducto implements OnInit {
   private confirm = inject(ZooConfirmationService);
   private toast = inject(ShowToast);
   private reportesService = inject(GenerarReportes);
+  private onboarding = inject(OnboardingService);
 
   isDownloading = signal(false);
 
@@ -53,6 +56,8 @@ export default class ListaProducto implements OnInit {
   ];
 
   ngOnInit() {
+
+
     this.store.setPage(1, 100);
 
     this.store.updateFilters({
@@ -62,8 +67,12 @@ export default class ListaProducto implements OnInit {
     this.store.loadProducts();
   }
 
-  onPageChange(event: any) {
-    const page = event.page + 1;
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-producto-lista");
+  }
+
+  onPageChange(event: DataViewPageEvent) {
+    const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }
 

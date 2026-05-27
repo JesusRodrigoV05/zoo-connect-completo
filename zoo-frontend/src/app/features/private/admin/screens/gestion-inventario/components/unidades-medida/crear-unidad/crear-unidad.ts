@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  afterNextRender,
 } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -18,6 +19,7 @@ import { MessageModule } from "primeng/message";
 import { UnidadesMedidaStore } from "@app/features/private/admin/stores/admin-unidades-medida.store";
 import { AdminUnidadesMedida } from "@app/features/private/admin/services/admin-unidades-medida";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-crear-unidad",
@@ -42,6 +44,7 @@ export default class CrearUnidad implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly unidadService = inject(AdminUnidadesMedida);
   private readonly toast = inject(ShowToast);
+  private readonly onboarding = inject(OnboardingService);
 
   protected isEditMode = signal(false);
   protected formSubmitted = signal(false);
@@ -73,7 +76,13 @@ export default class CrearUnidad implements OnInit {
       this.isEditMode.set(true);
       this.unidadId.set(+id);
       this.loadData(+id);
+    } else {
+
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-unidad-crear");
   }
 
   private loadData(id: number) {

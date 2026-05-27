@@ -39,10 +39,10 @@ export class AdminInventario {
       params = params.set("tipo_producto_id", tipoProductoId);
     }
 
-    return this.http.get<any>(this.inventoryUrl, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(this.inventoryUrl, { params }).pipe(
       map((response) => ({
         ...response,
-        items: response.items.map((item: any) =>
+        items: response.items.map((item) =>
           ProductoAdapter.fromBackend(item),
         ),
       })),
@@ -105,10 +105,10 @@ export class AdminInventario {
   ): Observable<PaginatedResponse<Producto>> {
     let params = new HttpParams().set("page", page).set("size", size);
 
-    return this.http.get<any>(this.alertasStockUrl, { params }).pipe(
+    return this.http.get<PaginatedResponse<unknown>>(this.alertasStockUrl, { params }).pipe(
       map((response) => ({
         ...response,
-        items: response.items.map((item: any) =>
+        items: response.items.map((item) =>
           ProductoAdapter.fromBackend(item),
         ),
       })),

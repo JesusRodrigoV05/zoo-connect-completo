@@ -1,5 +1,70 @@
 <zoo-main-container>
+  <header class="audit-page-header">
+    <div class="header-content">
+      <div>
+        <h1>{{ title() }}</h1>
+        <p>{{ subtitle() }}</p>
+      </div>
+      <div class="header-stats">
+        <span class="total-badge">{{ totalRecords() }} registros encontrados</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filtros -->
+  <div class="audit-filters-bar card">
+    <div class="filter-group">
+      <span class="p-input-icon-left w-full">
+        <i class="pi pi-search"></i>
+        <input 
+          pInputText 
+          type="text" 
+          placeholder="Buscar evento o detalle..." 
+          class="w-full"
+          [value]="searchTerm()"
+          (input)="updateSearch($event)"
+        />
+      </span>
+    </div>
+
+    <div class="filter-group">
+      <p-datepicker 
+        [ngModel]="dateRange()"
+        (ngModelChange)="onDateChange($event)"
+        selectionMode="range" 
+        [readonlyInput]="true" 
+        placeholder="Rango de fechas"
+        [showIcon]="true"
+        class="w-full"
+        styleClass="w-full"
+      ></p-datepicker>
+    </div>
+
+    <div class="filter-group">
+      <p-select 
+        [options]="usuarios()" 
+        [ngModel]="selectedUserId()"
+        (ngModelChange)="onUserChange($event)"
+        placeholder="Filtrar por usuario" 
+        [showClear]="true"
+        [filter]="true"
+        class="w-full"
+        styleClass="w-full"
+      ></p-select>
+    </div>
+
+    <div class="filter-actions">
+      <p-button 
+        icon="pi pi-filter-slash" 
+        severity="secondary" 
+        pTooltip="Limpiar filtros"
+        (onClick)="clearFilters()"
+      ></p-button>
+    </div>
+  </div>
+
   <p-dataview
+    styleClass="tour-audit-dataview"
     [value]="auditorias()"
     [rows]="rows()"
     [paginator]="true"
@@ -12,33 +77,71 @@
   >
     <ng-template #list let-items>
       <div class="audit-list-container">
-        @for (item of items; track item.id) {
-        <div class="audit-item">
-          <div class="audit-header">
+        <!-- Encabezados de "tabla" -->
+        <div class="audit-item audit-table-header">
+          <div class="audit-col-event">Evento / Acción</div>
+          <div class="audit-col-user">Usuario</div>
+          <div class="audit-col-detail">Detalle / Referencia</div>
+          <div class="audit-col-date">Fecha y Hora</div>
+        </div>
+
+        @for (item of items; track item.id; let isFirst = $first) {
+        <div class="audit-item audit-row" [class.tour-audit-first-row]="isFirst">
+          <!-- Columna Evento -->
+          <div class="audit-col-event">
             <p-tag
-              [value]="item.event"
+              styleClass="tour-audit-description"
+              [value]="item.action || item.event"
               [severity]="getSeverity(item.event)"
             ></p-tag>
-            <span class="audit-timestamp"
-              >{{ item.timestamp | date : "medium" }}</span
-            >
           </div>
-          <div class="audit-body">
-            <div class="audit-detail">
-              <strong>Usuario:</strong>
-              <span>{{ item.user.username }} ({{ item.user.email }})</span>
-            </div>
+
+          <!-- Columna Usuario -->
+          <div class="audit-col-user tour-audit-user">
+            @if (item.user) {
+              <div class="user-info">
+                <span class="username">{{ item.user.username }}</span>
+                <span class="email text-muted">{{ item.user.email }}</span>
+              </div>
+            } @else {
+              <span class="text-muted">Sistema</span>
+            }
+          </div>
+
+          <!-- Columna Detalle -->
+          <div class="audit-col-detail">
+            @if(item.detail) {
+              <span class="detail-text">{{ item.detail }}</span>
+            }
             @if(item.attempted_email) {
-            <div class="audit-detail">
-              <strong>Email Intentado:</strong>
-              <span>{{ item.attempted_email }}</span>
-            </div>
+              <span class="ref-text text-muted">Ref: {{ item.attempted_email }}</span>
+            }
+            @if(!item.detail && !item.attempted_email) {
+              <span class="text-muted">-</span>
+            }
+          </div>
+
+          <!-- Columna Fecha -->
+          <div class="audit-col-date tour-audit-date">
+            <span class="audit-timestamp">
+              {{ item.timestamp | date : "medium" }}
+            </span>
+            
+            @if(isFirst){
+              <p-button
+                icon="pi pi-question-circle"
+                severity="contrast"
+                [rounded]="true"
+                [text]="true"
+                pTooltip="Iniciar tour guiado"
+                (onClick)="startGuidedTour()"
+              />
             }
           </div>
         </div>
         } @empty {
         <div class="empty-message">
-          <span>No se encontraron registros de auditoría.</span>
+          <span>No se encontraron registros.</span>
         </div>
         }
       </div>

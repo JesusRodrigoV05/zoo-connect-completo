@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   OnInit,
+  afterNextRender,
 } from "@angular/core";
 import { ButtonModule } from "primeng/button";
 import { TipoItem } from "../tipo-item";
@@ -11,11 +12,12 @@ import { FormsModule } from "@angular/forms";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { PaginatorModule } from "primeng/paginator";
 import { SelectButtonModule } from "primeng/selectbutton";
-import { DataViewModule } from "primeng/dataview";
+import { DataViewModule, DataViewPageEvent } from "primeng/dataview";
 import { Router, RouterLink } from "@angular/router";
 import { ConfirmationService } from "primeng/api";
 import { TiposProductoStore } from "@app/features/private/admin/stores/admin-tipo-productos.store";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-lista-tipos",
@@ -39,6 +41,7 @@ export default class ListaTipos implements OnInit {
   readonly store = inject(TiposProductoStore);
   readonly router = inject(Router);
   confirmation = inject(ZooConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
 
   layoutOptions = [
     { icon: "pi pi-list", value: "list" },
@@ -48,10 +51,16 @@ export default class ListaTipos implements OnInit {
   layout: "list" | "grid" = "list";
 
   ngOnInit() {
+
+
     this.store.loadItems();
   }
 
-  onPageChange(event: any) {
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-tipo-lista");
+  }
+
+  onPageChange(event: DataViewPageEvent) {
     const page = event.first / event.rows + 1;
     this.store.setPage(page, event.rows);
   }

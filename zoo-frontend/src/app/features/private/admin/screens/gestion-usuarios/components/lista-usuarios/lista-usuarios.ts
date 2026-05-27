@@ -4,6 +4,7 @@ import {
   computed,
   DestroyRef,
   effect,
+  afterNextRender,
   inject,
   signal,
 } from "@angular/core";
@@ -18,6 +19,7 @@ import { PaginatedResponse } from "@models/common";
 import { Usuario } from "@models/usuario";
 import { AuthStore } from "@stores/auth.store";
 import { AdminUsuarios } from "@app/features/private/admin/services/admin-usuarios";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "zoo-lista-usuarios",
@@ -30,6 +32,8 @@ export default class ListaUsuarios {
   private usuariosService = inject(AdminUsuarios);
   private readonly authStore = inject(AuthStore);
   private destroyRef = inject(DestroyRef);
+  private readonly onboarding = inject(OnboardingService);
+  private tourPrompted = false;
 
   protected currentPage = signal(1);
   protected pageSize = signal(10);
@@ -61,6 +65,7 @@ export default class ListaUsuarios {
       .subscribe({
         next: (response) => {
           this.userData.set(response);
+
         },
         error: (err) => {
           console.error("Error al cargar usuarios:", err);
@@ -70,6 +75,10 @@ export default class ListaUsuarios {
           this.userData.set(null);
         },
       });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-usuarios-lista");
   }
 
   protected onPageChange(event: DataViewPageEvent): void {

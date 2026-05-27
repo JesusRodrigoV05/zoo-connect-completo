@@ -22,7 +22,7 @@ export class VetRecetas {
   getRecetas(
     page: number = 1,
     size: number = 50,
-    filters?: { animalId?: number; usuarioId?: number; productoId?: number },
+    filters?: { animalId?: number; usuarioId?: string; productoId?: number },
   ): Observable<PaginatedResponse<Receta>> {
     let params = new HttpParams().set("page", page).set("size", size);
 

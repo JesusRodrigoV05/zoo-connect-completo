@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -17,6 +18,7 @@ import { InputTextModule } from "primeng/inputtext";
 import { FloatLabel } from "primeng/floatlabel";
 import { TextareaModule } from "primeng/textarea";
 import { NgTemplateOutlet } from "@angular/common";
+import { HttpErrorResponse } from "@angular/common/http";
 import { CheckboxModule } from "primeng/checkbox";
 import { ShowToast } from "@app/shared/services";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -31,6 +33,7 @@ import {
 import { Loader } from "@app/shared/components";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-crear-especie",
@@ -58,6 +61,7 @@ export default class CrearEspecie implements OnInit {
   route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
   private readonly adminEspecies = inject(AdminEspecies);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly formSubmitted = signal(false);
   protected readonly isLoading = signal(false);
@@ -66,7 +70,7 @@ export default class CrearEspecie implements OnInit {
   activo: boolean | null = null;
 
   protected readonly pageTitle = computed(() =>
-    this.isEditMode() ? "Editar Especie" : "Crear Nueva Especie",
+    this.isEditMode() ? "Editar Especie" : "Registrar Especie",
   );
   protected readonly pageSubtitle = computed(() =>
     this.isEditMode()
@@ -92,6 +96,8 @@ export default class CrearEspecie implements OnInit {
   });
 
   ngOnInit(): void {
+
+
     const idParam = this.route.snapshot.paramMap.get("id");
     if (idParam) {
       const id = +idParam;
@@ -99,6 +105,10 @@ export default class CrearEspecie implements OnInit {
       this.currentEspecieId.set(id);
       this.loadEspecieData(id);
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-especies-crear");
   }
 
   private loadEspecieData(id: number): void {
@@ -206,7 +216,7 @@ export default class CrearEspecie implements OnInit {
     this.formSubmitted.set(false);
   }
 
-  private handleApiError(error: any, action: "crear" | "actualizar"): void {
+  private handleApiError(error: HttpErrorResponse, action: "crear" | "actualizar"): void {
     console.error(`Error al ${action} especie:`, error);
     let errorMessage = `Error al ${action} la especie`;
 

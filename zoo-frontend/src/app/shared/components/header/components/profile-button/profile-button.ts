@@ -5,7 +5,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStore } from '@app/core/stores/auth.store';
+import { AuthStore } from '@stores/auth.store';
 import { Usuario } from '@models/usuario/usuario.model';
 import { UserAvatar } from '@app/shared/components/user-avatar';
 import { UserInfo } from '../user-info';
@@ -35,6 +35,7 @@ export class ProfileButton {
   readonly isAdmin = computed(() => this.authStore.isAdmin());
   readonly isVet = computed(() => this.authStore.isVeterinario());
   readonly isCuidador = computed(() => this.authStore.isCuidador());
+  readonly isOsi = computed(() => this.authStore.isOsi());
   readonly defaultAvatarUrl = '/assets/images/default-avatar.jpg';
   
   protected readonly items = computed(() => [
@@ -53,30 +54,6 @@ export class ProfileButton {
           command: () => {
             this.navigateToSettings();
           },
-        },
-        {
-          label: 'Panel de Administración',
-          icon: 'pi pi-shield',
-          command: () => {
-            this.router.navigate(['/admin']);
-          },
-          visible: this.isAdmin(),
-        },
-        {
-          label: 'Panel Veterinario',
-          icon: 'pi pi-shield',
-          command: () => {
-            this.router.navigate(['/vet']);
-          },
-          visible: this.isVet(),
-        },
-        {
-          label: 'Panel Cuidador',
-          icon: 'pi pi-shield',
-          command: () => {
-            this.router.navigate(['/cuidador']);
-          },
-          visible: this.isCuidador(),
         },
         {
           separator: true,

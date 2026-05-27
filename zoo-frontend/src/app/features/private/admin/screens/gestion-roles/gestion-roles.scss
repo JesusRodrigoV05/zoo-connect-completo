@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  .header-title {
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      margin: 0.25rem 0 0;
+      color: var(--text-color-secondary);
+      font-size: 0.875rem;
+    }
+  }
+}
+
+.filters {
+  margin-bottom: 1rem;
+
+  .p-input-icon-left {
+    width: 100%;
+    max-width: 300px;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: var(--surface-section);
+  font-weight: 600;
+}
+
+:host ::ng-deep .p-paginator {
+  justify-content: flex-end;
+  padding: 1rem 0;
+}

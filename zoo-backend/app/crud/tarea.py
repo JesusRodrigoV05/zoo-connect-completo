@@ -1,8 +1,11 @@
+import logging
 from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from typing import Optional
 from datetime import date, datetime
+
+logger = logging.getLogger(__name__)
 
 from app.models.tarea import (
     TipoTarea, TareaRecurrente, Tarea,
@@ -99,7 +102,8 @@ def create_tarea_recurrente(db: Session, tarea_in: TareaRecurrenteCreate) -> Tar
         return db_tarea_recurrente
     except IntegrityError as e:
         db.rollback()
-        raise HTTPException(status_code=409, detail=f"Error de integridad: {e.orig}")
+        logger.exception("Error de integridad creando tarea recurrente")
+        raise HTTPException(status_code=409, detail="Error de integridad")
 
 def get_tarea_recurrente(db: Session, id: int) -> Optional[TareaRecurrente]:
     return db.query(TareaRecurrente).options(joinedload(TareaRecurrente.tipo_tarea)).filter(TareaRecurrente.id_tarea_recurrente == id).first()
@@ -132,7 +136,8 @@ def update_tarea_recurrente(db: Session, db_tarea_recurrente: TareaRecurrente, t
         return db_tarea_recurrente
     except IntegrityError as e:
         db.rollback()
-        raise HTTPException(status_code=409, detail=f"Error de integridad: {e.orig}")
+        logger.exception("Error de integridad actualizando tarea recurrente")
+        raise HTTPException(status_code=409, detail="Error de integridad")
 
 def delete_tarea_recurrente(db: Session, db_tarea_recurrente: TareaRecurrente) -> TareaRecurrente:
     db_tarea_recurrente.is_active = False 
@@ -143,12 +148,14 @@ def delete_tarea_recurrente(db: Session, db_tarea_recurrente: TareaRecurrente) -
 
 #TAREAS
 
-def create_tarea_manual(db: Session, tarea_in: TareaCreate) -> Tarea:
+def create_tarea_manual(db: Session, tarea_in: TareaCreate, current_user: Optional[User] = None) -> Tarea:
     _validate_tarea_fks(db, tarea_in.tipo_tarea_id, tarea_in.animal_id, tarea_in.habitat_id)
     if tarea_in.usuario_asignado_id:
         user = db.query(User).filter(User.id == tarea_in.usuario_asignado_id).first()
         if not user:
              raise HTTPException(status_code=404, detail="Usuario asignado no encontrado")
+        if current_user and tarea_in.usuario_asignado_id == current_user.id and not current_user.is_admin:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No puedes asignarte una tarea a ti mismo")
 
     db_tarea = Tarea(**tarea_in.model_dump())
     db.add(db_tarea)
@@ -158,7 +165,8 @@ def create_tarea_manual(db: Session, tarea_in: TareaCreate) -> Tarea:
         return db_tarea
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error creando tarea: {e}")
+        logger.exception("Error creando tarea manual")
+        raise HTTPException(status_code=500, detail="Error al crear la tarea")
 
 def get_tareas_query(
     db: Session,
@@ -197,12 +205,15 @@ def get_tarea(db: Session, id_tarea: int) -> Optional[Tarea]:
         joinedload(Tarea.habitat)
     ).filter(Tarea.id_tarea == id_tarea).first()
 
-def asignar_tarea(db: Session, db_tarea: Tarea, db_usuario_asignar: User) -> Tarea:
+def asignar_tarea(db: Session, db_tarea: Tarea, db_usuario_asignar: User, current_user: Optional[User] = None) -> Tarea:
     if db_tarea.usuario_asignado_id is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Esta tarea ya ha sido asignada")
     
     if db_usuario_asignar.role.name != UserRole.CUIDADOR.value and not db_usuario_asignar.is_admin:
        raise HTTPException(status_code=400, detail=f"El usuario debe ser Cuidador")
+
+    if current_user and db_usuario_asignar.id == current_user.id and not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No puedes asignarte una tarea a ti mismo")
 
     db_tarea.usuario_asignado_id = db_usuario_asignar.id
     db.add(db_tarea)
@@ -213,7 +224,8 @@ def asignar_tarea(db: Session, db_tarea: Tarea, db_usuario_asignar: User) -> Tar
         return db_tarea
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error al asignar la tarea: {e}")
+        logger.exception("Error asignando tarea")
+        raise HTTPException(status_code=500, detail="Error al asignar la tarea")
 
 #COMPLETAR TAREAS
 
@@ -238,7 +250,8 @@ def completar_tarea_simple(db: Session, db_tarea: Tarea, db_usuario: User, notas
         return db_tarea
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error al completar: {e}")
+        logger.exception("Error completando tarea simple")
+        raise HTTPException(status_code=500, detail="Error al completar la tarea")
 
 def completar_tarea_alimentacion(
     db: Session,
@@ -328,11 +341,12 @@ def completar_tarea_alimentacion(
 
     except (ValueError, IntegrityError) as e:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al procesar la alimentacion: {e}")
+        logger.error("Error procesando alimentacion: %s", e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error al procesar la alimentacion")
     except Exception as e:
         db.rollback()
-        print(f"Error critico completando tarea: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error interno del servidor")
+        logger.exception("Error critico completando tarea de alimentacion")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
     
 def completar_tarea_tratamiento(
     db: Session,
@@ -395,8 +409,9 @@ def completar_tarea_tratamiento(
 
     except (ValueError, IntegrityError) as e:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error validando datos: {e}")
+        logger.error("Error validando datos de tratamiento: %s", e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error validando datos")
     except Exception as e:
         db.rollback()
-        print(f"Error crítico completando tratamiento: {e}")
+        logger.exception("Error critico completando tratamiento")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")

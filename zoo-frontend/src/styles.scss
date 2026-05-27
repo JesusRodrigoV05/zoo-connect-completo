@@ -1,4 +1,6 @@
 @use "primeicons/primeicons.css" as *;
+@use "./app/shared/styles/driverjs-theme-green";
+@import "driver.js/dist/driver.css";
 
 html {
   color-scheme: light;
@@ -25,4 +27,21 @@ body {
 
 .splitter {
   height: 100%;
+}
+
+.col-w5 { width: 5%; }
+.col-w10 { width: 10%; }
+.col-w15 { width: 15%; }
+.col-w20 { width: 20%; }
+.col-w25 { width: 25%; }
+.col-w30 { width: 30%; }
+.col-w35 { width: 35%; }
+.col-w50 { width: 50%; }
+
+.empty-icon {
+  font-size: 3rem;
+}
+
+.checkbox-col {
+  width: 3rem;
 }

@@ -1,6 +1,6 @@
-<td class="font-medium">{{ item().nombre }}</td>
-<td class="text-secondary">{{ item().descripcion }}</td>
-<td class="text-center">
+<td class="font-medium tour-vet-tipos-atencion-col-nombre">{{ item().nombre }}</td>
+<td class="text-secondary tour-vet-tipos-atencion-col-descripcion">{{ item().descripcion }}</td>
+<td class="text-center tour-vet-tipos-atencion-col-acciones">
   <div class="row-actions">
     <zoo-item-action-button tipo="edit" (click)="onEdit.emit(item())" />
     <zoo-item-action-button tipo="delete" (click)="onDelete.emit(item().id)" />

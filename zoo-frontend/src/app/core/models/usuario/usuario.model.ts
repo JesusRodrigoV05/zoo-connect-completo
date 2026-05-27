@@ -3,6 +3,7 @@ export enum RolId {
     VISITANTE = 2,
     CUIDADOR = 3,  
     VETERINARIO = 4,
+    OSI = 5,
 }
 
 export interface Rol {
@@ -12,10 +13,13 @@ export interface Rol {
 
 export interface Usuario {
     id: string,
-    email: string, 
+    email: string,
     username: string,
+    phoneNumber?: string | null,
+    phoneVerified?: boolean,
     fotoUrl: string,
     activo: boolean,
     rol: Rol,
     creadoEn: string,
+    permisos?: string[],
 }

@@ -2,18 +2,22 @@ import { UpdateProfileRequest } from "@models/usuario";
 import { Usuario, RolId } from "../../models/usuario/usuario.model";
 
 export interface UsuarioBackendResponse {
-  id: number;
-  email: string;
+  id: string;
+  email: string | null;
   username: string;
+  phone_number?: string | null;
+  phone_verified?: boolean;
   photo_url: string | null;
   is_active: boolean;
   role_id: number;
   created_at: string;
+  permissions?: string[];
 }
 
 export interface CreateUsuarioRequest {
-  email: string;
+  email?: string;
   username: string;
+  phone_number?: string;
   password: string;
   role_id: number;
 }
@@ -35,9 +39,11 @@ export interface BackendUpdateProfileRequest {
 export class UsuarioAdapter {
   static fromBackend(backendUser: UsuarioBackendResponse): Usuario {
     return {
-      id: backendUser.id.toString(),
-      email: backendUser.email,
+      id: backendUser.id,
+      email: backendUser.email || "",
       username: backendUser.username,
+      phoneNumber: backendUser.phone_number ?? null,
+      phoneVerified: backendUser.phone_verified ?? false,
       fotoUrl: backendUser.photo_url || "",
       activo: backendUser.is_active,
       rol: {
@@ -45,6 +51,7 @@ export class UsuarioAdapter {
         nombre: this.getRoleNameById(backendUser.role_id),
       },
       creadoEn: backendUser.created_at,
+      permisos: backendUser.permissions ?? [],
     };
   }
 
@@ -58,6 +65,7 @@ export class UsuarioAdapter {
       2: "Visitante",
       3: "Cuidador",
       4: "Veterinario",
+      5: "OSI",
     };
     return roleNames[roleId] || "Desconocido";
   }
@@ -138,8 +146,8 @@ export class UsuarioAdapter {
       frontendUser.password !== undefined &&
       frontendUser.password.trim().length > 0
     ) {
-      if (frontendUser.password.trim().length < 6) {
-        throw new Error("La contraseña debe tener al menos 6 caracteres");
+      if (frontendUser.password.trim().length < 12) {
+        throw new Error("La contraseña debe tener al menos 12 caracteres");
       }
       request.password = frontendUser.password.trim();
     }
@@ -158,8 +166,8 @@ export class UsuarioAdapter {
   static isValidBackendResponse(obj: any): obj is UsuarioBackendResponse {
     return (
       obj &&
-      typeof obj.id === "number" &&
-      typeof obj.email === "string" &&
+      typeof obj.id === "string" &&
+      (obj.email === null || typeof obj.email === "string") &&
       typeof obj.username === "string" &&
       (obj.photo_url === null || typeof obj.photo_url === "string") &&
       typeof obj.is_active === "boolean" &&
@@ -179,6 +187,7 @@ export class UsuarioAdapter {
       obj.rol &&
       typeof obj.rol.id === "number" &&
       typeof obj.rol.nombre === "string" &&
+      (obj.permisos === undefined || Array.isArray(obj.permisos)) &&
       typeof obj.creadoEn === "string"
     );
   }

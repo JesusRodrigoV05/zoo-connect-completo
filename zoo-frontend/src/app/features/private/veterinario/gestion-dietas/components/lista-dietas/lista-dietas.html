@@ -2,14 +2,14 @@
 <div class="list-page-container">
   <p-confirmDialog />
 
-  <div class="header-actions">
+  <div class="header-actions tour-vet-dietas-header">
     <div class="title-container">
       <h2>Gestión de Dietas</h2>
       <p>Planificación nutricional clínica</p>
     </div>
 
     <div class="actions-container">
-      <div class="search-wrapper">
+      <div class="search-wrapper tour-vet-dietas-search">
         <p-iconfield iconPosition="left">
           <p-inputicon styleClass="pi pi-search" />
           <input
@@ -36,6 +36,7 @@
 
       <div class="buttons-wrapper">
         <p-button
+          styleClass="tour-vet-dietas-refresh-btn"
           variant="text"
           (onClick)="loadDietas(currentPage(), pageSize())"
           icon="pi pi-refresh"
@@ -44,11 +45,20 @@
           pTooltip="Recargar lista"
         />
         <p-button
+          styleClass="tour-vet-dietas-new-btn"
           icon="pi pi-plus"
           label="Nueva Dieta"
           [rounded]="true"
           severity="success"
           routerLink="../crear"
+        />
+        <p-button
+          styleClass="tour-vet-dietas-tour-btn"
+          icon="pi pi-question-circle"
+          label="Tour guiado"
+          [rounded]="true"
+          severity="contrast"
+          (onClick)="startGuidedTour()"
         />
       </div>
     </div>
@@ -59,6 +69,7 @@
   } @else if(error()) { } @else if (dietaData()) { @let response = dietaData()!;
   <p-dataview
     #dv
+    styleClass="tour-vet-dietas-dataview tour-vet-dietas-paginator"
     [value]="response.items"
     [paginator]="true"
     [rows]="response.size"
@@ -72,11 +83,12 @@
   >
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ response.total }} dietas registradas</span>
+        <span class="tour-vet-dietas-total">Total: {{ response.total }} dietas registradas</span>
 
-        <span>Página {{ response.page }} de {{ response.pages }}</span>
+        <span class="tour-vet-dietas-page">Página {{ response.page }} de {{ response.pages }}</span>
 
         <p-selectButton
+          styleClass="tour-vet-dietas-layout-switch tour-vet-dietas-layout"
           [ngModel]="layout()"
           (ngModelChange)="layout.set($event)"
           [options]="layoutOptions"
@@ -127,14 +139,12 @@
 
     <ng-template #empty>
       <div class="empty-state">
-        <i
-          class="pi pi-apple"
-          style="font-size: 3rem; color: var(--p-green-500)"
-        ></i>
+        <i class="pi pi-apple empty-icon"></i>
 
         <p>No se encontraron dietas.</p>
 
         <p-button
+          styleClass="tour-vet-dietas-empty-new-btn"
           icon="pi pi-plus"
           label="Crear Primera Dieta"
           [rounded]="true"

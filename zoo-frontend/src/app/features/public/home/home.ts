@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, PLATFORM_ID } from "@angular/core";
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+} from "@angular/core";
 import { SocialSection } from "./components/social-section";
 import { ContactSection } from "./components/contact-section";
 import { NoticiasSection } from "./components/noticias-section";
@@ -6,6 +11,7 @@ import { HeroSection } from "./components/hero-section";
 import { ServicesSection } from "./components/services-section";
 import { Carousel } from "./components/carousel";
 import { WeatherSection } from "./components/weather-section";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-home",
@@ -23,7 +29,12 @@ import { WeatherSection } from "./components/weather-section";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Home {
+  private readonly onboarding = inject(OnboardingService);
+
+  constructor() {
+
+  }
+
   protected onSubmitContact(): void {
-    console.log("Formulario de contacto enviado");
   }
 }

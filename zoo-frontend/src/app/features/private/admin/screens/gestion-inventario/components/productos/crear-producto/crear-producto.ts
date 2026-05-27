@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -18,7 +19,7 @@ import { InputNumberModule } from "primeng/inputnumber";
 import { SelectModule } from "primeng/select";
 import { CheckboxModule } from "primeng/checkbox";
 import { StepperModule } from "primeng/stepper";
-import { FileUpload, FileUploadModule } from "primeng/fileupload";
+import { FileUpload, FileUploadModule, FileSelectEvent } from "primeng/fileupload";
 import { ImageModule } from "primeng/image";
 import { MessageModule } from "primeng/message";
 import { ProductStore } from "@app/features/private/admin/stores/admin-productos.store";
@@ -26,6 +27,7 @@ import { TiposProductoStore } from "@app/features/private/admin/stores/admin-tip
 import { UnidadesMedidaStore } from "@app/features/private/admin/stores/admin-unidades-medida.store";
 import { AdminInventario } from "@app/features/private/admin/services/admin-inventario";
 import { ShowToast } from "@app/shared/services";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import {
   CreateProducto,
   UpdateProducto,
@@ -62,6 +64,7 @@ export default class CrearProducto implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly inventoryService = inject(AdminInventario);
   private readonly toast = inject(ShowToast);
+  private readonly onboarding = inject(OnboardingService);
 
   fileUploader = viewChild<FileUpload>("fileUploader");
 
@@ -101,7 +104,13 @@ export default class CrearProducto implements OnInit {
       this.isEditMode.set(true);
       this.productId.set(+id);
       this.loadProductData(+id);
+    } else {
+
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-inventario-producto-crear");
   }
 
   private loadProductData(id: number) {
@@ -125,7 +134,7 @@ export default class CrearProducto implements OnInit {
     });
   }
 
-  onFileSelect(event: any) {
+  onFileSelect(event: FileSelectEvent) {
     if (event.files && event.files.length > 0) {
       this.selectedFile.set(event.files[0]);
     }

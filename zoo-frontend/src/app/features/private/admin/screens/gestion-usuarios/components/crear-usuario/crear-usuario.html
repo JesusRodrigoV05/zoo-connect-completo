@@ -1,7 +1,16 @@
 <p-card class="crear-usuario-card">
   <ng-template pTemplate="header">
-    <div class="card-header">
-      <h2>{{ pageTitle }}</h2>
+    <div class="card-header tour-user-form-header">
+      <div class="card-header-row">
+        <h2>{{ pageTitle }}</h2>
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          (onClick)="startGuidedTour()"
+        />
+      </div>
 
       <p class="subtitle">Ingresa los datos del usuario</p>
     </div>
@@ -87,6 +96,7 @@
         label="Cancelar"
         [rounded]="true"
         severity="secondary"
+        styleClass="tour-user-cancel-btn"
         (onClick)="onCancel()"
         [disabled]="isLoading()"
       />
@@ -96,6 +106,7 @@
         [label]="buttonText"
         [rounded]="true"
         severity="primary"
+        styleClass="tour-user-submit-btn"
         [loading]="isLoading()"
         [disabled]="usuarioForm.invalid || isLoading()"
       />

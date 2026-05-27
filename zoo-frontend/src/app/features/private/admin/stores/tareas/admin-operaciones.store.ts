@@ -130,7 +130,7 @@ export const TareasPendientesStore = signalStore(
         ),
       ),
 
-      assignTask: rxMethod<{ tareaId: number; usuarioId: number }>(
+      assignTask: rxMethod<{ tareaId: number; usuarioId: string }>(
         pipe(
           switchMap(({ tareaId, usuarioId }) =>
             adminService.assignTask(tareaId, usuarioId).pipe(

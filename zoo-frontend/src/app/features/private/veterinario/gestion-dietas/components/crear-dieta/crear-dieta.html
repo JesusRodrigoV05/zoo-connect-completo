@@ -1,7 +1,7 @@
 <div class="form-container">
   <p-card styleClass="diet-card">
     <ng-template pTemplate="header">
-      <div class="card-header">
+      <div class="card-header tour-vet-dietas-create-header">
         <div class="header-icon">
           <i class="pi pi-apple"></i>
         </div>
@@ -9,17 +9,31 @@
           <h2>{{ pageTitle() }}</h2>
           <p class="subtitle">Planificación nutricional</p>
         </div>
+        <p-button
+          styleClass="tour-vet-dietas-create-tour-btn"
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          [rounded]="true"
+          severity="contrast"
+          (onClick)="startGuidedTour()"
+        />
       </div>
     </ng-template>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
-      <div class="form-section">
+      <div class="form-section tour-vet-dieta-datos-generales">
         <h4>Datos Generales</h4>
 
         <div class="form-grid">
           <div class="field full-width">
             <p-floatlabel>
-              <input pInputText id="nombre" formControlName="nombre" fluid />
+              <input
+                pInputText
+                id="nombre"
+                formControlName="nombre"
+                fluid
+                class="tour-vet-dieta-nombre"
+              />
               <label for="nombre"
                 >Nombre de la Dieta (ej. Dieta Felinos Standard) *</label
               >
@@ -31,7 +45,7 @@
             }
           </div>
 
-          <div class="field radio-group full-width">
+          <div class="field radio-group full-width tour-vet-dieta-asignar-a">
             <label class="block mb-2 font-semibold text-color-secondary"
               >Asignar a:</label
             >
@@ -63,7 +77,7 @@
             </div>
           </div>
 
-          <div class="field full-width">
+          <div class="field full-width tour-vet-dieta-target-selector">
             @if (form.get('targetType')?.value === 'especie') {
             <p-floatlabel>
               <p-select
@@ -75,6 +89,7 @@
                 [filter]="true"
                 filterPlaceholder="Buscar especie..."
                 fluid
+                styleClass="tour-vet-dieta-especie"
               />
               <label for="targetEsp">Seleccionar Especie *</label>
             </p-floatlabel>
@@ -89,6 +104,7 @@
                 [filter]="true"
                 filterPlaceholder="Buscar animal..."
                 fluid
+                styleClass="tour-vet-dieta-animal"
               />
               <label for="targetAnim">Seleccionar Animal *</label>
             </p-floatlabel>
@@ -101,10 +117,11 @@
         </div>
       </div>
 
-      <div class="form-section mt-4">
+      <div class="form-section mt-4 tour-vet-dieta-ingredientes-section">
         <div class="flex justify-between align-items-center mb-3">
           <h4>Ingredientes y Raciones</h4>
           <p-button
+            styleClass="tour-vet-dieta-add-ingredient-btn"
             label="Agregar Ingrediente"
             icon="pi pi-plus"
             size="small"
@@ -115,16 +132,16 @@
 
         <div formArrayName="detalles">
           <p-table
+            styleClass="tour-vet-dietas-ingredientes-table p-datatable-sm ingredient-table"
             [value]="detalles.controls"
-            styleClass="p-datatable-sm ingredient-table"
           >
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 35%">Producto (Alimento) *</th>
-                <th style="width: 15%">Cantidad *</th>
-                <th style="width: 20%">Unidad *</th>
-                <th style="width: 25%">Frecuencia/Notas *</th>
-                <th style="width: 5%"></th>
+                <th class="tour-vet-dieta-producto col-w35">Producto (Alimento) *</th>
+                <th class="tour-vet-dieta-cantidad col-w15">Cantidad *</th>
+                <th class="tour-vet-dieta-unidad col-w20">Unidad *</th>
+                <th class="tour-vet-dieta-frecuencia col-w25">Frecuencia/Notas *</th>
+                <th class="tour-vet-dieta-remove-btn col-w5"></th>
               </tr>
             </ng-template>
 
@@ -139,8 +156,8 @@
                     [filter]="true"
                     placeholder="Seleccionar..."
                     appendTo="body"
-                    styleClass="w-full table-input"
                     fluid
+                    styleClass="w-full table-input tour-vet-dieta-producto"
                     [invalid]="isInvalid('productoId', i)"
                   />
                 </td>
@@ -153,6 +170,7 @@
                     inputStyleClass="w-full text-center p-1"
                     fluid
                     class="compact-number"
+                    styleClass="tour-vet-dieta-cantidad"
                     [invalid]="isInvalid('cantidad', i)"
                   />
                 </td>
@@ -165,8 +183,8 @@
                     optionValue="id"
                     placeholder="U.M."
                     appendTo="body"
-                    styleClass="w-full table-input"
                     fluid
+                    styleClass="w-full table-input tour-vet-dieta-unidad"
                     [invalid]="isInvalid('unidadMedidaId', i)"
                   />
                 </td>
@@ -176,17 +194,18 @@
                     pInputText
                     formControlName="frecuencia"
                     placeholder="Ej. Diario, Lun-Mie"
-                    class="w-full p-2 table-text"
+                    class="w-full p-2 table-text tour-vet-dieta-frecuencia"
                     fluid
                     [ngClass]="{'ng-invalid ng-dirty': isInvalid('frecuencia', i)}"
                   />
                 </td>
 
-                <td class="text-center">
+                <td class="text-center tour-vet-dieta-remove-btn">
                   <p-button
                     icon="pi pi-trash"
                     class="p-button-text p-button-danger p-button-rounded p-button-sm"
                     (click)="removeDetalle(i)"
+                    styleClass="tour-vet-dieta-remove-btn"
                     pTooltip="Quitar"
                   />
                 </td>
@@ -198,6 +217,7 @@
 
       <div class="form-actions mt-5">
         <p-button
+          styleClass="tour-vet-dieta-cancel-btn"
           label="Cancelar"
           icon="pi pi-times"
           [text]="true"
@@ -206,6 +226,7 @@
           [disabled]="isProcessing()"
         />
         <p-button
+          styleClass="tour-vet-dieta-save-btn"
           [label]="isEditMode() ? 'Actualizar Dieta' : 'Guardar Dieta'"
           icon="pi pi-check"
           type="submit"

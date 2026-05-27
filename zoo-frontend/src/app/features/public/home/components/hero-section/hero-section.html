@@ -5,9 +5,17 @@
 
   <div class="hero-content">
     <div class="hero-text">
-      <span class="hero-badge">🦁 Descubre la naturaleza</span>
+      <div class="tour-public-home-badge-row">
+        <span class="hero-badge">🦁 Descubre la naturaleza</span>
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-compass"
+          styleClass="p-button-sm p-button-rounded p-button-outlined"
+          (onClick)="startGuidedTour()"
+        />
+      </div>
 
-      <h1 class="hero-title" #heroTitle>
+      <h1 class="hero-title tour-public-home-hero-title" #heroTitle>
         Conecta con la
 
         <span class="highlight" data-text="vida salvaje">vida salvaje</span>

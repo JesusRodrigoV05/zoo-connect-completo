@@ -27,7 +27,7 @@ class Tarea(Base):
     titulo = Column(String(255), nullable=False)
     descripcion_tarea = Column(Text, nullable=True)
     
-    usuario_asignado_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    usuario_asignado_id = Column(String(120), ForeignKey("users.id"), nullable=True, index=True)
     tipo_tarea_id = Column(Integer, ForeignKey("tipo_tarea.id_tipo_tarea"), nullable=False, index=True)
     
     fecha_programada = Column(Date, nullable=False, index=True)
@@ -60,7 +60,7 @@ class TareaRecurrente(Base):
     descripcion_plantilla = Column(Text, nullable=True)
     
     tipo_tarea_id = Column(Integer, ForeignKey("tipo_tarea.id_tipo_tarea"), nullable=False)
-    usuario_asignado_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    usuario_asignado_id = Column(String(120), ForeignKey("users.id"), nullable=True)
     frecuencia_cron = Column(String(100), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     
@@ -122,7 +122,7 @@ class RegistroAlimentacion(Base):
     __tablename__ = "registro_alimentacion"
     
     id_registro_alimentacion = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    usuario_id = Column(String(120), ForeignKey("users.id"), nullable=False)
     fecha_alimentacion = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     notas_observaciones = Column(Text, nullable=True)
     

@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -14,13 +15,14 @@ import { TagModule } from "primeng/tag";
 import { DialogModule } from "primeng/dialog";
 import { TextareaModule } from "primeng/textarea";
 import { TooltipModule } from "primeng/tooltip";
-import { SelectButtonModule } from "primeng/selectbutton";
+import { SelectButtonModule, SelectButtonChangeEvent } from "primeng/selectbutton";
 import { MisTareasStore } from "@app/shared/stores/ejecucion-tarea.store";
 import { Tarea } from "../../admin/models/tareas/tarea.model";
 import { InputNumberModule } from "primeng/inputnumber";
 import { DatePipe } from "@angular/common";
 import { VetRecetas } from "../../veterinario/services/historiales/vet-recetas";
 import { Receta } from "../../veterinario/models/historiales/receta.model";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 interface DetalleFormulario {
   productoId: number;
@@ -52,6 +54,8 @@ interface DetalleFormulario {
 export default class MisTareas {
   readonly store = inject(MisTareasStore);
   readonly vetRecetasService = inject(VetRecetas);
+  private readonly onboarding = inject(OnboardingService);
+  private tourPrompted = false;
 
   displayDialog = signal(false);
   tareaSeleccionada = signal<Tarea | null>(null);
@@ -95,13 +99,19 @@ export default class MisTareas {
 
   ngOnInit() {
     this.cargarTareas();
+
+
+  }
+
+  startGuidedTour() {
+    this.onboarding.startTour("cuidador-mis-tareas");
   }
 
   cargarTareas() {
     this.store.loadMisTareas({ completadas: this.mostrarCompletadas() });
   }
 
-  onFilterChange(event: any) {
+  onFilterChange(event: SelectButtonChangeEvent) {
     this.mostrarCompletadas.set(event.value);
     this.cargarTareas();
   }
@@ -191,7 +201,7 @@ export default class MisTareas {
     const descripcion = tarea.descripcion?.toLowerCase();
     const contieneId = descripcion?.includes("receta id");
 
-    const esTipoReceta = tarea.tipoTarea?.id === 2;
+    const esTipoReceta = tarea.tipoTarea?.nombre?.toLowerCase().includes("tratamiento") || false;
 
     return esTipoReceta && contieneId;
   }

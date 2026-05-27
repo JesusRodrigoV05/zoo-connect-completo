@@ -145,7 +145,7 @@ class AnimalFavorito(Base):
 
     id_animal_favorito = Column("id_animal_favorito", Integer, primary_key=True, autoincrement=True)
     fecha_guardado = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    usuario_id = Column(String(120), ForeignKey("users.id"), nullable=False)
     
     animal_id = Column(Integer, ForeignKey("animals.id_animal"), nullable=False)
 

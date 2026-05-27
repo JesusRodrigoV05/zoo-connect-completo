@@ -1,5 +1,5 @@
 <div class="menu-botones-container">
-  @for(button of buttons(); track button.ruta) {
+  @for(button of visibleButtons(); track button.ruta) {
     <p-button
         [icon]="button.icono"
         [label]="button.texto"

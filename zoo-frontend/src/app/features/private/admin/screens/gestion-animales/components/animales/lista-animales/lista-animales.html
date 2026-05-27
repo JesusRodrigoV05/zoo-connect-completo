@@ -2,9 +2,16 @@
 <div class="list-page-container">
   <p-confirmDialog />
 
-  <div class="header-actions">
+  <div class="header-actions tour-animales-header">
     <h2>Gestión de Animales</h2>
     <div class="buttons">
+      <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()"
+      />
       <p-button
         variant="text"
         (onClick)="loadAnimales(currentPage(), pageSize())"
@@ -12,14 +19,18 @@
         severity="danger"
         [rounded]="true"
         pTooltip="Recargar"
+        styleClass="tour-animales-reload-btn"
       />
-      <p-button
-        icon="pi pi-plus"
-        label="Registrar Animal"
-        [rounded]="true"
-        severity="primary"
-        routerLink="/admin/animales/crear"
-      />
+      @if (canCreateAnimals()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Registrar Animal"
+          [rounded]="true"
+          severity="primary"
+          routerLink="/admin/animales/crear"
+          styleClass="tour-animales-register-btn"
+        />
+      }
     </div>
   </div>
 
@@ -40,6 +51,7 @@
   </div>
   } @else if (animalData()) { @let response = animalData()!;
   <p-dataview
+    styleClass="tour-animales-table"
     #dv
     [value]="response.items"
     [paginator]="true"
@@ -55,9 +67,14 @@
   >
     <ng-template #header>
       <div class="dataview-header">
-        <span>Total: {{ response.total }} animales</span>
-        <span>Página {{ response.page }} de {{ response.pages }}</span>
+        <span class="tour-animales-column-name"
+          >Total: {{ response.total }} animales</span
+        >
+        <span class="tour-animales-column-actions"
+          >Página {{ response.page }} de {{ response.pages }}</span
+        >
         <p-selectbutton
+          styleClass="tour-animales-view-type"
           [ngModel]="layout()"
           (ngModelChange)="layout.set($event)"
           [options]="options"
@@ -96,13 +113,15 @@
     <ng-template #empty>
       <div class="empty-state">
         <p>No hay animales disponibles.</p>
-        <p-button
-          icon="pi pi-plus"
-          label="Registrar Primer Animal"
-          [rounded]="true"
-          severity="primary"
-          routerLink="/admin/animal/crear"
-        />
+        @if (canCreateAnimals()) {
+          <p-button
+            icon="pi pi-plus"
+            label="Registrar Primer Animal"
+            [rounded]="true"
+            severity="primary"
+            routerLink="/admin/animales/crear"
+          />
+        }
       </div>
     </ng-template>
   </p-dataview>

@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -17,6 +18,7 @@ import { CardModule } from "primeng/card";
 import { SelectModule } from "primeng/select";
 import { CheckboxModule } from "primeng/checkbox";
 import { ShowToast } from "@app/shared/services";
+import { HttpErrorResponse } from "@angular/common/http";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AdminAnimales } from "@app/features/private/admin/services/admin-animales";
 import { catchError, finalize } from "rxjs/operators";
@@ -33,6 +35,7 @@ import { CreateAnimal, EstadoOperativo, MediaAnimal } from "@models/animales";
 import { forkJoin, Observable, of } from "rxjs";
 import { EspecieStore } from "@stores/especies.store";
 import { HabitatStore } from "@stores/habitat.store";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "zoo-crear-animal",
@@ -65,6 +68,7 @@ export default class CrearAnimal implements OnInit {
   private readonly adminAnimalesMedia = inject(AdminAnimalesMultimedia);
   protected readonly especieStore = inject(EspecieStore);
   protected readonly habitatStore = inject(HabitatStore);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly formSubmitted = signal(false);
   protected readonly isProcessing = signal(false);
@@ -115,6 +119,8 @@ export default class CrearAnimal implements OnInit {
   });
 
   ngOnInit(): void {
+
+
     this.especieStore.loadEspecies();
     this.habitatStore.loadHabitats();
     const id = this.route.snapshot.paramMap.get("id");
@@ -125,6 +131,10 @@ export default class CrearAnimal implements OnInit {
       this.loadAnimalData(animalId);
       this.loadAnimalMedia(animalId);
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-animales-crear");
   }
 
   private loadAnimalData(id: number): void {
@@ -310,7 +320,7 @@ export default class CrearAnimal implements OnInit {
     this.router.navigate(["/admin/animales/lista"]);
   }
 
-  private handleError(error: any): void {
+  private handleError(error: HttpErrorResponse): void {
     this.showToast.showError("Error", "Ocurrió un error: " + error.message);
   }
 

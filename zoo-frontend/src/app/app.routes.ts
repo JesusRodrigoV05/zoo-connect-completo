@@ -1,6 +1,5 @@
 import { Routes } from "@angular/router";
-import { authGuard, loggedGuard, veterinaryGuard } from "./core/guards";
-import { cuidadorGuard } from "@guards/cuidador-guard";
+import { authGuard, loggedGuard, permissionGuard } from "./core/guards";
 import { unsavedChangesGuard } from "@guards/unsaved-changes-guard";
 
 export const routes: Routes = [
@@ -112,24 +111,34 @@ export const routes: Routes = [
   {
     path: "admin",
     loadComponent: () =>
-      import("./features/private/admin/layout/admin-layout/admin-layout"),
-    canActivate: [authGuard],
+      import("./core/layout/layout"),
+    canActivateChild: [permissionGuard],
     loadChildren: () => import("./features/private/admin/admin.routes"),
   },
   {
     path: "vet",
     loadComponent: () =>
-      import("./features/private/veterinario/layout/vet-layout/vet-layout"),
-    canActivate: [veterinaryGuard],
+      import("./core/layout/layout"),
+    data: { requiredPermissions: ["manage_veterinary_module"] },
+    canActivateChild: [permissionGuard],
     loadChildren: () =>
       import("./features/private/veterinario/veterinario.routes"),
   },
   {
     path: "cuidador",
     loadComponent: () =>
-      import("./features/private/cuidador/layout/vet-layout/vet-layout"),
-    canActivate: [cuidadorGuard],
+      import("./core/layout/layout"),
+    data: { requiredPermissions: ["manage_tasks"] },
+    canActivateChild: [permissionGuard],
     loadChildren: () => import("./features/private/cuidador/cuidador.routes"),
+  },
+  {
+    path: "osi",
+    loadComponent: () =>
+      import("./core/layout/layout"),
+    data: { requiredPermissions: ["view_admin_dashboard"] },
+    canActivateChild: [permissionGuard],
+    loadChildren: () => import("./features/private/osi/osi.routes"),
   },
   {
     path: "404",

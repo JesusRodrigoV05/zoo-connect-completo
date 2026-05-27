@@ -1,6 +1,8 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   effect,
   inject,
@@ -22,6 +24,11 @@ import { finalize } from "rxjs";
 import { DrawerModule } from "primeng/drawer";
 import { EspecieDetalle } from "../especie-detalle";
 import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-service";
+import { FormsModule } from "@angular/forms";
+import { SelectButtonModule } from "primeng/selectbutton";
+import { NgClass } from "@angular/common";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
+import { AuthStore } from "@stores/auth.store";
 
 @Component({
   selector: "app-lista-especies",
@@ -33,6 +40,9 @@ import { ZooConfirmationService } from "@app/shared/services/zoo-confirmation-se
     ConfirmDialogModule,
     DrawerModule,
     EspecieDetalle,
+    FormsModule,
+    SelectButtonModule,
+    NgClass,
   ],
   providers: [ConfirmationService],
   templateUrl: "./lista-especies.html",
@@ -45,6 +55,8 @@ export default class ListaEspecies {
   private readonly destroyRef = inject(DestroyRef);
   private readonly toastService = inject(ShowToast);
   private confirmation = inject(ZooConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
+  private readonly authStore = inject(AuthStore);
 
   protected readonly currentPage = signal(1);
   protected readonly pageSize = signal(10);
@@ -56,13 +68,24 @@ export default class ListaEspecies {
 
   protected readonly detalleVisible = signal(false);
   protected readonly idDetalleSeleccionado = signal<number | null>(null);
+  protected readonly layout = signal<"list" | "grid">("list");
+  protected readonly options: ("list" | "grid")[] = ["list", "grid"];
+  protected readonly canCreateSpecies = computed(() =>
+    this.authStore.hasPermission("animals_create_species"),
+  );
 
   constructor() {
+
+
     effect(() => {
       const page = this.currentPage();
       const size = this.pageSize();
       this.loadEspecies(page, size);
     });
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-especies-lista");
   }
 
   protected loadEspecies(page: number, size: number): void {

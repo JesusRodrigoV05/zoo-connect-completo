@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -31,6 +32,7 @@ import { AdminHabitat } from "@app/features/private/admin/services/admin-habitat
 import { Location } from "@angular/common";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { CardModule } from "primeng/card";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 interface LugarOption {
   label: string;
@@ -65,6 +67,7 @@ export default class CrearRutina {
   private location = inject(Location);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private onboarding = inject(OnboardingService);
 
   readonly store = inject(RecurrentesStore);
   readonly tiposStore = inject(TiposTareaStore);
@@ -154,7 +157,12 @@ export default class CrearRutina {
       this.loadItemData(+idParam);
     } else {
       this.initializeDefaultForm();
+
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-tareas-rutina-crear");
   }
 
   // --- LOGICA DE CARGA ---

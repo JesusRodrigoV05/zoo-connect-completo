@@ -87,7 +87,7 @@ export class CrearReceta {
 
     generarTarea: [false],
     frecuenciaCron: [""],
-    usuarioAsignadoId: [null as number | null],
+    usuarioAsignadoId: [null as string | null],
   });
 
   constructor() {
@@ -156,7 +156,7 @@ export class CrearReceta {
     this.form.patchValue({ frecuenciaCron: cron });
   }
 
-  setType(val: any) {
+  setType(val: "hourly" | "daily" | "weekly") {
     this.uiCronType.set(val);
     this.recalcularCron();
   }

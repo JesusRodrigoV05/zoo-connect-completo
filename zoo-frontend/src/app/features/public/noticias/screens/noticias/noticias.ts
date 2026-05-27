@@ -4,7 +4,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   selector: 'app-noticias',
   imports: [],
   templateUrl: './noticias.html',
-  styleUrl: './noticias.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Noticias {

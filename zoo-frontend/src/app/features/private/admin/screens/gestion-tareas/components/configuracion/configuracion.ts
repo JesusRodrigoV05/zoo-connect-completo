@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   inject,
@@ -16,6 +17,7 @@ import { TipoTareaItem } from "../tipos/tipo-tarea-item/tipo-tarea-item";
 import { CrearTipoTarea } from "../tipos/crear-tipo-tarea/crear-tipo-tarea";
 import { TiposTareaStore } from "@app/features/private/admin/stores/tareas/admin-tipo-tares.store";
 import { TipoTarea } from "@app/features/private/admin/models/tareas/tarea.model";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 
 @Component({
   selector: "app-configuracion",
@@ -37,6 +39,7 @@ import { TipoTarea } from "@app/features/private/admin/models/tareas/tarea.model
 export default class Configuracion implements OnInit {
   readonly store = inject(TiposTareaStore);
   private confirmationService = inject(ConfirmationService);
+  private readonly onboarding = inject(OnboardingService);
 
   layout: "list" | "grid" = "list";
   layoutOptions = [
@@ -49,6 +52,11 @@ export default class Configuracion implements OnInit {
 
   ngOnInit() {
     this.store.loadItems();
+
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-tareas-configuracion");
   }
 
   openCreate() {

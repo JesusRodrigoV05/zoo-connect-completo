@@ -5,4 +5,5 @@ export interface MenuButton {
   ruta: string;
   exacto?: boolean;
   componente?: any;
+  permisos?: string[];
 }
