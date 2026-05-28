@@ -92,7 +92,7 @@ def create_default_admin():
             },
             {
                 "email": "visita1@gmail.com",
-                "username": "visitante.visitante.demo",
+                "username": "ariel.visitante.gomez",
                 "phone_number": "+59165136063",
                 "password": "User_Visitor_Pass_99!",
                 "role": "visitante"
