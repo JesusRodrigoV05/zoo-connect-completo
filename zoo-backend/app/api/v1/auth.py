@@ -373,7 +373,10 @@ async def login(
     # el usuario existe ahora verificamos si no esta blqoueado
     if policia.is_account_locked(user):
         from datetime import datetime, timezone
-        remaining = user.locked_until - datetime.now(timezone.utc)
+        locked_until = user.locked_until
+        if locked_until.tzinfo is None:
+            locked_until = locked_until.replace(tzinfo=timezone.utc)
+        remaining = locked_until - datetime.now(timezone.utc)
         minutes_left = max(1, int(remaining.total_seconds() / 60))
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
