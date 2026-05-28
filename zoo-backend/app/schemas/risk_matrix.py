@@ -29,8 +29,8 @@ class RiskMatrixEntryUpdate(RiskMatrixEntryBase):
 
 class RiskMatrixEntryOut(RiskMatrixEntryBase):
     id: int
-    created_by_id: Optional[int] = None
-    updated_by_id: Optional[int] = None
+    created_by_id: Optional[str] = None
+    updated_by_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

@@ -152,6 +152,455 @@ export default class MatrizRiesgos {
       });
   }
 
+  protected exportMatrix(format: string): void {
+    const data = this.rows();
+    if (!data.length) {
+      this.toast.showWarning("Validación", "No hay datos en la matriz para exportar");
+      return;
+    }
+
+    if (format === "pdf") {
+      this.exportAsPdf(data);
+    } else if (format === "xlsx") {
+      this.exportAsExcel(data);
+    } else if (format === "txt") {
+      this.exportAsTxt(data);
+    } else if (format === "png") {
+      this.exportAsImage(data);
+    }
+  }
+
+  private exportAsPdf(rows: RiskRow[]): void {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      this.toast.showError("Error", "No se pudo abrir la ventana de impresión. Habilita las ventanas emergentes.");
+      return;
+    }
+
+    const summary = this.riskSummary();
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Matriz de Riesgos - ZooConnect</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 30px; color: #1e293b; }
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4f46e5; padding-bottom: 15px; margin-bottom: 20px; }
+          h1 { margin: 0; font-size: 24px; color: #1e293b; }
+          .meta { font-size: 13px; color: #64748b; margin-top: 5px; }
+          .summary-badges { display: flex; gap: 10px; }
+          .badge { padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+          .bajo { background-color: #dcfce7; color: #166534; }
+          .moderado { background-color: #fef9c3; color: #854d0e; }
+          .alto { background-color: #ffedd5; color: #9a3412; }
+          .extremo { background-color: #fee2e2; color: #991b1b; }
+          
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
+          th { background-color: #1e293b; color: white; padding: 8px; text-align: left; font-weight: bold; }
+          td { border-bottom: 1px solid #e2e8f0; padding: 8px; vertical-align: top; max-width: 150px; word-wrap: break-word; }
+          tr:nth-child(even) { background-color: #f8fafc; }
+          
+          .center { text-align: center; }
+          .risk-cell { padding: 4px 8px; border-radius: 3px; font-weight: bold; display: inline-block; }
+          
+          @media print {
+            body { margin: 15px; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <h1>Matriz de Análisis de Riesgos</h1>
+            <div class="meta">ZooConnect | Generado el ${new Date().toLocaleDateString()} | Total: ${rows.length} riesgos</div>
+          </div>
+          <div class="summary-badges">
+            <span class="badge bajo">Bajo: ${summary["Bajo"]}</span>
+            <span class="badge moderado">Moderado: ${summary["Moderado"]}</span>
+            <span class="badge alto">Alto: ${summary["Alto"]}</span>
+            <span class="badge extremo">Extremo: ${summary["Extremo"]}</span>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 30px;">N°</th>
+              <th>Activo de Información</th>
+              <th>Amenaza</th>
+              <th>Consecuencia</th>
+              <th style="width: 30px;" class="center">P.I.</th>
+              <th style="width: 30px;" class="center">I.I.</th>
+              <th style="width: 80px;" class="center">R. Inherente</th>
+              <th>Controles a implementar</th>
+              <th style="width: 40px;" class="center">Tipo</th>
+              <th style="width: 50px;" class="center">Nivel</th>
+              <th style="width: 60px;" class="center">Frecuencia</th>
+              <th style="width: 30px;" class="center">P.R.</th>
+              <th style="width: 30px;" class="center">I.R.</th>
+              <th style="width: 80px;" class="center">R. Residual</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((row, idx) => {
+              const inherentScore = this.inherentRisk(row);
+              const inherentLvl = this.riskLevel(inherentScore);
+              const residualScore = this.residualScore(row);
+              const residualLvl = this.riskLevel(residualScore);
+              
+              return `
+                <tr>
+                  <td class="center">${idx + 1}</td>
+                  <td>${row.asset}</td>
+                  <td>${row.threat}</td>
+                  <td>${row.consequence || ""}</td>
+                  <td class="center">${row.probability}</td>
+                  <td class="center">${row.impact}</td>
+                  <td class="center">
+                    <span class="risk-cell ${inherentLvl.toLowerCase()}">${inherentScore} (${inherentLvl})</span>
+                  </td>
+                  <td>${row.control || ""}</td>
+                  <td class="center">${row.type}</td>
+                  <td class="center">${row.automationLevel}</td>
+                  <td class="center">${row.frequency}</td>
+                  <td class="center">${row.residualProbability}</td>
+                  <td class="center">${row.residualImpact}</td>
+                  <td class="center">
+                    <span class="risk-cell ${residualLvl.toLowerCase()}">${residualScore} (${residualLvl})</span>
+                  </td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+
+        <div style="text-align: center; margin-top: 30px; font-size: 10px; color: #94a3b8;" class="meta">
+          ZooConnect - Confidencial. Generado automáticamente para impresión.
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              window.close();
+            }, 500);
+          }
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+  }
+
+  private exportAsExcel(rows: RiskRow[]): void {
+    let csv = "\uFEFF"; // UTF-8 BOM
+    
+    const headers = [
+      "No.",
+      "Activo de Informacion",
+      "Amenaza / Vulnerabilidad",
+      "Riesgo y Consecuencia",
+      "Probabilidad Inherent",
+      "Impacto Inherent",
+      "Puntuacion Inherent",
+      "Nivel Inherent",
+      "Tratamiento",
+      "Controles a Implementar",
+      "Tipo Control",
+      "Nivel Control",
+      "Frecuencia Control",
+      "Probabilidad Residual",
+      "Impacto Residual",
+      "Puntuacion Residual",
+      "Nivel Residual"
+    ];
+    
+    csv += headers.join(";") + "\n";
+
+    rows.forEach((row, idx) => {
+      const line = [
+        idx + 1,
+        `"${row.asset.replace(/"/g, '""')}"`,
+        `"${row.threat.replace(/"/g, '""')}"`,
+        `"${(row.consequence || "").replace(/"/g, '""')}"`,
+        row.probability,
+        row.impact,
+        this.inherentRisk(row),
+        this.riskLevel(this.inherentRisk(row)),
+        `"${row.treatment}"`,
+        `"${(row.control || "").replace(/"/g, '""')}"`,
+        row.type,
+        row.automationLevel,
+        row.frequency,
+        row.residualProbability,
+        row.residualImpact,
+        this.residualScore(row),
+        this.riskLevel(this.residualScore(row))
+      ];
+      csv += line.join(";") + "\n";
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const link = document.createElement("a");
+    link.download = `Matriz_Riesgos_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  }
+
+  private exportAsTxt(rows: RiskRow[]): void {
+    let txt = "================================================================================\n";
+    txt += "                     MATRIZ DE ANÁLISIS DE RIESGOS - ZOOCONNECT\n";
+    txt += ` Generado el: ${new Date().toLocaleDateString()} | Total de riesgos: ${rows.length}\n`;
+    txt += "================================================================================\n\n";
+
+    rows.forEach((row, idx) => {
+      txt += `${idx + 1}. ACTIVO: ${row.asset}\n`;
+      txt += `   AMENAZA: ${row.threat}\n`;
+      txt += `   CONSECUENCIA: ${row.consequence || "N/A"}\n`;
+      txt += `   EVALUACIÓN RIESGO INHERENTE:\n`;
+      txt += `     - Probabilidad: ${row.probability} | Impacto: ${row.impact}\n`;
+      txt += `     - Puntuación: ${this.inherentRisk(row)} | Nivel: ${this.riskLevel(this.inherentRisk(row))}\n`;
+      txt += `     - Tratamiento: ${row.treatment}\n`;
+      txt += `   MITIGACIÓN:\n`;
+      txt += `     - Controles: ${row.control || "Ninguno"}\n`;
+      txt += `     - Tipo: ${row.type} | Automatización: ${row.automationLevel} | Frecuencia: ${row.frequency}\n`;
+      txt += `   RIESGO RESIDUAL:\n`;
+      txt += `     - Probabilidad: ${row.residualProbability} | Impacto: ${row.residualImpact}\n`;
+      txt += `     - Puntuación: ${this.residualScore(row)} | Nivel: ${this.riskLevel(this.residualScore(row))}\n`;
+      txt += "--------------------------------------------------------------------------------\n\n";
+    });
+
+    const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+    const link = document.createElement("a");
+    link.download = `Matriz_Riesgos_${new Date().toISOString().slice(0, 10)}.txt`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  }
+
+  private exportAsImage(rows: RiskRow[]): void {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const padding = 30;
+    const headerHeight = 120;
+    const rowHeight = 60;
+    const tableTop = padding + headerHeight;
+    const totalHeight = tableTop + (rows.length + 1) * rowHeight + padding + 40;
+
+    canvas.width = 1200;
+    canvas.height = totalHeight;
+
+    // Background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Title border
+    ctx.strokeStyle = "#4f46e5";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, padding + 70);
+    ctx.stroke();
+
+    // Title text
+    ctx.fillStyle = "#1e293b";
+    ctx.font = "bold 24px Arial, sans-serif";
+    ctx.fillText("Matriz de Análisis de Riesgos - ZooConnect", padding + 15, padding + 25);
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = "14px Arial, sans-serif";
+    ctx.fillText(`Generado el: ${new Date().toLocaleDateString()} | Total de riesgos registrados: ${rows.length}`, padding + 15, padding + 50);
+
+    // Legend
+    const summary = this.riskSummary();
+    ctx.font = "bold 12px Arial, sans-serif";
+    
+    let legendX = 650;
+    const drawBadge = (label: string, count: number, bgColor: string, textColor: string) => {
+      ctx.fillStyle = bgColor;
+      ctx.beginPath();
+      ctx.roundRect(legendX, padding + 15, 110, 30, 6);
+      ctx.fill();
+      
+      ctx.fillStyle = textColor;
+      ctx.fillText(`${label}: ${count}`, legendX + 15, padding + 34);
+      legendX += 120;
+    };
+
+    drawBadge("Bajo", summary["Bajo"] || 0, "#dcfce7", "#166534");
+    drawBadge("Moderado", summary["Moderado"] || 0, "#fef9c3", "#854d0e");
+    drawBadge("Alto", summary["Alto"] || 0, "#ffedd5", "#9a3412");
+    drawBadge("Extremo", summary["Extremo"] || 0, "#fee2e2", "#991b1b");
+
+    // Table settings
+    const cols = [
+      { name: "N°", width: 40, align: "center" as const },
+      { name: "Activo", width: 160, align: "left" as const },
+      { name: "Amenaza", width: 160, align: "left" as const },
+      { name: "Consecuencia", width: 180, align: "left" as const },
+      { name: "P.I.", width: 40, align: "center" as const },
+      { name: "I.I.", width: 40, align: "center" as const },
+      { name: "R. Inherent", width: 100, align: "center" as const },
+      { name: "Controles", width: 180, align: "left" as const },
+      { name: "P.R.", width: 40, align: "center" as const },
+      { name: "I.R.", width: 40, align: "center" as const },
+      { name: "R. Residual", width: 100, align: "center" as const },
+    ];
+
+    let startX = padding;
+    
+    // Draw Header Background
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(padding, tableTop, 1140, rowHeight);
+
+    // Draw Headers
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 13px Arial, sans-serif";
+    startX = padding;
+    for (const col of cols) {
+      const textX = col.align === "center" ? startX + col.width / 2 : startX + 10;
+      ctx.textAlign = col.align;
+      ctx.fillText(col.name, textX, tableTop + rowHeight / 2 + 5);
+      startX += col.width;
+    }
+
+    // Draw Rows
+    ctx.font = "12px Arial, sans-serif";
+    
+    let currentY = tableTop + rowHeight;
+    rows.forEach((row, idx) => {
+      ctx.fillStyle = idx % 2 === 0 ? "#f8fafc" : "#ffffff";
+      ctx.fillRect(padding, currentY, 1140, rowHeight);
+      
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, currentY + rowHeight);
+      ctx.lineTo(padding + 1140, currentY + rowHeight);
+      ctx.stroke();
+
+      startX = padding;
+      ctx.fillStyle = "#334155";
+
+      cols.forEach((col, colIdx) => {
+        ctx.textAlign = col.align;
+        const textX = col.align === "center" ? startX + col.width / 2 : startX + 10;
+        const textY = currentY + rowHeight / 2 + 4;
+
+        if (colIdx === 0) {
+          ctx.fillText((idx + 1).toString(), textX, textY);
+        } else if (colIdx === 1) {
+          this.drawWrappedText(ctx, row.asset, textX, textY - 8, col.width - 20, 15);
+        } else if (colIdx === 2) {
+          this.drawWrappedText(ctx, row.threat, textX, textY - 8, col.width - 20, 15);
+        } else if (colIdx === 3) {
+          this.drawWrappedText(ctx, row.consequence || "", textX, textY - 8, col.width - 20, 15);
+        } else if (colIdx === 4) {
+          ctx.fillText(row.probability.toString(), textX, textY);
+        } else if (colIdx === 5) {
+          ctx.fillText(row.impact.toString(), textX, textY);
+        } else if (colIdx === 6) {
+          const score = this.inherentRisk(row);
+          const lvl = this.riskLevel(score);
+          const colors = this.getRiskColor(lvl);
+          
+          ctx.fillStyle = colors.bg;
+          ctx.beginPath();
+          ctx.roundRect(startX + 5, currentY + 12, col.width - 10, 36, 4);
+          ctx.fill();
+          
+          ctx.fillStyle = colors.text;
+          ctx.font = "bold 12px Arial, sans-serif";
+          ctx.fillText(`${score} (${lvl})`, textX, textY);
+          ctx.font = "12px Arial, sans-serif";
+          ctx.fillStyle = "#334155";
+        } else if (colIdx === 7) {
+          this.drawWrappedText(ctx, row.control || "Sin control", textX, textY - 8, col.width - 20, 15);
+        } else if (colIdx === 8) {
+          ctx.fillText(row.residualProbability.toString(), textX, textY);
+        } else if (colIdx === 9) {
+          ctx.fillText(row.residualImpact.toString(), textX, textY);
+        } else if (colIdx === 10) {
+          const score = this.residualScore(row);
+          const lvl = this.riskLevel(score);
+          const colors = this.getRiskColor(lvl);
+          
+          ctx.fillStyle = colors.bg;
+          ctx.beginPath();
+          ctx.roundRect(startX + 5, currentY + 12, col.width - 10, 36, 4);
+          ctx.fill();
+          
+          ctx.fillStyle = colors.text;
+          ctx.font = "bold 12px Arial, sans-serif";
+          ctx.fillText(`${score} (${lvl})`, textX, textY);
+          ctx.font = "12px Arial, sans-serif";
+          ctx.fillStyle = "#334155";
+        }
+
+        startX += col.width;
+      });
+
+      currentY += rowHeight;
+    });
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "italic 11px Arial, sans-serif";
+    ctx.fillText("Generado automáticamente por el Sistema de Gestión de Riesgos de ZooConnect. Confidencial.", canvas.width / 2, totalHeight - 20);
+
+    const link = document.createElement("a");
+    link.download = `Matriz_Riesgos_${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  private getRiskColor(level: RiskLevel): { bg: string; text: string } {
+    switch (level) {
+      case "Bajo": return { bg: "#dcfce7", text: "#15803d" };
+      case "Moderado": return { bg: "#fef9c3", text: "#a16207" };
+      case "Alto": return { bg: "#ffedd5", text: "#c2410c" };
+      case "Extremo": return { bg: "#fee2e2", text: "#b91c1c" };
+      default: return { bg: "#f1f5f9", text: "#475569" };
+    }
+  }
+
+  private drawWrappedText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number): void {
+    const words = text.split(" ");
+    let line = "";
+    let testY = y;
+    let linesCount = 0;
+    
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + " ";
+      const metrics = ctx.measureText(testLine);
+      const testWidth = metrics.width;
+      
+      if (testWidth > maxWidth && n > 0) {
+        if (linesCount < 2) {
+          ctx.fillText(line, x, testY);
+          line = words[n] + " ";
+          testY += lineHeight;
+          linesCount++;
+        } else {
+          ctx.fillText(line.trim() + "...", x, testY);
+          line = "";
+          break;
+        }
+      } else {
+        line = testLine;
+      }
+    }
+    if (line) {
+      ctx.fillText(line, x, testY);
+    }
+  }
+
   private defaultRows(): RiskRow[] {
     return [
     {
