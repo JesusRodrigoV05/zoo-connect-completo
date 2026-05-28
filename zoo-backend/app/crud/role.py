@@ -62,7 +62,7 @@ def _get_role_permission_entries(db: Session, role: Role) -> List[dict]:
 
 
 def _build_role_item(db: Session, role: Role) -> RoleItem:
-    user_count = db.query(User).filter(User.role_id == role.id).count()
+    user_count = db.query(User).filter(User.role_id == role.id, User.is_active == True).count()
     has_custom = (
         db.query(RolePermission).filter(RolePermission.role_id == role.id).first()
         is not None
@@ -76,7 +76,7 @@ def _build_role_item(db: Session, role: Role) -> RoleItem:
 
 
 def _build_role_detail(db: Session, role: Role) -> RoleDetail:
-    user_count = db.query(User).filter(User.role_id == role.id).count()
+    user_count = db.query(User).filter(User.role_id == role.id, User.is_active == True).count()
     permissions = _get_role_permission_entries(db, role)
     return RoleDetail(
         id=role.id,
