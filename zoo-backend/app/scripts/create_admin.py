@@ -92,7 +92,7 @@ def create_default_admin():
             },
             {
                 "email": "visita1@gmail.com",
-                "username": "visita.visitante.demo",
+                "username": "visitante.visitante.demo",
                 "phone_number": "+59165136063",
                 "password": "User_Visitor_Pass_99!",
                 "role": "visitante"
@@ -127,13 +127,13 @@ def create_default_admin():
         osi_role = db.query(Role).filter(Role.name == "osi").first()
         if osi_role:
             osi_email = "osi@zooconnect.qzz.io"
-            osi_user = db.query(User).filter(User.id == "oscar.osi.seguridad").first()
+            osi_user = db.query(User).filter(User.id == "oscar.osi.castro").first()
             if not osi_user:
                 print("   + Creando usuario OSI de prueba")
                 db.add(User(
-                    id="oscar.osi.seguridad",
+                    id="oscar.osi.castro",
                     email=osi_email,
-                    username="oscar.osi.seguridad",
+                    username="oscar.osi.castro",
                     phone_number="+59167156187",
                     hashed_password=get_password_hash("Osi_Secure_Change_2026!"),
                     is_active=True,

@@ -51,9 +51,9 @@ def upgrade() -> None:
             WHEN 'admin_legacy' THEN 'jose.admin.alvarado'
             WHEN 'juan_cuida' THEN 'juan.cuidador.perez'
             WHEN 'ana_veterinaria' THEN 'ana.vet.garcia'
-            WHEN 'visitante_pro' THEN 'visita.visitante.demo'
+            WHEN 'visitante_pro' THEN 'visitante.visitante.demo'
             WHEN 'soporte_tecnico' THEN 'soporte.admin.tecnico'
-            WHEN 'osi' THEN 'oscar.osi.seguridad'
+            WHEN 'osi' THEN 'oscar.osi.castro'
             ELSE trim(both '.' from regexp_replace(lower(username), '[^a-z0-9]+', '.', 'g'))
         END;
         UPDATE users
