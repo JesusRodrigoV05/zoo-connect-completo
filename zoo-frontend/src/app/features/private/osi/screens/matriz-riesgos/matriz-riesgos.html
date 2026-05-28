@@ -1,6 +1,6 @@
 <zoo-main-container>
   <section class="risk-page">
-    <header class="risk-header">
+    <header class="risk-header tour-risk-header">
       <div>
         <p class="eyebrow">Seguridad de la información</p>
         <h1>Matriz de análisis de riesgos</h1>
@@ -10,10 +10,19 @@
       </div>
 
       <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()">
+      </p-button>
+
+      <p-button
         variant="text"
         icon="pi pi-refresh"
         severity="danger"
         [rounded]="true"
+        styleClass="tour-risk-refresh-btn"
         pTooltip="Actualizar"
         tooltipPosition="bottom"
         (onClick)="loadRows()">
@@ -23,6 +32,7 @@
         type="button"
         icon="pi pi-plus"
         label="Agregar fila"
+        class="tour-risk-add-btn"
         (click)="addRow()"
       ></button>
       <button
@@ -30,12 +40,13 @@
         type="button"
         icon="pi pi-save"
         label="Guardar matriz"
+        class="tour-risk-save-btn"
         [disabled]="saving()"
         (click)="saveRows()"
       ></button>
 
       <div style="display: flex; gap: 0.4rem; align-items: center; margin-left: 0.4rem;">
-        <select #exportFormat class="p-inputtext" style="padding: 0.45rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; background: var(--p-card-background); font-size: 13px; font-family: inherit; color: inherit; cursor: pointer;">
+        <select #exportFormat class="p-inputtext tour-risk-export-select" style="padding: 0.45rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; background: var(--p-card-background); font-size: 13px; font-family: inherit; color: inherit; cursor: pointer;">
           <option value="pdf">PDF (.pdf)</option>
           <option value="xlsx">Excel (.csv)</option>
           <option value="txt">Texto (.txt)</option>
@@ -47,12 +58,13 @@
           icon="pi pi-download"
           label="Exportar"
           severity="secondary"
+          class="tour-risk-export-btn"
           (click)="exportMatrix(exportFormat.value)"
         ></button>
       </div>
     </header>
 
-    <section class="help-panel" aria-label="Ayuda de valoración de riesgo">
+    <section class="help-panel tour-risk-help" aria-label="Ayuda de valoración de riesgo">
       <div>
         <h2>Ayuda de cálculo</h2>
         <p>
@@ -61,7 +73,7 @@
         </p>
       </div>
 
-      <div class="heatmap" aria-label="Matriz de probabilidad por impacto">
+      <div class="heatmap tour-risk-heatmap" aria-label="Matriz de probabilidad por impacto">
         <div class="axis-label y-axis">Probabilidad</div>
         <div class="axis-label x-axis">Impacto</div>
         @for (probability of scaleValues; track probability) {
@@ -92,7 +104,7 @@
       <span class="legend-item alto">Alto: {{ riskSummary()["Alto"] }}</span>
       <span class="legend-item extremo">Extremo: {{ riskSummary()["Extremo"] }}</span>
     </div>
-    <div class="table-shell">
+    <div class="table-shell tour-risk-table">
       <table class="risk-table">
         <thead>
           <tr>

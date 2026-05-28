@@ -12,6 +12,7 @@ import { finalize } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ShowToast } from "@app/shared/services";
 import { MainContainer } from "@app/shared/components/main-container";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { AdminRolesService, RoleItem } from "../../services/admin-roles";
 
 @Component({
@@ -37,6 +38,7 @@ export default class GestionRoles {
   private readonly service = inject(AdminRolesService);
   private readonly toast = inject(ShowToast);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly loading = signal(true);
   protected readonly roles = signal<RoleItem[]>([]);
@@ -87,6 +89,10 @@ export default class GestionRoles {
 
   protected createRole(): void {
     this.router.navigate(["/admin/roles/crear"]);
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-roles-lista");
   }
 
   protected deleteRole(role: RoleItem): void {

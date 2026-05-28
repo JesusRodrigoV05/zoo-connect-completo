@@ -29,6 +29,8 @@ export type AdminTourKey =
   | "admin-tareas-crear-manual"
   | "admin-tareas-rutina-crear"
   | "admin-tareas-tipo-crear"
+  | "admin-roles-lista"
+  | "admin-matriz-riesgos"
   | "admin-usuarios-lista"
   | "admin-usuarios-crear"
   | "admin-usuarios-editar"
@@ -89,7 +91,7 @@ export class OnboardingService {
 
     this.destroyTour();
 
-    const steps = this.getTourSteps(key);
+    const steps = this.getAvailableTourSteps(this.getTourSteps(key));
     if (steps.length === 0) {
       return;
     }
@@ -158,7 +160,7 @@ export class OnboardingService {
 
     this.destroyTour();
 
-    const steps = this.getTourSteps(key);
+    const steps = this.getAvailableTourSteps(this.getTourSteps(key));
     if (steps.length === 0) {
       return;
     }
@@ -258,6 +260,29 @@ export class OnboardingService {
     );
   }
 
+  private getAvailableTourSteps(steps: DriveStep[]): DriveStep[] {
+    return steps.filter((step) => {
+      if (!step.element || typeof step.element !== "string") {
+        return true;
+      }
+
+      const target = document.querySelector(step.element);
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+
+      const rect = target.getBoundingClientRect();
+      const style = window.getComputedStyle(target);
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        style.opacity !== "0"
+      );
+    });
+  }
+
   private resolveTourKey(explicitKey?: AdminTourKey): AdminTourKey | null {
     if (explicitKey) {
       return explicitKey;
@@ -295,6 +320,12 @@ export class OnboardingService {
 
     if (url.startsWith("/admin/dashboard")) {
       return "admin-dashboard";
+    }
+    if (url.startsWith("/admin/roles")) {
+      return "admin-roles-lista";
+    }
+    if (url.startsWith("/admin/matriz-riesgos") || url.startsWith("/osi/matriz-riesgos")) {
+      return "admin-matriz-riesgos";
     }
     if (url.startsWith("/admin/animales/especies/lista")) {
       return "admin-especies-lista";
@@ -918,12 +949,12 @@ export class OnboardingService {
       case "admin-dashboard":
         return [
           {
-            element: ".admin-menu-list",
+            element: ".tour-menu-toggle",
             popover: {
-              title: "Menú lateral",
+              title: "Abrir menú lateral",
               description:
-                "Aquí navegas a todos los módulos administrativos del sistema.",
-              side: "right",
+                "Usa este botón para desplegar la navegación y entrar a los módulos administrativos del sistema.",
+              side: "bottom",
               align: "start",
             },
           },
@@ -1010,6 +1041,158 @@ export class OnboardingService {
               title: "Rendimiento Operativo",
               description:
                 "Monitorea el estado de tareas de hoy para control operativo.",
+            },
+          },
+        ];
+
+      case "admin-roles-lista":
+        return [
+          {
+            element: ".tour-roles-header",
+            popover: {
+              title: "Gestión de roles",
+              description:
+                "Desde esta vista administras los perfiles de acceso del sistema y revisas su uso actual.",
+            },
+          },
+          {
+            element: ".tour-roles-refresh-btn",
+            popover: {
+              title: "Actualizar listado",
+              description:
+                "Recarga los roles para ver cambios recientes sin salir de la pantalla.",
+            },
+          },
+          {
+            element: ".tour-roles-new-btn",
+            popover: {
+              title: "Nuevo rol",
+              description:
+                "Abre el flujo para crear un rol con permisos adecuados para un grupo de usuarios.",
+            },
+          },
+          {
+            element: ".tour-roles-search",
+            popover: {
+              title: "Buscar roles",
+              description:
+                "Filtra el listado por nombre para ubicar rápidamente un rol específico.",
+            },
+          },
+          {
+            element: ".tour-roles-table",
+            popover: {
+              title: "Tabla de roles",
+              description:
+                "Concentra los roles disponibles, su asignación de usuarios y su configuración de permisos.",
+            },
+          },
+          {
+            element: ".tour-roles-col-users",
+            popover: {
+              title: "Usuarios asignados",
+              description:
+                "Indica cuántas cuentas usan cada rol. Un rol con usuarios asignados requiere revisión antes de eliminarse.",
+            },
+          },
+          {
+            element: ".tour-roles-col-custom",
+            popover: {
+              title: "Permisos personalizados",
+              description:
+                "Muestra si el rol tiene ajustes específicos más allá de su configuración base.",
+            },
+          },
+          {
+            element: ".tour-roles-actions",
+            popover: {
+              title: "Acciones del rol",
+              description:
+                "Permite editar o eliminar roles según las reglas de seguridad y uso del sistema.",
+            },
+          },
+          {
+            element: ".tour-roles-paginator",
+            popover: {
+              title: "Paginación",
+              description:
+                "Navega entre páginas cuando el catálogo de roles supera el tamaño visible.",
+            },
+          },
+        ];
+
+      case "admin-matriz-riesgos":
+        return [
+          {
+            element: ".tour-risk-header",
+            popover: {
+              title: "Matriz de riesgos",
+              description:
+                "Vista para registrar activos, amenazas, controles y riesgo residual con cálculo automático.",
+            },
+          },
+          {
+            element: ".tour-risk-refresh-btn",
+            popover: {
+              title: "Actualizar matriz",
+              description:
+                "Recarga los registros guardados para revisar la versión más reciente.",
+            },
+          },
+          {
+            element: ".tour-risk-add-btn",
+            popover: {
+              title: "Agregar fila",
+              description:
+                "Añade un nuevo riesgo para documentar un activo, amenaza y control asociado.",
+            },
+          },
+          {
+            element: ".tour-risk-save-btn",
+            popover: {
+              title: "Guardar matriz",
+              description:
+                "Persiste los cambios realizados en la matriz después de completar los datos obligatorios.",
+            },
+          },
+          {
+            element: ".tour-risk-help",
+            popover: {
+              title: "Ayuda de cálculo",
+              description:
+                "Resume cómo se interpreta la multiplicación de probabilidad e impacto.",
+            },
+          },
+          {
+            element: ".tour-risk-heatmap",
+            popover: {
+              title: "Mapa de calor",
+              description:
+                "Visualiza el nivel de riesgo resultante para cada combinación de probabilidad e impacto.",
+            },
+          },
+          {
+            element: ".tour-risk-table",
+            popover: {
+              title: "Tabla editable",
+              description:
+                "Aquí se documentan activos, amenazas, consecuencias, controles y puntuaciones residuales.",
+            },
+          },
+          {
+            element: ".tour-risk-export-select",
+            popover: {
+              title: "Formato de exportación",
+              description:
+                "Selecciona el tipo de archivo que necesitas generar para compartir o archivar la matriz.",
+            },
+          },
+          {
+            element: ".tour-risk-export-btn",
+            popover: {
+              title: "Exportar",
+              description:
+                "Genera la matriz en el formato seleccionado para reportes o evidencia documental.",
             },
           },
         ];
@@ -2764,20 +2947,19 @@ export class OnboardingService {
             },
           },
           {
-            element:
-              ".tour-encuestas-empty-create-btn, .tour-encuestas-main-create-btn",
+            element: ".tour-encuestas-dataview",
             popover: {
-              title: "Crear primera encuesta",
+              title: "Estado del listado",
               description:
-                "Este botón aparece cuando no hay registros para iniciar la primera encuesta. <br><strong>Ejemplo:</strong> crear encuesta inicial del sistema.",
+                "El contenedor muestra las encuestas disponibles o el estado vacío con la opción de crear la primera.",
             },
           },
           {
-            element: ".tour-encuestas-item-edit-btn",
+            element: ".tour-encuestas-main-create-btn",
             popover: {
-              title: "Editar encuesta",
+              title: "Crear o editar contenido",
               description:
-                "Permite modificar una encuesta existente desde la lista. <br><strong>Ejemplo:</strong> cambiar fechas o preguntas de una encuesta activa.",
+                "Desde esta acción ingresas al formulario para crear una encuesta; las acciones por registro aparecen dentro del listado cuando existen datos.",
             },
           },
         ];
@@ -2861,35 +3043,35 @@ export class OnboardingService {
       case "admin-auditoria-lista":
         return [
           {
-            element: ".tour-audit-first-row",
+            element: ".audit-page-header",
             popover: {
-              title: "Primera fila de auditoría",
+              title: "Auditoría del sistema",
               description:
-                "Registro más reciente donde puedes ver evento, usuario y fecha. <br><strong>Ejemplo:</strong> LOGIN_SUCCESS del administrador.",
+                "Encabezado del historial con acceso al tour, actualización y conteo de registros encontrados.",
             },
           },
           {
-            element: ".tour-audit-user",
+            element: ".tour-audit-filters",
             popover: {
-              title: "Usuario",
+              title: "Filtros de auditoría",
               description:
-                "Identifica qué usuario ejecutó la acción registrada. <br><strong>Ejemplo:</strong> admin@zooconnect.com.",
+                "Permiten buscar por texto, rango de fechas y usuario sin depender de que existan filas cargadas.",
             },
           },
           {
-            element: ".tour-audit-description",
+            element: ".tour-audit-dataview",
             popover: {
-              title: "Descripción",
+              title: "Listado de eventos",
               description:
-                "Muestra el tipo de evento auditado. <br><strong>Ejemplo:</strong> LOGIN_SUCCESS, LOGIN_FAILED o CREATE_USER.",
+                "Contenedor principal del historial. Muestra los eventos cuando existen datos o un mensaje vacío si no hay resultados.",
             },
           },
           {
-            element: ".tour-audit-date",
+            element: ".tour-audit-dataview .audit-table-header",
             popover: {
-              title: "Fecha",
+              title: "Columnas de auditoría",
               description:
-                "Fecha y hora en que ocurrió el evento. <br><strong>Ejemplo:</strong> 26 abr 2026, 09:45.",
+                "Organiza evento, usuario, detalle, origen y fecha para revisar trazabilidad de forma consistente.",
             },
           },
           {

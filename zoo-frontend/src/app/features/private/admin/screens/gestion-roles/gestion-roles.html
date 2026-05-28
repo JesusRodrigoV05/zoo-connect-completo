@@ -1,16 +1,24 @@
 <zoo-main-container>
 <div class="gestion-roles-page">
   <div class="header">
-    <div class="header-title">
+    <div class="header-title tour-roles-header">
       <h1>Roles</h1>
       <p class="subtitle">Administra los roles del sistema</p>
     </div>
     <div class="header-actions" style="display: flex; gap: 0.5rem; align-items: center;">
       <p-button
+        label="Tour guiado"
+        icon="pi pi-question-circle"
+        severity="contrast"
+        [rounded]="true"
+        (onClick)="startGuidedTour()">
+      </p-button>
+      <p-button
         variant="text"
         icon="pi pi-refresh"
         severity="danger"
         [rounded]="true"
+        styleClass="tour-roles-refresh-btn"
         pTooltip="Actualizar"
         tooltipPosition="bottom"
         (onClick)="loadRoles()">
@@ -19,12 +27,13 @@
         pButton
         label="Nuevo Rol"
         icon="pi pi-plus"
+        class="tour-roles-new-btn"
         (click)="createRole()">
       </button>
     </div>
   </div>
 
-  <div class="filters">
+  <div class="filters tour-roles-search">
     <span class="p-input-icon-left">
       <i class="pi pi-search"></i>
       <input
@@ -42,13 +51,13 @@
     [loading]="loading()"
     [paginator]="false"
     [tableStyle]="{'min-width': '50rem'}"
-    styleClass="p-datatable-striped">
+    styleClass="p-datatable-striped tour-roles-table">
     <ng-template pTemplate="header">
       <tr>
         <th>Nombre</th>
-        <th>Usuarios</th>
-        <th>Permisos Personalizados</th>
-        <th>Acciones</th>
+        <th class="tour-roles-col-users">Usuarios</th>
+        <th class="tour-roles-col-custom">Permisos Personalizados</th>
+        <th class="tour-roles-actions">Acciones</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-role>
@@ -56,18 +65,20 @@
         <td>{{ role.name }}</td>
         <td>
           <p-tag
+            styleClass="tour-roles-col-users"
             [value]="role.user_count + ' usuario(s)'"
             [severity]="role.user_count > 0 ? 'info' : 'secondary'">
           </p-tag>
         </td>
         <td>
           <p-tag
+            styleClass="tour-roles-col-custom"
             [value]="role.has_custom_permissions ? 'Si' : 'No'"
             [severity]="role.has_custom_permissions ? 'success' : 'secondary'">
           </p-tag>
         </td>
         <td>
-          <div class="action-buttons">
+          <div class="action-buttons tour-roles-actions">
             <button
               pButton
               pTooltip="Editar rol"
@@ -99,6 +110,7 @@
   </p-table>
 
   <p-paginator
+    styleClass="tour-roles-paginator"
     [rows]="pageSize()"
     [totalRecords]="totalRecords()"
     [rowsPerPageOptions]="[10, 20, 50]"

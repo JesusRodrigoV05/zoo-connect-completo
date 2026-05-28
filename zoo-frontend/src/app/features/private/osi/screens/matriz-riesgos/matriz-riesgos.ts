@@ -6,6 +6,7 @@ import { TooltipModule } from "primeng/tooltip";
 import { ConfirmDialog } from "primeng/confirmdialog";
 import { ConfirmationService } from "primeng/api";
 import { MainContainer } from "@app/shared/components/main-container";
+import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { finalize } from "rxjs";
 import { ShowToast } from "@app/shared/services";
@@ -86,6 +87,7 @@ export default class MatrizRiesgos {
   private readonly toast = inject(ShowToast);
   private readonly confirmService = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly onboarding = inject(OnboardingService);
 
   protected readonly controlTypes = CONTROL_TYPES;
   protected readonly automationLevels = AUTOMATION_LEVELS;
@@ -168,6 +170,10 @@ export default class MatrizRiesgos {
     } else if (format === "png") {
       this.exportAsImage(data);
     }
+  }
+
+  protected startGuidedTour(): void {
+    this.onboarding.startTour("admin-matriz-riesgos");
   }
 
   private exportAsPdf(rows: RiskRow[]): void {

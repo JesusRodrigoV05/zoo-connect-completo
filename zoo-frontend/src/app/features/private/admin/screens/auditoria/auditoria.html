@@ -7,6 +7,14 @@
       </div>
       <div class="header-stats" style="display: flex; gap: 0.5rem; align-items: center;">
         <p-button
+          icon="pi pi-question-circle"
+          label="Tour guiado"
+          severity="contrast"
+          [rounded]="true"
+          pTooltip="Iniciar tour guiado"
+          (onClick)="startGuidedTour()"
+        />
+        <p-button
           variant="text"
           (onClick)="refresh()"
           icon="pi pi-refresh"
@@ -21,7 +29,7 @@
   </header>
 
   <!-- Filtros -->
-  <div class="audit-filters-bar card">
+  <div class="audit-filters-bar card tour-audit-filters">
     <div class="filter-group">
       <span class="p-input-icon-left w-full">
         <i class="pi pi-search"></i>
@@ -154,17 +162,6 @@
             <span class="audit-timestamp">
               {{ item.timestamp | date : "medium" }}
             </span>
-            
-            @if(isFirst){
-              <p-button
-                icon="pi pi-question-circle"
-                severity="contrast"
-                [rounded]="true"
-                [text]="true"
-                pTooltip="Iniciar tour guiado"
-                (onClick)="startGuidedTour()"
-              />
-            }
           </div>
         </div>
         } @empty {
