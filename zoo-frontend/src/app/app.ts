@@ -10,7 +10,6 @@ import { AuthStore } from "@stores/auth.store";
 import { isPlatformBrowser } from "@angular/common";
 import { ScrollTopModule } from "primeng/scrolltop";
 import { Toast } from "primeng/toast";
-import { ShowToast } from "./shared/services";
 import { ButtonModule } from "primeng/button";
 import { MessageService } from "primeng/api";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
@@ -33,9 +32,7 @@ import { ConfirmPopupModule } from "primeng/confirmpopup";
 export class App implements OnInit {
   protected title = "zoo-connect-web";
   private readonly authStore = inject(AuthStore);
-  private showToast = inject(ShowToast);
   private platformId = inject(PLATFORM_ID);
-  private authInitialized = false;
   private messageService = inject(MessageService);
 
   constructor() {
@@ -50,31 +47,15 @@ export class App implements OnInit {
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    if (isPlatformBrowser(this.platformId) && !this.authInitialized) {
-      this.authInitialized = true;
-      await this.initializeAuth();
-    }
-  }
-
-  private async initializeAuth(): Promise<void> {
-    try {
-      await this.authStore.initializeAuth();
-      if (this.authStore.suggest2FA()) {
-        this.messageService.add({
-          key: "toast-con-link",
-          severity: "warn",
-          summary: "Habilitación de Verificacion en dos pasos",
-          detail:
-            "Tu cuenta puede ser más segura si habilitas la verificación en dos pasos.",
-        });
-      }
-    } catch (error) {
-      this.showToast.showError(
-        "Error",
-        "No se pudo restaurar tu sesion, intentalo de nuevo mas tarde",
-      );
-      console.error("Error inicializando autenticación:", error);
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId) && this.authStore.suggest2FA()) {
+      this.messageService.add({
+        key: "toast-con-link",
+        severity: "warn",
+        summary: "Habilitación de Verificacion en dos pasos",
+        detail:
+          "Tu cuenta puede ser más segura si habilitas la verificación en dos pasos.",
+      });
     }
   }
 

@@ -1,10 +1,13 @@
 import {
   ApplicationConfig,
   inject,
+  isDevMode,
+  PLATFORM_ID,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
-  provideZonelessChangeDetection, isDevMode,
+  provideZonelessChangeDetection,
 } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
 import {
   provideRouter,
   TitleStrategy,
@@ -58,9 +61,14 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     ConfirmationService,
     provideAppInitializer(async () => {
+      const platformId = inject(PLATFORM_ID);
+      if (!isPlatformBrowser(platformId)) {
+        return;
+      }
+
       const authStore = inject(AuthStore);
 
-      return authStore.initializeAuth().then(() => {});
+      await authStore.initializeAuth();
     }),
     { provide: TitleStrategy, useClass: CustomTitleStrategy }, provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
