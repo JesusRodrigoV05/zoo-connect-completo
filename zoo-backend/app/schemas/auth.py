@@ -28,7 +28,7 @@ class TokenResponse(BaseModel):
 from app.core.password_policy import validate_password_strength_func
 
 class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
+    identifier: str
 
 
 class ResetPasswordRequest(BaseModel):

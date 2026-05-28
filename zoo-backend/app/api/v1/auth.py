@@ -662,31 +662,67 @@ async def forgot_password(
     body: ForgotPasswordRequest,
     db: Session = Depends(get_db),
 ):
-    user = crud_user.get_user_by_email(db, email=body.email)
+    user = crud_user.get_user_by_identifier(db, body.identifier)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No existe una cuenta con ese usuario o telefono.",
+        )
+    if not user.phone_number:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tu cuenta no tiene un numero de celular registrado para recuperar contrasena.",
+        )
 
-    return {"msg": "Si la cuenta existe, se envio un codigo SMS de recuperacion"}
+    try:
+        code = crud_user.create_sms_otp(db, user, "reset_password")
+        await sms_service.send_otp(user.phone_number, code, "reset_password")
+    except Exception as e:
+        logger.error(f"Error al enviar SMS OTP de recuperacion: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No se pudo enviar el codigo SMS. Intenta nuevamente.",
+        )
+
+    # Ocultar parcialmente el número para mayor privacidad (ej. ******123)
+    masked_phone = f"******{user.phone_number[-4:]}" if len(user.phone_number) >= 4 else user.phone_number
+    return {"msg": f"Se envio un codigo SMS de recuperacion a tu numero {masked_phone}"}
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
 async def reset_password(
     body: ResetPasswordRequest, 
+    response: Response,
     db: Session = Depends(get_db)
 ):
-    user = crud_token.get_user_by_reset_token(db, token=body.token)
+    user = crud_user.get_user_by_identifier(db, body.identifier)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado.",
+        )
 
     if not crud_user.verify_sms_otp(db, user, body.code, "reset_password"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Codigo SMS invalido",
+            detail="Codigo SMS invalido o expirado.",
         )
 
-    if crud_user.is_password_in_history(db, user, body.new_password):
+    # Decodificar contraseña si viene encriptada con RSA
+    decrypted_password = body.new_password
+    if len(body.new_password) > 100:
+        try:
+            decrypted_password = RSAManager.decrypt_password(body.new_password)
+        except Exception as e:
+            logger.warning(f"Error decrypting reset password with RSA, trying as plain text: {str(e)}")
+
+    if crud_user.is_password_in_history(db, user, decrypted_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No puedes reutilizar una contrasena que ya has usado anteriormente",
+            detail="No puedes reutilizar una contrasena que ya has usado anteriormente.",
         )
 
-    crud_user.update_password(db, db_user=user, new_password=body.new_password)
+    crud_user.update_password(db, db_user=user, new_password=decrypted_password)
 
     if user.must_change_password:
         user.must_change_password = False
@@ -700,7 +736,7 @@ async def reset_password(
         set_refresh_cookie(response, refresh_token)
         return TokenResponse(access_token=access_token, token_type="bearer")
 
-    return {"msg": "Contrasena actualizada exitosamente"}
+    return {"msg": "Contrasena actualizada exitosamente."}
 
 
 # put user

@@ -26,6 +26,7 @@ import { PasswordModule } from "primeng/password";
 import { Loader } from "@app/shared/components/loader";
 import { LogoImage } from "@app/shared/components";
 import { evaluatePasswordStrength } from "@app/shared/utils/password-strength";
+import { EncryptionService } from "@app/core/services/encryption.service";
 
 @Component({
   selector: "app-reset-password",
@@ -56,6 +57,7 @@ export default class ResetPassword {
   private readonly restorePasswordService = inject(RestorePassword);
   private readonly toastService = inject(ShowToast);
   private readonly authStore = inject(AuthStore);
+  private readonly encryptionService = inject(EncryptionService);
 
   protected readonly isResetting = signal(false);
   protected readonly formSubmitted = signal(false);
@@ -152,7 +154,7 @@ export default class ResetPassword {
     return fieldNames[fieldName] || fieldName;
   }
 
-  protected onSubmit(): void {
+  protected async onSubmit(): Promise<void> {
     this.formSubmitted.set(true);
 
     if (!this.resetForm.valid) {
@@ -175,30 +177,36 @@ export default class ResetPassword {
 
     const { identifier, code, password } = this.resetForm.value;
 
-    this.restorePasswordService
-      .resetPassword(identifier!, code!, password!)
-      .pipe(finalize(() => this.isResetting.set(false)))
-      .subscribe({
-        next: (response: any) => {
-          if (response.access_token) {
-            this.authStore.setTokens(response.access_token);
-            this.authStore.loadUserProfile().then(() => {
-              this.router.navigate(["/inicio"]);
-            });
-          } else {
-            this.toastService.showSuccess("Éxito", response.msg);
-            this.router.navigate(["/login"]);
-          }
-        },
-        error: (error) => {
-          let errorMessage = "Error al restablecer contraseña";
-          if (error.status === 400) {
-            errorMessage = error.error?.detail || "Token inválido o expirado";
-          } else if (error.status === 404) {
-            errorMessage = "Usuario no encontrado";
-          }
-          this.toastService.showError("Error", errorMessage);
-        },
-      });
+    try {
+      const encryptedPassword = await this.encryptionService.encrypt(password!);
+      this.restorePasswordService
+        .resetPassword(identifier!, code!, encryptedPassword)
+        .pipe(finalize(() => this.isResetting.set(false)))
+        .subscribe({
+          next: (response: any) => {
+            if (response.access_token) {
+              this.authStore.setTokens(response.access_token);
+              this.authStore.loadUserProfile().then(() => {
+                this.router.navigate(["/inicio"]);
+              });
+            } else {
+              this.toastService.showSuccess("Éxito", response.msg);
+              this.router.navigate(["/login"]);
+            }
+          },
+          error: (error) => {
+            let errorMessage = "Error al restablecer contraseña";
+            if (error.status === 400) {
+              errorMessage = error.error?.detail || "Token inválido o expirado";
+            } else if (error.status === 404) {
+              errorMessage = "Usuario no encontrado";
+            }
+            this.toastService.showError("Error", errorMessage);
+          },
+        });
+    } catch (e) {
+      this.isResetting.set(false);
+      this.toastService.showError("Error", "Error al cifrar la contraseña");
+    }
   }
 }

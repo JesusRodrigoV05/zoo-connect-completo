@@ -102,6 +102,8 @@ def get_user_by_identifier(db: Session, identifier: str) -> User | None:
     return query.filter(
         (User.id == normalized_identifier)
         | (User.username == normalized_identifier)
+        | (User.phone_number == normalized_identifier)
+        | (User.email == normalized_identifier)
     ).first()
 
 
