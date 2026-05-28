@@ -25,6 +25,7 @@ import { MainContainer } from '@app/shared/components/main-container';
 import { OnboardingService } from '@app/shared/services/onboarding.service';
 import { ActivatedRoute } from '@angular/router';
 import { Auditoria as AuditoriaModel } from '@models/auditoria';
+import { AuditIpDetails } from './audit-ip-details';
 
 @Component({
   selector: 'app-auditoria',
@@ -40,7 +41,8 @@ import { Auditoria as AuditoriaModel } from '@models/auditoria';
     DatePickerModule,
     SelectModule,
     FormsModule,
-    TooltipModule
+    TooltipModule,
+    AuditIpDetails
   ],
   templateUrl: './auditoria.html',
   styleUrl: './auditoria.scss',
@@ -58,6 +60,8 @@ export default class Auditoria {
   protected readonly searchTerm = signal<string>('');
   protected readonly dateRange = signal<Date[] | null>(null);
   protected readonly selectedUserId = signal<string | null>(null);
+  protected readonly selectedAuditLog = signal<AuditoriaModel | null>(null);
+  protected readonly showIpDetails = signal(false);
 
   protected readonly logType = signal<"application" | "security">(
     this.route.snapshot.data["logType"] === "application" ? "application" : "security",
@@ -162,6 +166,11 @@ export default class Auditoria {
     this.searchTerm.set('');
     this.dateRange.set(null);
     this.selectedUserId.set(null);
+  }
+
+  protected openIpDetails(auditLog: AuditoriaModel) {
+    this.selectedAuditLog.set(auditLog);
+    this.showIpDetails.set(true);
   }
 
   protected getSeverity(event: string): 'success' | 'info' | 'warn' | 'danger' {

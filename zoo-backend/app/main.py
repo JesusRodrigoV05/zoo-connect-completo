@@ -8,6 +8,7 @@ import logging
 
 from fastapi_pagination import add_pagination
 from app.core.config import settings
+from app.core.request_context import current_client_ip, resolve_client_ip
 from app.scripts.create_admin import create_default_admin
 from app.scripts.seeds import init_db
 from app.core.scheduler import scheduler, setup_scheduler
@@ -93,6 +94,8 @@ SENSITIVE_PREFIXES = (
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
+    current_client_ip.set(resolve_client_ip(request))
+
     # Optimización para CORS preflight
     if request.method == "OPTIONS":
         return await call_next(request)

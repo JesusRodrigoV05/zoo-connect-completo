@@ -112,7 +112,7 @@
 }
 
 .audit-col-detail {
-  flex: 1;
+  flex: 1 1 260px;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -130,8 +130,33 @@
   }
 }
 
+.audit-col-ip {
+  flex: 0 0 230px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+
+  .ip-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    font-size: 0.8125rem;
+  }
+
+  .ip-address {
+    color: var(--p-text-color);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 .audit-col-date {
-  flex: 0 0 220px;
+  flex: 0 0 190px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -171,7 +196,7 @@
     display: none;
   }
 
-  .audit-col-event, .audit-col-user, .audit-col-date {
+  .audit-col-event, .audit-col-user, .audit-col-date, .audit-col-ip {
     flex: 1 1 auto;
   }
 

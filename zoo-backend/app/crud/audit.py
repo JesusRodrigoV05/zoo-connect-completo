@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 from app.db.session import SessionLocal
 from app.models.audit_log import AuditLog
 from app.core.enums import AuditEvent, AuditLogType
+from app.core.request_context import current_client_ip
+from app.services.ip_guide import lookup_ip, summarize_ip_guide
 
 
 SECURITY_EVENTS = {
@@ -37,13 +39,17 @@ def create_audit_log(
     action: Optional[str] = None,
     detail: Optional[str] = None,
     user_id: Optional[str] = None,
-    attempted_email: Optional[str] = None
+    attempted_email: Optional[str] = None,
+    ip_address: Optional[str] = None,
 ) -> None:
     db: Session = SessionLocal()
     
     try:
         event_value = _enum_value(event)
         email_to_log = attempted_email.lower().strip() if attempted_email else None
+        resolved_ip = ip_address or current_client_ip.get()
+        ip_guide_data = lookup_ip(resolved_ip) if resolved_ip else None
+        ip_summary = summarize_ip_guide(ip_guide_data)
         
         db_log = AuditLog(
             event=event_value,
@@ -51,7 +57,12 @@ def create_audit_log(
             action=action,
             detail=detail,
             user_id=user_id,
-            attempted_email=email_to_log
+            attempted_email=email_to_log,
+            ip_address=resolved_ip,
+            ip_country=ip_summary.get("country"),
+            ip_asn=ip_summary.get("asn"),
+            ip_organization=ip_summary.get("organization"),
+            ip_guide_data=ip_guide_data,
         )
         
         db.add(db_log)
@@ -94,7 +105,10 @@ def get_audit_logs_by_type_query(
             (AuditLog.action.ilike(search_filter)) | 
             (AuditLog.event.ilike(search_filter)) |
             (AuditLog.detail.ilike(search_filter)) |
-            (AuditLog.attempted_email.ilike(search_filter))
+            (AuditLog.attempted_email.ilike(search_filter)) |
+            (AuditLog.ip_address.ilike(search_filter)) |
+            (AuditLog.ip_country.ilike(search_filter)) |
+            (AuditLog.ip_organization.ilike(search_filter))
         )
 
     if user_id:

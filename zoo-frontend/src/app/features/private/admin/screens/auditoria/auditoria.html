@@ -82,6 +82,7 @@
           <div class="audit-col-event">Evento / Acción</div>
           <div class="audit-col-user">Usuario</div>
           <div class="audit-col-detail">Detalle / Referencia</div>
+          <div class="audit-col-ip">IP / Origen</div>
           <div class="audit-col-date">Fecha y Hora</div>
         </div>
 
@@ -119,6 +120,24 @@
             @if(!item.detail && !item.attempted_email) {
               <span class="text-muted">-</span>
             }
+          </div>
+
+          <!-- Columna IP -->
+          <div class="audit-col-ip">
+            <div class="ip-info">
+              <span class="ip-address">{{ item.ip_address || "Sin IP" }}</span>
+              <span class="text-muted">{{ item.ip_country || "Pais no disponible" }}</span>
+              <span class="text-muted">{{ item.ip_organization || "ASN no disponible" }}</span>
+            </div>
+            <p-button
+              icon="pi pi-eye"
+              label="Ver mas"
+              severity="secondary"
+              size="small"
+              [outlined]="true"
+              pTooltip="Ver informacion completa de ip.guide"
+              (onClick)="openIpDetails(item)"
+            />
           </div>
 
           <!-- Columna Fecha -->
@@ -164,4 +183,10 @@
       </div>
     </ng-template>
   </p-dataview>
+
+  <zoo-audit-ip-details
+    [auditLog]="selectedAuditLog()"
+    [visible]="showIpDetails()"
+    (visibleChange)="showIpDetails.set($event)"
+  />
 </zoo-main-container>
