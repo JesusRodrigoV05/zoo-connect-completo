@@ -64,23 +64,4 @@ export class PasswordHistoryComponent implements OnInit {
       }
     });
   }
-  
-  protected clearHistory(): void {
-    if (!confirm("¿Estás seguro de que deseas limpiar todo el histórico de contraseñas?")) {
-      return;
-    }
-    
-    const userId = this.authStore.usuario()?.id;
-    if (!userId) return;
-    
-    this.authService.clearPasswordHistory(userId).subscribe({
-      next: () => {
-        this.passwordHistory.set([]);
-      },
-      error: (err) => {
-        console.error("Error al limpiar histórico:", err);
-        this.error.set("Error al limpiar el histórico");
-      }
-    });
-  }
 }
