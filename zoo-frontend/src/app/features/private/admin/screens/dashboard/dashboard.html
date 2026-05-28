@@ -8,6 +8,15 @@
 
       <div class="quick-actions">
         <p-button
+          variant="text"
+          (onClick)="store.loadDashboard()"
+          icon="pi pi-refresh"
+          severity="danger"
+          [rounded]="true"
+          pTooltip="Actualizar datos"
+          tooltipPosition="bottom"
+        />
+        <p-button
           label="Tour guiado"
           icon="pi pi-question-circle"
           severity="contrast"

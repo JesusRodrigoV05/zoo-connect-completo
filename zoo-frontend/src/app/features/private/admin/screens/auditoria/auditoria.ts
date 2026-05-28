@@ -97,15 +97,18 @@ export default class Auditoria {
     pages: 0,
   };
 
+  protected readonly refreshTrigger = signal<number>(0);
+
   private auditoriaResponse$ = combineLatest([
     toObservable(this.paginationState),
     toObservable(this.searchTerm).pipe(debounceTime(400)),
     toObservable(this.dateRange),
     toObservable(this.selectedUserId),
-    toObservable(this.logType)
+    toObservable(this.logType),
+    toObservable(this.refreshTrigger)
   ]).pipe(
     tap(() => this.isLoading.set(true)),
-    switchMap(([state, search, dates, userId, type]) => {
+    switchMap(([state, search, dates, userId, type, _]) => {
       let dateFrom: string | undefined;
       let dateTo: string | undefined;
       
@@ -135,6 +138,10 @@ export default class Auditoria {
   protected auditoriaResponse = toSignal(this.auditoriaResponse$, {
     initialValue: this.initialResponse,
   });
+
+  protected refresh(): void {
+    this.refreshTrigger.update(n => n + 1);
+  }
 
   constructor() {
 

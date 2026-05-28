@@ -5,7 +5,16 @@
       <h1>Roles</h1>
       <p class="subtitle">Administra los roles del sistema</p>
     </div>
-    <div class="header-actions">
+    <div class="header-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+      <p-button
+        variant="text"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Actualizar"
+        tooltipPosition="bottom"
+        (onClick)="loadRoles()">
+      </p-button>
       <button
         pButton
         label="Nuevo Rol"

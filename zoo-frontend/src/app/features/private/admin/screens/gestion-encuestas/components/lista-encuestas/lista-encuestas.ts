@@ -19,6 +19,7 @@ import { ShowToast } from "@app/shared/services";
 import { Observable } from "rxjs";
 import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { AuthStore } from "@stores/auth.store";
+import { TooltipModule } from "primeng/tooltip";
 
 @Component({
   selector: "zoo-lista-encuestas",
@@ -30,6 +31,7 @@ import { AuthStore } from "@stores/auth.store";
     EncuestaItem,
     RouterLink,
     ConfirmPopupModule,
+    TooltipModule,
   ],
   providers: [ConfirmationService],
   templateUrl: "./lista-encuestas.html",
@@ -53,7 +55,7 @@ export default class ListaEncuestas {
     this.loadSurveys();
   }
 
-  private loadSurveys(): void {
+  protected loadSurveys(): void {
     this.surveys$ = this.surveyService.getAllSurveys();
 
   }

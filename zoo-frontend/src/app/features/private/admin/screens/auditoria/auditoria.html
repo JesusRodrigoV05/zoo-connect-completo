@@ -5,7 +5,16 @@
         <h1>{{ title() }}</h1>
         <p>{{ subtitle() }}</p>
       </div>
-      <div class="header-stats">
+      <div class="header-stats" style="display: flex; gap: 0.5rem; align-items: center;">
+        <p-button
+          variant="text"
+          (onClick)="refresh()"
+          icon="pi pi-refresh"
+          severity="danger"
+          [rounded]="true"
+          pTooltip="Actualizar"
+          tooltipPosition="bottom"
+        />
         <span class="total-badge">{{ totalRecords() }} registros encontrados</span>
       </div>
     </div>

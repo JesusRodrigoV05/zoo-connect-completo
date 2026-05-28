@@ -11,16 +11,27 @@
         (onClick)="startGuidedTour()"
       />
     </div>
-    @if (canCreateSurveys()) {
+    <div class="buttons flex gap-2">
       <p-button
-        icon="pi pi-plus"
-        label="Crear Encuesta"
+        variant="text"
+        (onClick)="loadSurveys()"
+        icon="pi pi-refresh"
+        severity="danger"
         [rounded]="true"
-        severity="primary"
-        styleClass="tour-encuestas-main-create-btn"
-        routerLink="/admin/encuestas/crear"
+        pTooltip="Actualizar"
+        tooltipPosition="bottom"
       />
-    }
+      @if (canCreateSurveys()) {
+        <p-button
+          icon="pi pi-plus"
+          label="Crear Encuesta"
+          [rounded]="true"
+          severity="primary"
+          styleClass="tour-encuestas-main-create-btn"
+          routerLink="/admin/encuestas/crear"
+        />
+      }
+    </div>
   </div>
 
   @let surveys = this.surveys$ | async; @if(surveys){

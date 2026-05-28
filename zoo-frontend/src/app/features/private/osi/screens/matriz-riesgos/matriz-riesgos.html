@@ -9,6 +9,15 @@
         </p>
       </div>
 
+      <p-button
+        variant="text"
+        icon="pi pi-refresh"
+        severity="danger"
+        [rounded]="true"
+        pTooltip="Actualizar"
+        tooltipPosition="bottom"
+        (onClick)="loadRows()">
+      </p-button>
       <button
         pButton
         type="button"
