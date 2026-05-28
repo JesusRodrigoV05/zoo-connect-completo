@@ -46,3 +46,136 @@
 
 <!-- Histórico de Contraseñas -->
 <password-history />
+
+<p-card styleClass="ajustes-card change-password-card">
+  <ng-template pTemplate="title">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-lock"></i>
+      <span>Cambiar Contraseña</span>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="subtitle">
+    Actualiza tu contraseña validando tu clave actual y un código SMS.
+  </ng-template>
+
+  <form class="change-password-form" [formGroup]="changePasswordForm" (ngSubmit)="changePassword()">
+    <div class="password-fields-grid">
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-password id="currentPassword" formControlName="currentPassword" [feedback]="false" [toggleMask]="true" autocomplete="current-password" fluid />
+          <label for="currentPassword">Contraseña actual</label>
+        </p-floatlabel>
+        @if (getCurrentPasswordError(); as error) {
+        <p-message severity="error" variant="simple" size="small">{{ error }}</p-message>
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-password id="newPassword" formControlName="newPassword" [feedback]="false" [toggleMask]="true" autocomplete="new-password" fluid />
+          <label for="newPassword">Nueva contraseña</label>
+        </p-floatlabel>
+        @if (getNewPasswordError(); as error) {
+        <p-message severity="error" variant="simple" size="small">{{ error }}</p-message>
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-password id="confirmPassword" formControlName="confirmPassword" [feedback]="false" [toggleMask]="true" autocomplete="new-password" fluid />
+          <label for="confirmPassword">Repetir nueva contraseña</label>
+        </p-floatlabel>
+        @if (getConfirmPasswordError(); as error) {
+        <p-message severity="error" variant="simple" size="small">{{ error }}</p-message>
+        }
+      </div>
+    </div>
+
+    <div class="password-helper-grid">
+      <section class="password-tips-container">
+        <div class="tips-header">
+          <i class="pi pi-lightbulb"></i>
+          <span>Tips para crear una contraseña fácil de recordar</span>
+        </div>
+        <div class="tips-list">
+          @for (tip of passwordTips; track tip.title) {
+          <div class="tip-card">
+            <div class="tip-title">{{ tip.title }}</div>
+            <div class="tip-example">"{{ tip.example }}"</div>
+            <div class="tip-result">{{ tip.result }}</div>
+            <div class="tip-description">{{ tip.description }}</div>
+          </div>
+          }
+        </div>
+      </section>
+
+      <section class="password-strength-container">
+        <div class="strength-info">
+          <span class="label">Seguridad: <strong>{{ strengthLabel }}</strong></span>
+          <div class="strength-bar-bg" aria-hidden="true">
+            <div class="strength-bar-fill" [ngClass]="strengthClass" [style.width.%]="strengthPercent"></div>
+          </div>
+        </div>
+
+        <div class="rules-grid">
+          <div class="rule-item" [class.valid]="rules.length">
+            <i [class]="rules.length ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+            <span>12+ caracteres</span>
+          </div>
+          <div class="rule-item" [class.valid]="rules.uppercase">
+            <i [class]="rules.uppercase ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+            <span>Mayúscula</span>
+          </div>
+          <div class="rule-item" [class.valid]="rules.lowercase">
+            <i [class]="rules.lowercase ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+            <span>Minúscula</span>
+          </div>
+          <div class="rule-item" [class.valid]="rules.digit">
+            <i [class]="rules.digit ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+            <span>Número</span>
+          </div>
+          <div class="rule-item" [class.valid]="rules.special">
+            <i [class]="rules.special ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+            <span>Especial</span>
+          </div>
+          <div class="rule-item" [class.valid]="rules.noRepeats && rules.noSequence">
+            <i [class]="rules.noRepeats && rules.noSequence ? 'pi pi-check-circle' : 'pi pi-circle'"></i>
+            <span>Patrón seguro</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="otp-panel">
+      <div class="otp-copy">
+        <i class="pi pi-mobile"></i>
+        <div>
+          <h4>Enviar código</h4>
+          <p>Se enviará un código a tu número {{ maskedPhone }}.</p>
+        </div>
+      </div>
+
+      <div class="otp-actions">
+        <p-button type="button" label="Enviar código" icon="pi pi-send" [loading]="requestingCode()" [disabled]="!canRequestCode" (onClick)="requestPasswordCode()" />
+        @if (codeCooldown() > 0) {
+        <span class="cooldown">Reenviar en {{ codeCooldown() }}s</span>
+        }
+      </div>
+
+      <div class="field verification-field">
+        <p-floatlabel variant="on">
+          <input id="verificationCode" pInputText type="text" inputmode="numeric" formControlName="verificationCode" autocomplete="one-time-code" fluid />
+          <label for="verificationCode">Código SMS</label>
+        </p-floatlabel>
+        @if (getVerificationCodeError(); as error) {
+        <p-message severity="error" variant="simple" size="small">{{ error }}</p-message>
+        }
+      </div>
+    </section>
+
+    <div class="change-password-actions">
+      <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="resetChangePasswordForm()" />
+      <p-button type="submit" label="Cambiar Contraseña" icon="pi pi-check" [loading]="submittingPassword()" [disabled]="!canChangePassword" />
+    </div>
+  </form>
+</p-card>

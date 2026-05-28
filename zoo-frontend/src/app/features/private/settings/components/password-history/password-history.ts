@@ -37,7 +37,11 @@ export class PasswordHistoryComponent implements OnInit {
     this.loadPasswordHistory();
   }
   
-  protected loadPasswordHistory(): void {
+  public refresh(): void {
+    this.loadPasswordHistory();
+  }
+  
+  private loadPasswordHistory(): void {
     this.loading.set(true);
     this.error.set(null);
     

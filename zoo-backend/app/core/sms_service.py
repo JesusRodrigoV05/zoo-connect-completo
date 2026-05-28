@@ -44,6 +44,7 @@ async def send_otp(phone_number: str, code: str, purpose: str) -> dict:
         "verify_phone": "verificar tu cuenta",
         "reset_password": "restablecer tu contrasena",
         "login_2fa": "confirmar tu inicio de sesion",
+        "change_password": "cambiar tu contrasena",
     }.get(purpose, "confirmar la operacion")
     message = f"ZooConnect: tu codigo para {purpose_text} es {code}. Expira en {settings.SMS_OTP_EXPIRE_MINUTES} minutos."
     return await send_sms(phone_number, message)

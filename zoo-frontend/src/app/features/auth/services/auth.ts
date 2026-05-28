@@ -12,6 +12,8 @@ import {
   TokenResponse,
   UpdateProfileRequest,
   VerifyLogin2FARequest,
+  ChangePasswordRequestCodeResponse,
+  ChangePasswordWithCodeRequest,
 } from "@models/usuario/request_response.model";
 import { Usuario } from "@models/usuario/usuario.model";
 import { environment } from "@env";
@@ -125,6 +127,20 @@ export class Auth {
   clearPasswordHistory(userId: string): Observable<{msg: string}> {
     return this.http.delete<{msg: string}>(
       `${environment.apiUrl}/admin_users/users/${userId}/password-history`
+    );
+  }
+
+  requestChangePasswordCode(): Observable<ChangePasswordRequestCodeResponse> {
+    return this.http.post<ChangePasswordRequestCodeResponse>(
+      `${environment.apiUrl}/security/change-password/request-code`,
+      {}
+    );
+  }
+
+  changePasswordWithCode(data: ChangePasswordWithCodeRequest): Observable<{message: string}> {
+    return this.http.post<{message: string}>(
+      `${environment.apiUrl}/security/change-password/verify-and-change`,
+      data
     );
   }
 }

@@ -7,3 +7,245 @@
   flex-direction: column;
   gap: 1rem;
 }
+
+.change-password-card {
+  margin-top: 1.5rem;
+}
+
+.change-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.password-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.password-helper-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+  gap: 1rem;
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.password-tips-container,
+.password-strength-container,
+.otp-panel {
+  border: 1px solid var(--p-surface-200);
+  background: var(--p-surface-50);
+  border-radius: 1rem;
+  padding: 1.15rem;
+}
+
+.tips-header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--p-primary-700);
+  font-weight: 700;
+  margin-bottom: 1rem;
+
+  i {
+    color: var(--p-primary-500);
+  }
+}
+
+.tips-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+
+  @media (max-width: 680px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tip-card {
+  background: var(--p-surface-card);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+
+  .tip-title {
+    font-weight: 700;
+    color: var(--p-text-color);
+    margin-bottom: 0.35rem;
+  }
+
+  .tip-example {
+    font-size: 0.86rem;
+    color: var(--p-text-muted-color);
+    font-style: italic;
+  }
+
+  .tip-result {
+    display: inline-block;
+    margin: 0.45rem 0;
+    padding: 0.4rem 0.65rem;
+    border-radius: 0.5rem;
+    background: var(--p-primary-50);
+    color: var(--p-primary-700);
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-weight: 800;
+  }
+
+  .tip-description {
+    font-size: 0.82rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.strength-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+
+  .label {
+    font-size: 0.9rem;
+    color: var(--p-text-muted-color);
+
+    strong {
+      color: var(--p-text-color);
+    }
+  }
+}
+
+.strength-bar-bg {
+  height: 7px;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--p-surface-200);
+}
+
+.strength-bar-fill {
+  height: 100%;
+  transition: width 0.25s ease, background-color 0.2s ease;
+
+  &.weak {
+    background: var(--p-red-500);
+  }
+
+  &.medium {
+    background: var(--p-orange-500);
+  }
+
+  &.strong {
+    background: var(--p-green-500);
+  }
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.5rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.84rem;
+
+  i {
+    font-size: 0.95rem;
+  }
+
+  &.valid {
+    color: var(--p-green-600);
+    font-weight: 700;
+
+    i {
+      color: var(--p-green-500);
+    }
+  }
+}
+
+.otp-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(220px, 280px);
+  gap: 1rem;
+  align-items: center;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}
+
+.otp-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+
+  > i {
+    width: 2.4rem;
+    height: 2.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--p-primary-700);
+    background: var(--p-primary-50);
+    flex-shrink: 0;
+  }
+
+  h4 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    color: var(--p-text-color);
+  }
+
+  p {
+    margin: 0;
+    color: var(--p-text-muted-color);
+    line-height: 1.45;
+  }
+}
+
+.otp-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cooldown {
+  font-size: 0.78rem;
+  color: var(--p-text-muted-color);
+}
+
+.verification-field {
+  min-width: 0;
+}
+
+.change-password-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  @media (max-width: 560px) {
+    flex-direction: column;
+  }
+}

@@ -48,6 +48,17 @@ export interface ResetPasswordRequest {
   new_password: string;
 }
 
+export interface ChangePasswordRequestCodeResponse {
+  message: string;
+  masked_phone: string;
+}
+
+export interface ChangePasswordWithCodeRequest {
+  current_password: string;
+  new_password: string;
+  code: string;
+}
+
 export interface LoginResponse {
   access_token: string;
   token_type: string;
