@@ -429,15 +429,8 @@ def _enforce_password_history_limit(db: Session, user: User) -> None:
 
 
 def _get_password_history_limit(role_name: str) -> int:
-    """Obtiene el límite de histórico según el rol."""
-    role_limits = {
-        "administrador": settings.PASSWORD_HISTORY_ADMIN_MAX,
-        "osi": settings.PASSWORD_HISTORY_ESPECIALISTA_MAX,
-        "veterinario": settings.PASSWORD_HISTORY_ESPECIALISTA_MAX,
-        "cuidador": settings.PASSWORD_HISTORY_ESPECIALISTA_MAX,
-        "visitante": settings.PASSWORD_HISTORY_PACIENTE_MAX,
-    }
-    return role_limits.get(role_name, settings.PASSWORD_HISTORY_USUARIO_BASICO_MAX)
+    """Obtiene el límite de histórico de contraseñas (mantener hasta 5)."""
+    return 5
 
 
 def _get_password_validity_days(role_name: str) -> int:
@@ -461,11 +454,17 @@ def is_password_expired(user: User) -> bool:
 
 
 def is_password_in_history(db: Session, user: User, new_password: str) -> bool:
-    """Verifica si la nueva contraseña ya estuvo en el histórico."""
+    """Verifica si la nueva contraseña es la actual o ya estuvo en las últimas 5 del histórico."""
+    # Primero verificar contra la contraseña activa actual
+    if verify_password(new_password, user.hashed_password):
+        return True
+
+    # Luego verificar contra las últimas 5 contraseñas del histórico
     history_records = (
         db.query(PasswordHistory)
         .filter(PasswordHistory.user_id == user.id)
         .order_by(PasswordHistory.created_at.desc())
+        .limit(5)
         .all()
     )
 
