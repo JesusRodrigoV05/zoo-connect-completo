@@ -16,7 +16,6 @@ import {
 } from "@models/usuario/request_response.model";
 import { isPlatformBrowser } from "@angular/common";
 import { ShowToast } from "@app/shared/services";
-import { Theme } from "@app/features/private/settings/services/theme-service";
 import { environment } from "@env";
 
 interface AuthState {
@@ -64,7 +63,6 @@ export const AuthStore = signalStore(
       router = inject(Router),
       platformId = inject(PLATFORM_ID),
       toastService = inject(ShowToast),
-      themeService = inject(Theme),
     ) => {
       const setTokenInStorage = (key: string, value: string): void => {
         if (isPlatformBrowser(platformId)) {
@@ -87,7 +85,6 @@ export const AuthStore = signalStore(
 
       const clearAuthStateAndStorage = () => {
         removeTokenFromStorage(ACCESS_TOKEN_KEY);
-        removeTokenFromStorage(themeService.THEME_KEY);
         patchState(store, getInitialState());
       };
 
@@ -273,7 +270,6 @@ export const AuthStore = signalStore(
             );
           } finally {
             clearAuthStateAndStorage();
-            themeService.setTheme("light");
             toastService.showSuccess("Sesión cerrada exitosamente", "Éxito");
             await router.navigate(["/login"]);
           }
@@ -281,7 +277,6 @@ export const AuthStore = signalStore(
 
         logoutSilently() {
           clearAuthStateAndStorage();
-          themeService.setTheme("light");
           router.navigate(["/login"], {
             queryParams: { sessionExpired: true },
           });
