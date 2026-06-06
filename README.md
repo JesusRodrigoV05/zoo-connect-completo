@@ -83,8 +83,12 @@ Los tests end-to-end se encuentran en `zoo-frontend/src/tests/`, organizados por
 
 ```text
 zoo-frontend/src/tests/
-├── jesus-velasco/
+├── jesusvelasco/
 │   └── jesus-velasco.spec.ts
+├── luzticona/
+├── manueldelgadillo/
+├── manueljimenez/
+└── oscarmenacho/
 ```
 
 Cada integrante debe crear su carpeta dentro de `zoo-frontend/src/tests/` con su nombre y colocar allí sus archivos `.spec.ts`.
@@ -102,9 +106,13 @@ Los tests del backend se encuentran en `zoo-backend/tests/`, organizados por int
 
 ```text
 zoo-backend/tests/
-├── jesus-velasco/
+├── jesusvelasco/
 │   ├── conftest.py
 │   └── test_backend.py
+├── luzticona/
+├── manueldelgadillo/
+├── manueljimenez/
+└── oscarmenacho/
 ```
 
 Cada integrante debe crear su carpeta dentro de `zoo-backend/tests/` con su nombre y colocar allí sus archivos de test.
