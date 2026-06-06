@@ -22,7 +22,7 @@ router = APIRouter(
 
 @router.get("/users", response_model=Page[UserOutWithRole], dependencies=[Depends(require_admin_user)])
 def admin_list_users(
-    role_id: Optional[int] = Query(None, description="Filtrar por ID de Rol (1:Admin, 3:Cuidador, 4:Vet)"),
+    role_id: Optional[List[int]] = Query(None, description="Filtrar por IDs de Rol (ej: 1,3,4)"),
     is_active: Optional[bool] = Query(None, description="Filtrar por estado activo/inactivo"),
     search: Optional[str] = Query(None, description="Buscar por nombre o email"),
     db: Session = Depends(get_db)
