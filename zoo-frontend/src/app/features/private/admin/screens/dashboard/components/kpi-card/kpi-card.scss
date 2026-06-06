@@ -73,12 +73,12 @@
     background: var(--p-surface-100);
 
     &.positive {
-      color: var(--green-600);
-      background: var(--green-50);
+      color: var(--p-green-600);
+      background: var(--p-green-50);
     }
     &.negative {
-      color: var(--red-600);
-      background: var(--red-50);
+      color: var(--p-red-600);
+      background: var(--p-red-50);
     }
   }
 

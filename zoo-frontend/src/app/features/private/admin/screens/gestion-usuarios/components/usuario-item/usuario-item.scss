@@ -4,13 +4,13 @@
 
 ::ng-deep .usuario-card {
   transition: all 0.2s ease-in-out;
-  border: 1px solid var(--surface-border);
-  background: var(--surface-card);
+  border: 1px solid var(--p-surface-border);
+  background: var(--p-surface-card);
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-color: var(--primary-color);
+    border-color: var(--p-primary-color);
   }
 
   .p-card-body {
@@ -45,7 +45,7 @@
       margin: 0;
       font-size: 1rem;
       font-weight: 600;
-      color: var(--text-color);
+      color: var(--p-text-color);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -60,7 +60,7 @@
 
   .email {
     margin: 0;
-    color: var(--text-color-secondary);
+    color: var(--p-text-color-secondary);
     font-size: 0.875rem;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -109,8 +109,8 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 
   &.healthy .dot {
-    background: #4ade80;
-    box-shadow: 0 0 8px #4ade80;
+    background: var(--p-emerald-400);
+    box-shadow: 0 0 8px var(--p-emerald-400);
   }
 }
 
@@ -118,7 +118,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #fbbf24;
+  background: var(--p-amber-400);
 }
 
 .animal-name {

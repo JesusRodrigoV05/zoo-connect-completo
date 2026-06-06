@@ -94,13 +94,13 @@
     flex-shrink: 0;
 
     &.role-cuidador {
-      background: #10b981;
+      background: var(--p-emerald-500);
     }
     &.role-veterinario {
-      background: #8b5cf6;
+      background: var(--p-violet-500);
     }
     &.role-admin {
-      background: #3b82f6;
+      background: var(--p-blue-500);
     }
   }
 
@@ -130,16 +130,16 @@
     letter-spacing: 0.5px;
 
     &.role-cuidador {
-      background: #ecfdf5;
-      color: #059669;
+      background: var(--p-emerald-50);
+      color: var(--p-emerald-600);
     }
     &.role-veterinario {
-      background: #f5f3ff;
-      color: #7c3aed;
+      background: var(--p-violet-50);
+      color: var(--p-violet-600);
     }
     &.role-admin {
-      background: #eff6ff;
-      color: #2563eb;
+      background: var(--p-blue-50);
+      color: var(--p-blue-600);
     }
   }
 }
@@ -161,13 +161,13 @@
     font-weight: bold;
 
     &.role-cuidador {
-      background: #10b981;
+      background: var(--p-emerald-500);
     }
     &.role-veterinario {
-      background: #8b5cf6;
+      background: var(--p-violet-500);
     }
     &.role-admin {
-      background: #3b82f6;
+      background: var(--p-blue-500);
     }
   }
 
@@ -189,4 +189,26 @@
 
 ::ng-deep .modern-select-panel .p-select-list-container {
   padding: 0.5rem;
+}
+
+:host-context(.dark-mode) {
+  ::ng-deep .assign-dialog-modern {
+    .p-dialog-header {
+      background: var(--p-darkgreen-900);
+    }
+
+    .p-dialog-content {
+      background: var(--p-darkgreen-950);
+    }
+
+    .p-dialog-footer {
+      background: var(--p-darkgreen-800);
+      border-top-color: var(--p-darkgreen-700);
+    }
+  }
+
+  .dialog-header .icon-wrapper {
+    background: var(--p-darkgreen-800);
+    color: var(--p-primary-300);
+  }
 }

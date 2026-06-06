@@ -1,7 +1,7 @@
 .demo-container {
   width: 100%;
   height: 100%;
-  background: var(--p-surface-0);
+  background: var(--p-surface-card);
   :host-context(html.dark-mode) & {
     background: var(--p-surface-950);
   }

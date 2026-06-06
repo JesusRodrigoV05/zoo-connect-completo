@@ -180,3 +180,26 @@
     }
   }
 }
+
+:host-context(.dark-mode) {
+  .cron-builder-panel {
+    background: var(--p-darkgreen-900);
+    border-color: var(--p-darkgreen-700);
+  }
+
+  .days-grid .day-cell {
+    background: var(--p-darkgreen-950);
+    border-color: var(--p-darkgreen-700);
+
+    &:hover {
+      background: var(--p-darkgreen-800);
+      border-color: var(--p-primary-color);
+    }
+
+    &.selected {
+      background: var(--p-primary-color);
+      border-color: var(--p-primary-color);
+      color: var(--p-primary-contrast-color);
+    }
+  }
+}

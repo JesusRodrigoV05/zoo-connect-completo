@@ -12,19 +12,19 @@
 }
 
 :host ::ng-deep p-button.boton-menu-individual.p-button-outlined:hover {
-  background-color: var(--primary-color);
-  color: var(--primary-contrast-color);
+  background-color: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
 
   transform: translateY(-2px);
 
-  box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
 }
 
 :host ::ng-deep p-button.boton-menu-individual.boton-activo {
-  background-color: var(--primary-color);
-  color: var(--primary-contrast-color);
+  background-color: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
 
-  border-color: var(--primary-color);
+  border-color: var(--p-primary-color);
 }

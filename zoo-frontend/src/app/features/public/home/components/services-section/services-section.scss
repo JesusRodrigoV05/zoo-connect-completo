@@ -62,7 +62,7 @@
   .section-title {
     font-size: clamp(2.5rem, 5vw, 3.5rem);
     font-weight: 800;
-    color: var(--p-darkgreen-900);
+    color: var(--p-text-color);
     margin: 0 0 1.5rem;
     line-height: 1.1;
 
@@ -112,7 +112,7 @@
 
   &:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 40px -12px rgba(var(--p-primary-color), 0.15);
+    box-shadow: 0 20px 40px -12px color-mix(in srgb, var(--p-primary-color) 15%, transparent);
     border-color: var(--p-primary-200);
 
     .card-icon-blob {
@@ -127,7 +127,7 @@
   &.highlighted {
     background: var(--p-primary-600);
     color: white;
-    box-shadow: 0 20px 40px -12px rgba(var(--p-primary-600), 0.4);
+    box-shadow: 0 20px 40px -12px color-mix(in srgb, var(--p-primary-600) 40%, transparent);
 
     .card-icon-blob {
       background: rgba(255, 255, 255, 0.2);

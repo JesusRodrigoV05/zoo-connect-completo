@@ -4,7 +4,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-color);
+  color: var(--p-text-color);
 
   box-icon {
     width: 1.4rem;
@@ -40,6 +40,6 @@
   .empty {
     padding: 1rem;
     text-align: center;
-    color: var(--text-color-secondary);
+    color: var(--p-text-color-secondary);
   }
 }
