@@ -24,6 +24,7 @@ import { UnidadesMedidaStore } from "@app/features/private/admin/stores/admin-un
 import { DatePickerModule } from "primeng/datepicker";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { AuthStore } from "@stores/auth.store";
+import { TipoProductoId } from "@app/core/models/common/enums.model";
 
 @Component({
   selector: "app-crear-receta",
@@ -112,7 +113,7 @@ export class CrearReceta {
   ngOnInit() {
     this.productStore.setPage(1, 100);
     this.productStore.updateFilters({
-      tipoProductoId: 4,
+      tipoProductoId: TipoProductoId.MEDICAMENTO,
       nombre: null,
     });
 

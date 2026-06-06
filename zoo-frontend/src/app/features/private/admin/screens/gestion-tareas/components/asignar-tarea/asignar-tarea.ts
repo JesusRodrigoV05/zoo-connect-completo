@@ -56,7 +56,7 @@ export class AsignarTarea {
     this.adminUsuarios
       .getUsers(1, 100, {
         isActive: true,
-        roleIds: [1, 3, 4],
+        roleIds: [RolId.ADMIN, RolId.CUIDADOR, RolId.VETERINARIO],
       })
       .subscribe({
         next: (res) => {

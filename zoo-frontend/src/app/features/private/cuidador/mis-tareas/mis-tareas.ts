@@ -17,6 +17,7 @@ import { TooltipModule } from "primeng/tooltip";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { MisTareasStore } from "@app/shared/stores/ejecucion-tarea.store";
 import { Tarea } from "../../admin/models/tareas/tarea.model";
+import { TipoTareaId } from "@app/core/models/common/enums.model";
 import { InputNumberModule } from "primeng/inputnumber";
 import { DatePipe } from "@angular/common";
 import { VetRecetas } from "../../veterinario/services/historiales/vet-recetas";
@@ -191,7 +192,7 @@ export default class MisTareas {
     const descripcion = tarea.descripcion?.toLowerCase();
     const contieneId = descripcion?.includes("receta id");
 
-    const esTipoReceta = tarea.tipoTarea?.id === 2;
+    const esTipoReceta = tarea.tipoTarea?.id === TipoTareaId.TRATAMIENTO_MEDICO;
 
     return esTipoReceta && contieneId;
   }

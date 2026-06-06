@@ -31,6 +31,7 @@ import { EspecieStore } from "@stores/especies.store";
 import { AdminAnimales } from "@app/features/private/admin/services/admin-animales";
 import { AlimentacionService } from "../../../services/alimentacion-service";
 import { ShowToast } from "@app/shared/services";
+import { TipoProductoId } from "@app/core/models/common/enums.model";
 import {
   CreateDietaRequest,
   UpdateDietaRequest,
@@ -101,7 +102,7 @@ export default class CrearDieta implements OnInit {
   ngOnInit() {
     this.productStore.setPage(1, 100);
     this.productStore.updateFilters({
-      tipoProductoId: 2,
+      tipoProductoId: TipoProductoId.ALIMENTO,
       nombre: null,
     });
     this.productStore.loadProducts();

@@ -8,7 +8,7 @@ import {
   signal,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { Usuario } from "@app/core/models/usuario";
+import { Usuario, RolId } from "@app/core/models/usuario";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import { TagModule } from "primeng/tag";
@@ -83,13 +83,13 @@ export class UsuarioItem {
     roleId: number,
   ): "success" | "info" | "warn" | "danger" {
     switch (roleId) {
-      case 1:
+      case RolId.ADMIN:
         return "danger";
-      case 2:
+      case RolId.VISITANTE:
         return "warn";
-      case 3:
+      case RolId.CUIDADOR:
         return "success";
-      case 4:
+      case RolId.VETERINARIO:
         return "info";
       default:
         return "info";
