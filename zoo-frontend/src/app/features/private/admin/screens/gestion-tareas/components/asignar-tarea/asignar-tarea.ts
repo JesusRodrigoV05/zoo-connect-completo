@@ -6,6 +6,7 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from "@angular/core";
 import { RolId, Usuario } from "@models/usuario";
 import { ButtonModule } from "primeng/button";
@@ -37,19 +38,23 @@ export class AsignarTarea {
   usuarios = signal<Usuario[]>([]);
   loadingUsuarios = signal(false);
   selectedUserId = signal<number | null>(null);
+  private loaded = signal(false);
 
   constructor() {
     effect(() => {
       if (this.visible()) {
-        this.loadUsers();
+        untracked(() => this.loadUsers());
       } else {
-        this.selectedUserId.set(null);
+        untracked(() => {
+          this.selectedUserId.set(null);
+          this.loaded.set(false);
+        });
       }
     });
   }
 
   private loadUsers() {
-    if (this.usuarios().length > 0) return;
+    if (this.loaded()) return;
 
     this.loadingUsuarios.set(true);
 
@@ -64,8 +69,12 @@ export class AsignarTarea {
             (u) => u.rol.id !== RolId.VISITANTE,
           );
           this.usuarios.set(validUsers);
+          this.loaded.set(true);
         },
-        error: (e) => console.error(e),
+        error: (e) => {
+          console.error(e);
+          this.loaded.set(true);
+        },
         complete: () => this.loadingUsuarios.set(false),
       });
   }

@@ -224,7 +224,7 @@ def completar_tarea_simple(db: Session, db_tarea: Tarea, db_usuario: User, notas
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id == TipoTareaId.ALIMENTACION
+    if db_tarea.tipo_tarea_id == TipoTareaId.ALIMENTACION:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta es una tarea de alimentacion. Use el endpoint especifico")
         
     db_tarea.is_completed = True
@@ -254,7 +254,7 @@ def completar_tarea_alimentacion(
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id != TipoTareaId.ALIMENTACION
+    if db_tarea.tipo_tarea_id != TipoTareaId.ALIMENTACION:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta no es una tarea de alimentacion")
 
     if not payload.detalles:
