@@ -184,7 +184,7 @@
       font-size: 1.75rem;
       transition: transform 0.3s ease;
 
-      @media (prefers-color-scheme: dark) {
+      :host-context(.dark-mode) & {
         background: var(--p-teagreen-900);
         color: var(--p-teagreen-200);
       }

@@ -269,7 +269,7 @@
       }
 
       .p-highlight .p-galleria-indicator-button {
-        background-color: var(--primary-500);
+        background-color: var(--p-primary-color);
       }
     }
   }
@@ -280,18 +280,18 @@
   bottom: 1.5rem;
   left: 1.5rem;
   right: 1.5rem;
-  background: var(--surface-card);
+  background: var(--p-surface-card);
   backdrop-filter: blur(10px);
   border-radius: 1rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--text-color);
+  color: var(--p-text-color);
   font-weight: 600;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
   mat-icon {
-    color: var(--primary-500);
+    color: var(--p-primary-color);
   }
 }
 
@@ -299,7 +299,7 @@
   position: absolute;
   top: 2rem;
   right: -1rem;
-  background: var(--surface-card);
+  background: var(--p-surface-card);
   padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
