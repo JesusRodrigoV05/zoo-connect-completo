@@ -75,36 +75,16 @@ docker-compose restart
 
 ---
 
-## 🧪 Pruebas y Tests
-
-### Tests del Frontend (E2E con Playwright)
-
-Los tests end-to-end se encuentran en `zoo-frontend/src/tests/`, organizados por integrante:
+## Pruebas
 
 ```text
 zoo-frontend/src/tests/
 ├── jesusvelasco/
-│   └── jesus-velasco.spec.ts
 ├── luzticona/
 ├── manueldelgadillo/
 ├── manueljimenez/
 └── oscarmenacho/
-```
 
-Cada integrante debe crear su carpeta dentro de `zoo-frontend/src/tests/` con su nombre y colocar allí sus archivos `.spec.ts`.
-
-Para ejecutar los tests de frontend:
-
-```bash
-cd zoo-frontend
-npx playwright test
-```
-
-### Tests del Backend (pytest)
-
-Los tests del backend se encuentran en `zoo-backend/tests/`, organizados por integrante:
-
-```text
 zoo-backend/tests/
 ├── jesusvelasco/
 │   ├── conftest.py
@@ -115,12 +95,10 @@ zoo-backend/tests/
 └── oscarmenacho/
 ```
 
-Cada integrante debe crear su carpeta dentro de `zoo-backend/tests/` con su nombre y colocar allí sus archivos de test.
-
-Para ejecutar los tests de backend:
+Ejecutar tests:
 
 ```bash
-cd zoo-backend
-pytest tests/
+cd zoo-frontend && vitest
+cd zoo-backend && pytest
 ```
 
