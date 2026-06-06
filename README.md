@@ -116,17 +116,3 @@ cd zoo-backend
 pytest tests/
 ```
 
-### Pruebas Unitarias (Java)
-
-Las pruebas unitarias Java se organizan bajo `src/test/java/edu/bo/ucb/`, con una carpeta por integrante:
-
-```text
-src/test/java/edu/bo/ucb/
-├── jesusvelasco/
-├── luzticona/
-├── manueldelgadillo/
-├── manueljimenez/
-└── oscarmenacho/
-```
-
-Cada integrante debe colocar sus archivos `.java` de prueba dentro de su carpeta correspondiente.
