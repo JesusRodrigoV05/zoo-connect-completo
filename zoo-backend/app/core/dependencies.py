@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.db.session import get_db
 from app.crud import user as crud_user
 from app.models.user import User
-from app.core.enums import UserRole
+from app.core.enums import UserRole, RolId
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -40,7 +40,7 @@ def get_current_active_user(current_user: User = Depends(get_current_user)):
 def require_admin_user(current_user: User = Depends(get_current_active_user)):
     """"
     role_name = str(getattr(current_user.role, "value", getattr(current_user, "role", ""))).lower()
-    if role_name == "administrador" or getattr(current_user, "role_id", None) == 1:
+    if role_name == "administrador" or getattr(current_user, "role_id", None) == RolId.ADMIN:
         return current_user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permisos insuficientes (admin requerido)")
     """
@@ -109,7 +109,7 @@ def require_inventory_read_permission(
 
 
 def require_veterinario(current_user: User = Depends(get_current_active_user)):
-    is_vet = current_user.role.name.upper() == "VETERINARIO" or current_user.role_id == 4
+    is_vet = current_user.role.name.upper() == "VETERINARIO" or current_user.role_id == RolId.VETERINARIO
     if not is_vet:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

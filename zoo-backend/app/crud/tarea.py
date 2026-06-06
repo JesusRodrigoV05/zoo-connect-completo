@@ -10,7 +10,7 @@ from app.models.tarea import (
 )
 from app.models.animal import Animal, Habitat
 from app.models.user import User
-from app.core.enums import UserRole
+from app.core.enums import UserRole, TipoTareaId, TipoSalidaId
 
 from app.schemas.tarea import (
     TipoTareaCreate, TipoTareaUpdate,
@@ -224,7 +224,7 @@ def completar_tarea_simple(db: Session, db_tarea: Tarea, db_usuario: User, notas
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id == 1: # ID 1 = Alimentación
+    if db_tarea.tipo_tarea_id == TipoTareaId.ALIMENTACION
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta es una tarea de alimentacion. Use el endpoint especifico")
         
     db_tarea.is_completed = True
@@ -254,7 +254,7 @@ def completar_tarea_alimentacion(
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id != 1: # Hardcoded ID 1 para Alimentacion
+    if db_tarea.tipo_tarea_id != TipoTareaId.ALIMENTACION
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta no es una tarea de alimentacion")
 
     if not payload.detalles:
@@ -287,7 +287,7 @@ def completar_tarea_alimentacion(
         #logica transaccional
         _ = _procesar_salida_transaccional(
             db=db,
-            tipo_salida_id=1, # ID 1 = "Consumo Alimentacion"
+            tipo_salida_id=TipoSalidaId.CONSUMO_ALIMENTACION,
             detalles=detalles_salida,
             usuario_id=db_usuario.id
         )
@@ -347,7 +347,7 @@ def completar_tarea_tratamiento(
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id != 2: 
+    if db_tarea.tipo_tarea_id != TipoTareaId.TRATAMIENTO_MEDICO:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta no es una tarea de tratamiento medico")
 
     if not payload.detalles:
@@ -377,7 +377,7 @@ def completar_tarea_tratamiento(
 
         _ = _procesar_salida_transaccional(
             db=db,
-            tipo_salida_id=2, 
+            tipo_salida_id=TipoSalidaId.CONSUMO_TRATAMIENTO,
             detalles=detalles_salida,
             usuario_id=db_usuario.id
         )

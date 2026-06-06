@@ -11,6 +11,7 @@ from app.crud import tarea as crud_tarea
 from app.schemas import dieta as schemas_dieta
 from app.models import tarea as models_tarea
 from app.models.user import User
+from app.core.enums import TipoTareaId
 
 router = APIRouter()
 
@@ -78,7 +79,7 @@ def get_sugerencia_dieta_para_tarea(
 
     db_tarea = _get_tarea_local_or_404(id_tarea, db)
 
-    if db_tarea.tipo_tarea_id != 1 and "alimentacion" not in str(db_tarea.tipo_tarea.nombre_tipo_tarea).lower():
+    if db_tarea.tipo_tarea_id != TipoTareaId.ALIMENTACION and "alimentacion" not in str(db_tarea.tipo_tarea.nombre_tipo_tarea).lower():
          raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="Esta tarea no parece ser de Alimentacion"
