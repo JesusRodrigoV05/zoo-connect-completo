@@ -4,6 +4,7 @@ from app.models.tarea import TipoTarea
 from app.models.inventario import TipoSalida
 from app.models.role import Role
 
+
 def init_db():
     db = SessionLocal()
     try:
@@ -62,6 +63,20 @@ def init_db():
                 nombre_tipo_salida="Consumo Tratamiento",
                 descripcion_tipo_salida="Salida automática por aplicación de medicamentos",
                 is_active=True
+            ))
+
+        print("4. Verificando Usuario Cuidador...")
+        from app.models.user import User
+        from app.core.security import get_password_hash
+        if not db.query(User).filter_by(email="cuidador@zconnect.com").first():
+            print("   + Creando usuario: cuidador@zconnect.com")
+            db.add(User(
+                email="cuidador@zconnect.com",
+                username="cuidador",
+                hashed_password=get_password_hash("cuidador123"),
+                role_id=3,
+                is_active=True,
+                email_verified=True
             ))
 
         db.commit()

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.core.dependencies import get_current_active_user, get_current_user_optional
+from app.core.dependencies import get_current_active_user
 from app.crud import animal as crud_animal
 from app.schemas.animal import AnimalFavoritoCreate, AnimalFavoritoOut
 from app.models.user import User

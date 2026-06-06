@@ -6,7 +6,7 @@ from fastapi import File, Form, UploadFile
 from app.core.uploader import upload_to_cloudinary, delete_from_cloudinary
 
 from app.db.session import get_db
-from app.core.dependencies import require_admin_user, get_current_active_user, require_animal_management_permission, get_current_user_optional
+from app.core.dependencies import require_admin_user, get_current_active_user, require_animal_management_permission
 
 from app.crud import animal as crud_animal
 from app.schemas.animal import (
@@ -99,8 +99,8 @@ def create_animal(animal_in: AnimalCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/animals/", response_model=Page[AnimalOut], tags=["Animales"])
-def list_animals(db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_user_optional)):
-    user_role = getattr(getattr(current_user, 'role', None), 'name', 'visitante').lower()
+def list_animals(db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_active_user)):
+    user_role = getattr(getattr(current_user, 'role', None), 'nombre_rol', 'visitante').lower()
     allowed_roles = {"administrador", "veterinario", "cuidador"}
 
     if user_role in allowed_roles:
@@ -109,12 +109,12 @@ def list_animals(db: Session = Depends(get_db), current_user: Optional[User] = D
         return paginate(crud_animal.list_animals(db, es_publico=True))
 
 @router.get("/animals/{animal_id}", response_model=AnimalOut, tags=["Animales"])
-def get_animal(animal_id: int, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_user_optional)):
+def get_animal(animal_id: int, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_active_user)):
     db_animal = crud_animal.get_animal(db, animal_id)
     if not db_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
 
-    user_role = getattr(getattr(current_user, 'role', None), 'name', 'visitante').lower()
+    user_role = getattr(getattr(current_user, 'role', None), 'nombre_rol', 'visitante').lower()
     allowed_roles = {"administrador", "veterinario", "cuidador"}
     
     if not db_animal.es_publico and user_role not in allowed_roles:
