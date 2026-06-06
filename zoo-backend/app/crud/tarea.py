@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, Query, joinedload
+from sqlalchemy.orm import Session, Query, joinedload, selectinload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from typing import Optional
@@ -168,10 +168,10 @@ def get_tareas_query(
     fecha_programada: Optional[date] = None
 ) -> Query:
     query = db.query(Tarea).options(
-        joinedload(Tarea.tipo_tarea),
-        joinedload(Tarea.usuario_asignado),
-        joinedload(Tarea.animal),
-        joinedload(Tarea.habitat)
+        selectinload(Tarea.tipo_tarea),
+        selectinload(Tarea.usuario_asignado),
+        selectinload(Tarea.animal),
+        selectinload(Tarea.habitat)
     )
 
     if is_completed is not None:
@@ -191,10 +191,10 @@ def get_tareas_query(
 
 def get_tarea(db: Session, id_tarea: int) -> Optional[Tarea]:
     return db.query(Tarea).options(
-        joinedload(Tarea.tipo_tarea),
-        joinedload(Tarea.usuario_asignado),
-        joinedload(Tarea.animal),
-        joinedload(Tarea.habitat)
+        selectinload(Tarea.tipo_tarea),
+        selectinload(Tarea.usuario_asignado),
+        selectinload(Tarea.animal),
+        selectinload(Tarea.habitat)
     ).filter(Tarea.id_tarea == id_tarea).first()
 
 def asignar_tarea(db: Session, db_tarea: Tarea, db_usuario_asignar: User) -> Tarea:
