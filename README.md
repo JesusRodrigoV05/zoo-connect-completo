@@ -72,3 +72,61 @@ docker-compose down
 ```bash
 docker-compose restart
 ```
+
+---
+
+## 🧪 Pruebas y Tests
+
+### Tests del Frontend (E2E con Playwright)
+
+Los tests end-to-end se encuentran en `zoo-frontend/src/tests/`, organizados por integrante:
+
+```text
+zoo-frontend/src/tests/
+├── jesus-velasco/
+│   └── jesus-velasco.spec.ts
+```
+
+Cada integrante debe crear su carpeta dentro de `zoo-frontend/src/tests/` con su nombre y colocar allí sus archivos `.spec.ts`.
+
+Para ejecutar los tests de frontend:
+
+```bash
+cd zoo-frontend
+npx playwright test
+```
+
+### Tests del Backend (pytest)
+
+Los tests del backend se encuentran en `zoo-backend/tests/`, organizados por integrante:
+
+```text
+zoo-backend/tests/
+├── jesus-velasco/
+│   ├── conftest.py
+│   └── test_backend.py
+```
+
+Cada integrante debe crear su carpeta dentro de `zoo-backend/tests/` con su nombre y colocar allí sus archivos de test.
+
+Para ejecutar los tests de backend:
+
+```bash
+cd zoo-backend
+pytest tests/
+```
+
+### Pruebas Unitarias (Java)
+
+Las pruebas unitarias Java se organizan bajo `src/test/java/edu/bo/ucb/`, con una carpeta por integrante:
+
+```text
+src/test/java/edu/bo/ucb/
+├── jesusvelasco/
+├── luzticona/
+├── manueldelgadillo/
+├── manueljimenez/
+└── oscarmenacho/
+```
+
+Cada integrante debe colocar sus archivos `.java` de prueba dentro de su carpeta correspondiente.
