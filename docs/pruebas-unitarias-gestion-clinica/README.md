@@ -2,16 +2,14 @@
 
 Pruebas **unitarias** de los casos **CP31, CP32, CP33, CP35 y CP45**. Viven en este repositorio (`zoo-connect-completo`), junto al código de la aplicación.
 
-> Las **pruebas de aceptación (ATDD)** con Selenium + Java están en el proyecto aparte [`atdd-gestion-clinica/`](../../atdd-gestion-clinica/) para subirse a otro repositorio.
 
----
 
 ## Qué incluye
 
 | Capa | Herramienta | Ubicación | Qué valida |
 |------|-------------|-----------|------------|
 | Backend | pytest | `zoo-backend/tests/gestion_clinica/` | Reglas de negocio y CRUD (con mocks) |
-| Frontend | Vitest | `zoo-frontend/src/app/features/private/veterinario/tests/` | Adaptadores y mapeo de datos |
+| Frontend | Vitest | `zoo-frontend/src/tests/manueldelgadillo/` | Adaptadores y mapeo de datos |
 
 No requieren navegador ni API en ejecución (aisladas con mocks).
 
@@ -34,12 +32,8 @@ zoo-connect-completo/
 │       └── test_cp45_cerrar_ciclo_clinico.py
 └── zoo-frontend/
     ├── vitest.config.ts
-    └── src/app/features/private/veterinario/tests/
-        ├── cp31-tipo-atencion.vitest.ts
-        ├── cp32-consulta-clinica.vitest.ts
-        ├── cp33-receta-tareas.vitest.ts
-        ├── cp35-orden-examen.vitest.ts
-        └── cp45-cerrar-historial.vitest.ts
+    └── src/tests/manueldelgadillo/
+        └── manuel-delgadillo.spec.ts
 ```
 
 ---
@@ -48,11 +42,11 @@ zoo-connect-completo/
 
 | ID | Descripción | Backend | Frontend (Vitest) |
 |----|-------------|---------|-------------------|
-| CP31 | Crear tipo de atención | `test_cp31_crear_tipo_atencion.py` | `cp31-tipo-atencion.vitest.ts` |
-| CP32 | Registrar consulta clínica | `test_cp32_registrar_consulta_clinica.py` | `cp32-consulta-clinica.vitest.ts` |
-| CP33 | Receta genera tarea automática | `test_cp33_receta_genera_tarea_automatica.py` | `cp33-receta-tareas.vitest.ts` |
-| CP35 | Emitir orden de examen | `test_cp35_emitir_orden_examen.py` | `cp35-orden-examen.vitest.ts` |
-| CP45 | Cerrar ciclo clínico | `test_cp45_cerrar_ciclo_clinico.py` | `cp45-cerrar-historial.vitest.ts |
+| CP31 | Crear tipo de atención | `test_cp31_crear_tipo_atencion.py` | `manuel-delgadillo.spec.ts` |
+| CP32 | Registrar consulta clínica | `test_cp32_registrar_consulta_clinica.py` | `manuel-delgadillo.spec.ts` |
+| CP33 | Receta genera tarea automática | `test_cp33_receta_genera_tarea_automatica.py` | `manuel-delgadillo.spec.ts` |
+| CP35 | Emitir orden de examen | `test_cp35_emitir_orden_examen.py` | `manuel-delgadillo.spec.ts` |
+| CP45 | Cerrar ciclo clínico | `test_cp45_cerrar_ciclo_clinico.py` | `manuel-delgadillo.spec.ts` |
 
 ---
 
@@ -104,12 +98,15 @@ cd zoo-frontend
 # Todas las unitarias del frontend
 npm run test:unit
 
-# Una por una
-npx vitest run src/app/features/private/veterinario/tests/cp31-tipo-atencion.vitest.ts
-npx vitest run src/app/features/private/veterinario/tests/cp32-consulta-clinica.vitest.ts
-npx vitest run src/app/features/private/veterinario/tests/cp33-receta-tareas.vitest.ts
-npx vitest run src/app/features/private/veterinario/tests/cp35-orden-examen.vitest.ts
-npx vitest run src/app/features/private/veterinario/tests/cp45-cerrar-historial.vitest.ts
+# Archivo unificado (5 casos: CP31, CP32, CP33, CP35, CP45)
+npx vitest run src/tests/manueldelgadillo/manuel-delgadillo.spec.ts
+
+# Un caso por nombre (filtro)
+npx vitest run src/tests/manueldelgadillo/manuel-delgadillo.spec.ts -t "CP31"
+npx vitest run src/tests/manueldelgadillo/manuel-delgadillo.spec.ts -t "CP32"
+npx vitest run src/tests/manueldelgadillo/manuel-delgadillo.spec.ts -t "CP33"
+npx vitest run src/tests/manueldelgadillo/manuel-delgadillo.spec.ts -t "CP35"
+npx vitest run src/tests/manueldelgadillo/manuel-delgadillo.spec.ts -t "CP45"
 ```
 
 ---

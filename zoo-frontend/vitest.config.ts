@@ -5,7 +5,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
-    include: ["src/**/*.vitest.ts"],
+    include: [
+      "src/**/*.vitest.ts",
+      "src/tests/manueldelgadillo/**/*.spec.ts",
+    ],
     reporters: ["verbose"],
   },
   resolve: {

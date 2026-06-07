@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 :host {
   display: block;
   height: 100%;
@@ -122,3 +123,142 @@
     }
   }
 }
+=======
+:host {
+  display: block;
+  height: 100%;
+  padding: 2rem;
+  background-color: var(--p-surface-ground);
+}
+
+.planificador-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .title-block {
+    h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--p-text-color);
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--p-text-muted-color);
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.table-card {
+  background: var(--p-surface-card);
+  border-radius: 16px;
+  border: 1px solid var(--p-surface-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+
+  .empty-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--p-surface-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    i {
+      font-size: 2.5rem;
+      color: var(--p-text-muted-color);
+    }
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+
+  p {
+    margin: 0;
+    color: var(--p-text-muted-color);
+  }
+}
+
+:host ::ng-deep {
+  .p-datatable.zoo-table {
+    .p-datatable-header {
+      background: transparent;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: var(--p-darkgreen-300);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid var(--p-surface-border);
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--p-surface-card);
+      transition: background-color 0.2s;
+
+      > td {
+        padding: 1.25rem 1rem;
+        border-bottom: 1px solid var(--p-surface-border);
+        color: var(--p-text-color);
+      }
+
+      &:last-child > td {
+        border-bottom: none;
+      }
+    }
+
+    .p-paginator {
+      border-top: 1px solid var(--p-surface-border);
+      background: transparent;
+      padding: 1rem;
+
+      .p-paginator-element {
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+:host-context(.dark-mode) {
+  .table-card {
+    background: var(--p-darkgreen-900);
+    border-color: var(--p-darkgreen-700);
+  }
+
+    ::ng-deep .p-datatable.zoo-table {
+    .p-datatable-thead > tr > th {
+      background: var(--p-darkgreen-800);
+    }
+  }
+}
+>>>>>>> 8585d29f67065f84845a9a98969c45d34d0ed0be
