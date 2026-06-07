@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["http://localhost:3000"]
     DEFAULT_ADMIN_EMAIL: str
     DEFAULT_ADMIN_PASSWORD: str
+    DEFAULT_VET_EMAIL: str = "vet@zconnect.com"
+    DEFAULT_VET_PASSWORD: str = "vetABC123!"
     #
     CLOUDINARY_CLOUD_NAME: str
     CLOUDINARY_API_KEY: str

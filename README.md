@@ -8,10 +8,20 @@ Repositorio unificado (Monorepo) del sistema **Zoo Connect**, una plataforma mod
 
 ```text
 /zoo-connect-completo
-├── zoo-backend/           # API RESTful (FastAPI, Python 3.10)
-├── zoo-frontend/          # Aplicación Web (Angular 20, Bun)
-├── docker-compose.yml     # Orquestador de contenedores
-└── .gitignore             # Reglas globales de exclusión
+├── zoo-backend/                              # API RESTful (FastAPI, Python 3.10)
+├── zoo-frontend/                             # Aplicación Web (Angular 20, Bun)
+├── docs/pruebas-unitarias-gestion-clinica/   # README pruebas unitarias (CP31–CP45)
+├── atdd-gestion-clinica/                     # ATDD Java (subir a otro repositorio)
+├── docker-compose.yml
+└── .gitignore
+```
+
+### Pruebas — Gestión Clínica
+
+| Tipo | Dónde | Documentación |
+|------|--------|---------------|
+| **Unitarias** (pytest + Vitest) | En este repo (`zoo-backend/tests/`, `zoo-frontend/.../tests/`) | [docs/pruebas-unitarias-gestion-clinica/README.md](docs/pruebas-unitarias-gestion-clinica/README.md) |
+| **Aceptación ATDD** (Selenium + Java) | Carpeta `atdd-gestion-clinica/` (proyecto aparte) | [atdd-gestion-clinica/README.md](atdd-gestion-clinica/README.md) |
 
 ```
 
