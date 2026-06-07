@@ -10,6 +10,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:unit": "vitest run",
+    "test:unit:gestion-clinica": "vitest run src/tests/manueldelgadillo/manuel-delgadillo.spec.ts",
     "test:unit:watch": "vitest",
     "test:unit:headed": "vitest run --browser.headless=false",
     "test:unit:ui": "vitest --ui",
