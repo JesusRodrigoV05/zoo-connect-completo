@@ -40,11 +40,21 @@ def _get_tarea_or_404(id_tarea: int, db: Session = Depends(get_db)) -> models_ta
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return db_obj
 
-def _get_cuidador_or_404(id_usuario: int, db: Session = Depends(get_db)) -> User:
-    db_user = crud_user.get_user(db, id_usuario)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="Usuario a asignar no encontrado")
-    return db_user
+def _get_cuidador_or_404(usuario_id: int, db: Session):
+    usuario = crud_user.get_user(db, usuario_id)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Permitir roles: 1 (Admin), 3 (Cuidador), 4 (Veterinario)
+    ROLES_PERMITIDOS = [1, 3, 4]
+    
+    if usuario.role_id not in ROLES_PERMITIDOS:
+        raise HTTPException(
+            status_code=400, 
+            detail="El usuario no tiene un rol autorizado para cumplir tareas"
+        )
+        
+    return usuario
 
 def get_today():
     return date.today()
@@ -166,15 +176,44 @@ def list_tareas_asignadas_hoy(
 ):
     query = crud_tarea.get_tareas_query(db, fecha_programada=fecha)
     return paginate(query)
+from fastapi.encoders import jsonable_encoder
+import logging
 
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 @router.put("/{id_tarea}/asignar", response_model=schemas_tarea.TareaOut, dependencies=[Depends(require_admin_user)])
 def assign_tarea(
     body: schemas_tarea.TareaAssign,
     db_tarea: models_tarea.Tarea = Depends(_get_tarea_or_404),
     db: Session = Depends(get_db),
 ):
-    db_usuario = _get_cuidador_or_404(body.usuario_asignado_id, db)
-    return crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario)
+    # Log para ver qué datos están entrando exactamente al endpoint
+    logger.info(f"====== INTENTO DE ASIGNACIÓN ======")
+    logger.info(f"ID Tarea recibida en URL (vía dependencia): {getattr(db_tarea, 'id', 'No encontrada')}")
+    logger.info(f"Payload recibido (body): {jsonable_encoder(body)}")
+    logger.info(f"Objeto db_tarea completo: {db_tarea.__dict__}")
+    try:
+        logger.info(f"Buscando cuidador con ID: {body.usuario_asignado_id}")
+        db_usuario = _get_cuidador_or_404(body.usuario_asignado_id, db)
+        
+        logger.info(f"Ejecutando crud_tarea.asignar_tarea...")
+        resultado = crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario)
+        
+        logger.info(f"Asignación exitosa para tarea {db_tarea.id_tarea}")
+        return resultado
+
+    except HTTPException as http_ex:
+        # Captura errores controlados lanzados por tus subfunciones (_get_cuidador_or_404, etc)
+        logger.error(f"HTTPException en assign_tarea: {http_ex.status_code} - {http_ex.detail}")
+        raise http_ex
+    except Exception as e:
+        # Captura cualquier error inesperado de base de datos o lógica de Python
+        logger.exception(f"Error inesperado procesando la asignación: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail=f"Error interno en el servidor: {str(e)}"
+        )
 
 
 #Ejecuion tareas

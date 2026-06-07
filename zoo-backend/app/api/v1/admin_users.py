@@ -20,19 +20,34 @@ router = APIRouter(
     dependencies=[Depends(require_admin_user)]  
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 @router.get("/users", response_model=Page[UserOutWithRole], dependencies=[Depends(require_admin_user)])
 def admin_list_users(
-    role_id: Optional[int] = Query(None, description="Filtrar por ID de Rol (1:Admin, 3:Cuidador, 4:Vet)"),
+    role_id: Optional[List[int]] = Query(None, description="Filtrar por IDs de Rol (Ej: ?role_id=1&role_id=3)"),
     is_active: Optional[bool] = Query(None, description="Filtrar por estado activo/inactivo"),
     search: Optional[str] = Query(None, description="Buscar por nombre o email"),
     db: Session = Depends(get_db)
 ):
-    return paginate(crud_user.get_users_query(
-        db=db, 
-        role_id=role_id, 
-        is_active=is_active, 
-        search=search
-    ))
+    logger.info("====== LISTANDO USUARIOS DESDE ADMIN ======")
+    logger.info(f"Parámetro 'role_id' capturado en FastAPI: {role_id} (Tipo: {type(role_id)})")
+    logger.info(f"Filtros adicionales -> is_active: {is_active}, search: {search}")
+
+    try:
+        query = crud_user.get_users_query(
+            db=db, 
+            role_id=role_id, 
+            is_active=is_active, 
+            search=search
+        )
+        logger.info("Consulta generada exitosamente en el CRUD, procediendo a paginar...")
+        return paginate(query)
+        
+    except Exception as e:
+        logger.exception(f"Error en admin_list_users al procesar la query: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error interno al obtener usuarios")
 
 
 @router.get("/users/{user_id}", response_model=UserOut)
