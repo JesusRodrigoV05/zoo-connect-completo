@@ -1,3 +1,5 @@
+docs/
+
 .env
 .env.*.local
 .DS_Store
@@ -38,4 +40,14 @@ typings/
 .vercel/
 API.md
 .github/
-docs/
+
+# Pruebas de aceptación ATDD (repositorio aparte)
+atdd-gestion-clinica/
+tests-gestion-clinica/
+
+# Artefactos de pruebas E2E / Playwright
+zoo-frontend/test-results/
+zoo-frontend/playwright-report/
+zoo-frontend/.env.e2e
+
+

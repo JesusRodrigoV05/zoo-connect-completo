@@ -82,6 +82,12 @@ export const routes: Routes = [
           import("./features/public/quizzes/screens/quizzes/quizzes"),
       },
       {
+        path: "privacidad",
+        title: "Política de Privacidad",
+        loadComponent: () =>
+          import("./features/public/privacidad/privacidad"),
+      },
+      {
         path: "acerca-de",
         title: "Acerca de",
         loadComponent: () => import("./features/public/about/about"),
