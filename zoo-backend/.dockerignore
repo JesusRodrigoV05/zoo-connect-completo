@@ -1,4 +1,5 @@
 venv/
+.venv/
 __pycache__/
 *.pyc
 .env
@@ -7,3 +8,9 @@ __pycache__/
 README.md
 Dockerfile
 .dockerignore
+.idea/
+.vscode/
+*.md
+*.log
+tests/
+.pytest_cache/

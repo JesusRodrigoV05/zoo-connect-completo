@@ -1,6 +1,11 @@
 node_modules
 dist
+.angular
 .git
 .env
 .vscode
+.idea/
 README.md
+*.md
+*.log
+coverage/
