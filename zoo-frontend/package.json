@@ -21,7 +21,8 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "20.2.10",
+    "@angular/animations": "^21.0.3",
+    "@angular/cdk": "^21.2.14",
     "@angular/common": "^21.0.3",
     "@angular/compiler": "^21.0.3",
     "@angular/core": "^21.0.3",
@@ -41,7 +42,7 @@
     "express": "^5.2.1",
     "gsap": "^3.13.0",
     "primeicons": "^7.0.0",
-    "primeng": "^20.4.0",
+    "primeng": "^21.1.9",
     "qrcode": "^1.5.4",
     "rxjs": "~7.8.2",
     "simplex-noise": "^4.0.3",
