@@ -5,7 +5,8 @@ export default defineConfig({
   test: {
     globals: true,
     // Entorno Node.js: pruebas de lógica pura (adapters, models) sin DOM
-    environment: 'node',
+    //environment: 'node',
+    environment: 'jsdom',
     // Patrón para encontrar los archivos de prueba
     include: ['src/**/*.spec.ts', 'src/**/*.test.ts'],
     // Reporte de resultados
@@ -15,6 +16,7 @@ export default defineConfig({
     alias: {
       '@app': path.resolve(process.cwd(), 'src/app'),
       '@adapters': path.resolve(process.cwd(), 'src/app/core/adapters'),
+      '@features': path.resolve(process.cwd(), 'src/app/features'),
       '@models': path.resolve(process.cwd(), 'src/app/core/models'),
       '@env': path.resolve(process.cwd(), 'src/environment/environment.ts'),
     },

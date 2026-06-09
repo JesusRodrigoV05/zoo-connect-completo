@@ -4,7 +4,6 @@
  * Framework: Angular TestBed / Vitest
  * Módulos bajo prueba: adapters/tareas.adapter.ts, services/tareas/admin-tipos-tarea.ts
  */
-
 import { TestBed } from "@angular/core/testing";
 import { provideHttpClient } from "@angular/common/http";
 import {
