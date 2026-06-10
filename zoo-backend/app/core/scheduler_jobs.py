@@ -54,7 +54,11 @@ def generar_tareas_diarias():
                     is_completed=False
                 )
 
-                db.add(nueva_tarea)
+                db.flush()
+                print(f"[DEBUG scheduler] Tarea creada: id={nueva_tarea.id_tarea}, tipo_tarea_id={plantilla.tipo_tarea_id}, animal_id={plantilla.animal_id}, habitat_id={plantilla.habitat_id}, usuario_asignado_id={plantilla.usuario_asignado_id}")
+                if plantilla.tipo_tarea_id == 1 and plantilla.animal_id is None:
+                    print(f"[DEBUG scheduler] WARNING: Tarea de alimentacion ID={nueva_tarea.id_tarea} creada SIN animal_id desde plantilla ID={plantilla.id_tarea_recurrente}")
+
                 db.commit() 
                 tareas_creadas_count += 1
 

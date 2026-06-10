@@ -1,31 +1,32 @@
-import { defineConfig } from 'vitest/config';
-import path from 'path';
+/// <reference types="vitest" />
+import path from "node:path";
+import { defineConfig } from "vite";
+import angular from "@analogjs/vite-plugin-angular";
 
 export default defineConfig({
+  plugins: [angular()],
   test: {
     globals: true,
-    // Entorno Node.js: pruebas de lógica pura (adapters, models) sin DOM
-    //environment: 'node',
-    environment: 'jsdom',
-    // Patrón para encontrar los archivos de prueba
-    include: ['src/**/*.spec.ts', 'src/**/*.test.ts'],
-    // Reporte de resultados
-    reporter: ['verbose'],
-    setupFiles: ['./src/setup-vitest.ts'],
-    
+    environment: "jsdom",
+    setupFiles: ["src/test-setup.ts"],
+    include: [
+      "src/**/*.vitest.ts",
+      "src/tests/**/*.spec.ts",
+      "src/app/**/*.spec.ts",
+    ],
+    reporters: ["verbose"],
+  },
+  resolve: {
     alias: {
-      '@app': path.resolve(process.cwd(), 'src/app'),
-      '@adapters': path.resolve(process.cwd(), 'src/app/core/adapters'),
-      '@features': path.resolve(process.cwd(), 'src/app/features'),
-      '@models': path.resolve(process.cwd(), 'src/app/core/models'),
-      '@env': path.resolve(process.cwd(), 'src/environment/environment.ts'),
-    },
-
-    // Cobertura con v8
-    coverage: {
-      provider: 'v8',
-      include: ['src/app/features/private/admin/adapters/**'],
-      reporter: ['text', 'lcov'],
+      "@app": path.resolve(__dirname, "./src/app"),
+      "@models": path.resolve(__dirname, "./src/app/core/models"),
+      "@guards": path.resolve(__dirname, "./src/app/core/guards"),
+      "@adapters": path.resolve(__dirname, "./src/app/core/adapters"),
+      "@stores": path.resolve(__dirname, "./src/app/core/stores"),
+      "@directive": path.resolve(__dirname, "./src/app/core/directives"),
+      "@features": path.resolve(__dirname, "./src/app/features"),
+      "@shared": path.resolve(__dirname, "./src/app/shared"),
+      "@env": path.resolve(__dirname, "./src/environment/environment.ts"),
     },
   },
 });

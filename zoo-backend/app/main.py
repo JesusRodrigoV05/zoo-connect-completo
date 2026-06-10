@@ -6,6 +6,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi_pagination import add_pagination
 from app.core.config import settings
 from app.scripts.create_admin import create_default_admin
+from app.scripts.create_vet import create_default_vet
 from app.scripts.seeds import init_db 
 from app.core.scheduler import scheduler, setup_scheduler
 
@@ -24,6 +25,9 @@ async def lifespan(app: FastAPI):
 
     print("Verificando usuario administrador")
     await run_in_threadpool(create_default_admin)
+
+    print("Verificando usuario veterinario E2E")
+    await run_in_threadpool(create_default_vet)
     
     print("Iniciando Scheduler")
     setup_scheduler()

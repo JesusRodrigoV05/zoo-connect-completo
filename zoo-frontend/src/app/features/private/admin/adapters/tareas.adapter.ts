@@ -79,10 +79,13 @@ export class TareaAdapter {
       tipoTarea: data.tipo_tarea
         ? TipoTareaAdapter.fromBackend(data.tipo_tarea)
         : undefined,
+      usuarioAsignadoId: data.usuario_asignado?.id,
       usuarioAsignado: data.usuario_asignado
         ? UsuarioAdapter.fromBackend(data.usuario_asignado)
         : undefined,
+      animalId: data.animal?.id_animal,
       animal: data.animal ? AnimalAdapter.fromBackend(data.animal) : undefined,
+      habitatId: data.habitat?.id_habitat,
       habitat: data.habitat
         ? HabitatAdapter.toFrontend(data.habitat)
         : undefined,

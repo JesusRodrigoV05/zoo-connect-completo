@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, Query, joinedload
+from sqlalchemy.orm import Session, Query, joinedload, selectinload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from typing import Optional
@@ -10,7 +10,7 @@ from app.models.tarea import (
 )
 from app.models.animal import Animal, Habitat
 from app.models.user import User
-from app.core.enums import UserRole
+from app.core.enums import UserRole, TipoTareaId, TipoSalidaId
 
 from app.schemas.tarea import (
     TipoTareaCreate, TipoTareaUpdate,
@@ -168,10 +168,10 @@ def get_tareas_query(
     fecha_programada: Optional[date] = None
 ) -> Query:
     query = db.query(Tarea).options(
-        joinedload(Tarea.tipo_tarea),
-        joinedload(Tarea.usuario_asignado),
-        joinedload(Tarea.animal),
-        joinedload(Tarea.habitat)
+        selectinload(Tarea.tipo_tarea),
+        selectinload(Tarea.usuario_asignado),
+        selectinload(Tarea.animal),
+        selectinload(Tarea.habitat)
     )
 
     if is_completed is not None:
@@ -191,10 +191,10 @@ def get_tareas_query(
 
 def get_tarea(db: Session, id_tarea: int) -> Optional[Tarea]:
     return db.query(Tarea).options(
-        joinedload(Tarea.tipo_tarea),
-        joinedload(Tarea.usuario_asignado),
-        joinedload(Tarea.animal),
-        joinedload(Tarea.habitat)
+        selectinload(Tarea.tipo_tarea),
+        selectinload(Tarea.usuario_asignado),
+        selectinload(Tarea.animal),
+        selectinload(Tarea.habitat)
     ).filter(Tarea.id_tarea == id_tarea).first()
 
 def asignar_tarea(db: Session, db_tarea: Tarea, db_usuario_asignar: User) -> Tarea:
@@ -224,7 +224,7 @@ def completar_tarea_simple(db: Session, db_tarea: Tarea, db_usuario: User, notas
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id == 1: # ID 1 = Alimentación
+    if db_tarea.tipo_tarea_id == TipoTareaId.ALIMENTACION:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta es una tarea de alimentacion. Use el endpoint especifico")
         
     db_tarea.is_completed = True
@@ -247,6 +247,10 @@ def completar_tarea_alimentacion(
     payload: TareaAlimentacionCompletar
 ) -> RegistroAlimentacion:
     
+    print(f"[DEBUG completar_alimentacion] tarea_id={db_tarea.id_tarea}, usuario={db_usuario.email}")
+    print(f"[DEBUG] payload recibido: notas_observaciones={payload.notas_observaciones}")
+    print(f"[DEBUG] detalles ({len(payload.detalles)} items): {[{'producto_id': d.producto_id, 'cantidad_entregada': str(d.cantidad_entregada)} for d in payload.detalles]}")
+    
     #validaciones de Estado
     if db_tarea.is_completed:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="La tarea ya ha sido completada")
@@ -254,7 +258,7 @@ def completar_tarea_alimentacion(
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id != 1: # Hardcoded ID 1 para Alimentacion
+    if db_tarea.tipo_tarea_id != TipoTareaId.ALIMENTACION:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta no es una tarea de alimentacion")
 
     if not payload.detalles:
@@ -263,6 +267,7 @@ def completar_tarea_alimentacion(
     #determinar destino
     target_animal_id = db_tarea.animal_id
     target_habitat_id = db_tarea.habitat_id
+    print(f"[DEBUG completar_alimentacion] target_animal_id={target_animal_id}, target_habitat_id={target_habitat_id}")
 
     if not target_animal_id and not target_habitat_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La tarea de alimentacion no tiene destino (animal/habitat)")
@@ -271,15 +276,18 @@ def completar_tarea_alimentacion(
         #preparar salida inventario
         detalles_salida = []
         for d in payload.detalles:
+            print(f"[DEBUG] procesando detalle: producto_id={d.producto_id}, cantidad_entregada={d.cantidad_entregada}, >0? {d.cantidad_entregada > 0}")
             if d.cantidad_entregada > 0:
                 detalles_salida.append(
                     DetalleSalidaCreate(
                         producto_id=d.producto_id,
                         cantidad_salida=d.cantidad_entregada,
-                        animal_id=target_animal_id, 
-                        habitat_id=target_habitat_id 
+                        animal_id=target_animal_id,
+                        habitat_id=target_habitat_id if not target_animal_id else None,
                     )
                 )
+        
+        print(f"[DEBUG] detalles_salida construidos: {len(detalles_salida)} items")
         
         if not detalles_salida:
              raise ValueError("No se entrego ningun producto (cantidad_entregada > 0)")
@@ -287,7 +295,7 @@ def completar_tarea_alimentacion(
         #logica transaccional
         _ = _procesar_salida_transaccional(
             db=db,
-            tipo_salida_id=1, # ID 1 = "Consumo Alimentacion"
+            tipo_salida_id=TipoSalidaId.CONSUMO_ALIMENTACION,
             detalles=detalles_salida,
             usuario_id=db_usuario.id
         )
@@ -328,10 +336,11 @@ def completar_tarea_alimentacion(
 
     except (ValueError, IntegrityError) as e:
         db.rollback()
+        print(f"[ERROR 400] {type(e).__name__}: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al procesar la alimentacion: {e}")
     except Exception as e:
         db.rollback()
-        print(f"Error critico completando tarea: {e}")
+        print(f"[ERROR 500] Error critico completando tarea: {type(e).__name__}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error interno del servidor")
     
 def completar_tarea_tratamiento(
@@ -347,7 +356,7 @@ def completar_tarea_tratamiento(
     if not db_usuario.is_admin and db_tarea.usuario_asignado_id != db_usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para completar esta tarea")
 
-    if db_tarea.tipo_tarea_id != 2: 
+    if db_tarea.tipo_tarea_id != TipoTareaId.TRATAMIENTO_MEDICO:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta no es una tarea de tratamiento medico")
 
     if not payload.detalles:
@@ -377,7 +386,7 @@ def completar_tarea_tratamiento(
 
         _ = _procesar_salida_transaccional(
             db=db,
-            tipo_salida_id=2, 
+            tipo_salida_id=TipoSalidaId.CONSUMO_TRATAMIENTO,
             detalles=detalles_salida,
             usuario_id=db_usuario.id
         )

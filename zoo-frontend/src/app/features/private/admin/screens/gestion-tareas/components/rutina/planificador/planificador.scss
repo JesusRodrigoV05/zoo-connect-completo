@@ -122,3 +122,16 @@
     }
   }
 }
+
+:host-context(.dark-mode) {
+  .table-card {
+    background: var(--p-darkgreen-900);
+    border-color: var(--p-darkgreen-700);
+  }
+
+    ::ng-deep .p-datatable.zoo-table {
+    .p-datatable-thead > tr > th {
+      background: var(--p-darkgreen-800);
+    }
+  }
+}

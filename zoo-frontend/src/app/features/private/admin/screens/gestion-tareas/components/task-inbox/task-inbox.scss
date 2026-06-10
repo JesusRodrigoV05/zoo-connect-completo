@@ -1,11 +1,16 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .inbox-grid {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex: 1;
 }
 
 .task-card {

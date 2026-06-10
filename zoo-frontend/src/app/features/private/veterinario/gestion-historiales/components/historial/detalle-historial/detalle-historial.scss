@@ -172,37 +172,72 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
     &.weight {
-      background: #eff6ff;
-      color: #1e40af;
+      background: var(--p-blue-50);
+      color: var(--p-blue-800);
       .vital-icon {
-        background: #dbeafe;
-        color: #1e40af;
+        background: var(--p-blue-100);
+        color: var(--p-blue-800);
       }
     }
     &.temp {
-      background: #fff7ed;
-      color: #9a3412;
+      background: var(--p-orange-50);
+      color: var(--p-orange-800);
       .vital-icon {
-        background: #ffedd5;
-        color: #9a3412;
+        background: var(--p-orange-100);
+        color: var(--p-orange-800);
       }
     }
     &.heart {
-      background: #fef2f2;
-      color: #991b1b;
+      background: var(--p-red-50);
+      color: var(--p-red-800);
       .vital-icon {
-        background: #fee2e2;
-        color: #991b1b;
+        background: var(--p-red-100);
+        color: var(--p-red-800);
       }
     }
     &.lungs {
-      background: #f0fdf4;
-      color: #166534;
+      background: var(--p-emerald-50);
+      color: var(--p-emerald-800);
       .vital-icon {
-        background: #dcfce7;
-        color: #166534;
+        background: var(--p-emerald-100);
+        color: var(--p-emerald-800);
       }
     }
+
+  :host-context(.dark-mode) & {
+    &.weight {
+      background: var(--p-blue-900);
+      color: var(--p-blue-200);
+      .vital-icon {
+        background: var(--p-blue-800);
+        color: var(--p-blue-100);
+      }
+    }
+    &.temp {
+      background: var(--p-orange-900);
+      color: var(--p-orange-200);
+      .vital-icon {
+        background: var(--p-orange-800);
+        color: var(--p-orange-100);
+      }
+    }
+    &.heart {
+      background: var(--p-red-900);
+      color: var(--p-red-200);
+      .vital-icon {
+        background: var(--p-red-800);
+        color: var(--p-red-100);
+      }
+    }
+    &.lungs {
+      background: var(--p-emerald-900);
+      color: var(--p-emerald-200);
+      .vital-icon {
+        background: var(--p-emerald-800);
+        color: var(--p-emerald-100);
+      }
+    }
+  }
   }
 }
 

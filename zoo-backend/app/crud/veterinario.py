@@ -12,6 +12,7 @@ from app.models.tarea import TareaRecurrente, Tarea
 from datetime import date
 
 from app.schemas import veterinario as schemas_vet
+from app.core.enums import TipoTareaId
 
 #HELPERS
 
@@ -325,7 +326,7 @@ def create_receta(
             nueva_plantilla = TareaRecurrente(
                 titulo_plantilla=titulo_tarea,
                 descripcion_plantilla=f"Seguir instrucciones receta ID {db_receta.id_receta}",
-                tipo_tarea_id=2,
+                tipo_tarea_id=TipoTareaId.TRATAMIENTO_MEDICO,
                 usuario_asignado_id=receta_in.usuario_asignado_id,
                 frecuencia_cron=receta_in.frecuencia_cron,
                 is_active=True,
@@ -339,8 +340,8 @@ def create_receta(
             nueva_tarea = Tarea(
                 titulo=f"Dosis Única: {titulo_tarea}",
                 descripcion_tarea=receta_in.instrucciones_administracion or "Aplicar dosis unica",
-                tipo_tarea_id=2,
-                
+                tipo_tarea_id=TipoTareaId.TRATAMIENTO_MEDICO,
+
                 fecha_programada=date.today(),
                 
                 usuario_asignado_id=receta_in.usuario_asignado_id,

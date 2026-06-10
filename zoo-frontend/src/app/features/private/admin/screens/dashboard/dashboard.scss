@@ -97,6 +97,10 @@
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
   height: 100%;
 
+  :host-context(.dark-mode) & {
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+  }
+
   .card-header-flex {
     display: flex;
     justify-content: space-between;
@@ -114,9 +118,9 @@
 }
 
 .total-badge {
-  background: var(--primary-50);
-  color: var(--primary-700);
-  border: 1px solid var(--primary-100);
+  background: var(--p-primary-50);
+  color: var(--p-primary-700);
+  border: 1px solid var(--p-primary-100);
   padding: 0.4rem 1rem;
   border-radius: 30px;
   font-size: 0.9rem;

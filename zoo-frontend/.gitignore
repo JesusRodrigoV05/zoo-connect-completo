@@ -45,3 +45,6 @@ Thumbs.db
 API.md
 .github/
 .env
+.env.e2e
+/test-results
+/playwright-report

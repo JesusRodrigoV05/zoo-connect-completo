@@ -48,7 +48,7 @@
     height: 32px;
     border-radius: 50%;
     background: var(--p-primary-color);
-    color: white;
+    color: var(--p-primary-contrast-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,7 +77,7 @@
   display: flex;
   justify-content: center;
   padding: 1rem;
-  background: white;
+  background: var(--p-surface-card);
   border-radius: 12px;
   border: 2px solid var(--p-surface-border);
 

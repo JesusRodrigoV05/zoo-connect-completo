@@ -11,16 +11,23 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
+:host-context(.dark-mode) ::ng-deep .ajustes-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+:host-context(.dark-mode) ::ng-deep .ajustes-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
 :host ::ng-deep .ajustes-card .p-card-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--p-text-color);
   margin-bottom: 0.5rem;
 }
 
 :host ::ng-deep .ajustes-card .p-card-subtitle {
   font-size: 0.95rem;
-  color: var(--text-color-secondary);
+  color: var(--p-text-muted-color);
   margin-bottom: 1.5rem;
 }
 
@@ -31,7 +38,7 @@
 .settings-section {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--surface-border);
+  border-bottom: 1px solid var(--p-surface-border);
 }
 
 .settings-section:last-child {
@@ -43,10 +50,10 @@
 .section-title {
   font-size: 1.1rem;
   font-weight: 500;
-  color: var(--primary-color);
+  color: var(--p-primary-color);
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--primary-color);
+  border-bottom: 2px solid var(--p-primary-color);
   display: inline-block;
 }
 
@@ -75,13 +82,13 @@
 .setting-info h4 {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--p-text-color);
   margin: 0 0 0.3rem 0;
 }
 
 .setting-info p {
   font-size: 0.9rem;
-  color: var(--text-color-secondary);
+  color: var(--p-text-muted-color);
   margin: 0;
   line-height: 1.4;
 }

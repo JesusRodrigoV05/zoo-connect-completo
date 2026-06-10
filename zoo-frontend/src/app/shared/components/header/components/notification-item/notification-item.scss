@@ -7,20 +7,20 @@
 	border-radius: .375rem;
 	transition: all .2s ease;
 	position: relative;
-	border-bottom: 1px solid var(--surface-border);
+	border-bottom: 1px solid var(--p-surface-border);
 
 	&:last-child {
 		border-bottom: none;
 	}
 
 	&.unread {
-		background: var(--surface-50);
-		border-left: 2px solid var(--primary-color);
+		background: var(--p-surface-50);
+		border-left: 2px solid var(--p-primary-color);
 		padding-left: calc(.75rem - 2px);
 	}
 
 	&:hover {
-		background: var(--surface-100);
+		background: var(--p-surface-100);
 
 		.actions {
 			opacity: 1;
@@ -37,8 +37,8 @@
 
 		.message {
 			margin: 0;
-			color: var(--text-color);
-			font-size: .875rem;
+		color: var(--p-text-color);
+		font-size: .875rem;
 			line-height: 1.4;
 			overflow: hidden;
 			text-overflow: ellipsis;
