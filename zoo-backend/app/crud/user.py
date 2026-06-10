@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 from starlette import status
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from app.models.user import User
 from app.models.role import Role
@@ -36,14 +36,17 @@ def get_user_by_email(db: Session, email: str) -> User | None:
 
 def get_users_query(
     db: Session, 
-    role_id: Optional[List[int]] = None, 
+    role_id: Optional[Any] = None,
     is_active: Optional[bool] = None, 
     search: Optional[str] = None
 ) -> Query:
     query = db.query(User).options(joinedload(User.role))
     
-    if role_id:
-        query = query.filter(User.role_id.in_(role_id))
+    if role_id is not None:
+        if isinstance(role_id, list):
+            query = query.filter(User.role_id.in_(role_id))
+        else:
+            query = query.filter(User.role_id == role_id)
         
     if is_active is not None:
         query = query.filter(User.is_active == is_active)

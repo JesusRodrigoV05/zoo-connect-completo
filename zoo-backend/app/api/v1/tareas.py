@@ -40,11 +40,20 @@ def _get_tarea_or_404(id_tarea: int, db: Session = Depends(get_db)) -> models_ta
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return db_obj
 
-def _get_cuidador_or_404(id_usuario: int, db: Session = Depends(get_db)) -> User:
-    db_user = crud_user.get_user(db, id_usuario)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="Usuario a asignar no encontrado")
-    return db_user
+def _get_cuidador_or_404(usuario_id: int, db: Session):
+    usuario = crud_user.get_user(db, usuario_id)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    ROLES_PERMITIDOS = [1, 3, 4]
+
+    if usuario.role_id not in ROLES_PERMITIDOS:
+        raise HTTPException(
+            status_code=400,
+            detail="El usuario no tiene un rol autorizado para cumplir tareas"
+        )
+
+    return usuario
 
 def get_today():
     return date.today()
@@ -144,23 +153,13 @@ def list_mis_tareas(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    print(f"[DEBUG mis-tareas] usuario={current_user.email}, is_completed={is_completed}, fecha={fecha}")
     query = crud_tarea.get_tareas_query(
         db,
         is_completed=is_completed,
         usuario_asignado_id=current_user.id,
         fecha_programada=fecha
     )
-    page = paginate(query)
-    print(f"[DEBUG mis-tareas] total={len(page.items)} tareas devueltas para {current_user.email}")
-    for item in page.items:
-        tipo_ta = item.tipo_tarea.nombre_tipo_tarea if item.tipo_tarea else "?"
-        animal_id = item.animal.id_animal if item.animal else None
-        tipo_id = item.tipo_tarea.id_tipo_tarea if item.tipo_tarea else None
-        print(f"  -> tarea_id={item.id_tarea}, tipo='{tipo_ta}' (id={tipo_id}), animal_id={animal_id}")
-        if tipo_id == 1 and animal_id is None:
-            print(f"[DEBUG mis-tareas] WARNING: tarea ID={item.id_tarea} tipo=ALIMENTACION sin animal_id")
-    return page
+    return paginate(query)
 
 @router.get("/sin-asignar", response_model=Page[schemas_tarea.TareaOut], dependencies=[Depends(require_admin_user)])
 def list_tareas_sin_asignar(
@@ -177,17 +176,38 @@ def list_tareas_asignadas_hoy(
     query = crud_tarea.get_tareas_query(db, fecha_programada=fecha)
     return paginate(query)
 
+from fastapi.encoders import jsonable_encoder
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 @router.put("/{id_tarea}/asignar", response_model=schemas_tarea.TareaOut, dependencies=[Depends(require_admin_user)])
 def assign_tarea(
     body: schemas_tarea.TareaAssign,
     db_tarea: models_tarea.Tarea = Depends(_get_tarea_or_404),
     db: Session = Depends(get_db),
 ):
-    db_usuario = _get_cuidador_or_404(body.usuario_asignado_id, db)
-    return crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario)
+    logger.info(f"====== INTENTO DE ASIGNACIÓN ======")
+    logger.info(f"ID Tarea recibida: {getattr(db_tarea, 'id', 'No encontrada')}")
+    logger.info(f"Payload recibido: {jsonable_encoder(body)}")
+    try:
+        db_usuario = _get_cuidador_or_404(body.usuario_asignado_id, db)
+        resultado = crud_tarea.asignar_tarea(db, db_tarea=db_tarea, db_usuario_asignar=db_usuario)
+        logger.info(f"Asignación exitosa para tarea {db_tarea.id_tarea}")
+        return resultado
+    except HTTPException as http_ex:
+        logger.error(f"HTTPException en assign_tarea: {http_ex.status_code} - {http_ex.detail}")
+        raise http_ex
+    except Exception as e:
+        logger.exception(f"Error inesperado procesando la asignación: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno en el servidor: {str(e)}"
+        )
 
 
-#Ejecuion tareas
+#Ejecucion tareas
 
 @router.post("/{id_tarea}/completar-simple", response_model=schemas_tarea.TareaOut)
 def completar_tarea_simple(
@@ -198,7 +218,7 @@ def completar_tarea_simple(
 ):
     if db_tarea.usuario_asignado_id is None:
         raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aun")
-    
+
     return crud_tarea.completar_tarea_simple(
         db=db,
         db_tarea=db_tarea,
@@ -215,7 +235,7 @@ def completar_tarea_alimentacion(
 ):
     if db_tarea.usuario_asignado_id is None:
          raise HTTPException(status_code=400, detail="La tarea no ha sido asignada aún")
-        
+
     return crud_tarea.completar_tarea_alimentacion(
         db=db,
         db_tarea=db_tarea,
@@ -235,8 +255,8 @@ def complete_task_tratamiento(
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
     return crud_tarea.completar_tarea_tratamiento(
-        db=db, 
-        db_tarea=tarea, 
-        db_usuario=current_user, 
+        db=db,
+        db_tarea=tarea,
+        db_usuario=current_user,
         payload=payload
     )
