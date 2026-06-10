@@ -78,6 +78,12 @@ def get_sugerencia_dieta_para_tarea(
 ):
 
     db_tarea = _get_tarea_local_or_404(id_tarea, db)
+    
+    print(f"[DEBUG sugerencia-dieta] tarea_id={id_tarea}, animal_id={db_tarea.animal_id}, tipo_tarea_id={db_tarea.tipo_tarea_id}, tarea_recurrente_id={db_tarea.tarea_recurrente_id}")
+    if db_tarea.tarea_recurrente_id:
+        print(f"[DEBUG sugerencia-dieta] tarea_id={id_tarea} generada por plantilla recurrente ID={db_tarea.tarea_recurrente_id}")
+    if db_tarea.animal_id is None:
+        print(f"[DEBUG sugerencia-dieta] WARNING: tarea_id={id_tarea} es de alimentacion pero NO tiene animal_id")
 
     if db_tarea.tipo_tarea_id != TipoTareaId.ALIMENTACION and "alimentacion" not in str(db_tarea.tipo_tarea.nombre_tipo_tarea).lower():
          raise HTTPException(
@@ -91,7 +97,12 @@ def get_sugerencia_dieta_para_tarea(
             detail="La tarea no esta asignada a un animal especifico"
         )
 
+    print(f"[DEBUG sugerencia-dieta] Buscando dieta para animal_id={db_tarea.animal_id}...")
     dieta = crud_dieta.get_dieta_for_animal(db, animal_id=db_tarea.animal_id)
+    if dieta:
+        print(f"[DEBUG sugerencia-dieta] Dieta ENCONTRADA: id={dieta.id_dieta}, nombre={dieta.nombre_dieta}, detalles={len(dieta.detalles_dieta)}")
+    else:
+        print(f"[DEBUG sugerencia-dieta] Dieta NO ENCONTRADA para animal_id={db_tarea.animal_id}")
     
     if not dieta:
         raise HTTPException(

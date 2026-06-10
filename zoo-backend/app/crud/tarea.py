@@ -247,6 +247,10 @@ def completar_tarea_alimentacion(
     payload: TareaAlimentacionCompletar
 ) -> RegistroAlimentacion:
     
+    print(f"[DEBUG completar_alimentacion] tarea_id={db_tarea.id_tarea}, usuario={db_usuario.email}")
+    print(f"[DEBUG] payload recibido: notas_observaciones={payload.notas_observaciones}")
+    print(f"[DEBUG] detalles ({len(payload.detalles)} items): {[{'producto_id': d.producto_id, 'cantidad_entregada': str(d.cantidad_entregada)} for d in payload.detalles]}")
+    
     #validaciones de Estado
     if db_tarea.is_completed:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="La tarea ya ha sido completada")
@@ -263,6 +267,7 @@ def completar_tarea_alimentacion(
     #determinar destino
     target_animal_id = db_tarea.animal_id
     target_habitat_id = db_tarea.habitat_id
+    print(f"[DEBUG completar_alimentacion] target_animal_id={target_animal_id}, target_habitat_id={target_habitat_id}")
 
     if not target_animal_id and not target_habitat_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La tarea de alimentacion no tiene destino (animal/habitat)")
@@ -271,15 +276,18 @@ def completar_tarea_alimentacion(
         #preparar salida inventario
         detalles_salida = []
         for d in payload.detalles:
+            print(f"[DEBUG] procesando detalle: producto_id={d.producto_id}, cantidad_entregada={d.cantidad_entregada}, >0? {d.cantidad_entregada > 0}")
             if d.cantidad_entregada > 0:
                 detalles_salida.append(
                     DetalleSalidaCreate(
                         producto_id=d.producto_id,
                         cantidad_salida=d.cantidad_entregada,
-                        animal_id=target_animal_id, 
-                        habitat_id=target_habitat_id 
+                        animal_id=target_animal_id,
+                        habitat_id=target_habitat_id if not target_animal_id else None,
                     )
                 )
+        
+        print(f"[DEBUG] detalles_salida construidos: {len(detalles_salida)} items")
         
         if not detalles_salida:
              raise ValueError("No se entrego ningun producto (cantidad_entregada > 0)")
@@ -328,10 +336,11 @@ def completar_tarea_alimentacion(
 
     except (ValueError, IntegrityError) as e:
         db.rollback()
+        print(f"[ERROR 400] {type(e).__name__}: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al procesar la alimentacion: {e}")
     except Exception as e:
         db.rollback()
-        print(f"Error critico completando tarea: {e}")
+        print(f"[ERROR 500] Error critico completando tarea: {type(e).__name__}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error interno del servidor")
     
 def completar_tarea_tratamiento(

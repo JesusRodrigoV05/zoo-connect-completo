@@ -203,12 +203,15 @@ def _procesar_salida_transaccional(
     #procesar detalles
     for detalle_in in detalles:
         cantidad_a_descontar = detalle_in.cantidad_salida
+        print(f"[DEBUG salida] producto_id={detalle_in.producto_id}, cantidad_a_descontar={cantidad_a_descontar}")
         if cantidad_a_descontar <= 0:
             raise ValueError("La cantidad de salida debe ser positiva")
 
         db_producto = db.query(Producto).filter(
             Producto.id_producto == detalle_in.producto_id
         ).with_for_update().first()
+        
+        print(f"[DEBUG salida] producto encontrado: {db_producto.nombre_producto if db_producto else 'None'}, is_active={db_producto.is_active if db_producto else 'N/A'}, stock_actual={db_producto.stock_actual if db_producto else 'N/A'}")
 
         if not db_producto or not db_producto.is_active:
             raise ValueError(f"El Producto ID {detalle_in.producto_id} no existe o esta inactivo")

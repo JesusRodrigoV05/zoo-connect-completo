@@ -104,7 +104,7 @@ export const MisTareasStore = signalStore(
       loadSugerenciaDieta: rxMethod<number>(
         pipe(
           tap(() =>
-            patchState(store, { loadingDieta: true, sugerenciaDieta: null }),
+            patchState(store, { loadingDieta: true, sugerenciaDieta: null, error: null }),
           ),
           switchMap((idTarea) =>
             ejecucionService.getSugerenciaDieta(idTarea).pipe(
@@ -132,7 +132,7 @@ export const MisTareasStore = signalStore(
       ),
 
       resetSugerencia: () => {
-        patchState(store, { sugerenciaDieta: null, loadingDieta: false });
+        patchState(store, { sugerenciaDieta: null, loadingDieta: false, error: null });
       },
 
       completarTareaAlimentacion: rxMethod<{ id: number; data: any }>(
@@ -158,6 +158,12 @@ export const MisTareasStore = signalStore(
                   }));
                 },
                 error: (err: any) => {
+                  console.error("[DEBUG FRONTEND] completarTareaAlimentacion ERROR", {
+                    status: err?.status,
+                    statusText: err?.statusText,
+                    errorBody: err?.error,
+                    errorMsg: err?.error?.message || err?.message,
+                  });
                   const errorMsg =
                     err?.error?.message || "Error al registrar alimentación";
                   toast.showError("Error", errorMsg);

@@ -50,4 +50,6 @@ zoo-frontend/test-results/
 zoo-frontend/playwright-report/
 zoo-frontend/.env.e2e
 
+.atl/
+
 

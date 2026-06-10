@@ -52,6 +52,11 @@ export class EjecucionTareas {
     data: CompletarTareaAlimentacion,
   ): Observable<any> {
     const payload = TareaAdapter.toCompletarAlimentacion(data);
+    console.log("[DEBUG FRONTEND] completeFeedingTask HTTP payload", {
+      url: `${this.apiUrl}/${id}/completar-alimentacion`,
+      id,
+      payload,
+    });
     return this.http.post<any>(
       `${this.apiUrl}/${id}/completar-alimentacion`,
       payload,

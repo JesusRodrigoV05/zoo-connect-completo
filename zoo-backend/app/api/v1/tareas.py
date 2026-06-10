@@ -144,13 +144,23 @@ def list_mis_tareas(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
+    print(f"[DEBUG mis-tareas] usuario={current_user.email}, is_completed={is_completed}, fecha={fecha}")
     query = crud_tarea.get_tareas_query(
         db,
         is_completed=is_completed,
         usuario_asignado_id=current_user.id,
         fecha_programada=fecha
     )
-    return paginate(query)
+    page = paginate(query)
+    print(f"[DEBUG mis-tareas] total={len(page.items)} tareas devueltas para {current_user.email}")
+    for item in page.items:
+        tipo_ta = item.tipo_tarea.nombre_tipo_tarea if item.tipo_tarea else "?"
+        animal_id = item.animal.id_animal if item.animal else None
+        tipo_id = item.tipo_tarea.id_tipo_tarea if item.tipo_tarea else None
+        print(f"  -> tarea_id={item.id_tarea}, tipo='{tipo_ta}' (id={tipo_id}), animal_id={animal_id}")
+        if tipo_id == 1 and animal_id is None:
+            print(f"[DEBUG mis-tareas] WARNING: tarea ID={item.id_tarea} tipo=ALIMENTACION sin animal_id")
+    return page
 
 @router.get("/sin-asignar", response_model=Page[schemas_tarea.TareaOut], dependencies=[Depends(require_admin_user)])
 def list_tareas_sin_asignar(

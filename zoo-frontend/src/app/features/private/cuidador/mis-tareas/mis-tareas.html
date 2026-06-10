@@ -44,7 +44,7 @@
           <td>
             <div class="task-info">
               <span class="task-title">{{ tarea.titulo }}</span>
-              @if (tarea.tipoTarea?.titulo?.toLowerCase()?.includes('aliment'))
+              @if (tarea.tipoTarea?.nombre?.toLowerCase()?.includes('aliment'))
               {
               <span class="type-badge diet">
                 <i class="pi pi-apple"></i>

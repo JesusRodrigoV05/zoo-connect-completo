@@ -76,8 +76,9 @@ export default class MisTareas {
   constructor() {
     effect(() => {
       const sugerencia = this.store.sugerenciaDieta();
+      const dialogOpen = this.displayDialog();
 
-      if (sugerencia && this.displayDialog()) {
+      if (sugerencia && dialogOpen) {
         const nuevosDetalles: DetalleFormulario[] =
           sugerencia.detalles_dieta.map((d) => ({
             productoId: d.producto_id,
@@ -110,14 +111,24 @@ export default class MisTareas {
     this.tareaSeleccionada.set(tarea);
     this.observaciones.set("");
 
+    this.displayDialog.set(true);
     this.formDetalles.set([]);
     this.store.resetSugerencia();
 
-    if (tarea.tipoTarea?.nombre?.toLowerCase().includes("aliment")) {
+    if (
+      tarea.tipoTarea?.nombre?.toLowerCase().includes("aliment") &&
+      tarea.animalId
+    ) {
       this.store.loadSugerenciaDieta(tarea.id);
+    } else if (
+      tarea.tipoTarea?.nombre?.toLowerCase().includes("aliment") &&
+      !tarea.animalId
+    ) {
+      console.warn(
+        "[DEBUG FRONTEND] Tarea de alimentación sin animal_id, no se puede cargar dieta",
+        tarea,
+      );
     }
-
-    this.displayDialog.set(true);
   }
 
   confirmarCompletar() {
@@ -145,6 +156,12 @@ export default class MisTareas {
       notasObservaciones: this.observaciones(),
       detalles: detallesPayload,
     };
+
+    console.log("[DEBUG FRONTEND] procesarTareaAlimentacion", {
+      tareaId: tarea.id,
+      dataPayload,
+      detallesRaw: detalles,
+    });
 
     this.store.completarTareaAlimentacion({
       id: tarea.id,
