@@ -36,12 +36,12 @@ export class App implements OnInit {
   private messageService = inject(MessageService);
 
   constructor() {
-    afterRenderEffect(async () => {
+    afterRenderEffect(() => {
       if (isPlatformBrowser(this.platformId)) {
-        const AOS = (await import("aos")).default;
-        AOS.init({
-          once: true,
-          duration: 1000,
+        import("aos").then((module) => {
+          module.default.init({ once: true, duration: 1000 });
+        }).catch(() => {
+          /* AOS failed to load, non-critical */
         });
       }
     });

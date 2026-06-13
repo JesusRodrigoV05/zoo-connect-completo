@@ -1,5 +1,5 @@
 import { computed } from "@angular/core";
-import { inject } from "@angular/core/primitives/di";
+import { inject } from "@angular/core";
 import { AdminEspecies } from "@app/features/private/admin/services/admin-especies";
 import { Especie } from "@models/animales";
 import {

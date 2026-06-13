@@ -160,8 +160,8 @@ export class HabitatAdapter {
       obj &&
       typeof obj.id_habitat === "number" &&
       typeof obj.nombre_habitat === "string" &&
-      typeof obj.tipo === "string" &&
-      typeof obj.descripcion === "string" &&
+      typeof obj.tipo_habitat === "string" &&
+      typeof obj.descripcion_habitat === "string" &&
       typeof obj.condiciones_climaticas === "string" &&
       typeof obj.is_active === "boolean"
     );

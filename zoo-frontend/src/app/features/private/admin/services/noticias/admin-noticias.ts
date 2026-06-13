@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { inject } from "@angular/core/primitives/di";
+import { inject } from "@angular/core";
 import { environment } from "@env";
 import { PaginatedResponse } from "@models/common";
 import { Noticia } from "@models/noticias/noticia.model";

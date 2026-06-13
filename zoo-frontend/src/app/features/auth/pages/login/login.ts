@@ -40,7 +40,7 @@ export default class Login {
 
   loginForm: FormGroup = this.fb.group({
     email: ["", [Validators.required]],
-    password: ["", [Validators.required, Validators.minLength(5)]],
+    password: ["", [Validators.required, Validators.minLength(12)]],
   });
 
   loading = this.authStore.loading;
