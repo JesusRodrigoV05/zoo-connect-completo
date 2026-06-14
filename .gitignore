@@ -38,3 +38,6 @@ typings/
 .vercel/
 API.md
 .github/
+
+.atl/
+docs/

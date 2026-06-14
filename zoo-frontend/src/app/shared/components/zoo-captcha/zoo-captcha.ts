@@ -90,6 +90,7 @@ export class ZooCaptcha implements OnInit, OnDestroy {
   reset(): void {
     this.token.set(null);
     this.showError.set(false);
+    this.recaptchaService.reset();
   }
 
   ngOnDestroy() {

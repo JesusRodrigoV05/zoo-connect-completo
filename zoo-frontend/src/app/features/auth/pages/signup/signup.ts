@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, signal, ViewChild, OnInit } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -56,6 +56,8 @@ export default class Signup implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly toastService = inject(ShowToast);
+
+  @ViewChild('zooCaptcha') zooCaptcha?: ZooCaptcha;
 
   protected readonly isLoading = this.authStore.loading;
   protected readonly error = this.authStore.error;
@@ -144,6 +146,9 @@ export default class Signup implements OnInit {
         await this.router.navigate(['/verify-email'], { queryParams: { phone: phoneNumber } });
       }
     } catch (e) {
+    } finally {
+      this.captchaToken.set(null);
+      this.zooCaptcha?.reset();
     }
   }
 

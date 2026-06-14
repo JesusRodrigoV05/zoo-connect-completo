@@ -1,4 +1,4 @@
-import { Component, inject, signal, ChangeDetectionStrategy } from "@angular/core";
+import { Component, inject, signal, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -38,6 +38,8 @@ export default class Login {
   protected readonly authStore = inject(AuthStore);
   private readonly fb = inject(FormBuilder);
 
+  @ViewChild('zooCaptcha') zooCaptcha?: ZooCaptcha;
+
   loginForm: FormGroup = this.fb.group({
     email: ["", [Validators.required]],
     password: ["", [Validators.required, Validators.minLength(12)]],
@@ -58,6 +60,9 @@ export default class Login {
 
       const { email, password } = this.loginForm.value;
       await this.authStore.login(email, password, token);
+
+      this.captchaToken.set(null);
+      this.zooCaptcha?.reset();
     } else {
       this.markFormGroupTouched();
     }
