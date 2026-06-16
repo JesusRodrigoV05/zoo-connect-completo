@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class RiskMatrixEntryBase(BaseModel):
+    information_asset_id: Optional[int] = None
     asset: str = ""
     threat: str = ""
     consequence: str = ""

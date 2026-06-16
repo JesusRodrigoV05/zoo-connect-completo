@@ -120,6 +120,7 @@ app.include_router(
 )
 app.include_router(roles.router, prefix="/zooconnect/admin_roles", tags=["roles"])
 app.include_router(audit_logs.router, prefix="/zooconnect/audit", tags=["audit"])
+app.include_router(information_assets.router, prefix="/zooconnect/information-assets", tags=["information-assets"])
 app.include_router(risk_matrix.router, prefix="/zooconnect/risk-matrix", tags=["risk-matrix"])
 app.include_router(animals.router, prefix="/zooconnect/animals")
 app.include_router(surveys.router, prefix="/zooconnect/surveys")

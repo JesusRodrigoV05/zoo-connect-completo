@@ -5,6 +5,7 @@ import { environment } from "@env";
 
 export interface RiskMatrixEntryDto {
   id: number;
+  information_asset_id?: number;
   asset: string;
   threat: string;
   consequence: string;
@@ -20,6 +21,7 @@ export interface RiskMatrixEntryDto {
 }
 
 export interface RiskMatrixEntryPayload {
+  information_asset_id?: number;
   asset: string;
   threat: string;
   consequence: string;
@@ -37,10 +39,14 @@ export interface RiskMatrixEntryPayload {
 @Injectable({ providedIn: "root" })
 export class RiskMatrixService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/risk-matrix`;
+  private readonly url = `${environment.apiUrl}/zooconnect/risk-matrix`;
 
   list(): Observable<RiskMatrixEntryDto[]> {
     return this.http.get<RiskMatrixEntryDto[]>(this.url);
+  }
+
+  create(entry: RiskMatrixEntryPayload): Observable<RiskMatrixEntryDto> {
+    return this.http.post<RiskMatrixEntryDto>(this.url, entry);
   }
 
   replaceAll(entries: RiskMatrixEntryPayload[]): Observable<RiskMatrixEntryDto[]> {

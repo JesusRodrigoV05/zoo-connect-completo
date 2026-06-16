@@ -32,6 +32,7 @@ class RiskMatrixEntry(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
+    information_asset_id = Column(Integer, ForeignKey("information_assets.id"), nullable=True)
     asset = Column(Text, nullable=False, default="")
     threat = Column(Text, nullable=False, default="")
     consequence = Column(Text, nullable=False, default="")
@@ -56,3 +57,4 @@ class RiskMatrixEntry(Base):
 
     created_by = relationship("User", foreign_keys=[created_by_id])
     updated_by = relationship("User", foreign_keys=[updated_by_id])
+    information_asset = relationship("InformationAsset", back_populates="risk_entries")

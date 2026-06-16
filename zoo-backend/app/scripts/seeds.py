@@ -4,6 +4,7 @@ from app.models.tarea import TipoTarea
 from app.models.inventario import TipoSalida
 from app.models.role import Role
 from app.crud.permission import ensure_permissions_catalog, ensure_role_permissions
+from app.crud.information_asset import sync_assets_from_permissions
 
 def init_db():
     db = SessionLocal()
@@ -76,5 +77,7 @@ def init_db():
     except Exception as e:
         print(f"!!! Error cargando datos iniciales: {e}")
         db.rollback()
+    finally:
+        db.close()ollback()
     finally:
         db.close()

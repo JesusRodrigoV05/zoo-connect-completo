@@ -28,6 +28,11 @@ export class SidebarOsiMenu {
       route: "/osi/roles-accesos",
     },
     {
+      text: "Inventario de Activos",
+      icon: "pi pi-list",
+      route: "/osi/inventario-activos",
+    },
+    {
       text: "Matriz de Riesgos",
       icon: "pi pi-exclamation-triangle",
       route: "/osi/matriz-riesgos",

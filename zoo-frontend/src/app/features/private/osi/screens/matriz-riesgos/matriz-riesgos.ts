@@ -10,6 +10,8 @@ import { OnboardingService } from "@app/shared/services/onboarding.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { finalize } from "rxjs";
 import { ShowToast } from "@app/shared/services";
+import { RiskWizard } from "./components/risk-wizard/risk-wizard";
+import { DialogModule } from "primeng/dialog";
 import {
   RiskMatrixEntryDto,
   RiskMatrixEntryPayload,
@@ -25,6 +27,7 @@ interface RiskOption {
 
 interface RiskRow {
   id: number;
+  informationAssetId?: number;
   asset: string;
   threat: string;
   consequence: string;
@@ -77,7 +80,16 @@ const TREATMENTS_BY_LEVEL: Record<RiskLevel, string[]> = {
 @Component({
   selector: "app-matriz-riesgos",
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, ConfirmDialog, MainContainer],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    ButtonModule, 
+    TooltipModule, 
+    ConfirmDialog, 
+    MainContainer,
+    RiskWizard,
+    DialogModule
+  ],
   templateUrl: "./matriz-riesgos.html",
   styleUrl: "./matriz-riesgos.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,6 +107,7 @@ export default class MatrizRiesgos {
   protected readonly scaleValues = [5, 4, 3, 2, 1];
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
+  protected readonly showWizard = signal(false);
   protected readonly rows = signal<RiskRow[]>(this.defaultRows());
 
   protected readonly riskSummary = computed(() => {
@@ -151,6 +164,24 @@ export default class MatrizRiesgos {
         error: () => {
           this.toast.showError("Error", "No se pudo guardar la matriz de riesgos");
         },
+      });
+  }
+
+  protected onWizardCompleted(payload: RiskMatrixEntryPayload): void {
+    this.showWizard.set(false);
+    this.saving.set(true);
+    this.service
+      .create(payload)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.saving.set(false))
+      )
+      .subscribe({
+        next: (entry) => {
+          this.rows.update((rows) => [...rows, this.fromDto(entry)]);
+          this.toast.showSuccess("Éxito", "Riesgo analizado y agregado a la matriz");
+        },
+        error: () => this.toast.showError("Error", "No se pudo guardar el análisis de riesgo"),
       });
   }
 
@@ -724,6 +755,7 @@ export default class MatrizRiesgos {
   private fromDto(entry: RiskMatrixEntryDto): RiskRow {
     return {
       id: entry.id,
+      informationAssetId: entry.information_asset_id,
       asset: entry.asset,
       threat: entry.threat,
       consequence: entry.consequence,
@@ -741,6 +773,7 @@ export default class MatrizRiesgos {
 
   private toPayload(row: RiskRow): RiskMatrixEntryPayload {
     return {
+      information_asset_id: row.informationAssetId,
       asset: row.asset,
       threat: row.threat,
       consequence: row.consequence,

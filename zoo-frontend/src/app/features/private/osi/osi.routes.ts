@@ -16,6 +16,13 @@ const osiRoutes: Routes = [
       import("../admin/screens/gestion-permisos/gestion-permisos"),
   },
   {
+    path: "inventario-activos",
+    title: "Inventario de Activos",
+    data: { requiredPermissions: ["risk_matrix_access"] },
+    loadComponent: () =>
+      import("./screens/inventario-activos/inventario-activos"),
+  },
+  {
     path: "matriz-riesgos",
     title: "Matriz de Riesgos",
     data: { requiredPermissions: ["risk_matrix_access"] },

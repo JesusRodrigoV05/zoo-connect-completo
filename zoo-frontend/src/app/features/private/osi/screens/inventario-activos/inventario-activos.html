@@ -1,0 +1,101 @@
+<zoo-main-container>
+  <header class="assets-header">
+    <div>
+      <p class="eyebrow">Gestión de Seguridad</p>
+      <h1>Inventario de Activos de Información</h1>
+      <p>Administra los activos críticos que requieren análisis de riesgo.</p>
+    </div>
+    <div class="actions">
+      <p-button label="Nuevo Activo" icon="pi pi-plus" [rounded]="true" (onClick)="openCreate()"></p-button>
+    </div>
+  </header>
+
+  <div class="table-card">
+    <p-table [value]="assets()" [loading]="loading()" [rows]="10" [paginator]="true" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Confidencialidad</th>
+          <th>Integridad</th>
+          <th>Disponibilidad</th>
+          <th>Criticidad</th>
+          <th style="width: 100px">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-asset>
+        <tr>
+          <td>
+            <span class="font-bold">{{ asset.name }}</span>
+            <p class="text-sm text-gray-500">{{ asset.description }}</p>
+          </td>
+          <td>{{ asset.category }}</td>
+          <td>
+            <span class="val-badge val-{{asset.confidentiality}}">{{ asset.confidentiality }}</span>
+          </td>
+          <td>
+            <span class="val-badge val-{{asset.integrity}}">{{ asset.integrity }}</span>
+          </td>
+          <td>
+            <span class="val-badge val-{{asset.availability}}">{{ asset.availability }}</span>
+          </td>
+          <td>
+            <span class="criticidad-badge val-{{getCriticidad(asset)}}">
+              {{ getCriticidad(asset) >= 4 ? 'Alta' : getCriticidad(asset) >= 2 ? 'Media' : 'Baja' }}
+            </span>
+          </td>
+          <td>
+            <div class="flex gap-2">
+              <p-button icon="pi pi-pencil" [text]="true" (onClick)="openEdit(asset)"></p-button>
+              <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="confirmDelete(asset.id)"></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center p-4">No hay activos registrados.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog [header]="editingId ? 'Editar Activo' : 'Nuevo Activo'" [(visible)]="showDialog" [modal]="true" [style]="{width: '450px'}">
+    <div class="form-grid">
+      <div class="field">
+        <label for="name">Nombre del Activo</label>
+        <input pInputText id="name" [(ngModel)]="currentAsset.name" class="w-full" />
+      </div>
+      <div class="field">
+        <label for="category">Categoría</label>
+        <p-select [options]="categories" [(ngModel)]="currentAsset.category" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+      </div>
+      <div class="field">
+        <label for="description">Descripción</label>
+        <textarea pTextarea id="description" [(ngModel)]="currentAsset.description" rows="3" class="w-full"></textarea>
+      </div>
+      
+      <div class="valuation-section">
+        <h3>Valoración CID (1-5)</h3>
+        <div class="cid-row">
+          <label>Confidencialidad</label>
+          <p-rating [(ngModel)]="currentAsset.confidentiality" [stars]="5"></p-rating>
+        </div>
+        <div class="cid-row">
+          <label>Integridad</label>
+          <p-rating [(ngModel)]="currentAsset.integrity" [stars]="5"></p-rating>
+        </div>
+        <div class="cid-row">
+          <label>Disponibilidad</label>
+          <p-rating [(ngModel)]="currentAsset.availability" [stars]="5"></p-rating>
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" icon="pi pi-times" [text]="true" (onClick)="showDialog.set(false)"></p-button>
+      <p-button label="Guardar" icon="pi pi-check" [loading]="saving()" (onClick)="saveAsset()"></p-button>
+    </ng-template>
+  </p-dialog>
+</zoo-main-container>
+
+<p-confirmDialog />

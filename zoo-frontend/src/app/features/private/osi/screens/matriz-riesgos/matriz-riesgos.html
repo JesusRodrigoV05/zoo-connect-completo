@@ -246,4 +246,17 @@
   </section>
 
   <p-confirmDialog />
+
+  <p-dialog 
+    header="Analizador de Riesgos Automatizado" 
+    [(visible)]="showWizard" 
+    [modal]="true" 
+    [style]="{width: '700px'}" 
+    [draggable]="false" 
+    [resizable]="false">
+    <zoo-risk-wizard 
+      (completed)="onWizardCompleted($event)" 
+      (cancelled)="showWizard.set(false)">
+    </zoo-risk-wizard>
+  </p-dialog>
 </zoo-main-container>
