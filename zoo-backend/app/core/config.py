@@ -85,6 +85,13 @@ class Settings(BaseSettings):
     PASSWORD_VALIDITY_USUARIO_BASICO_DAYS: int = 180
     #
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_db_url(cls, v: str):
+        if v and v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql://", 1)
+        return v
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]):

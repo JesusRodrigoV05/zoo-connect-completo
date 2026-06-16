@@ -33,6 +33,7 @@ from app.schemas.auth import (
     ResetPasswordRequest,
     EmailVerificationRequest,
     ResendVerificationRequest,
+    UpdatePhoneRequest,
 )
 
 from app.core import email_service
@@ -304,6 +305,34 @@ async def resend_verification(
     return {"message": "Codigo SMS reenviado exitosamente."}
 
 
+@router.patch("/update-phone", status_code=status.HTTP_200_OK)
+async def update_phone(
+    request: Request,
+    body: UpdatePhoneRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    # Verificar si el teléfono ya existe
+    existing_user = crud_user.get_user_by_phone(db, phone_number=body.phone_number)
+    if existing_user and existing_user.id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El número de teléfono ya está registrado por otro usuario.",
+        )
+
+    # Actualizar teléfono y generar OTP
+    try:
+        code = crud_user.request_phone_update(db, current_user, body.phone_number)
+        await sms_service.send_otp(body.phone_number, code, "verify_phone")
+        return {"message": "Código de verificación enviado al nuevo número."}
+    except Exception as e:
+        logger.error(f"Error al solicitar actualización de teléfono: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No se pudo enviar el SMS de verificación.",
+        )
+
+
 # rate limiting
 @router.post("/login", response_model=Union[TokenResponse, LoginStep2Response, MustChangePasswordResponse])
 @limiter.limit("10/minute")
@@ -329,7 +358,7 @@ async def login(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Verificacion de seguridad requerida.",
             )
-        client_ip = request.client.host if request.client else None
+        client_ip = resolve_client_ip(request)
         recaptcha_result = await verify_recaptcha(payload.recaptcha_token, client_ip)
         if not is_valid_recaptcha(recaptcha_result):
             background_tasks.add_task(

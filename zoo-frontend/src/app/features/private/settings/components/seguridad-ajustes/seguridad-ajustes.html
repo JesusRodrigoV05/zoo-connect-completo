@@ -18,6 +18,23 @@
   </ng-template>
 
   <div class="settings-section">
+    <h3 class="section-title">Teléfono</h3>
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4>Cambiar número de teléfono</h4>
+        <p>Actualiza tu número registrado para recibir códigos SMS.</p>
+      </div>
+      <div class="field" style="width: 200px;">
+        <p-floatlabel variant="on">
+          <input id="newPhone" pInputText type="tel" [(ngModel)]="newPhoneNumber" fluid />
+          <label for="newPhone">Nuevo número</label>
+        </p-floatlabel>
+      </div>
+      <p-button type="button" label="Actualizar" icon="pi pi-refresh" (onClick)="updatePhoneNumber()" [loading]="updatingPhone()" />
+    </div>
+  </div>
+
+  <div class="settings-section">
     <h3 class="section-title tour-settings-auth-section">Autenticación</h3>
     <div class="setting-item tour-settings-2fa">
       <div class="setting-info">

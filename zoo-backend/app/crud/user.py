@@ -321,15 +321,18 @@ def verify_user_email(db: Session, email: str, code: str) -> bool:
     return False
 
 
-def mark_phone_verified(db: Session, phone_number: str) -> bool:
-    user = get_user_by_phone(db, phone_number=phone_number)
-    if not user:
-        return False
-    user.phone_verified = True
-    user.is_active = True
-    db.add(user)
+def request_phone_update(db: Session, user: User, new_phone: str) -> str:
+    """
+    Actualiza temporalmente el número de teléfono y genera un código de verificación.
+    """
+    user.phone_number = new_phone
+    user.phone_verified = False
+    
+    # Generar y retornar el nuevo código
+    code = create_sms_otp(db, user, "verify_phone")
     db.commit()
-    return True
+    db.refresh(user)
+    return code
 
 
 def create_sms_otp(db: Session, user: User, purpose: str) -> str:

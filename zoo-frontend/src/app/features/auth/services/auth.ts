@@ -143,4 +143,11 @@ export class Auth {
       data
     );
   }
+
+  updatePhone(phoneNumber: string): Observable<{message: string}> {
+    return this.http.patch<{message: string}>(
+      `${this.authUrl}/update-phone`,
+      { phone_number: phoneNumber }
+    );
+  }
 }

@@ -75,6 +75,8 @@ export default class SeguridadAjustes implements OnInit {
   protected readonly codeRequested = signal(false);
   protected readonly submittingPassword = signal(false);
   protected readonly maskedPhoneFromServer = signal<string | null>(null);
+  protected readonly updatingPhone = signal(false);
+  protected newPhoneNumber = "";
   protected readonly codeCooldown = signal(0);
 
   protected twoFaModel = signal(this.authStore.twoFAenabled());
@@ -173,6 +175,25 @@ export default class SeguridadAjustes implements OnInit {
     this.showDisable2FA.set(false);
   }
 
+  protected async updatePhoneNumber(): Promise<void> {
+    if (!this.newPhoneNumber) {
+      this.toast.showError("Error", "Ingresa un número de teléfono válido.");
+      return;
+    }
+
+    this.updatingPhone.set(true);
+    this.authService.updatePhone(this.newPhoneNumber).subscribe({
+      next: (response) => {
+        this.updatingPhone.set(false);
+        this.toast.showSuccess("Código enviado", response.message);
+        // Aquí se podría abrir un diálogo de verificación si fuera necesario
+      },
+      error: (error) => {
+        this.updatingPhone.set(false);
+        this.toast.showError("Error", this.getErrorDetail(error));
+      },
+    });
+  }
   protected get maskedPhone(): string {
     const serverPhone = this.maskedPhoneFromServer();
     if (serverPhone) return serverPhone;
