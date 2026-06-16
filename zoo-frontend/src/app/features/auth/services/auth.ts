@@ -16,6 +16,7 @@ import {
   ChangePasswordWithCodeRequest,
 } from "@models/usuario/request_response.model";
 import { Usuario } from "@models/usuario/usuario.model";
+import { PasswordHistoryEntry } from "@models/usuario/password-history.model";
 import { environment } from "@env";
 import {
   BackendUpdateProfileRequest,
@@ -117,11 +118,11 @@ export class Auth {
     });
   }
 
-  getPasswordHistory(userId: string, limit: number = 10): Observable<Array<{id: number, user_id: string, password_hash: string, created_at: string}>> {
-    return this.http.get<Array<{id: number, user_id: string, password_hash: string, created_at: string}>>(
+  getPasswordHistory(userId: string, limit: number = 10): Observable<PasswordHistoryEntry[]> {
+    return this.http.get<Array<{id: number; user_id: string; password_hash: string; created_at: string}>>(
       `${environment.apiUrl}/admin_users/users/${userId}/password-history`,
       { params: { limit: limit.toString() } }
-    );
+    ).pipe(map(entries => entries.map(({ password_hash: _, ...rest }) => rest)));
   }
 
   clearPasswordHistory(userId: string): Observable<{msg: string}> {

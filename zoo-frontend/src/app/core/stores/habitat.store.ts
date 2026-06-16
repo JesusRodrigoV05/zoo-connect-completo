@@ -1,5 +1,5 @@
 import { computed } from "@angular/core";
-import { inject } from "@angular/core/primitives/di";
+import { inject } from "@angular/core";
 import { AdminHabitat } from "@app/features/private/admin/services/admin-habitat";
 import { Habitat } from "@models/habitat";
 import {

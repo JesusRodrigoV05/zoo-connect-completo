@@ -98,7 +98,7 @@
               </p-floatlabel>
             </div>
 
-            <zoo-captcha (tokenChange)="captchaToken.set($event)" />
+            <zoo-captcha #zooCaptcha (tokenChange)="captchaToken.set($event)" />
 
             @if (!generatePassword) {
             <div class="field suggestion-action">

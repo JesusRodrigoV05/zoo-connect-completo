@@ -36,7 +36,7 @@
               [showPasswordToggle]="true"
             />
 
-            <zoo-captcha (tokenChange)="captchaToken.set($event)" />
+            <zoo-captcha #zooCaptcha (tokenChange)="captchaToken.set($event)" />
 
             <div class="auth-link-container right-aligned">
               <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a>

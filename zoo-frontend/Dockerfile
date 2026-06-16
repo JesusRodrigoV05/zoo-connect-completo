@@ -1,12 +1,13 @@
-FROM node:24-slim AS build
+FROM oven/bun:1.2-slim AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+COPY package.json bun.lock ./
+RUN bun install
 COPY . .
-RUN npm run build -- --configuration production
+RUN bun run build
 
-FROM node:24-slim AS runtime
+FROM oven/bun:1.2-slim AS runtime
 WORKDIR /app
 COPY --from=build /app/dist ./dist
 EXPOSE 4200
-CMD ["node", "dist/zoo-connect-web/server/server.mjs"]
+USER bun
+CMD ["bun", "dist/zoo-connect-web/server/server.mjs"]

@@ -1,7 +1,9 @@
 import { inject, Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { environment } from "@env";
+import { AnimalMediaAdapter, AnimalMediaApiResponse } from "@adapters/animales";
 import { PaginatedResponse } from "@models/common";
 import { MediaAnimal } from "@models/animales";
 import { HabitatMediaResponse } from "@adapters/habitat";
@@ -33,10 +35,17 @@ export class AdminAnimalesMultimedia {
     const params = new HttpParams()
       .set("page", page.toString())
       .set("size", size.toString());
-    return this.http.get<PaginatedResponse<MediaAnimal>>(
-      `${this.apiUrl}/animals/${animalId}/media`,
-      { params }
-    );
+    return this.http
+      .get<PaginatedResponse<AnimalMediaApiResponse>>(
+        `${this.apiUrl}/animals/${animalId}/media`,
+        { params }
+      )
+      .pipe(
+        map((response) => ({
+          ...response,
+          items: response.items.map(AnimalMediaAdapter.fromApi),
+        }))
+      );
   }
 
   uploadAnimalMedia(
@@ -49,10 +58,12 @@ export class AdminAnimalesMultimedia {
     formData.append("descripcion_media_animal", metadata.descripcion || "");
     formData.append("tipo_medio", "true"); // true para imagen, false para video, segun backend es bool
 
-    return this.http.post<MediaAnimal>(
-      `${this.apiUrl}/animals/${metadata.animalId}/media`,
-      formData
-    );
+    return this.http
+      .post<AnimalMediaApiResponse>(
+        `${this.apiUrl}/animals/${metadata.animalId}/media`,
+        formData
+      )
+      .pipe(map(AnimalMediaAdapter.fromApi));
   }
 
   deleteAnimalMedia(mediaId: number): Observable<void> {
