@@ -1,0 +1,30 @@
+name: CI/CD Pipeline - Deploy to EC2
+
+on:
+  push:
+    branches:
+      - Presentacion-Seguridad
+
+jobs:
+  deploy:
+    name: Deploy Application to AWS EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Execute Remote SSH Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            cd ~/zoo-connect-completo
+
+            git fetch origin Presentacion-Seguridad
+            git reset --hard origin/Presentacion-Seguridad
+
+            docker compose up -d --build

@@ -1,7 +1,5 @@
 # 🦁 Zoo Connect Web - Sistema de Gestión de Zoológicos
 
-# Cambio
-
 Una aplicación web moderna para la **gestión de zoológicos** construida con **Angular 21** y optimizada con **Bun**. Su objetivo es **digitalizar y centralizar** la información operativa y clínica (salud, dieta, inventario) para el personal (gerentes, veterinarios, cuidadores) y mejorar la toma de decisiones.
 
 El proyecto **Zoo Connect Web** tiene como objetivo principal proporcionar **información consolidada** para optimizar los recursos, asegurar el bienestar animal y mejorar la eficiencia en la gestión del zoológico.
