@@ -13,6 +13,7 @@ from app.schemas.risk_matrix import (
     RiskMatrixEntryOut,
     RiskMatrixEntryUpdate,
 )
+from app.services.risk_validator import RiskPolicyViolation
 
 router = APIRouter(
     dependencies=[Depends(require_permission(PermissionCode.RISK_MATRIX_ACCESS))]
@@ -30,7 +31,10 @@ def create_risk_matrix_entry(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    return crud_risk_matrix.create_entry(db, entry_in, current_user.id)
+    try:
+        return crud_risk_matrix.create_entry(db, entry_in, current_user.id)
+    except (RiskPolicyViolation, ValueError) as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.put("", response_model=List[RiskMatrixEntryOut])
@@ -39,7 +43,10 @@ def replace_risk_matrix_entries(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    return crud_risk_matrix.replace_entries(db, entries_in, current_user.id)
+    try:
+        return crud_risk_matrix.replace_entries(db, entries_in, current_user.id)
+    except (RiskPolicyViolation, ValueError) as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.put("/{entry_id}", response_model=RiskMatrixEntryOut)
@@ -49,10 +56,14 @@ def update_risk_matrix_entry(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    entry = crud_risk_matrix.update_entry(db, entry_id, entry_in, current_user.id)
+    try:
+        entry = crud_risk_matrix.update_entry(db, entry_id, entry_in, current_user.id)
+    except (RiskPolicyViolation, ValueError) as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     if not entry:
         raise HTTPException(status_code=404, detail="Fila de matriz no encontrada")
     return entry
+
 
 
 @router.delete("/{entry_id}", status_code=status.HTTP_204_NO_CONTENT)
