@@ -86,7 +86,8 @@ export class AdminUsuarios {
 
   createUser(
     userData: Omit<Usuario, "id" | "creadoEn" | "activo"> & {
-      password: string;
+      generate_password?: boolean;
+      phone_number?: string;
     },
   ): Observable<Usuario> {
     try {

@@ -44,21 +44,67 @@
       <div class="field">
         <p-floatlabel variant="on">
           <input
-            id="username"
+            id="nombre"
             pInputText
             type="text"
-            formControlName="username"
-            autocomplete="username"
+            formControlName="nombre"
+            autocomplete="given-name"
           />
 
-          <label for="username">Nombre de Usuario</label>
+          <label for="nombre">Nombre</label>
         </p-floatlabel>
 
-        @if (isInvalid('username')) {
+        @if (isInvalid('nombre')) {
 
         <ng-container
           [ngTemplateOutlet]="alerta"
-          [ngTemplateOutletContext]="{fieldName: 'username'}"
+          [ngTemplateOutletContext]="{fieldName: 'nombre'}"
+        />
+
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="apellido"
+            pInputText
+            type="text"
+            formControlName="apellido"
+            autocomplete="family-name"
+          />
+
+          <label for="apellido">Apellido</label>
+        </p-floatlabel>
+
+        @if (isInvalid('apellido')) {
+
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{fieldName: 'apellido'}"
+        />
+
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            id="phoneNumber"
+            pInputText
+            type="tel"
+            formControlName="phoneNumber"
+            autocomplete="tel"
+          />
+
+          <label for="phoneNumber">Teléfono</label>
+        </p-floatlabel>
+
+        @if (isInvalid('phoneNumber')) {
+
+        <ng-container
+          [ngTemplateOutlet]="alerta"
+          [ngTemplateOutletContext]="{fieldName: 'phoneNumber'}"
         />
 
         }

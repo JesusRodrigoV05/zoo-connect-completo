@@ -76,9 +76,11 @@ export default class CrearUsuario implements OnInit {
       this.buttonText = "Guardar Cambios";
 
       this.adminUsuarios.getUserById(id).subscribe((user) => {
+        const parts = user.username.split('.');
         this.usuarioForm.patchValue({
           email: user.email,
-          username: user.username,
+          nombre: parts[0] || '',
+          apellido: parts[2] || parts[1] || '',
           rol: user.rol.id,
         });
       });
@@ -127,9 +129,19 @@ export default class CrearUsuario implements OnInit {
     });
   }
 
+  private readonly ROLE_SLUG_MAP: Record<number, string> = {
+    [RolId.ADMIN]: 'admin',
+    [RolId.VISITANTE]: 'visitante',
+    [RolId.CUIDADOR]: 'cuidador',
+    [RolId.VETERINARIO]: 'vet',
+    [RolId.OSI]: 'osi',
+  };
+
   protected readonly usuarioForm = this.fb.group({
     email: ["", [Validators.required, Validators.email]],
-    username: ["", [Validators.required, Validators.minLength(2)]],
+    nombre: ["", [Validators.required, Validators.minLength(2)]],
+    apellido: ["", [Validators.required, Validators.minLength(2)]],
+    phoneNumber: ["", [Validators.required, Validators.pattern("^\\+[1-9]\\d{7,14}$")]],
     rol: [RolId.VISITANTE, [Validators.required]],
   });
 
@@ -156,6 +168,9 @@ export default class CrearUsuario implements OnInit {
           fieldName,
         )} debe tener al menos ${requiredLength} caracteres`;
       }
+      if (field.errors["pattern"]) {
+        return "El formato del teléfono no es válido (ej: +5491112345678)";
+      }
     }
     return "";
   }
@@ -163,7 +178,9 @@ export default class CrearUsuario implements OnInit {
   private getFieldDisplayName(fieldName: string): string {
     const fieldNames: { [key: string]: string } = {
       email: "El email",
-      username: "El nombre de usuario",
+      nombre: "El nombre",
+      apellido: "El apellido",
+      phoneNumber: "El teléfono",
       rol: "El rol",
     };
     return fieldNames[fieldName] || fieldName;
@@ -176,15 +193,21 @@ export default class CrearUsuario implements OnInit {
       this.isLoading.set(true);
 
       if (!this.isEditMode) {
-        const generatedPassword = this.usuarioForm.value.username! + "ZooAdmin2026!";
+        const nombre = this.usuarioForm.value.nombre!;
+        const apellido = this.usuarioForm.value.apellido!;
+        const rolId = this.usuarioForm.value.rol!;
+        const roleSlug = this.ROLE_SLUG_MAP[rolId] || 'visitante';
+        const username = `${nombre}.${roleSlug}.${apellido}`;
+
         const usuarioData = {
           email: this.usuarioForm.value.email!,
-          username: this.usuarioForm.value.username!,
-          password: generatedPassword,
+          username,
+          phone_number: this.usuarioForm.value.phoneNumber!,
           fotoUrl: "",
+          generate_password: true,
           rol: {
-            id: this.usuarioForm.value.rol!,
-            nombre: this.getRoleName(this.usuarioForm.value.rol!),
+            id: rolId,
+            nombre: this.getRoleName(rolId),
           },
         };
 
@@ -193,7 +216,10 @@ export default class CrearUsuario implements OnInit {
           .pipe(finalize(() => this.isLoading.set(false)))
           .subscribe({
             next: () => {
-              this.zooToast.showSuccess("Éxito", "Usuario creado exitosamente");
+              this.zooToast.showSuccess(
+                "Éxito",
+                "Usuario creado exitosamente. Las credenciales se enviaron al usuario por email y SMS.",
+              );
               this.router.navigate(["/admin/usuarios/lista"]);
             },
             error: (error) => this.zooToast.showError("Error", error.message),
@@ -207,11 +233,17 @@ export default class CrearUsuario implements OnInit {
           return;
         }
 
+        const nombre = this.usuarioForm.value.nombre!;
+        const apellido = this.usuarioForm.value.apellido!;
+        const rolId = this.usuarioForm.value.rol!;
+        const roleSlug = this.ROLE_SLUG_MAP[rolId] || 'visitante';
+        const username = `${nombre}.${roleSlug}.${apellido}`;
+
         const updateData = {
-          username: this.usuarioForm.value.username!,
+          username,
           rol: {
-            id: this.usuarioForm.value.rol!,
-            nombre: this.getRoleName(this.usuarioForm.value.rol!),
+            id: rolId,
+            nombre: this.getRoleName(rolId),
           },
         };
 
