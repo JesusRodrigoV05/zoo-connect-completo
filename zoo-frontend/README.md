@@ -1,5 +1,7 @@
 # 🦁 Zoo Connect Web - Sistema de Gestión de Zoológicos
 
+# Cambio
+
 Una aplicación web moderna para la **gestión de zoológicos** construida con **Angular 21** y optimizada con **Bun**. Su objetivo es **digitalizar y centralizar** la información operativa y clínica (salud, dieta, inventario) para el personal (gerentes, veterinarios, cuidadores) y mejorar la toma de decisiones.
 
 El proyecto **Zoo Connect Web** tiene como objetivo principal proporcionar **información consolidada** para optimizar los recursos, asegurar el bienestar animal y mejorar la eficiencia en la gestión del zoológico.
@@ -10,35 +12,35 @@ El proyecto **Zoo Connect Web** tiene como objetivo principal proporcionar **inf
 
 ### Equipo: Tech Zoo Innovators
 
-| Rol | Nombre | Responsabilidades |
-| --- | --- | --- |
-| **Product Owner** | Delgadillo Calderon, Manuel F. | Representar las necesidades del cliente y priorizar y gestionar el product backlog. |
-| **Scrum Master** | Jimenez Mendoza, Manuel F. | Facilitar el proceso Scrum, eliminar impedimentos y asegurar la adherencia a las normas. |
-| **Desarrolladores** | Delgadillo, M. F., Jimenez, M. F., Velasco, J. J. R. | Diseño, desarrollo y entrega de incrementos funcionales. |
-| **QAs** | Delgadillo, M. F., Jimenez, M. F., Velasco, J. J. R. | Validar la calidad, funcionalidad y seguridad de cada incremento del producto. |
+| Rol                 | Nombre                                               | Responsabilidades                                                                        |
+| ------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Product Owner**   | Delgadillo Calderon, Manuel F.                       | Representar las necesidades del cliente y priorizar y gestionar el product backlog.      |
+| **Scrum Master**    | Jimenez Mendoza, Manuel F.                           | Facilitar el proceso Scrum, eliminar impedimentos y asegurar la adherencia a las normas. |
+| **Desarrolladores** | Delgadillo, M. F., Jimenez, M. F., Velasco, J. J. R. | Diseño, desarrollo y entrega de incrementos funcionales.                                 |
+| **QAs**             | Delgadillo, M. F., Jimenez, M. F., Velasco, J. J. R. | Validar la calidad, funcionalidad y seguridad de cada incremento del producto.           |
 
 ### Normas y Acuerdos del Equipo
 
-* **Comunicación:** Utilizamos **Slack** (formal) y **Discord** (síncrono/urgente) para mantenernos actualizados y comunicarnos eficazmente.
-* **Reuniones:** Celebramos **Daily Scrums** (15 min) diariamente para sincronización. Las ceremonias de *sprint* se calendarizan en **Trello**.
-* **Resolución de Conflictos:** Los conflictos se abordan de manera constructiva, escalando la decisión al **Scrum Master (Jimenez)** para mediar una solución colaborativa.
-* **Entrega de Trabajo:** Se espera que cada miembro entregue su trabajo dentro del plazo y de acuerdo con la **Definición de Hecho (DoD)**, incluyendo una revisión de código obligatoria y pruebas de QA.
+- **Comunicación:** Utilizamos **Slack** (formal) y **Discord** (síncrono/urgente) para mantenernos actualizados y comunicarnos eficazmente.
+- **Reuniones:** Celebramos **Daily Scrums** (15 min) diariamente para sincronización. Las ceremonias de _sprint_ se calendarizan en **Trello**.
+- **Resolución de Conflictos:** Los conflictos se abordan de manera constructiva, escalando la decisión al **Scrum Master (Jimenez)** para mediar una solución colaborativa.
+- **Entrega de Trabajo:** Se espera que cada miembro entregue su trabajo dentro del plazo y de acuerdo con la **Definición de Hecho (DoD)**, incluyendo una revisión de código obligatoria y pruebas de QA.
 
 ### Arquitectura y Herramientas
 
-* **Herramientas de Desarrollo:** VS Code, Bun, GitHub, Postman, Docker.
-* **Gestor de Base de Datos:** PostgreSQL (base de datos relacional robusta).
-* **Arquitectura del Sistema:** El sistema utiliza una **arquitectura modular desacoplada** (Frontend Angular 20 + Backend API) que permite una alta escalabilidad y un rendimiento óptimo. Se utiliza PostgreSQL para la gestión de la información crítica (clínica y operativa).
+- **Herramientas de Desarrollo:** VS Code, Bun, GitHub, Postman, Docker.
+- **Gestor de Base de Datos:** PostgreSQL (base de datos relacional robusta).
+- **Arquitectura del Sistema:** El sistema utiliza una **arquitectura modular desacoplada** (Frontend Angular 20 + Backend API) que permite una alta escalabilidad y un rendimiento óptimo. Se utiliza PostgreSQL para la gestión de la información crítica (clínica y operativa).
 
 ---
 
 ## 🚀 Tecnologías Principales
 
-* **Angular 21:** Framework principal con las últimas características.
-* **Bun:** Runtime de JavaScript ultrarrápido y gestor de paquetes.
-* **TypeScript 5.8:** Tipado estático robusto.
-* **NgRx Signals:** Manejo de estado reactivo moderno.
-* **PostgreSQL:** Base de datos relacional para información crítica.
+- **Angular 21:** Framework principal con las últimas características.
+- **Bun:** Runtime de JavaScript ultrarrápido y gestor de paquetes.
+- **TypeScript 5.8:** Tipado estático robusto.
+- **NgRx Signals:** Manejo de estado reactivo moderno.
+- **PostgreSQL:** Base de datos relacional para información crítica.
 
 ---
 
@@ -99,28 +101,29 @@ El proyecto puede ejecutarse de dos maneras distintas, dependiendo de si estás 
 
 Utiliza estos comandos para programar y ver los cambios en tiempo real. La aplicación estará disponible en `http://localhost:4200/`.
 
-* **Servidor de desarrollo estándar:**
+- **Servidor de desarrollo estándar:**
+
 ```bash
 bun start
 ```
 
-* **Modo observador de cambios:**
+- **Modo observador de cambios:**
+
 ```bash
 bun run watch
 ```
 
+- **Servidor SSR (Server-Side Rendering) local:**
 
-* **Servidor SSR (Server-Side Rendering) local:**
 ```bash
 bun run serve:ssr:zoo-connect-web
 ```
 
-* **Generar build de producción manual:**
+- **Generar build de producción manual:**
+
 ```bash
 bun run build
 ```
-
-
 
 ### Opción B: Despliegue con Docker (Producción)
 
@@ -143,9 +146,9 @@ docker run -d --name zoo-connect-frontend -p 4200:4200 --env-file .env zoo-conne
 **Paso 3: Verificación y Gestión del Contenedor**
 La aplicación estará disponible en `http://localhost:4200`. Utiliza estos comandos para gestionar el servicio:
 
-* **Ver logs:** `docker logs -f zoo-connect-frontend`
-* **Detener servicio:** `docker stop zoo-connect-frontend`
-* **Iniciar servicio detenido:** `docker start zoo-connect-frontend`
+- **Ver logs:** `docker logs -f zoo-connect-frontend`
+- **Detener servicio:** `docker stop zoo-connect-frontend`
+- **Iniciar servicio detenido:** `docker start zoo-connect-frontend`
 
 ---
 
@@ -194,17 +197,17 @@ src/
 
 La aplicación cuenta con un sistema robusto que incluye:
 
-* Login y registro con validaciones reactivas.
-* Tokens JWT (Access + Refresh Token) con auto-refresh.
-* Persistencia segura compatible con SSR en `localStorage`.
-* Guards de autenticación para proteger rutas sensibles.
+- Login y registro con validaciones reactivas.
+- Tokens JWT (Access + Refresh Token) con auto-refresh.
+- Persistencia segura compatible con SSR en `localStorage`.
+- Guards de autenticación para proteger rutas sensibles.
 
 **Roles disponibles:**
 
-* `administrador`: Acceso total.
-* `veterinario`: Gestión clínica de animales.
-* `cuidador`: Mantenimiento diario.
-* `visitante`: Visualización básica.
+- `administrador`: Acceso total.
+- `veterinario`: Gestión clínica de animales.
+- `cuidador`: Mantenimiento diario.
+- `visitante`: Visualización básica.
 
 ---
 
@@ -220,10 +223,10 @@ bun update
 
 **Dependencias principales establecidas:**
 
-* `@angular/core` ^20.0.0
-* `@ngrx/signals` ^20.0.1
-* `primeng` ^20.2.0
-* `rxjs` ~7.8.0
+- `@angular/core` ^20.0.0
+- `@ngrx/signals` ^20.0.1
+- `primeng` ^20.2.0
+- `rxjs` ~7.8.0
 
 ---
 
@@ -231,8 +234,7 @@ bun update
 
 La aplicación web requiere conexión con el backend estructurado en FastAPI. Las rutas de conexión son:
 
-* **Desarrollo:** `http://localhost:8000/api/v1`
-* **Producción:** Configurado internamente en `environment.production.ts`.
-
+- **Desarrollo:** `http://localhost:8000/api/v1`
+- **Producción:** Configurado internamente en `environment.production.ts`.
 
 **desarrollado con ❤️ usando angular 20 y bun por el equipo tech zoo innovators**
