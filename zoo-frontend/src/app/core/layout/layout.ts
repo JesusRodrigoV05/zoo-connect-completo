@@ -66,10 +66,18 @@ export default class Layout {
 
     if (this.hasPermission('manage_permissions')) {
       items.push({
-        text: this.authStore.isOsi() ? 'Matriz de Roles' : 'Roles',
+        text: 'Roles',
         icon: 'pi pi-shield',
-        route: this.authStore.isOsi() ? '/osi/roles-accesos' : '/admin/roles',
+        route: '/admin/roles',
       });
+
+      if (this.authStore.isOsi()) {
+        items.push({
+          text: 'Matriz de Roles',
+          icon: 'pi pi-table',
+          route: '/osi/roles-accesos',
+        });
+      }
     }
 
     if (this.hasPermission('risk_matrix_access')) {

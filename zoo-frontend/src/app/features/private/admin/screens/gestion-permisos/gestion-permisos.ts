@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { TagModule } from "primeng/tag";
+import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { forkJoin, finalize, of, switchMap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MainContainer } from "@app/shared/components/main-container";
@@ -112,7 +113,7 @@ const STANDALONE_COLUMNS: StandaloneAccessColumn[] = [
 @Component({
   selector: "app-gestion-permisos",
   standalone: true,
-  imports: [CommonModule, ButtonModule, InputTextModule, TagModule, MainContainer],
+  imports: [CommonModule, ButtonModule, InputTextModule, TagModule, ProgressSpinnerModule, MainContainer],
   templateUrl: "./gestion-permisos.html",
   styleUrl: "./gestion-permisos.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,

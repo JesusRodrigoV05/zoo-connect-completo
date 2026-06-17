@@ -4,8 +4,6 @@
 conductor
 docs
 md-seg
-**/.env
-**/.env.*
 **/node_modules
 **/dist
 **/.angular

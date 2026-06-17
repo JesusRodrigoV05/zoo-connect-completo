@@ -17,6 +17,7 @@ import {
 } from "./matriz-riesgos.service";
 
 type RiskLevel = "Bajo" | "Moderado" | "Alto" | "Extremo" | "Verifique valores";
+type SortField = "asset" | "threat" | "probability" | "impact" | "inherent" | "residual" | null;
 
 interface RiskOption {
   readonly label: string;
@@ -74,6 +75,8 @@ const TREATMENTS_BY_LEVEL: Record<RiskLevel, string[]> = {
   "Verifique valores": [],
 };
 
+const RISK_LEVELS: RiskLevel[] = ["Extremo", "Alto", "Moderado", "Bajo"];
+
 @Component({
   selector: "app-matriz-riesgos",
   standalone: true,
@@ -93,9 +96,16 @@ export default class MatrizRiesgos {
   protected readonly automationLevels = AUTOMATION_LEVELS;
   protected readonly frequencies = FREQUENCIES;
   protected readonly scaleValues = [5, 4, 3, 2, 1];
+  protected readonly riskLevels = RISK_LEVELS;
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly rows = signal<RiskRow[]>(this.defaultRows());
+
+  protected readonly searchQuery = signal("");
+  protected readonly filterLevel = signal<RiskLevel | "">("");
+  protected readonly sortField = signal<SortField>(null);
+  protected readonly sortDir = signal<"asc" | "desc">("asc");
+  protected readonly exportFormat = signal("pdf");
 
   protected readonly riskSummary = computed(() => {
     const counts: Record<string, number> = { Bajo: 0, Moderado: 0, Alto: 0, Extremo: 0 };
@@ -105,6 +115,76 @@ export default class MatrizRiesgos {
     }
     return counts;
   });
+
+  protected readonly extremeCount = computed(() => this.riskSummary()["Extremo"]);
+  protected readonly highOrAboveCount = computed(() =>
+    this.riskSummary()["Extremo"] + this.riskSummary()["Alto"]
+  );
+  protected readonly totalRisks = computed(() => this.rows().length);
+
+  protected readonly filteredRows = computed(() => {
+    let data = this.rows();
+    const query = this.searchQuery().trim().toLowerCase();
+    const level = this.filterLevel();
+
+    if (query) {
+      data = data.filter(
+        (r) =>
+          r.asset.toLowerCase().includes(query) ||
+          r.threat.toLowerCase().includes(query) ||
+          r.consequence.toLowerCase().includes(query),
+      );
+    }
+
+    if (level) {
+      data = data.filter((r) => this.riskLevel(this.inherentRisk(r)) === level);
+    }
+
+    const field = this.sortField();
+    const dir = this.sortDir();
+
+    if (field) {
+      data = [...data].sort((a, b) => {
+        let cmp = 0;
+        if (field === "asset") cmp = a.asset.localeCompare(b.asset);
+        else if (field === "threat") cmp = a.threat.localeCompare(b.threat);
+        else if (field === "probability") cmp = a.probability - b.probability;
+        else if (field === "impact") cmp = a.impact - b.impact;
+        else if (field === "inherent") cmp = this.inherentRisk(a) - this.inherentRisk(b);
+        else if (field === "residual") cmp = this.residualScore(a) - this.residualScore(b);
+        return dir === "asc" ? cmp : -cmp;
+      });
+    }
+
+    return data;
+  });
+
+  protected readonly heatmapData = computed(() => {
+    const grid: { prob: number; imp: number; count: number; level: RiskLevel }[] = [];
+    const coords: Record<string, number> = {};
+
+    for (const row of this.rows()) {
+      const key = `${row.probability}-${row.impact}`;
+      coords[key] = (coords[key] || 0) + 1;
+    }
+
+    for (let prob = 1; prob <= 5; prob++) {
+      for (let imp = 1; imp <= 5; imp++) {
+        const key = `${prob}-${imp}`;
+        const count = coords[key] || 0;
+        const level = count > 0 ? this.riskLevel(prob * imp) : "Bajo";
+        grid.push({ prob, imp, count, level });
+      }
+    }
+
+    return grid;
+  });
+
+  protected readonly ineffectiveControlCount = computed(() => {
+    return this.rows().filter((r) => this.residualScore(r) >= this.inherentRisk(r)).length;
+  });
+
+  protected readonly hasIneffectiveControls = computed(() => this.ineffectiveControlCount() > 0);
 
   constructor() {
     this.loadRows();
@@ -152,6 +232,20 @@ export default class MatrizRiesgos {
           this.toast.showError("Error", "No se pudo guardar la matriz de riesgos");
         },
       });
+  }
+
+  protected sortBy(field: SortField): void {
+    if (this.sortField() === field) {
+      this.sortDir.update((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      this.sortField.set(field);
+      this.sortDir.set("asc");
+    }
+  }
+
+  protected sortIndicator(field: SortField): string {
+    if (this.sortField() !== field) return "";
+    return this.sortDir() === "asc" ? " ▲" : " ▼";
   }
 
   protected exportMatrix(format: string): void {
@@ -304,7 +398,7 @@ export default class MatrizRiesgos {
   }
 
   private exportAsExcel(rows: RiskRow[]): void {
-    let csv = "\uFEFF"; // UTF-8 BOM
+    let csv = "\uFEFF";
     
     const headers = [
       "No.",
@@ -402,11 +496,9 @@ export default class MatrizRiesgos {
     canvas.width = 1200;
     canvas.height = totalHeight;
 
-    // Background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Title border
     ctx.strokeStyle = "#4f46e5";
     ctx.lineWidth = 6;
     ctx.beginPath();
@@ -414,7 +506,6 @@ export default class MatrizRiesgos {
     ctx.lineTo(padding, padding + 70);
     ctx.stroke();
 
-    // Title text
     ctx.fillStyle = "#1e293b";
     ctx.font = "bold 24px Arial, sans-serif";
     ctx.fillText("Matriz de Análisis de Riesgos - ZooConnect", padding + 15, padding + 25);
@@ -423,7 +514,6 @@ export default class MatrizRiesgos {
     ctx.font = "14px Arial, sans-serif";
     ctx.fillText(`Generado el: ${new Date().toLocaleDateString()} | Total de riesgos registrados: ${rows.length}`, padding + 15, padding + 50);
 
-    // Legend
     const summary = this.riskSummary();
     ctx.font = "bold 12px Arial, sans-serif";
     
@@ -444,7 +534,6 @@ export default class MatrizRiesgos {
     drawBadge("Alto", summary["Alto"] || 0, "#ffedd5", "#9a3412");
     drawBadge("Extremo", summary["Extremo"] || 0, "#fee2e2", "#991b1b");
 
-    // Table settings
     const cols = [
       { name: "N°", width: 40, align: "center" as const },
       { name: "Activo", width: 160, align: "left" as const },
@@ -461,11 +550,9 @@ export default class MatrizRiesgos {
 
     let startX = padding;
     
-    // Draw Header Background
     ctx.fillStyle = "#1e293b";
     ctx.fillRect(padding, tableTop, 1140, rowHeight);
 
-    // Draw Headers
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 13px Arial, sans-serif";
     startX = padding;
@@ -476,7 +563,6 @@ export default class MatrizRiesgos {
       startX += col.width;
     }
 
-    // Draw Rows
     ctx.font = "12px Arial, sans-serif";
     
     let currentY = tableTop + rowHeight;
@@ -715,6 +801,10 @@ export default class MatrizRiesgos {
       const treatment = treatments.includes(row.treatment) ? row.treatment : (treatments[0] ?? "");
       return rows.map((r) => (r.id === row.id ? { ...r, treatment } : r));
     });
+  }
+
+  protected isIneffectiveControl(row: RiskRow): boolean {
+    return this.residualScore(row) >= this.inherentRisk(row);
   }
 
   private normalizedScore(probability: number, impact: number): number {

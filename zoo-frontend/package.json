@@ -7,6 +7,7 @@
     "build": "ng build",
     "build:prod": "ng build --configuration production",
     "build:vercel": "ng build",
+    "postbuild": "node scripts/fix-html.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr": "bun dist/zoo-connect-web/server/server.mjs"

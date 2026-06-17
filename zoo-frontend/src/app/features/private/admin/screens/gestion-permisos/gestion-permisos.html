@@ -40,31 +40,32 @@
 
     @if (loading()) {
       <div class="loading-state">
-        <p>Preparando matriz de permisos por rol...</p>
+        <p-progressSpinner ariaLabel="Cargando matriz" />
+        <p>Cargando matriz de permisos...</p>
       </div>
     } @else {
       <div class="table-shell tour-permissions-table-shell">
         <table class="permissions-table tour-permissions-table">
           <thead>
             <tr>
-              <th class="tour-permissions-col-role" rowspan="2">Rol</th>
-              <th rowspan="2">Usuarios</th>
+              <th class="col-role" rowspan="2">Rol</th>
+              <th class="col-users" rowspan="2">Usuarios</th>
               @for (column of standaloneColumns; track column.key) {
-                <th class="tour-permissions-col-permission" rowspan="2">
+                <th class="col-perm" rowspan="2" [attr.title]="column.label">
                   <span>{{ column.label }}</span>
                 </th>
               }
               @for (group of accessGroups; track group.key) {
-                <th class="tour-permissions-col-permission permission-group-header" [attr.colspan]="group.children.length">
+                <th class="col-perm group-header" [attr.colspan]="group.children.length" [attr.title]="group.label">
                   <span>{{ group.label }}</span>
                 </th>
               }
-              <th class="tour-permissions-col-actions" rowspan="2">Acciones</th>
+              <th class="col-actions" rowspan="2">Acciones</th>
             </tr>
             <tr>
               @for (group of accessGroups; track group.key) {
                 @for (subColumn of group.children; track subColumn.key) {
-                  <th class="tour-permissions-col-permission permission-subheader">
+                  <th class="col-perm sub-header" [attr.title]="subColumn.label">
                     <span>{{ subColumn.label }}</span>
                   </th>
                 }
@@ -74,42 +75,45 @@
 
           <tbody>
             @for (role of filteredRoles(); track role.id) {
-              <tr class="group-toggle-row">
-                <td class="tour-permissions-col-role" [attr.rowspan]="2">
-                  <p-tag [value]="role.name" severity="info"></p-tag>
+              <tr class="role-row">
+                <td class="col-role" [attr.rowspan]="2">
+                  <p-tag [value]="role.name" [severity]="role.name === 'administrador' ? 'danger' : role.name === 'visitante' ? 'contrast' : 'info'" />
                 </td>
-                <td [attr.rowspan]="2">
-                  <span>{{ role.user_count }} usuario(s)</span>
+                <td class="col-users" [attr.rowspan]="2">
+                  <span class="user-count">{{ role.user_count }}</span>
                 </td>
                 @for (column of standaloneColumns; track column.key) {
-                  <td class="permission-cell tour-permissions-col-permission" [attr.rowspan]="2">
-                    <label>
+                  <td class="perm-cell" [attr.rowspan]="2" [class.perm-enabled]="isStandaloneAllowed(role, column)">
+                    <div class="perm-toggle">
                       <input
                         type="checkbox"
+                        [id]="'s-' + role.id + '-' + column.key"
                         [checked]="isStandaloneAllowed(role, column)"
                         (change)="toggleStandalone(role.id, column, ($any($event.target)).checked)"
                       />
-                    </label>
+                      <label [for]="'s-' + role.id + '-' + column.key" class="checkbox-faux"></label>
+                    </div>
                   </td>
                 }
                 @for (group of accessGroups; track group.key) {
-                  <td class="permission-cell permission-group-toggle" [attr.colspan]="group.children.length">
-                    <label>
+                  <td class="perm-cell group-toggle" [attr.colspan]="group.children.length" [class.perm-enabled]="isGroupEnabled(role, group)">
+                    <div class="perm-toggle">
                       <input
                         type="checkbox"
+                        [id]="'g-' + role.id + '-' + group.key"
                         [checked]="isGroupEnabled(role, group)"
                         (change)="toggleGroup(role.id, group, ($any($event.target)).checked)"
                       />
-                      <span>Habilitar {{ group.label }}</span>
-                    </label>
+                      <label [for]="'g-' + role.id + '-' + group.key" class="checkbox-faux"></label>
+                    </div>
                   </td>
                 }
-                <td class="actions-cell tour-permissions-col-actions" [attr.rowspan]="2">
+                <td class="col-actions" [attr.rowspan]="2">
                   <button
-                    class="tour-permissions-save-btn"
+                    class="save-btn"
                     pButton
                     type="button"
-                    label="Guardar"
+                    [label]="savingRoleId() === role.id ? 'Guardando...' : 'Guardar'"
                     icon="pi pi-save"
                     [disabled]="!dirtyRoles()[role.id] || savingRoleId() === role.id"
                     (click)="saveRolePermissions(role)"
@@ -119,22 +123,24 @@
               <tr>
                 @for (group of accessGroups; track group.key) {
                   @for (subColumn of group.children; track subColumn.key) {
-                    <td class="permission-cell tour-permissions-col-permission">
-                      <label>
+                    <td class="perm-cell sub-perm" [class.perm-disabled]="!isGroupEnabled(role, group)" [class.perm-enabled]="isSubColumnAllowed(role, subColumn) && isGroupEnabled(role, group)">
+                      <div class="perm-toggle">
                         <input
                           type="checkbox"
+                          [id]="'c-' + role.id + '-' + subColumn.key"
                           [disabled]="!isGroupEnabled(role, group)"
-                          [checked]="isSubColumnAllowed(role, subColumn)"
+                          [checked]="isSubColumnAllowed(role, subColumn) && isGroupEnabled(role, group)"
                           (change)="toggleSubColumn(role.id, subColumn, ($any($event.target)).checked)"
                         />
-                      </label>
+                        <label [for]="'c-' + role.id + '-' + subColumn.key" class="checkbox-faux"></label>
+                      </div>
                     </td>
                   }
                 }
               </tr>
             } @empty {
               <tr>
-                <td [attr.colspan]="leafColumnCount() + 3">
+                <td [attr.colspan]="leafColumnCount() + 3" class="empty-state">
                   No hay roles para mostrar.
                 </td>
               </tr>

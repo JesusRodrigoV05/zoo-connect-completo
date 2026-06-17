@@ -15,9 +15,20 @@ import { environment } from '@env';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const allowedHosts = (
-  process.env['NG_ALLOWED_HOSTS'] || 'localhost,127.0.0.1'
-)
+
+/**
+ * Rewrite deep-path hashed assets to root.
+ * Angular build bug: <script src="main-XXXXX.js"> is placed before <base href="/">,
+ * so on deep routes the browser resolves relative script paths incorrectly.
+ * E.g., F5 on /osi/matriz-riesgos requests /osi/main-XXXXX.js instead of /main-XXXXX.js
+ */
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  const m = req.path.match(/\/([\w-]+-[A-Z0-9]{8}\.(?:js|css))$/);
+  if (m) req.url = '/' + m[1];
+  next();
+});
+const allowedHosts = (process.env['NG_ALLOWED_HOSTS'] || 'localhost,127.0.0.1')
   .split(',')
   .map((host) => host.trim())
   .filter(Boolean);
@@ -68,7 +79,10 @@ app.get('/healthz', (_req, res) => {
 });
 
 app.use('/zooconnect', async (req: Request, res: Response) => {
-  const targetUrl = new URL(req.originalUrl, backendInternalUrl.replace(/\/zooconnect\/?$/, ''));
+  const targetUrl = new URL(
+    req.originalUrl,
+    backendInternalUrl.replace(/\/zooconnect\/?$/, ''),
+  );
   const headers = new Headers();
 
   for (const [key, value] of Object.entries(req.headers)) {
@@ -99,7 +113,11 @@ app.use('/zooconnect', async (req: Request, res: Response) => {
 
     res.status(backendResponse.status);
     backendResponse.headers.forEach((value, key) => {
-      if (!['content-encoding', 'transfer-encoding', 'connection'].includes(key.toLowerCase())) {
+      if (
+        !['content-encoding', 'transfer-encoding', 'connection'].includes(
+          key.toLowerCase(),
+        )
+      ) {
         res.setHeader(key, value);
       }
     });
@@ -153,8 +171,9 @@ app.get('/api/generate-quiz', requireAuth, async (req, res) => {
     const topic =
       (req.query['category'] as string) || 'Fauna Silvestre y Conservación';
 
-    const apiKey = (process.env['GEMINI_API_KEY'] || '') as any;
-    const ai = new GoogleGenAI(apiKey);
+    // AJUSTE EXACTO SEGÚN LA DOCUMENTACIÓN OFICIAL DEL SDK UNIFICADO
+    const apiKey = process.env['GEMINI_API_KEY'] || '';
+    const ai = new GoogleGenAI({ vertexai: false, apiKey: apiKey }); // <-- Objeto estructurado
 
     const prompt = `
           Genera un quiz educativo sobre: "${topic}".
@@ -162,7 +181,7 @@ app.get('/api/generate-quiz', requireAuth, async (req, res) => {
         `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-flash', // Tu modelo asignado para los cuestionarios de ZooConnect
       contents: prompt,
       config: {
         systemInstruction: 'Eres un experto zoólogo y educador veterinario.',

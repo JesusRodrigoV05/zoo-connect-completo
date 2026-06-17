@@ -9,60 +9,91 @@
         </p>
       </div>
 
-      <p-button
-        label="Tour guiado"
-        icon="pi pi-question-circle"
-        severity="contrast"
-        [rounded]="true"
-        (onClick)="startGuidedTour()">
-      </p-button>
+      <div class="risk-header-actions">
+        <p-button
+          label="Tour guiado"
+          icon="pi pi-question-circle"
+          severity="contrast"
+          [rounded]="true"
+          (onClick)="startGuidedTour()">
+        </p-button>
 
-      <p-button
-        variant="text"
-        icon="pi pi-refresh"
-        severity="danger"
-        [rounded]="true"
-        styleClass="tour-risk-refresh-btn"
-        pTooltip="Actualizar"
-        tooltipPosition="bottom"
-        (onClick)="loadRows()">
-      </p-button>
-      <button
-        pButton
-        type="button"
-        icon="pi pi-plus"
-        label="Agregar fila"
-        class="tour-risk-add-btn"
-        (click)="addRow()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        icon="pi pi-save"
-        label="Guardar matriz"
-        class="tour-risk-save-btn"
-        [disabled]="saving()"
-        (click)="saveRows()"
-      ></button>
-
-      <div style="display: flex; gap: 0.4rem; align-items: center; margin-left: 0.4rem;">
-        <select #exportFormat class="p-inputtext tour-risk-export-select" style="padding: 0.45rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; background: var(--p-card-background); font-size: 13px; font-family: inherit; color: inherit; cursor: pointer;">
-          <option value="pdf">PDF (.pdf)</option>
-          <option value="xlsx">Excel (.csv)</option>
-          <option value="txt">Texto (.txt)</option>
-          <option value="png">Imagen (.png)</option>
-        </select>
+        <p-button
+          variant="text"
+          icon="pi pi-refresh"
+          severity="danger"
+          [rounded]="true"
+          styleClass="tour-risk-refresh-btn"
+          pTooltip="Actualizar"
+          tooltipPosition="bottom"
+          (onClick)="loadRows()">
+        </p-button>
         <button
           pButton
           type="button"
-          icon="pi pi-download"
-          label="Exportar"
-          severity="secondary"
-          class="tour-risk-export-btn"
-          (click)="exportMatrix(exportFormat.value)"
+          icon="pi pi-plus"
+          label="Agregar fila"
+          class="tour-risk-add-btn"
+          (click)="addRow()"
         ></button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-save"
+          label="Guardar matriz"
+          class="tour-risk-save-btn"
+          [disabled]="saving()"
+          (click)="saveRows()"
+        ></button>
+
+        <div class="export-group">
+          <select #exportFormat class="p-inputtext tour-risk-export-select">
+            <option value="pdf">PDF (.pdf)</option>
+            <option value="xlsx">Excel (.csv)</option>
+            <option value="txt">Texto (.txt)</option>
+            <option value="png">Imagen (.png)</option>
+          </select>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-download"
+            label="Exportar"
+            severity="secondary"
+            class="tour-risk-export-btn"
+            (click)="exportMatrix(exportFormat.value)"
+          ></button>
+        </div>
       </div>
     </header>
+
+    <section class="dashboard-cards">
+      <div class="dashboard-card card-total">
+        <span class="card-label">Riesgos registrados</span>
+        <span class="card-value">{{ totalRisks() }}</span>
+      </div>
+      <div class="dashboard-card card-extreme">
+        <span class="card-label">Riesgos extremos</span>
+        <span class="card-value">{{ extremeCount() }}</span>
+      </div>
+      <div class="dashboard-card card-high-plus">
+        <span class="card-label">Alto o extremo</span>
+        <span class="card-value">{{ highOrAboveCount() }}</span>
+      </div>
+      <div class="dashboard-card card-ineffective" [class.has-issues]="hasIneffectiveControls()">
+        <span class="card-label">Controles ineficaces</span>
+        <span class="card-value">{{ ineffectiveControlCount() }}</span>
+      </div>
+    </section>
+
+    @if (hasIneffectiveControls()) {
+      <div class="alert-banner alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <span>
+          <strong>{{ ineffectiveControlCount() }} control(es) ineficaz(ces)</strong> — el riesgo residual
+          es igual o mayor al inherente. Revisá los controles marcados en naranja.
+        </span>
+      </div>
+    }
 
     <section class="help-panel tour-risk-help" aria-label="Ayuda de valoración de riesgo">
       <div>
@@ -73,15 +104,21 @@
         </p>
       </div>
 
-      <div class="heatmap tour-risk-heatmap" aria-label="Matriz de probabilidad por impacto">
+      <div class="heatmap tour-risk-heatmap" aria-label="Distribución de riesgos por probabilidad e impacto">
         <div class="axis-label y-axis">Probabilidad</div>
         <div class="axis-label x-axis">Impacto</div>
-        @for (probability of scaleValues; track probability) {
-          @for (impact of scaleValues; track impact) {
-            <div class="heat-cell risk-{{ riskClass(probability * impact) }}">
-              {{ probability * impact }}
-            </div>
-          }
+        @for (cell of heatmapData(); track cell.prob + "-" + cell.imp) {
+          <div
+            class="heat-cell data-cell risk-{{ riskClass(cell.prob * cell.imp) }}"
+            [class.has-data]="cell.count > 0"
+            pTooltip="{{ cell.count }} riesgo(s) — P:{{ cell.prob }} I:{{ cell.imp }}"
+            tooltipPosition="top"
+          >
+            <span class="heat-score">{{ cell.prob * cell.imp }}</span>
+            @if (cell.count > 0) {
+              <span class="heat-count">{{ cell.count }}</span>
+            }
+          </div>
         }
       </div>
 
@@ -98,150 +135,166 @@
         <p>Cargando matriz de riesgos...</p>
       </div>
     } @else {
-    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
-      <span class="legend-item bajo">Bajo: {{ riskSummary()["Bajo"] }}</span>
-      <span class="legend-item moderado">Moderado: {{ riskSummary()["Moderado"] }}</span>
-      <span class="legend-item alto">Alto: {{ riskSummary()["Alto"] }}</span>
-      <span class="legend-item extremo">Extremo: {{ riskSummary()["Extremo"] }}</span>
-    </div>
-    <div class="table-shell tour-risk-table">
-      <table class="risk-table">
-        <thead>
-          <tr>
-            <th rowspan="2">No.</th>
-            <th colspan="2">Activos e identificación</th>
-            <th colspan="5">Evaluación del riesgo inherente</th>
-            <th colspan="4">Mitigación</th>
-            <th colspan="4">Riesgo residual</th>
-            <th rowspan="2">Acciones</th>
-          </tr>
-          <tr>
-            <th>Activo de información</th>
-            <th>Amenaza / vulnerabilidad</th>
-            <th>Riesgo y consecuencia</th>
-            <th>Probabilidad</th>
-            <th>Impacto</th>
-            <th>Riesgo inherente</th>
-            <th>Nivel de riesgo</th>
-            <th>Tratamiento del riesgo inherente</th>
-            <th>Controles a implementar</th>
-            <th>Tipo</th>
-            <th>Nivel</th>
-            <th>Frecuencia</th>
-            <th>Probabilidad</th>
-            <th>Impacto</th>
-            <th>Riesgo residual</th>
-            <th>Nivel de riesgo residual</th>
-          </tr>
-        </thead>
+      <div class="toolbar">
+        <div class="filter-group">
+          <input
+            type="search"
+            class="p-inputtext filter-search"
+            placeholder="Buscar activo, amenaza o consecuencia..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+          />
+          <select
+            class="p-inputtext filter-level"
+            [ngModel]="filterLevel()"
+            (ngModelChange)="filterLevel.set($event)"
+          >
+            <option value="">Todos los niveles</option>
+            @for (level of riskLevels; track level) {
+              <option [value]="level">{{ level }}</option>
+            }
+          </select>
+        </div>
+        <span class="result-count">
+          {{ filteredRows().length }} de {{ totalRisks() }} riesgo(s)
+        </span>
+      </div>
 
-        <tbody>
-          @for (row of rows(); track row.id; let index = $index) {
+      <div class="table-shell tour-risk-table">
+        <table class="risk-table">
+          <thead>
             <tr>
-              <td class="number-cell">{{ index + 1 }}</td>
-              <td>
-                <textarea [(ngModel)]="row.asset" rows="2" aria-label="Activo de información"></textarea>
-              </td>
-              <td>
-                <textarea [(ngModel)]="row.threat" rows="2" aria-label="Amenaza o vulnerabilidad"></textarea>
-              </td>
-              <td>
-                <textarea [(ngModel)]="row.consequence" rows="3" aria-label="Riesgo y consecuencia"></textarea>
-              </td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  [(ngModel)]="row.probability"
-                  (ngModelChange)="syncTreatment(row)"
-                  aria-label="Probabilidad inherente"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  [(ngModel)]="row.impact"
-                  (ngModelChange)="syncTreatment(row)"
-                  aria-label="Impacto inherente"
-                />
-              </td>
-              <td class="score-cell">{{ inherentRisk(row) }}</td>
-              <td class="level-cell risk-{{ riskClass(inherentRisk(row)) }}">
-                {{ riskLevel(inherentRisk(row)) }}
-              </td>
-              <td>
-                <select [(ngModel)]="row.treatment" aria-label="Tratamiento del riesgo inherente">
-                  @for (treatment of treatmentsFor(row); track treatment) {
-                    <option [value]="treatment">{{ treatment }}</option>
-                  }
-                </select>
-              </td>
-              <td>
-                <textarea [(ngModel)]="row.control" rows="3" aria-label="Controles a implementar"></textarea>
-              </td>
-              <td>
-                <select [(ngModel)]="row.type" aria-label="Tipo de control">
-                  @for (type of controlTypes; track type.value) {
-                    <option [value]="type.value">{{ type.label }}</option>
-                  }
-                </select>
-              </td>
-              <td>
-                <select [(ngModel)]="row.automationLevel" aria-label="Nivel del control">
-                  @for (level of automationLevels; track level.value) {
-                    <option [value]="level.value">{{ level.label }}</option>
-                  }
-                </select>
-              </td>
-              <td>
-                <select [(ngModel)]="row.frequency" aria-label="Frecuencia del control">
-                  @for (frequency of frequencies; track frequency.value) {
-                    <option [value]="frequency.value">{{ frequency.label }}</option>
-                  }
-                </select>
-              </td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  [(ngModel)]="row.residualProbability"
-                  aria-label="Probabilidad residual"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  [(ngModel)]="row.residualImpact"
-                  aria-label="Impacto residual"
-                />
-              </td>
-              <td class="score-cell">{{ residualScore(row) }}</td>
-              <td class="level-cell risk-{{ riskClass(residualScore(row)) }}">
-                {{ riskLevel(residualScore(row)) }}
-              </td>
-              <td>
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-trash"
-                  severity="danger"
-                  [text]="true"
-                  pTooltip="Eliminar fila"
-                  tooltipPosition="top"
-                  (click)="confirmRemoveRow(row.id)"
-                ></button>
-              </td>
+              <th rowspan="2" class="sort-header" (click)="sortBy(null)">No.</th>
+              <th colspan="2">Activos e identificación</th>
+              <th colspan="5">Evaluación del riesgo inherente</th>
+              <th colspan="5">Mitigación</th>
+              <th colspan="4">Riesgo residual</th>
+              <th rowspan="2">Acciones</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+            <tr>
+              <th class="sort-header" (click)="sortBy('asset')">
+                Activo de información{{ sortIndicator('asset') }}
+              </th>
+              <th class="sort-header" (click)="sortBy('threat')">
+                Amenaza / vulnerabilidad{{ sortIndicator('threat') }}
+              </th>
+              <th>Riesgo y consecuencia</th>
+              <th class="sort-header" (click)="sortBy('probability')">
+                Probabilidad{{ sortIndicator('probability') }}
+              </th>
+              <th class="sort-header" (click)="sortBy('impact')">
+                Impacto{{ sortIndicator('impact') }}
+              </th>
+              <th class="sort-header" (click)="sortBy('inherent')">
+                Riesgo inherente{{ sortIndicator('inherent') }}
+              </th>
+              <th>Nivel de riesgo</th>
+              <th>Tratamiento del riesgo inherente</th>
+              <th>Controles a implementar</th>
+              <th>Tipo</th>
+              <th>Nivel</th>
+              <th>Frecuencia</th>
+              <th>Probabilidad</th>
+              <th>Impacto</th>
+              <th class="sort-header" (click)="sortBy('residual')">
+                Riesgo residual{{ sortIndicator('residual') }}
+              </th>
+              <th>Nivel de riesgo residual</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (row of filteredRows(); track row.id; let index = $index) {
+              <tr
+                class="risk-row"
+                [class.row-ineffective]="isIneffectiveControl(row)"
+              >
+                <td class="number-cell">{{ index + 1 }}</td>
+                <td>
+                  <textarea [(ngModel)]="row.asset" rows="2" aria-label="Activo de información"></textarea>
+                </td>
+                <td>
+                  <textarea [(ngModel)]="row.threat" rows="2" aria-label="Amenaza o vulnerabilidad"></textarea>
+                </td>
+                <td>
+                  <textarea [(ngModel)]="row.consequence" rows="3" aria-label="Riesgo y consecuencia"></textarea>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    [(ngModel)]="row.probability"
+                    (ngModelChange)="syncTreatment(row)"
+                    aria-label="Probabilidad inherente"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    [(ngModel)]="row.impact"
+                    (ngModelChange)="syncTreatment(row)"
+                    aria-label="Impacto inherente"
+                  />
+                </td>
+                <td class="score-cell">{{ inherentRisk(row) }}</td>
+                <td class="level-cell risk-{{ riskClass(inherentRisk(row)) }}">
+                  {{ riskLevel(inherentRisk(row)) }}
+                </td>
+                <td>
+                  <select [(ngModel)]="row.treatment" aria-label="Tratamiento del riesgo inherente">
+                    @for (treatment of treatmentsFor(row); track treatment) {
+                      <option [value]="treatment">{{ treatment }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <textarea [(ngModel)]="row.control" rows="3" aria-label="Controles a implementar"></textarea>
+                </td>
+                <td>
+                  <select [(ngModel)]="row.type" aria-label="Tipo de control">
+                    @for (type of controlTypes; track type.value) {
+                      <option [value]="type.value">{{ type.label }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <select [(ngModel)]="row.automationLevel" aria-label="Nivel del control">
+                    @for (level of automationLevels; track level.value) {
+                      <option [value]="level.value">{{ level.label }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <select [(ngModel)]="row.frequency" aria-label="Frecuencia del control">
+                    @for (frequency of frequencies; track frequency.value) {
+                      <option [value]="frequency.value">{{ frequency.label }}</option>
+                    }
+                  </select>
+                </td>
+                <td class="score-cell">{{ residualScore(row) }}</td>
+                <td class="level-cell risk-{{ riskClass(residualScore(row)) }}">
+                  {{ riskLevel(residualScore(row)) }}
+                </td>
+                <td>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    [text]="true"
+                    pTooltip="Eliminar fila"
+                    tooltipPosition="top"
+                    (click)="confirmRemoveRow(row.id)"
+                  ></button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     }
   </section>
 
