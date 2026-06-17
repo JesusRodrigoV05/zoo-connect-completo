@@ -778,25 +778,7 @@ export default class MatrizRiesgos {
   }
 
   protected addRow(): void {
-    const nextId = Math.max(...this.rows().map((row) => row.id), 0) + 1;
-    this.rows.update((rows) => [
-      ...rows,
-      {
-        id: nextId,
-        asset: "",
-        threat: "",
-        consequence: "",
-        probability: 1,
-        impact: 1,
-        treatment: "Aceptar",
-        control: "",
-        type: "P",
-        automationLevel: "M",
-        frequency: "M",
-        residualProbability: 1,
-        residualImpact: 1,
-      },
-    ]);
+    this.showWizard.set(true);
   }
 
   protected confirmRemoveRow(rowId: number): void {

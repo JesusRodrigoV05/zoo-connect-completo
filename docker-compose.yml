@@ -41,22 +41,22 @@ services:
     networks:
       - zoo_network
 
-  # frontend:
-  #   build:
-  #     context: ./zoo-frontend
-  #     dockerfile: Dockerfile
-  #   container_name: zoo-frontend
-  #   restart: always
-  #   environment:
-  #     - BACKEND_INTERNAL_URL=http://backend:8000/zooconnect
-  #   env_file:
-  #     - ./zoo-frontend/.env
-  #   ports:
-  #     - "4200:4200"
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - zoo_network
+  frontend:
+    build:
+      context: ./zoo-frontend
+      dockerfile: Dockerfile
+    container_name: zoo-frontend
+    restart: always
+    environment:
+      - BACKEND_INTERNAL_URL=http://backend:8000/zooconnect
+    env_file:
+      - ./zoo-frontend/.env
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+    networks:
+      - zoo_network
 
 networks:
   zoo_network:
