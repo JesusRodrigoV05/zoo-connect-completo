@@ -1,18 +1,17 @@
 {
   "name": "zoo-connect-web",
   "version": "0.0.0",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
     "build:vercel": "ng build",
-    "postbuild": "node scripts/fix-html.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr": "bun dist/zoo-connect-web/server/server.mjs"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^21.2.14",
     "@angular/cdk": "^21.2.12",
@@ -62,3 +61,4 @@
     "typescript": "~5.9.3"
   }
 }
+
