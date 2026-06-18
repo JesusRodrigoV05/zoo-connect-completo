@@ -1,6 +1,6 @@
 """risk controls methodology
 
-Revision ID: 20260617_risk_controls_methodology
+Revision ID: 20260617_risk_controls
 Revises: 856e3d2521dd
 Create Date: 2026-06-17 22:00:00.000000
 
@@ -11,7 +11,7 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = "20260617_risk_controls_methodology"
+revision: str = "20260617_risk_controls"
 down_revision: Union[str, Sequence[str], None] = "856e3d2521dd"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

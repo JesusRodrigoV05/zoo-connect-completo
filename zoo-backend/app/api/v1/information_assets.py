@@ -20,6 +20,11 @@ router = APIRouter()
     response_model=List[InformationAssetOut],
     dependencies=[Depends(require_permission(PermissionCode.RISK_MATRIX_ACCESS))],
 )
+@router.get(
+    "",
+    response_model=List[InformationAssetOut],
+    dependencies=[Depends(require_permission(PermissionCode.RISK_MATRIX_ACCESS))],
+)
 def list_information_assets(db: Session = Depends(get_db)):
     """Lista todos los activos de información registrados."""
     crud_assets.sync_assets_from_sources(db)
@@ -27,6 +32,11 @@ def list_information_assets(db: Session = Depends(get_db)):
 
 @router.post(
     "/",
+    response_model=InformationAssetOut,
+    dependencies=[Depends(require_permission(PermissionCode.RISK_MATRIX_ACCESS))],
+)
+@router.post(
+    "",
     response_model=InformationAssetOut,
     dependencies=[Depends(require_permission(PermissionCode.RISK_MATRIX_ACCESS))],
 )
