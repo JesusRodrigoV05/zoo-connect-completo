@@ -4,7 +4,7 @@ from app.models.tarea import TipoTarea
 from app.models.inventario import TipoSalida
 from app.models.role import Role
 from app.crud.permission import ensure_permissions_catalog, ensure_role_permissions
-from app.crud.information_asset import sync_assets_from_permissions
+from app.crud.information_asset import sync_assets_from_sources
 
 def init_db():
     db = SessionLocal()
@@ -70,6 +70,7 @@ def init_db():
         print("4. Verificando Permisos...")
         ensure_permissions_catalog(db)
         ensure_role_permissions(db)
+        sync_assets_from_sources(db)
 
         db.commit()
         print("--- Datos cargados exitosamente ---")

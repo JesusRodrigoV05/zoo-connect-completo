@@ -1,8 +1,10 @@
 from typing import Iterable, List
 
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.models.risk_control import RiskControl
 from app.models.risk_matrix import RiskMatrixEntry
 from app.schemas.risk_matrix import RiskMatrixEntryCreate, RiskMatrixEntryUpdate
 from app.services.risk_validator import validate_risk_entry
@@ -10,7 +12,12 @@ from app.crud.information_asset import get_asset
 
 
 def list_entries(db: Session) -> List[RiskMatrixEntry]:
-    return db.query(RiskMatrixEntry).order_by(RiskMatrixEntry.id).all()
+    return (
+        db.query(RiskMatrixEntry)
+        .options(joinedload(RiskMatrixEntry.controls))
+        .order_by(RiskMatrixEntry.id)
+        .all()
+    )
 
 
 def _validate_asset(db: Session, asset_id: int | None):
@@ -27,11 +34,13 @@ def create_entry(
 ) -> RiskMatrixEntry:
     validate_risk_entry(entry_in)
     _validate_asset(db, entry_in.information_asset_id)
+    data = entry_in.model_dump(exclude={"controls"})
     entry = RiskMatrixEntry(
-        **entry_in.model_dump(),
+        **data,
         created_by_id=user_id,
         updated_by_id=user_id,
     )
+    entry.controls = [RiskControl(**control.model_dump()) for control in entry_in.controls]
     db.add(entry)
     db.commit()
     db.refresh(entry)
@@ -43,20 +52,26 @@ def replace_entries(
     entries_in: Iterable[RiskMatrixEntryCreate],
     user_id: str | None = None,
 ) -> List[RiskMatrixEntry]:
+    entries_payload = list(entries_in)
     # Validate all entries before replacing
-    for entry_in in entries_in:
+    for entry_in in entries_payload:
         validate_risk_entry(entry_in)
         _validate_asset(db, entry_in.information_asset_id)
 
     try:
+        db.query(RiskControl).delete()
         db.query(RiskMatrixEntry).delete()
         entries = [
             RiskMatrixEntry(
-                **entry_in.model_dump(),
+                **entry_in.model_dump(exclude={"controls"}),
                 created_by_id=user_id,
                 updated_by_id=user_id,
+                controls=[
+                    RiskControl(**control.model_dump())
+                    for control in entry_in.controls
+                ],
             )
-            for entry_in in entries_in
+            for entry_in in entries_payload
         ]
         db.add_all(entries)
         db.commit()
@@ -79,9 +94,11 @@ def update_entry(
     if not entry:
         return None
 
-    for field, value in entry_in.model_dump().items():
+    data = entry_in.model_dump(exclude={"controls"})
+    for field, value in data.items():
         setattr(entry, field, value)
     entry.updated_by_id = user_id
+    entry.controls = [RiskControl(**control.model_dump()) for control in entry_in.controls]
 
     db.commit()
     db.refresh(entry)

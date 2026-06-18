@@ -1,6 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.information_asset import InformationAsset
+from app.models.inventario import Producto
 from app.schemas.information_asset import InformationAssetCreate, InformationAssetUpdate
 
 def list_assets(db: Session) -> List[InformationAsset]:
@@ -78,3 +79,38 @@ def sync_assets_from_permissions(db: Session) -> None:
         db.add(new_asset)
     
     db.commit()
+
+
+def sync_assets_from_inventory_products(db: Session) -> None:
+    """Sincroniza productos activos del inventario como activos de informacion."""
+    products = (
+        db.query(Producto)
+        .filter(Producto.is_active.is_(True))
+        .order_by(Producto.nombre_producto)
+        .all()
+    )
+
+    for product in products:
+        name = f"Inventario: {product.nombre_producto}"
+        existing = db.query(InformationAsset).filter(InformationAsset.name == name).first()
+        if existing:
+            continue
+
+        db.add(
+            InformationAsset(
+                name=name,
+                description=product.descripcion_producto
+                or "Producto activo del inventario operativo.",
+                category="Inventario / Producto",
+                confidentiality=2,
+                integrity=4,
+                availability=3,
+            )
+        )
+
+    db.commit()
+
+
+def sync_assets_from_sources(db: Session) -> None:
+    sync_assets_from_permissions(db)
+    sync_assets_from_inventory_products(db)

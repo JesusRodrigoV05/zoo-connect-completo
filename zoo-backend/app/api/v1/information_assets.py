@@ -22,6 +22,7 @@ router = APIRouter()
 )
 def list_information_assets(db: Session = Depends(get_db)):
     """Lista todos los activos de información registrados."""
+    crud_assets.sync_assets_from_sources(db)
     return crud_assets.list_assets(db)
 
 @router.post(

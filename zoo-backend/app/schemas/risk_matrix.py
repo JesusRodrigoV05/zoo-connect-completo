@@ -1,23 +1,27 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, conint
+
+from app.schemas.risk_control import RiskControlCreate, RiskControlOut
+
+
+RiskScore = conint(strict=True, ge=1, le=5)
 
 
 class RiskMatrixEntryBase(BaseModel):
     information_asset_id: Optional[int] = None
     asset: str = ""
     threat: str = ""
+    vulnerability: str = ""
+    risk_event: str = ""
     consequence: str = ""
-    probability: int = Field(1, ge=1, le=5)
-    impact: int = Field(1, ge=1, le=5)
+    probability: RiskScore = 1
+    impact: RiskScore = 1
     treatment: str = "Aceptar"
-    control: str = ""
-    control_type: str = Field("P", pattern="^(P|D|C|Di)$")
-    automation_level: str = Field("M", pattern="^(A|S|M)$")
-    frequency: str = Field("M", pattern="^(D|S|M|A|PT|m|s)$")
-    residual_probability: int = Field(1, ge=1, le=5)
-    residual_impact: int = Field(1, ge=1, le=5)
+    residual_probability: RiskScore = 1
+    residual_impact: RiskScore = 1
+    controls: list[RiskControlCreate] = Field(default_factory=list)
 
 
 class RiskMatrixEntryCreate(RiskMatrixEntryBase):
@@ -30,6 +34,7 @@ class RiskMatrixEntryUpdate(RiskMatrixEntryBase):
 
 class RiskMatrixEntryOut(RiskMatrixEntryBase):
     id: int
+    controls: list[RiskControlOut] = Field(default_factory=list)
     created_by_id: Optional[str] = None
     updated_by_id: Optional[str] = None
     created_at: datetime

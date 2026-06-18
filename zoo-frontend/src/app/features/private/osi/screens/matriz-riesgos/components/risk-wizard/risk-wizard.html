@@ -2,31 +2,32 @@
   <p-stepper [value]="activeStep()">
     <p-step-list>
       <p-step [value]="1">Activo</p-step>
-      <p-step [value]="2">Amenaza</p-step>
-      <p-step [value]="3">Valoración</p-step>
-      <p-step [value]="4">Mitigación</p-step>
+      <p-step [value]="2">Riesgo</p-step>
+      <p-step [value]="3">Inherente</p-step>
+      <p-step [value]="4">Control</p-step>
+      <p-step [value]="5">Residual</p-step>
     </p-step-list>
 
     <p-step-panels>
       <p-step-panel [value]="1">
         <div class="step-content">
-          <h3>Paso 1: Seleccione el activo a proteger</h3>
-          <p class="step-desc">El inventario OSI define qué estamos protegiendo.</p>
-          
+          <h3>Paso 1: Selecciona el activo</h3>
+          <p class="step-desc">El listado incluye activos OSI, productos del inventario y modulos del sistema.</p>
+
           <div class="asset-selection">
-            <p-listbox 
-              [options]="assets()" 
-              [ngModel]="selectedAssetId()" 
+            <p-listbox
+              [options]="assets()"
+              [ngModel]="selectedAssetId()"
               (ngModelChange)="onAssetSelect($event)"
-              optionLabel="name" 
+              optionLabel="name"
               optionValue="id"
               [filter]="true"
-              [listStyle]="{'max-height': '300px'}"
+              [listStyle]="{ 'max-height': '300px' }"
               styleClass="w-full">
               <ng-template let-asset pTemplate="item">
                 <div class="asset-item">
-                  <span class="font-bold">{{asset.name}}</span>
-                  <span class="text-sm text-gray-500">({{asset.category}})</span>
+                  <span class="font-bold">{{ asset.name }}</span>
+                  <span class="text-sm text-gray-500">({{ asset.category }})</span>
                 </div>
               </ng-template>
             </p-listbox>
@@ -41,64 +42,72 @@
 
       <p-step-panel [value]="2">
         <div class="step-content">
-          <h3>Paso 2: Análisis de Amenazas e Incidentes</h3>
-          
+          <h3>Paso 2: Amenaza, vulnerabilidad y evento</h3>
+
           @if (loadingIncidents()) {
-            <p>Buscando incidentes relacionados en auditoría...</p>
+            <p>Buscando incidentes relacionados en auditoria...</p>
           } @else if (incidents().length > 0) {
             <div class="incidents-found alert-info">
               <i class="pi pi-info-circle"></i>
-              <span>Se encontraron {{incidents().length}} incidentes de seguridad relacionados con este activo.</span>
+              <span>Se encontraron {{ incidents().length }} incidentes relacionados con este activo.</span>
             </div>
           } @else {
             <div class="incidents-not-found alert-warn">
               <i class="pi pi-check-circle"></i>
-              <span>No se detectaron incidentes recientes en los logs para este activo.</span>
+              <span>No se detectaron incidentes recientes para este activo.</span>
             </div>
           }
 
           <div class="form-grid">
             <div class="field">
-              <label>Amenaza / Vulnerabilidad</label>
-              <textarea pTextarea [(ngModel)]="threat" rows="2" class="w-full" placeholder="Ej: Usurpación de identidad por fuerza bruta"></textarea>
+              <label>Amenaza</label>
+              <textarea pTextarea [(ngModel)]="threat" rows="2" class="w-full" placeholder="Ej: Usurpacion de identidad"></textarea>
             </div>
             <div class="field">
-              <label>Riesgo y Consecuencia</label>
-              <textarea pTextarea [(ngModel)]="consequence" rows="2" class="w-full" placeholder="Ej: Pérdida de integridad de los datos de permisos"></textarea>
+              <label>Vulnerabilidad</label>
+              <textarea pTextarea [(ngModel)]="vulnerability" rows="2" class="w-full" placeholder="Ej: Credenciales debiles o MFA ausente"></textarea>
+            </div>
+            <div class="field">
+              <label>Evento de riesgo</label>
+              <textarea pTextarea [(ngModel)]="riskEvent" rows="2" class="w-full" placeholder="Ej: Acceso no autorizado y eliminacion de registros"></textarea>
+            </div>
+            <div class="field">
+              <label>Consecuencia</label>
+              <textarea pTextarea [(ngModel)]="consequence" rows="2" class="w-full" placeholder="Ej: Perdida de productividad y afectacion a clientes"></textarea>
             </div>
           </div>
 
           <div class="step-actions">
             <p-button label="Anterior" severity="secondary" (onClick)="activeStep.set(1)"></p-button>
-            <p-button label="Siguiente" [disabled]="!threat()" (onClick)="activeStep.set(3)"></p-button>
+            <p-button label="Siguiente" [disabled]="!threat() || !riskEvent()" (onClick)="activeStep.set(3)"></p-button>
           </div>
         </div>
       </p-step-panel>
 
       <p-step-panel [value]="3">
         <div class="step-content">
-          <h3>Paso 3: Evaluación de Riesgo Inherente</h3>
-          
+          <h3>Paso 3: Riesgo inherente</h3>
+
           <div class="risk-assessment">
             <div class="slider-field">
               <div class="flex justify-between">
-                <label>Probabilidad: {{probability()}}</label>
-                <span class="text-sm">Frecuencia de la amenaza</span>
+                <label>Probabilidad: {{ probability() }}</label>
+                <span class="text-sm">Valor entre 1 y 5</span>
               </div>
-              <p-slider [(ngModel)]="probability" [min]="1" [max]="5"></p-slider>
+              <p-slider [(ngModel)]="probability" [min]="1" [max]="5" [step]="1"></p-slider>
             </div>
 
             <div class="slider-field">
               <div class="flex justify-between">
-                <label>Impacto: {{impact()}}</label>
-                <span class="text-sm">Severidad si ocurre</span>
+                <label>Impacto: {{ impact() }}</label>
+                <span class="text-sm">Valor entre 1 y 5</span>
               </div>
-              <p-slider [(ngModel)]="impact" [min]="1" [max]="5"></p-slider>
+              <p-slider [(ngModel)]="impact" [min]="1" [max]="5" [step]="1"></p-slider>
             </div>
 
-            <div class="risk-result card-{{riskLevel.toLowerCase()}}">
-              <div class="score">{{riskScore}}</div>
-              <div class="level">Nivel de Riesgo: {{riskLevel}}</div>
+            <div class="risk-result card-{{ riskLevel.toLowerCase() }}">
+              <div class="score">{{ riskScore }}</div>
+              <div class="level">Nivel de riesgo: {{ riskLevel }}</div>
             </div>
           </div>
 
@@ -111,44 +120,73 @@
 
       <p-step-panel [value]="4">
         <div class="step-content">
-          <h3>Paso 4: Controles y Mitigación</h3>
-          
+          <h3>Paso 4: Control inicial</h3>
+
           <div class="form-grid">
             <div class="field">
-              <label>Tratamiento Sugerido</label>
-              <p-select 
-                [options]="['Aceptar', 'Reducir o Mitigar', 'Evitar o Eliminar', 'Compartir o Transferir']" 
-                [(ngModel)]="treatment" 
+              <label>Tratamiento</label>
+              <p-select
+                [options]="['Aceptar', 'Reducir o Mitigar', 'Evitar o Eliminar', 'Compartir o Transferir']"
+                [(ngModel)]="treatment"
                 styleClass="w-full">
               </p-select>
             </div>
-
             <div class="field">
-              <label>Controles a Implementar</label>
-              <textarea pTextarea [(ngModel)]="control" rows="3" class="w-full" placeholder="Ej: Implementar MFA y bloqueo de cuentas tras 3 intentos"></textarea>
+              <label>Descripcion del control</label>
+              <textarea pTextarea [(ngModel)]="control" rows="3" class="w-full" placeholder="Ej: MFA y bloqueo de cuentas tras intentos fallidos"></textarea>
             </div>
-
             <div class="field-group">
               <div class="field">
                 <label>Tipo</label>
                 <p-select [options]="controlTypes" [(ngModel)]="controlType" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
               </div>
               <div class="field">
-                <label>Nivel</label>
-                <p-select 
-                  [options]="[{label:'Automático', value:'A'}, {label:'Semiautomático', value:'S'}, {label:'Manual', value:'M'}]" 
-                  [(ngModel)]="automationLevel" 
-                  optionLabel="label" 
-                  optionValue="value" 
-                  styleClass="w-full">
-                </p-select>
+                <label>Implementacion</label>
+                <p-select [options]="automationLevels" [(ngModel)]="automationLevel" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+              </div>
+              <div class="field">
+                <label>Frecuencia</label>
+                <p-select [options]="frequencies" [(ngModel)]="frequency" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
               </div>
             </div>
           </div>
 
           <div class="step-actions">
             <p-button label="Anterior" severity="secondary" (onClick)="activeStep.set(3)"></p-button>
-            <p-button label="Generar Matriz" icon="pi pi-check" severity="success" (onClick)="finish()"></p-button>
+            <p-button label="Siguiente" (onClick)="activeStep.set(5)"></p-button>
+          </div>
+        </div>
+      </p-step-panel>
+
+      <p-step-panel [value]="5">
+        <div class="step-content">
+          <h3>Paso 5: Riesgo residual</h3>
+          <p class="step-desc">Selecciona los valores finales despues de considerar los controles.</p>
+
+          <div class="risk-assessment">
+            <div class="slider-field">
+              <div class="flex justify-between">
+                <label>Probabilidad residual: {{ residualProbability() }}</label>
+                <span class="text-sm">Minimo 1</span>
+              </div>
+              <p-slider [(ngModel)]="residualProbability" [min]="1" [max]="5" [step]="1"></p-slider>
+            </div>
+            <div class="slider-field">
+              <div class="flex justify-between">
+                <label>Impacto residual: {{ residualImpact() }}</label>
+                <span class="text-sm">Minimo 1</span>
+              </div>
+              <p-slider [(ngModel)]="residualImpact" [min]="1" [max]="5" [step]="1"></p-slider>
+            </div>
+            <div class="risk-result card-{{ residualLevel.toLowerCase() }}">
+              <div class="score">{{ residualScore }}</div>
+              <div class="level">Nivel residual: {{ residualLevel }}</div>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <p-button label="Anterior" severity="secondary" (onClick)="activeStep.set(4)"></p-button>
+            <p-button label="Crear riesgo" icon="pi pi-check" severity="success" (onClick)="finish()"></p-button>
           </div>
         </div>
       </p-step-panel>

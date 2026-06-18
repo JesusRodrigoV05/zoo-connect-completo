@@ -70,6 +70,14 @@ app = FastAPI(
     version="5.0.0",
 )
 
+@app.get("/")
+async def root():
+    return {"message": "ZooConnect API is running", "docs": "/docs", "version": "5.0.0"}
+
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ok"}
+
 # Log de orígenes permitidos para depuración en Render
 logger.info("Configurando CORS con orígenes: %s", settings.CORS_ORIGINS)
 

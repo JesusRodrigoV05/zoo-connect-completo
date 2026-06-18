@@ -1,6 +1,7 @@
 from .user import User
 from .role import Role
 from .risk_matrix import RiskMatrixEntry
+from .risk_control import RiskControl
 from .information_asset import InformationAsset
 from .permission import Permission
 from .role_permission import RolePermission
