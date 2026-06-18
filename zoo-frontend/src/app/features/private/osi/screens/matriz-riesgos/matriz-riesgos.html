@@ -540,32 +540,6 @@
         Descripcion
         <textarea rows="3" [(ngModel)]="currentAsset.description"></textarea>
       </label>
-      <div class="asset-score-grid">
-        <label>
-          Confidencialidad
-          <select [(ngModel)]="currentAsset.confidentiality">
-            @for (value of scaleValues; track value) {
-              <option [ngValue]="value">{{ value }}</option>
-            }
-          </select>
-        </label>
-        <label>
-          Integridad
-          <select [(ngModel)]="currentAsset.integrity">
-            @for (value of scaleValues; track value) {
-              <option [ngValue]="value">{{ value }}</option>
-            }
-          </select>
-        </label>
-        <label>
-          Disponibilidad
-          <select [(ngModel)]="currentAsset.availability">
-            @for (value of scaleValues; track value) {
-              <option [ngValue]="value">{{ value }}</option>
-            }
-          </select>
-        </label>
-      </div>
     </div>
     <ng-template pTemplate="footer">
       <p-button label="Cancelar" icon="pi pi-times" [text]="true" (onClick)="showAssetDialog.set(false)"></p-button>
