@@ -27,6 +27,10 @@ jobs:
             git fetch origin Presentacion-Seguridad
             git reset --hard origin/Presentacion-Seguridad
 
+            docker builder prune -af
+            docker image prune -af
+            docker container prune -f
+
             docker compose up -d --build
       - name: Configurar credenciales de AWS
         uses: aws-actions/configure-aws-credentials@v4

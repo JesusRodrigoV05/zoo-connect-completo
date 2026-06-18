@@ -20,10 +20,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
 RUN addgroup --system appuser && adduser --system --ingroup appuser appuser
+COPY --chown=appuser:appuser . .
 RUN mkdir -p /app/temp_keys /app/.cache/fontconfig \
-    && chown -R appuser:appuser /app \
+    && chown appuser:appuser /app/temp_keys /app/.cache /app/.cache/fontconfig \
     && chmod 700 /app/temp_keys
 USER appuser
 EXPOSE 8000
