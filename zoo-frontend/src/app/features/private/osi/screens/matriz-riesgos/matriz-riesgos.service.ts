@@ -31,7 +31,15 @@ export interface RiskMatrixEntryPayload {
   treatment: string;
   residual_probability: number;
   residual_impact: number;
-  controls: RiskControlPayload[];
+  controls?: RiskControlPayload[];
+  /** @deprecated Use controls[].description instead. Kept to avoid stale dev-server payload failures. */
+  control?: string;
+  /** @deprecated Use controls[].control_type instead. */
+  control_type?: string;
+  /** @deprecated Use controls[].automation_level instead. */
+  automation_level?: string;
+  /** @deprecated Use controls[].frequency instead. */
+  frequency?: string;
 }
 
 export interface RiskControlDto {
@@ -61,20 +69,49 @@ export class RiskMatrixService {
   }
 
   create(entry: RiskMatrixEntryPayload): Observable<RiskMatrixEntryDto> {
-    return this.http.post<RiskMatrixEntryDto>(this.url, entry);
+    return this.http.post<RiskMatrixEntryDto>(this.url, this.normalizePayload(entry));
   }
 
   update(id: number, entry: RiskMatrixEntryPayload): Observable<RiskMatrixEntryDto> {
-    return this.http.put<RiskMatrixEntryDto>(`${this.url}/${id}`, entry);
+    return this.http.put<RiskMatrixEntryDto>(`${this.url}/${id}`, this.normalizePayload(entry));
   }
 
   replaceAll(entries: RiskMatrixEntryPayload[]): Observable<RiskMatrixEntryDto[]> {
-    return this.http.put<RiskMatrixEntryDto[]>(this.url, entries).pipe(
+    return this.http.put<RiskMatrixEntryDto[]>(this.url, entries.map((entry) => this.normalizePayload(entry))).pipe(
       map((items) => items.sort((a, b) => a.id - b.id)),
     );
   }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
+  private normalizePayload(entry: RiskMatrixEntryPayload): RiskMatrixEntryPayload {
+    const legacyControl = entry.control?.trim();
+    const controls = entry.controls?.length
+      ? entry.controls
+      : legacyControl
+        ? [
+            {
+              description: legacyControl,
+              control_type: entry.control_type || "P",
+              automation_level: entry.automation_level || "A",
+              frequency: entry.frequency || "PT",
+            },
+          ]
+        : [];
+
+    const {
+      control,
+      control_type,
+      automation_level,
+      frequency,
+      ...payload
+    } = entry;
+
+    return {
+      ...payload,
+      controls,
+    };
   }
 }
