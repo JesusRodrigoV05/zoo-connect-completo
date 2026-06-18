@@ -2,10 +2,11 @@
   <section class="risk-page">
     <header class="risk-header tour-risk-header">
       <div>
-        <p class="eyebrow">Seguridad de la información</p>
-        <h1>Matriz de análisis de riesgos</h1>
+        <p class="eyebrow">Seguridad de la informacion</p>
+        <h1>Matriz de analisis de riesgos</h1>
         <p>
-          Registra activos, amenazas, controles y riesgo residual con cálculo automático de nivel.
+          Registra activos, amenazas, vulnerabilidades, eventos de riesgo,
+          controles y riesgo residual con calculo automatico de nivel.
         </p>
       </div>
 
@@ -17,7 +18,6 @@
           [rounded]="true"
           (onClick)="startGuidedTour()">
         </p-button>
-
         <p-button
           variant="text"
           icon="pi pi-refresh"
@@ -26,16 +26,16 @@
           styleClass="tour-risk-refresh-btn"
           pTooltip="Actualizar"
           tooltipPosition="bottom"
-          (onClick)="loadRows()">
+          (onClick)="loadRows(); loadAssets()">
         </p-button>
         <button
           pButton
           type="button"
           icon="pi pi-plus"
-          label="Agregar fila"
+          label="Agregar riesgo"
           class="tour-risk-add-btn"
-          (click)="addRow()"
-        ></button>
+          (click)="showWizard.set(true)">
+        </button>
         <button
           pButton
           type="button"
@@ -43,9 +43,8 @@
           label="Guardar matriz"
           class="tour-risk-save-btn"
           [disabled]="saving()"
-          (click)="saveRows()"
-        ></button>
-
+          (click)="saveRows()">
+        </button>
         <div class="export-group">
           <select #exportFormat class="p-inputtext tour-risk-export-select">
             <option value="pdf">PDF (.pdf)</option>
@@ -60,8 +59,8 @@
             label="Exportar"
             severity="secondary"
             class="tour-risk-export-btn"
-            (click)="exportMatrix(exportFormat.value)"
-          ></button>
+            (click)="exportMatrix(exportFormat.value)">
+          </button>
         </div>
       </div>
     </header>
@@ -79,41 +78,40 @@
         <span class="card-label">Alto o extremo</span>
         <span class="card-value">{{ highOrAboveCount() }}</span>
       </div>
-      <div class="dashboard-card card-ineffective" [class.has-issues]="hasIneffectiveControls()">
-        <span class="card-label">Controles ineficaces</span>
-        <span class="card-value">{{ ineffectiveControlCount() }}</span>
+      <div class="dashboard-card card-ineffective" [class.has-issues]="hasPendingControls()">
+        <span class="card-label">Sin controles</span>
+        <span class="card-value">{{ pendingControlsCount() }}</span>
       </div>
     </section>
 
-    @if (hasIneffectiveControls()) {
+    @if (hasPendingControls()) {
       <div class="alert-banner alert-warning">
         <i class="pi pi-exclamation-triangle alert-icon"></i>
         <span>
-          <strong>{{ ineffectiveControlCount() }} control(es) ineficaz(ces)</strong> — el riesgo residual
-          es igual o mayor al inherente. Revisá los controles marcados en naranja.
+          <strong>{{ pendingControlsCount() }} riesgo(s) sin controles</strong>.
+          La metodologia permite registrarlos primero y evaluar controles despues.
         </span>
       </div>
     }
 
-    <section class="help-panel tour-risk-help" aria-label="Ayuda de valoración de riesgo">
+    <section class="help-panel tour-risk-help" aria-label="Ayuda de valoracion de riesgo">
       <div>
-        <h2>Ayuda de cálculo</h2>
+        <h2>Metodo de calculo</h2>
         <p>
-          El nivel se calcula multiplicando probabilidad por impacto. Bajo: 1-4,
-          Moderado: 5-9, Alto: 10-19, Extremo: 20 o más.
+          Riesgo inherente y residual se calculan multiplicando probabilidad por
+          impacto. Bajo: 1-4, Moderado: 5-9, Alto: 10-19, Extremo: 20 o mas.
         </p>
       </div>
 
-      <div class="heatmap tour-risk-heatmap" aria-label="Distribución de riesgos por probabilidad e impacto">
+      <div class="heatmap tour-risk-heatmap" aria-label="Distribucion de riesgos por probabilidad e impacto">
         <div class="axis-label y-axis">Probabilidad</div>
         <div class="axis-label x-axis">Impacto</div>
         @for (cell of heatmapData(); track cell.prob + "-" + cell.imp) {
           <div
             class="heat-cell data-cell risk-{{ riskClass(cell.prob * cell.imp) }}"
             [class.has-data]="cell.count > 0"
-            pTooltip="{{ cell.count }} riesgo(s) — P:{{ cell.prob }} I:{{ cell.imp }}"
-            tooltipPosition="top"
-          >
+            pTooltip="{{ cell.count }} riesgo(s) - P:{{ cell.prob }} I:{{ cell.imp }}"
+            tooltipPosition="top">
             <span class="heat-score">{{ cell.prob * cell.imp }}</span>
             @if (cell.count > 0) {
               <span class="heat-count">{{ cell.count }}</span>
@@ -130,6 +128,19 @@
       </div>
     </section>
 
+    <nav class="risk-tabs" aria-label="Opciones de matriz de riesgos">
+      @for (tab of tabs; track tab.key) {
+        <button
+          type="button"
+          class="risk-tab"
+          [class.active]="activeTab() === tab.key"
+          (click)="activeTab.set(tab.key)">
+          <i [class]="tab.icon"></i>
+          <span>{{ tab.label }}</span>
+        </button>
+      }
+    </nav>
+
     @if (loading()) {
       <div class="loading-state">
         <p>Cargando matriz de riesgos...</p>
@@ -140,194 +151,364 @@
           <input
             type="search"
             class="p-inputtext filter-search"
-            placeholder="Buscar activo, amenaza o consecuencia..."
+            placeholder="Buscar activo, amenaza, evento o control..."
             [ngModel]="searchQuery()"
-            (ngModelChange)="searchQuery.set($event)"
-          />
+            (ngModelChange)="searchQuery.set($event)" />
           <select
             class="p-inputtext filter-level"
             [ngModel]="filterLevel()"
-            (ngModelChange)="filterLevel.set($event)"
-          >
+            (ngModelChange)="filterLevel.set($event)">
             <option value="">Todos los niveles</option>
-            @for (level of riskLevels; track level) {
-              <option [value]="level">{{ level }}</option>
-            }
+            <option value="Extremo">Extremo</option>
+            <option value="Alto">Alto</option>
+            <option value="Moderado">Moderado</option>
+            <option value="Bajo">Bajo</option>
           </select>
         </div>
-        <span class="result-count">
-          {{ filteredRows().length }} de {{ totalRisks() }} riesgo(s)
-        </span>
+        <span class="result-count">{{ filteredRows().length }} de {{ totalRisks() }} riesgo(s)</span>
       </div>
 
-      <div class="table-shell tour-risk-table">
-        <table class="risk-table">
-          <thead>
-            <tr>
-              <th rowspan="2" class="sort-header" (click)="sortBy(null)">No.</th>
-              <th colspan="2">Activos e identificación</th>
-              <th colspan="5">Evaluación del riesgo inherente</th>
-              <th colspan="5">Mitigación</th>
-              <th colspan="4">Riesgo residual</th>
-              <th rowspan="2">Acciones</th>
-            </tr>
-            <tr>
-              <th class="sort-header" (click)="sortBy('asset')">
-                Activo de información{{ sortIndicator('asset') }}
-              </th>
-              <th class="sort-header" (click)="sortBy('threat')">
-                Amenaza / vulnerabilidad{{ sortIndicator('threat') }}
-              </th>
-              <th>Riesgo y consecuencia</th>
-              <th class="sort-header" (click)="sortBy('probability')">
-                Probabilidad{{ sortIndicator('probability') }}
-              </th>
-              <th class="sort-header" (click)="sortBy('impact')">
-                Impacto{{ sortIndicator('impact') }}
-              </th>
-              <th class="sort-header" (click)="sortBy('inherent')">
-                Riesgo inherente{{ sortIndicator('inherent') }}
-              </th>
-              <th>Nivel de riesgo</th>
-              <th>Tratamiento del riesgo inherente</th>
-              <th>Controles a implementar</th>
-              <th>Tipo</th>
-              <th>Nivel</th>
-              <th>Frecuencia</th>
-              <th>Probabilidad</th>
-              <th>Impacto</th>
-              <th class="sort-header" (click)="sortBy('residual')">
-                Riesgo residual{{ sortIndicator('residual') }}
-              </th>
-              <th>Nivel de riesgo residual</th>
-            </tr>
-          </thead>
+      @switch (activeTab()) {
+        @case ("assets") {
+          <section class="tab-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Activos de informacion</h2>
+                <p>Incluye productos activos del inventario y modulos del sistema sincronizados por backend.</p>
+              </div>
+              <button pButton type="button" icon="pi pi-plus" label="Nuevo activo" (click)="openAssetDialog()"></button>
+            </div>
 
-          <tbody>
-            @for (row of filteredRows(); track row.id; let index = $index) {
-              <tr
-                class="risk-row"
-                [class.row-ineffective]="isIneffectiveControl(row)"
-              >
-                <td class="number-cell">{{ index + 1 }}</td>
-                <td>
-                  <textarea [(ngModel)]="row.asset" rows="2" aria-label="Activo de información"></textarea>
-                </td>
-                <td>
-                  <textarea [(ngModel)]="row.threat" rows="2" aria-label="Amenaza o vulnerabilidad"></textarea>
-                </td>
-                <td>
-                  <textarea [(ngModel)]="row.consequence" rows="3" aria-label="Riesgo y consecuencia"></textarea>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    [(ngModel)]="row.probability"
-                    (ngModelChange)="syncTreatment(row)"
-                    aria-label="Probabilidad inherente"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    [(ngModel)]="row.impact"
-                    (ngModelChange)="syncTreatment(row)"
-                    aria-label="Impacto inherente"
-                  />
-                </td>
-                <td class="score-cell">{{ inherentRisk(row) }}</td>
-                <td class="level-cell risk-{{ riskClass(inherentRisk(row)) }}">
-                  {{ riskLevel(inherentRisk(row)) }}
-                </td>
-                <td>
-                  <select [(ngModel)]="row.treatment" aria-label="Tratamiento del riesgo inherente">
-                    @for (treatment of treatmentsFor(row); track treatment) {
-                      <option [value]="treatment">{{ treatment }}</option>
-                    }
-                  </select>
-                </td>
-                <td>
-                  <textarea [(ngModel)]="row.control" rows="3" aria-label="Controles a implementar"></textarea>
-                </td>
-                <td>
-                  <select [(ngModel)]="row.type" aria-label="Tipo de control">
-                    @for (type of controlTypes; track type.value) {
-                      <option [value]="type.value">{{ type.label }}</option>
-                    }
-                  </select>
-                </td>
-                <td>
-                  <select [(ngModel)]="row.automationLevel" aria-label="Nivel del control">
-                    @for (level of automationLevels; track level.value) {
-                      <option [value]="level.value">{{ level.label }}</option>
-                    }
-                  </select>
-                </td>
-                <td>
-                  <select [(ngModel)]="row.frequency" aria-label="Frecuencia del control">
-                    @for (frequency of frequencies; track frequency.value) {
-                      <option [value]="frequency.value">{{ frequency.label }}</option>
-                    }
-                  </select>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    [(ngModel)]="row.residualProbability"
-                    aria-label="Probabilidad residual"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    [(ngModel)]="row.residualImpact"
-                    aria-label="Impacto residual"
-                  />
-                </td>
-                <td class="score-cell">{{ residualScore(row) }}</td>
-                <td class="level-cell risk-{{ riskClass(residualScore(row)) }}">
-                  {{ riskLevel(residualScore(row)) }}
-                </td>
-                <td>
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    [text]="true"
-                    pTooltip="Eliminar fila"
-                    tooltipPosition="top"
-                    (click)="confirmRemoveRow(row.id)"
-                  ></button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+            <div class="table-shell">
+              <table class="assets-table">
+                <thead>
+                  <tr>
+                    <th>Activo</th>
+                    <th>Categoria</th>
+                    <th>Conf.</th>
+                    <th>Integr.</th>
+                    <th>Disp.</th>
+                    <th>Criticidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (asset of assets(); track asset.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ asset.name }}</strong>
+                        <p>{{ asset.description || "Sin descripcion" }}</p>
+                      </td>
+                      <td>{{ asset.category }}</td>
+                      <td>{{ asset.confidentiality }}</td>
+                      <td>{{ asset.integrity }}</td>
+                      <td>{{ asset.availability }}</td>
+                      <td>{{ assetCriticality(asset) }}</td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="6">No hay activos registrados.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+
+        @case ("risks") {
+          <section class="tab-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Registro de riesgos</h2>
+                <p>Describe amenaza, vulnerabilidad, evento y consecuencia para cada activo.</p>
+              </div>
+              <button pButton type="button" icon="pi pi-plus" label="Fila manual" (click)="addRow()"></button>
+            </div>
+
+            <div class="table-shell tour-risk-table">
+              <table class="risk-table">
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th class="sort-header" (click)="sortBy('asset')">Activo{{ sortIndicator('asset') }}</th>
+                    <th class="sort-header" (click)="sortBy('threat')">Amenaza{{ sortIndicator('threat') }}</th>
+                    <th>Vulnerabilidad</th>
+                    <th>Evento de riesgo</th>
+                    <th>Consecuencia</th>
+                    <th class="sort-header" (click)="sortBy('probability')">Prob.{{ sortIndicator('probability') }}</th>
+                    <th class="sort-header" (click)="sortBy('impact')">Impacto{{ sortIndicator('impact') }}</th>
+                    <th class="sort-header" (click)="sortBy('inherent')">Inherente{{ sortIndicator('inherent') }}</th>
+                    <th>Nivel</th>
+                    <th>Tratamiento</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of filteredRows(); track row.id; let index = $index) {
+                    <tr class="risk-row">
+                      <td class="number-cell">{{ index + 1 }}</td>
+                      <td>
+                        <select
+                          #assetSelect
+                          [ngModel]="row.informationAssetId ?? ''"
+                          (change)="selectAsset(row, assetSelect.value)"
+                          aria-label="Activo de informacion">
+                          <option value="">Seleccionar activo</option>
+                          @for (asset of assets(); track asset.id) {
+                            <option [value]="asset.id">{{ asset.name }}</option>
+                          }
+                        </select>
+                        <textarea
+                          [(ngModel)]="row.asset"
+                          (ngModelChange)="touchRows()"
+                          rows="2"
+                          aria-label="Nombre del activo"></textarea>
+                      </td>
+                      <td>
+                        <textarea [(ngModel)]="row.threat" (ngModelChange)="touchRows()" rows="2" aria-label="Amenaza"></textarea>
+                      </td>
+                      <td>
+                        <textarea [(ngModel)]="row.vulnerability" (ngModelChange)="touchRows()" rows="2" aria-label="Vulnerabilidad"></textarea>
+                      </td>
+                      <td>
+                        <textarea [(ngModel)]="row.riskEvent" (ngModelChange)="touchRows()" rows="3" aria-label="Evento de riesgo"></textarea>
+                      </td>
+                      <td>
+                        <textarea [(ngModel)]="row.consequence" (ngModelChange)="touchRows()" rows="3" aria-label="Consecuencia"></textarea>
+                      </td>
+                      <td>
+                        <select [(ngModel)]="row.probability" (ngModelChange)="syncTreatment(row)" aria-label="Probabilidad inherente">
+                          @for (value of scaleValues; track value) {
+                            <option [ngValue]="value">{{ value }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        <select [(ngModel)]="row.impact" (ngModelChange)="syncTreatment(row)" aria-label="Impacto inherente">
+                          @for (value of scaleValues; track value) {
+                            <option [ngValue]="value">{{ value }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td class="score-cell">{{ inherentRisk(row) }}</td>
+                      <td class="level-cell risk-{{ riskClass(inherentRisk(row)) }}">{{ riskLevel(inherentRisk(row)) }}</td>
+                      <td>
+                        <select [(ngModel)]="row.treatment" (ngModelChange)="touchRows()" aria-label="Tratamiento">
+                          @for (treatment of treatmentsFor(row); track treatment) {
+                            <option [value]="treatment">{{ treatment }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        <button
+                          pButton
+                          type="button"
+                          icon="pi pi-trash"
+                          severity="danger"
+                          [text]="true"
+                          pTooltip="Eliminar riesgo"
+                          tooltipPosition="top"
+                          (click)="confirmRemoveRow(row)">
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+
+        @case ("controls") {
+          <section class="tab-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Controles por riesgo</h2>
+                <p>Una amenaza puede tener uno o varios controles independientes.</p>
+              </div>
+            </div>
+
+            <div class="control-list">
+              @for (row of filteredRows(); track row.id) {
+                <article class="risk-control-panel">
+                  <div class="risk-control-header">
+                    <div>
+                      <h3>{{ row.asset || "Activo pendiente" }}</h3>
+                      <p>{{ row.threat || "Amenaza pendiente" }}</p>
+                    </div>
+                    <button pButton type="button" icon="pi pi-plus" label="Agregar control" (click)="addControl(row)"></button>
+                  </div>
+
+                  @for (control of row.controls; track $index; let controlIndex = $index) {
+                    <div class="control-row">
+                      <textarea
+                        [(ngModel)]="control.description"
+                        (ngModelChange)="touchRows()"
+                        rows="2"
+                        placeholder="Descripcion del control"></textarea>
+                      <select [(ngModel)]="control.control_type" (ngModelChange)="touchRows()" aria-label="Tipo de control">
+                        @for (type of controlTypes; track type.value) {
+                          <option [value]="type.value">{{ type.label }}</option>
+                        }
+                      </select>
+                      <select [(ngModel)]="control.automation_level" (ngModelChange)="touchRows()" aria-label="Implementacion">
+                        @for (level of automationLevels; track level.value) {
+                          <option [value]="level.value">{{ level.label }}</option>
+                        }
+                      </select>
+                      <select [(ngModel)]="control.frequency" (ngModelChange)="touchRows()" aria-label="Frecuencia">
+                        @for (frequency of frequencies; track frequency.value) {
+                          <option [value]="frequency.value">{{ frequency.label }}</option>
+                        }
+                      </select>
+                      <button
+                        pButton
+                        type="button"
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [text]="true"
+                        (click)="removeControl(row, controlIndex)">
+                      </button>
+                    </div>
+                  } @empty {
+                    <div class="empty-control">
+                      Sin controles registrados para este riesgo.
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          </section>
+        }
+
+        @case ("residual") {
+          <section class="tab-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Evaluacion de riesgo residual</h2>
+                <p>Selecciona los valores finales de probabilidad e impacto residual, minimo 1 y maximo 5.</p>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <table class="risk-table residual-table">
+                <thead>
+                  <tr>
+                    <th>Activo</th>
+                    <th>Evento de riesgo</th>
+                    <th>Inherente</th>
+                    <th>Controles</th>
+                    <th>Prob. residual</th>
+                    <th>Impacto residual</th>
+                    <th class="sort-header" (click)="sortBy('residual')">Residual{{ sortIndicator('residual') }}</th>
+                    <th>Nivel residual</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of filteredRows(); track row.id) {
+                    <tr>
+                      <td>{{ row.asset }}</td>
+                      <td>{{ row.riskEvent }}</td>
+                      <td class="score-cell">{{ inherentRisk(row) }} - {{ riskLevel(inherentRisk(row)) }}</td>
+                      <td>{{ controlSummary(row) }}</td>
+                      <td>
+                        <select [(ngModel)]="row.residualProbability" (ngModelChange)="touchRows()" aria-label="Probabilidad residual">
+                          @for (value of scaleValues; track value) {
+                            <option [ngValue]="value">{{ value }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        <select [(ngModel)]="row.residualImpact" (ngModelChange)="touchRows()" aria-label="Impacto residual">
+                          @for (value of scaleValues; track value) {
+                            <option [ngValue]="value">{{ value }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td class="score-cell">{{ residualScore(row) }}</td>
+                      <td class="level-cell risk-{{ riskClass(residualScore(row)) }}">{{ riskLevel(residualScore(row)) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+      }
     }
   </section>
 
   <p-confirmDialog />
 
-  <p-dialog 
-    header="Analizador de Riesgos Automatizado" 
-    [(visible)]="showWizard" 
-    [modal]="true" 
-    [style]="{width: '700px'}" 
-    [draggable]="false" 
+  <p-dialog
+    header="Analizador de Riesgos"
+    [(visible)]="showWizard"
+    [modal]="true"
+    [style]="{ width: '760px', maxWidth: '95vw' }"
+    [draggable]="false"
     [resizable]="false">
-    <zoo-risk-wizard 
-      (completed)="onWizardCompleted($event)" 
+    <zoo-risk-wizard
+      (completed)="onWizardCompleted($event)"
       (cancelled)="showWizard.set(false)">
     </zoo-risk-wizard>
+  </p-dialog>
+
+  <p-dialog
+    header="Nuevo activo de informacion"
+    [(visible)]="showAssetDialog"
+    [modal]="true"
+    [style]="{ width: '480px', maxWidth: '95vw' }"
+    [draggable]="false"
+    [resizable]="false">
+    <div class="asset-form">
+      <label>
+        Nombre
+        <input type="text" [(ngModel)]="currentAsset.name" />
+      </label>
+      <label>
+        Categoria
+        <select [(ngModel)]="currentAsset.category">
+          <option value="Software">Software / Aplicaciones</option>
+          <option value="Hardware">Hardware / Servidores</option>
+          <option value="Datos">Datos / Base de datos</option>
+          <option value="Redes">Redes / Infraestructura</option>
+          <option value="Inventario / Producto">Inventario / Producto</option>
+        </select>
+      </label>
+      <label>
+        Descripcion
+        <textarea rows="3" [(ngModel)]="currentAsset.description"></textarea>
+      </label>
+      <div class="asset-score-grid">
+        <label>
+          Confidencialidad
+          <select [(ngModel)]="currentAsset.confidentiality">
+            @for (value of scaleValues; track value) {
+              <option [ngValue]="value">{{ value }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Integridad
+          <select [(ngModel)]="currentAsset.integrity">
+            @for (value of scaleValues; track value) {
+              <option [ngValue]="value">{{ value }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Disponibilidad
+          <select [(ngModel)]="currentAsset.availability">
+            @for (value of scaleValues; track value) {
+              <option [ngValue]="value">{{ value }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" icon="pi pi-times" [text]="true" (onClick)="showAssetDialog.set(false)"></p-button>
+      <p-button label="Guardar" icon="pi pi-check" [loading]="savingAsset()" (onClick)="saveAsset()"></p-button>
+    </ng-template>
   </p-dialog>
 </zoo-main-container>

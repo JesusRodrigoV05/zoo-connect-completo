@@ -4,7 +4,12 @@ from pathlib import Path
 from datetime import datetime, date
 from typing import List, Optional
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML, CSS
+try:
+    from weasyprint import HTML, CSS
+except Exception:
+    HTML = None
+    CSS = None
+
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 
@@ -33,6 +38,9 @@ class ReportService:
 
         template = env.get_template(template_name)
         html_string = template.render(context)
+
+        if HTML is None:
+            return b"PDF Generation failed: WeasyPrint system dependencies (libgobject-2.0-0) missing."
 
         pdf_bytes = HTML(string=html_string, base_url=str(BASE_DIR)).write_pdf()
         

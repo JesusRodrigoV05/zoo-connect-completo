@@ -46,7 +46,7 @@
 
 .field-group {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -57,6 +57,12 @@
   margin-top: 2rem;
   padding-top: 1rem;
   border-top: 1px solid var(--p-divider-color);
+}
+
+@media (max-width: 760px) {
+  .field-group {
+    grid-template-columns: 1fr;
+  }
 }
 
 .incidents-found, .incidents-not-found {
