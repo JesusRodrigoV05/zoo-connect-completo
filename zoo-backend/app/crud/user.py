@@ -372,6 +372,21 @@ def verify_sms_otp(db: Session, user: User, code: str, purpose: str) -> bool:
     db.refresh(user)
     return True
 
+
+def mark_phone_verified(db: Session, phone_number: str) -> bool:
+    user = get_user_by_phone(db, phone_number=phone_number)
+    if not user:
+        return False
+
+    user.phone_verified = True
+    user.email_verified = True
+    user.is_active = True
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return True
+
+
 def resend_verification_code(db: Session, email: str) -> Optional[User]:
     """
     Genera un nuevo código de verificación para un usuario no verificado.
