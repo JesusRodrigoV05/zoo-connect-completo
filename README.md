@@ -1,5 +1,7 @@
 # 🦁 Zoo Connect - Plataforma Global
 
+# mas
+
 Repositorio unificado (Monorepo) del sistema **Zoo Connect**, una plataforma moderna para la gestión clínica, operativa y administrativa de zoológicos. Este entorno integra tanto el frontend (Angular + Bun) como el backend (FastAPI + PostgreSQL + Redis) para facilitar su despliegue ágil y seguro mediante contenedores.
 
 ---
@@ -17,8 +19,8 @@ Repositorio unificado (Monorepo) del sistema **Zoo Connect**, una plataforma mod
 
 ## Requisitos Previos
 
-* **Docker** y **Docker Compose** instalados en tu sistema.
-* No es necesario tener instalados Node, Bun o Python de forma local en tu máquina; el sistema descargará y encapsulará todo lo necesario dentro de los contenedores.
+- **Docker** y **Docker Compose** instalados en tu sistema.
+- No es necesario tener instalados Node, Bun o Python de forma local en tu máquina; el sistema descargará y encapsulará todo lo necesario dentro de los contenedores.
 
 ---
 
@@ -30,8 +32,8 @@ Sigue estos pasos para levantar toda la infraestructura del zoológico con un so
 
 Asegúrate de crear y configurar los archivos `.env` en sus respectivas carpetas (basándote en los archivos `.env.example` de cada una):
 
-* Directorio Backend: `zoo-backend/.env`
-* Directorio Frontend: `zoo-frontend/.env`
+- Directorio Backend: `zoo-backend/.env`
+- Directorio Frontend: `zoo-frontend/.env`
 
 ### 2. Construir y Levantar el Sistema
 
@@ -45,10 +47,10 @@ docker-compose up -d --build
 
 Una vez que el proceso finalice y los contenedores estén en ejecución, los servicios estarán disponibles en las siguientes direcciones:
 
-* **Frontend (Interfaz de Usuario):** `http://localhost:4200`
-* **Backend (Documentación de la API):** `http://localhost:8000/docs`
-* **Base de Datos (PostgreSQL):** `localhost:5432`
-* **Caché (Redis):** `localhost:6379`
+- **Frontend (Interfaz de Usuario):** `http://localhost:4200`
+- **Backend (Documentación de la API):** `http://localhost:8000/docs`
+- **Base de Datos (PostgreSQL):** `localhost:5432`
+- **Caché (Redis):** `localhost:6379`
 
 ---
 
@@ -56,19 +58,20 @@ Una vez que el proceso finalice y los contenedores estén en ejecución, los ser
 
 Comandos útiles para la administración diaria del sistema en tu terminal (siempre desde la raíz del proyecto):
 
-* **Ver los registros (logs) en tiempo real:**
+- **Ver los registros (logs) en tiempo real:**
+
 ```bash
 docker-compose logs -f
 ```
 
+- **Apagar todo el sistema:**
 
-* **Apagar todo el sistema:**
 ```bash
 docker-compose down
 ```
 
+- **Reiniciar el sistema completo:**
 
-* **Reiniciar el sistema completo:**
 ```bash
 docker-compose restart
 ```
@@ -80,6 +83,7 @@ docker-compose restart
 Este proyecto implementa una capa extra de seguridad denominada **"Cifrado a Nivel de Aplicación"** mediante algoritmos asimétricos (RSA). Este mecanismo protege las credenciales de los usuarios incluso si el túnel HTTPS fuera comprometido.
 
 ### Flujo de Cifrado
+
 1. **Rotación Diaria:** El backend genera un nuevo par de llaves RSA (Pública y Privada) automáticamente cada 24 horas.
 2. **Entrega de Llave:** El frontend solicita la llave pública del día antes de enviar formularios sensibles (Login/Registro).
 3. **Cifrado en el Cliente:** La contraseña se cifra en el navegador del usuario usando la llave pública, convirtiéndola en un bloque ilegible.
@@ -95,8 +99,8 @@ Este flujo garantiza que las contraseñas nunca viajen ni se registren en texto 
 Para garantizar la autenticidad de los usuarios y evitar el registro de cuentas falsas, el sistema implementa un flujo de verificación obligatoria:
 
 1. **Registro:** Al crear una cuenta, el usuario queda en estado **inactivo**.
-2. **Envío de Código:** El sistema genera un código aleatorio de 6 dígitos y lo envía automáticamente al correo del usuario. 
-   - *Nota:* El sistema valida el envío en tiempo real; si el correo es inválido, el registro se cancela.
+2. **Envío de Código:** El sistema genera un código aleatorio de 6 dígitos y lo envía automáticamente al correo del usuario.
+   - _Nota:_ El sistema valida el envío en tiempo real; si el correo es inválido, el registro se cancela.
 3. **Pantalla de Verificación:** El usuario es redirigido a una interfaz para introducir el código recibido.
 4. **Activación:** Una vez validado el código, la cuenta se marca como **verificada** y se activa para permitir el inicio de sesión.
 
@@ -145,3 +149,4 @@ Si eres parte del equipo de desarrollo y acabas de descargar estos cambios, debe
 ```bash
 docker-compose exec backend alembic upgrade head
 ```
+
