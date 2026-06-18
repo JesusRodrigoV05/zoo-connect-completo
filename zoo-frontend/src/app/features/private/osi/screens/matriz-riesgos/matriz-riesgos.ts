@@ -428,6 +428,16 @@ export default class MatrizRiesgos {
     this.rows.update((rows) => [...rows]);
   }
 
+  protected threatOrVulnerability(row: RiskRow): string {
+    return row.threat || row.vulnerability;
+  }
+
+  protected updateThreatOrVulnerability(row: RiskRow, value: string): void {
+    row.threat = value;
+    row.vulnerability = "";
+    this.touchRows();
+  }
+
   protected inherentRisk(row: RiskRow): number {
     return this.normalizedScore(row.probability, row.impact);
   }

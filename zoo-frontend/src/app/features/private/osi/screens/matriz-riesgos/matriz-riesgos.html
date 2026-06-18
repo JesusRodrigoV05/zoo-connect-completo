@@ -220,7 +220,7 @@
             <div class="section-heading">
               <div>
                 <h2>Registro de riesgos</h2>
-                <p>Describe amenaza, vulnerabilidad, evento y consecuencia para cada activo.</p>
+                <p>Describe amenaza o vulnerabilidad, evento y consecuencia para cada activo.</p>
               </div>
               <button pButton type="button" icon="pi pi-plus" label="Fila manual" (click)="addRow()"></button>
             </div>
@@ -231,8 +231,7 @@
                   <tr>
                     <th>No.</th>
                     <th class="sort-header" (click)="sortBy('asset')">Activo{{ sortIndicator('asset') }}</th>
-                    <th class="sort-header" (click)="sortBy('threat')">Amenaza{{ sortIndicator('threat') }}</th>
-                    <th>Vulnerabilidad</th>
+                    <th class="sort-header" (click)="sortBy('threat')">Amenaza/Vulnerabilidad{{ sortIndicator('threat') }}</th>
                     <th>Evento de riesgo</th>
                     <th>Consecuencia</th>
                     <th class="sort-header" (click)="sortBy('probability')">Prob.{{ sortIndicator('probability') }}</th>
@@ -265,10 +264,11 @@
                           aria-label="Nombre del activo"></textarea>
                       </td>
                       <td>
-                        <textarea [(ngModel)]="row.threat" (ngModelChange)="touchRows()" rows="2" aria-label="Amenaza"></textarea>
-                      </td>
-                      <td>
-                        <textarea [(ngModel)]="row.vulnerability" (ngModelChange)="touchRows()" rows="2" aria-label="Vulnerabilidad"></textarea>
+                        <textarea
+                          [ngModel]="threatOrVulnerability(row)"
+                          (ngModelChange)="updateThreatOrVulnerability(row, $event)"
+                          rows="2"
+                          aria-label="Amenaza o vulnerabilidad"></textarea>
                       </td>
                       <td>
                         <textarea [(ngModel)]="row.riskEvent" (ngModelChange)="touchRows()" rows="3" aria-label="Evento de riesgo"></textarea>
