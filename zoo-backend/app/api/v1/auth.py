@@ -422,12 +422,12 @@ async def login(
             attempted_email=user.email,
         )
 
-        await policia.increment_login_failure(user.id, cache)
+        await policia.increment_login_failure(payload.identifier, cache)
 
-        failures = await policia.get_login_failures(user.id, cache)
+        failures = await policia.get_login_failures(payload.identifier, cache)
         if failures >= policia.MAX_FAILED_ATTEMPTS:
             background_tasks.add_task(policia.lock_account, user_id=user.id)
-            await policia.clear_login_failures(user.id, cache)
+            await policia.clear_login_failures(payload.identifier, cache)
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidas"
@@ -452,7 +452,7 @@ async def login(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario inactivo. Contacte al administrador."
         )
     # limpiadmor contadores redis
-    await policia.clear_login_failures(user.id, cache)
+    await policia.clear_login_failures(payload.identifier, cache)
     # comprobamos 2fa (antes que must_change_password)
     if user.is_totp_enabled:
         if user.phone_number:

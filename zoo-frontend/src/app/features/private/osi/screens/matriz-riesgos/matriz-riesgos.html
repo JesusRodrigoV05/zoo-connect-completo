@@ -274,6 +274,24 @@
                     }
                   </select>
                 </td>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    [(ngModel)]="row.residualProbability"
+                    aria-label="Probabilidad residual"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    [(ngModel)]="row.residualImpact"
+                    aria-label="Impacto residual"
+                  />
+                </td>
                 <td class="score-cell">{{ residualScore(row) }}</td>
                 <td class="level-cell risk-{{ riskClass(residualScore(row)) }}">
                   {{ riskLevel(residualScore(row)) }}

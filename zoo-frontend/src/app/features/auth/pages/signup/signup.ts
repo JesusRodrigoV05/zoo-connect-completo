@@ -66,13 +66,8 @@ export default class Signup implements OnInit {
   protected readonly signupForm: FormGroup = this.fb.group(
     {
       email: ["", [Validators.email]],
-      username: [
-        "",
-        [
-          Validators.required,
-          Validators.pattern("^[a-zA-Z0-9]+\\.(admin|cuidador|vet|visitante|osi)\\.[a-zA-Z0-9]+$"),
-        ],
-      ],
+      nombre: ["", [Validators.required, Validators.minLength(2)]],
+      apellido: ["", [Validators.required, Validators.minLength(2)]],
       phoneNumber: ["", [Validators.required, Validators.pattern("^\\+[1-9]\\d{7,14}$")]],
       password: ["", [Validators.minLength(12)]],
       confirmPassword: ["", [Validators.required]],
@@ -135,8 +130,9 @@ export default class Signup implements OnInit {
       return;
     }
 
-    const { email, username, phoneNumber } = this.signupForm.value;
+    const { email, nombre, apellido, phoneNumber } = this.signupForm.value;
     const password = this.signupForm.value.password;
+    const username = `${nombre}.visitante.${apellido}`;
 
     try {
       const res = await this.authStore.register(email, username, phoneNumber, password, this.generatePassword, token);
@@ -180,8 +176,11 @@ export default class Signup implements OnInit {
   get email() {
     return this.signupForm.get("email") as FormControl;
   }
-  get username() {
-    return this.signupForm.get("username") as FormControl;
+  get nombre() {
+    return this.signupForm.get("nombre") as FormControl;
+  }
+  get apellido() {
+    return this.signupForm.get("apellido") as FormControl;
   }
   get phoneNumber() {
     return this.signupForm.get("phoneNumber") as FormControl;
@@ -257,12 +256,22 @@ export default class Signup implements OnInit {
     return null;
   }
 
-  protected getUsernameError(): string | null {
-    const control = this.username;
+  protected getNombreError(): string | null {
+    const control = this.nombre;
     if (control?.errors && control?.touched) {
-      if (control.errors["required"]) return "El usuario es requerido";
-      if (control.errors["pattern"])
-        return "El formato debe ser nombre.rol.apellido (ej. juan.visitante.perez)";
+      if (control.errors["required"]) return "El nombre es requerido";
+      if (control.errors["minlength"])
+        return "El nombre debe tener al menos 2 caracteres";
+    }
+    return null;
+  }
+
+  protected getApellidoError(): string | null {
+    const control = this.apellido;
+    if (control?.errors && control?.touched) {
+      if (control.errors["required"]) return "El apellido es requerido";
+      if (control.errors["minlength"])
+        return "El apellido debe tener al menos 2 caracteres";
     }
     return null;
   }

@@ -8,6 +8,9 @@ from app.crud import user as crud_user
 from app.schemas.user import UserOut, AdminUserCreate, AdminUserUpdate
 from app.core.dependencies import require_permission, get_current_active_user
 from app.core.enums import AuditLogType, PermissionCode
+from app.core.email_service import send_generated_password_email
+from app.core.sms_service import send_sms
+from app.core.password_utils import generate_strong_password
 from app.models.user import User
 from app.crud import permission as crud_permission
 
@@ -156,17 +159,47 @@ def admin_get_user(user_id: str, db: Session = Depends(get_db)):
     return user
 
 @router.post(
-    "/users", 
-    response_model=UserOut, 
+    "/users",
+    response_model=UserOut,
     status_code=201,
     dependencies=[Depends(require_permission(PermissionCode.MANAGE_USERS))]
 )
-def admin_create_user(user_in: AdminUserCreate, db: Session = Depends(get_db)):
+async def admin_create_user(user_in: AdminUserCreate, db: Session = Depends(get_db)):
     if user_in.email and crud_user.get_user_by_email(db, user_in.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Email ya registrado"
         )
-    return crud_user.create_user_by_admin(db=db, user_in=user_in)
+
+    if user_in.generate_password:
+        generated = generate_strong_password()
+        user_in.password = generated
+    elif not user_in.password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Debe enviar una contraseña o indicar generate_password=true",
+        )
+
+    user = crud_user.create_user_by_admin(db=db, user_in=user_in)
+
+    if user_in.generate_password:
+        try:
+            if user.email:
+                await send_generated_password_email(
+                    email_to=user.email,
+                    password=user_in.password,
+                    username=user.username,
+                )
+            if user.phone_number:
+                msg = (
+                    f"ZooConnect: tu cuenta ha sido creada. "
+                    f"Tu contraseña temporal es: {user_in.password}. "
+                    f"Debes cambiarla al iniciar sesión."
+                )
+                await send_sms(user.phone_number, msg)
+        except Exception as e:
+            logger.exception("Error enviando credenciales a %s", user.email or user.phone_number)
+
+    return user
 
 @router.put(
     "/users/{user_id}", 

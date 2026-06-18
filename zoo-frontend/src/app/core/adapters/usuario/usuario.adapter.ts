@@ -18,7 +18,8 @@ export interface CreateUsuarioRequest {
   email?: string;
   username: string;
   phone_number?: string;
-  password: string;
+  password?: string;
+  generate_password?: boolean;
   role_id: number;
 }
 
@@ -72,7 +73,8 @@ export class UsuarioAdapter {
 
   static toCreateRequest(
     frontendUser: Omit<Usuario, "id" | "creadoEn" | "activo"> & {
-      password: string;
+      generate_password?: boolean;
+      phone_number?: string;
     },
   ): CreateUsuarioRequest {
     if (!frontendUser.email || frontendUser.email.trim().length < 3) {
@@ -87,16 +89,11 @@ export class UsuarioAdapter {
       );
     }
 
-    if (!frontendUser.password || frontendUser.password.trim().length < 6) {
-      throw new Error(
-        "La contraseña es requerida y debe tener al menos 6 caracteres",
-      );
-    }
-
     return {
       email: frontendUser.email.trim(),
       username: frontendUser.username.trim(),
-      password: frontendUser.password.trim(),
+      phone_number: frontendUser.phone_number?.trim(),
+      generate_password: true,
       role_id: frontendUser.rol.id,
     };
   }

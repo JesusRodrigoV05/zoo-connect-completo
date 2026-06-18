@@ -24,18 +24,38 @@
             <div class="field">
               <p-floatlabel variant="on">
                 <input
-                  id="username"
+                  id="nombre"
                   pInputText
                   type="text"
-                  formControlName="username"
-                  placeholder="nombre.rol.apellido (ej. juan.visitante.perez)"
-                  autocomplete="username"
+                  formControlName="nombre"
+                  placeholder="Ej. Juan"
+                  autocomplete="given-name"
                   fluid
                   autofocus
                 />
-                <label for="username">Usuario (nombre.rol.apellido)</label>
+                <label for="nombre">Nombre</label>
               </p-floatlabel>
-              @if (getUsernameError(); as error) {
+              @if (getNombreError(); as error) {
+              <p-message severity="error" variant="simple" size="small">
+                {{ error }}
+              </p-message>
+              }
+            </div>
+
+            <div class="field">
+              <p-floatlabel variant="on">
+                <input
+                  id="apellido"
+                  pInputText
+                  type="text"
+                  formControlName="apellido"
+                  placeholder="Ej. Perez"
+                  autocomplete="family-name"
+                  fluid
+                />
+                <label for="apellido">Apellido</label>
+              </p-floatlabel>
+              @if (getApellidoError(); as error) {
               <p-message severity="error" variant="simple" size="small">
                 {{ error }}
               </p-message>

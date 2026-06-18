@@ -22,12 +22,15 @@ class UserCreate(UserBase):
 
 
 class AdminUserCreate(UserBase):
-    password: str
+    password: str = ""
+    generate_password: bool = False
     role_id: int
     is_active: Optional[bool] = True
 
     @field_validator("password")
     def validate_password_strength(cls, v: str) -> str:
+        if not v:
+            return v
         return validate_password_strength_func(v)
 
 

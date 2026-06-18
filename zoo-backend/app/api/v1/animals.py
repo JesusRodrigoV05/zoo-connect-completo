@@ -8,6 +8,7 @@ from app.core.uploader import upload_to_cloudinary, delete_from_cloudinary
 from app.db.session import get_db
 from app.core.dependencies import (
     get_current_active_user,
+    get_optional_current_user,
     require_animal_catalog_permission,
     require_animal_management_permission,
     require_animals_create_permission,
@@ -220,7 +221,7 @@ def create_animal(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/animals/", response_model=Page[AnimalOut], tags=["Animales"])
-def list_animals(db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_active_user)):
+def list_animals(db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_optional_current_user)):
     user_role = getattr(getattr(current_user, 'role', None), 'nombre_rol', 'visitante').lower()
     allowed_roles = {"administrador", "veterinario", "cuidador"}
 
@@ -230,7 +231,7 @@ def list_animals(db: Session = Depends(get_db), current_user: Optional[User] = D
         return paginate(crud_animal.list_animals(db, es_publico=True))
 
 @router.get("/animals/{animal_id}", response_model=AnimalOut, tags=["Animales"])
-def get_animal(animal_id: int, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_active_user)):
+def get_animal(animal_id: int, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_optional_current_user)):
     db_animal = crud_animal.get_animal(db, animal_id)
     if not db_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
