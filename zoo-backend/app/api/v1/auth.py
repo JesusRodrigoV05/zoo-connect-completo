@@ -467,10 +467,22 @@ async def login(
     # comprobamos si debe cambiar contraseña
     if user.must_change_password:
         reset_token = crud_token.create_password_reset_token(db, user.id)
+        if user.phone_number:
+            try:
+                code = crud_user.create_sms_otp(db, user, "reset_password")
+                await sms_service.send_otp(user.phone_number, code, "reset_password")
+            except Exception:
+                logger.exception("Error enviando SMS OTP para cambio de contraseña")
         return MustChangePasswordResponse(reset_token=reset_token)
     # comprobamos si la contraseña expiró
     if crud_user.is_password_expired(user):
         reset_token = crud_token.create_password_reset_token(db, user.id)
+        if user.phone_number:
+            try:
+                code = crud_user.create_sms_otp(db, user, "reset_password")
+                await sms_service.send_otp(user.phone_number, code, "reset_password")
+            except Exception:
+                logger.exception("Error enviando SMS OTP para cambio de contraseña")
         return MustChangePasswordResponse(reset_token=reset_token)
     # login exitoso
     background_tasks.add_task(
@@ -561,9 +573,21 @@ async def verify_login_2fa(
 
     if user.must_change_password:
         reset_token = crud_token.create_password_reset_token(db, user.id)
+        if user.phone_number:
+            try:
+                code = crud_user.create_sms_otp(db, user, "reset_password")
+                await sms_service.send_otp(user.phone_number, code, "reset_password")
+            except Exception:
+                logger.exception("Error enviando SMS OTP para cambio de contraseña")
         return MustChangePasswordResponse(reset_token=reset_token)
     if crud_user.is_password_expired(user):
         reset_token = crud_token.create_password_reset_token(db, user.id)
+        if user.phone_number:
+            try:
+                code = crud_user.create_sms_otp(db, user, "reset_password")
+                await sms_service.send_otp(user.phone_number, code, "reset_password")
+            except Exception:
+                logger.exception("Error enviando SMS OTP para cambio de contraseña")
         return MustChangePasswordResponse(reset_token=reset_token)
 
     access_token, refresh_token = _issue_tokens_for_user(user, db)
