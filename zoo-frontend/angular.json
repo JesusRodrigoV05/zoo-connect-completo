@@ -55,6 +55,7 @@
               }
             ],
             "styles": ["src/styles.scss", "node_modules/aos/dist/aos.css"],
+            "scripts": ["node_modules/boxicons/dist/boxicons.js"],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {

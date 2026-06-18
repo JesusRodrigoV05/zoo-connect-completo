@@ -81,6 +81,32 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
+.result-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.result-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.result-card strong {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #0f172a;
+}
+
+.result-card.has-issues {
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
 .card-label {
   font-size: 0.75rem;
   font-weight: 600;
@@ -474,6 +500,10 @@
   min-width: 1300px;
 }
 
+.result-table {
+  min-width: 1500px;
+}
+
 .risk-table textarea {
   min-width: 12rem;
   resize: vertical;
@@ -531,6 +561,10 @@
 
 @media (max-width: 900px) {
   .dashboard-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .result-summary {
     grid-template-columns: repeat(2, 1fr);
   }
 

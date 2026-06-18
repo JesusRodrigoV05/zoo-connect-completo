@@ -36,6 +36,24 @@ import { AuthStore } from "@stores/auth.store";
 import { CustomTitleStrategy } from "./core/services/custom-title-strategy";
 import { provideServiceWorker } from '@angular/service-worker';
 
+async function clearDevelopmentServiceWorkers(): Promise<void> {
+  if (!isDevMode() || typeof navigator === "undefined" || !("serviceWorker" in navigator)) {
+    return;
+  }
+
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  await Promise.all(registrations.map((registration) => registration.unregister()));
+
+  if (typeof caches !== "undefined") {
+    const cacheNames = await caches.keys();
+    await Promise.all(
+      cacheNames
+        .filter((cacheName) => cacheName.startsWith("ngsw:") || cacheName.includes("ngsw"))
+        .map((cacheName) => caches.delete(cacheName)),
+    );
+  }
+}
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -68,6 +86,7 @@ export const appConfig: ApplicationConfig = {
 
       const authStore = inject(AuthStore);
 
+      await clearDevelopmentServiceWorkers();
       await authStore.initializeAuth();
     }),
     { provide: TitleStrategy, useClass: CustomTitleStrategy }, provideServiceWorker('ngsw-worker.js', {

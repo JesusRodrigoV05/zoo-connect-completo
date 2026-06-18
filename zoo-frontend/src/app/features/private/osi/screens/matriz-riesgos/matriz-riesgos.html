@@ -434,6 +434,77 @@
             </div>
           </section>
         }
+
+        @case ("result") {
+          <section class="tab-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Resultado final</h2>
+                <p>Vista consolidada de como queda la matriz despues de registrar riesgos, controles y residual.</p>
+              </div>
+            </div>
+
+            <div class="result-summary">
+              <div class="result-card">
+                <span class="card-label">Riesgos evaluados</span>
+                <strong>{{ totalRisks() }}</strong>
+              </div>
+              <div class="result-card">
+                <span class="card-label">Residual alto o extremo</span>
+                <strong>{{ residualHighOrAboveCount() }}</strong>
+              </div>
+              <div class="result-card">
+                <span class="card-label">Reduccion total</span>
+                <strong>{{ totalResidualReduction() }}</strong>
+              </div>
+              <div class="result-card" [class.has-issues]="hasPendingControls()">
+                <span class="card-label">Pendientes de control</span>
+                <strong>{{ pendingControlsCount() }}</strong>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <table class="risk-table result-table">
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>Activo</th>
+                    <th>Amenaza</th>
+                    <th>Evento</th>
+                    <th>Inherente</th>
+                    <th>Nivel inherente</th>
+                    <th>Controles</th>
+                    <th>Residual</th>
+                    <th>Nivel residual</th>
+                    <th>Reduccion</th>
+                    <th>Tratamiento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of filteredRows(); track row.id; let index = $index) {
+                    <tr>
+                      <td class="number-cell">{{ index + 1 }}</td>
+                      <td>{{ row.asset || "Activo pendiente" }}</td>
+                      <td>{{ row.threat || "Amenaza pendiente" }}</td>
+                      <td>{{ row.riskEvent || "Evento pendiente" }}</td>
+                      <td class="score-cell">{{ inherentRisk(row) }}</td>
+                      <td class="level-cell risk-{{ riskClass(inherentRisk(row)) }}">{{ riskLevel(inherentRisk(row)) }}</td>
+                      <td>{{ controlSummary(row) }}</td>
+                      <td class="score-cell">{{ residualScore(row) }}</td>
+                      <td class="level-cell risk-{{ riskClass(residualScore(row)) }}">{{ riskLevel(residualScore(row)) }}</td>
+                      <td class="score-cell">{{ riskReduction(row) }}</td>
+                      <td>{{ row.treatment || "Pendiente" }}</td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="11">No hay riesgos registrados para mostrar el resultado.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
       }
     }
   </section>
@@ -464,16 +535,6 @@
       <label>
         Nombre
         <input type="text" [(ngModel)]="currentAsset.name" />
-      </label>
-      <label>
-        Categoria
-        <select [(ngModel)]="currentAsset.category">
-          <option value="Software">Software / Aplicaciones</option>
-          <option value="Hardware">Hardware / Servidores</option>
-          <option value="Datos">Datos / Base de datos</option>
-          <option value="Redes">Redes / Infraestructura</option>
-          <option value="Inventario / Producto">Inventario / Producto</option>
-        </select>
       </label>
       <label>
         Descripcion

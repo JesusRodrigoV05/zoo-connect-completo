@@ -26,7 +26,7 @@ import {
 } from "./matriz-riesgos.service";
 
 type RiskLevel = "Bajo" | "Moderado" | "Alto" | "Extremo" | "Verifique valores";
-type RiskTab = "assets" | "risks" | "controls" | "residual";
+type RiskTab = "assets" | "risks" | "controls" | "residual" | "result";
 type SortField = "asset" | "threat" | "probability" | "impact" | "inherent" | "residual" | null;
 
 interface RiskOption {
@@ -116,6 +116,7 @@ export default class MatrizRiesgos {
     { key: "risks", label: "Riesgos", icon: "pi pi-exclamation-triangle" },
     { key: "controls", label: "Controles", icon: "pi pi-shield" },
     { key: "residual", label: "Residual", icon: "pi pi-chart-line" },
+    { key: "result", label: "Resultado", icon: "pi pi-check-circle" },
   ];
 
   protected readonly loading = signal(true);
@@ -154,6 +155,25 @@ export default class MatrizRiesgos {
   protected readonly totalRisks = computed(() => this.rows().length);
   protected readonly pendingControlsCount = computed(() => this.rows().filter((row) => row.controls.length === 0).length);
   protected readonly hasPendingControls = computed(() => this.pendingControlsCount() > 0);
+  protected readonly residualSummary = computed(() => {
+    const counts: Record<RiskLevel, number> = {
+      Bajo: 0,
+      Moderado: 0,
+      Alto: 0,
+      Extremo: 0,
+      "Verifique valores": 0,
+    };
+    for (const row of this.rows()) {
+      counts[this.riskLevel(this.residualScore(row))]++;
+    }
+    return counts;
+  });
+  protected readonly residualHighOrAboveCount = computed(
+    () => this.residualSummary().Extremo + this.residualSummary().Alto,
+  );
+  protected readonly totalResidualReduction = computed(() =>
+    this.rows().reduce((total, row) => total + this.riskReduction(row), 0),
+  );
 
   protected readonly filteredRows = computed(() => {
     let data = this.rows();
@@ -416,6 +436,10 @@ export default class MatrizRiesgos {
     return this.normalizedScore(row.residualProbability, row.residualImpact);
   }
 
+  protected riskReduction(row: RiskRow): number {
+    return Math.max(this.inherentRisk(row) - this.residualScore(row), 0);
+  }
+
   protected riskLevel(score: number): RiskLevel {
     if (score >= 1 && score <= 4) return "Bajo";
     if (score >= 5 && score <= 9) return "Moderado";
@@ -511,7 +535,7 @@ export default class MatrizRiesgos {
     return {
       name: "",
       description: "",
-      category: "Software",
+      category: "Manual",
       confidentiality: 1,
       integrity: 1,
       availability: 1,
