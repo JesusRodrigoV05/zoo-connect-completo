@@ -38,6 +38,7 @@ from app.schemas.auth import (
 
 from app.core import email_service
 from app.core import sms_service
+from app.core.request_context import resolve_client_ip
 from app.core.password_utils import generate_strong_password
 
 # 2fa
