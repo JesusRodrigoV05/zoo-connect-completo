@@ -45,6 +45,10 @@ class EmailVerificationRequest(BaseModel):
     code: str
     recaptcha_token: Optional[str] = None
 
+class ResendVerificationRequest(BaseModel):
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
+
 class UpdatePhoneRequest(BaseModel):
     phone_number: str
     recaptcha_token: Optional[str] = None

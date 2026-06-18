@@ -32,6 +32,7 @@ from app.api.v1 import (
     permissions,
     roles,
     audit_logs,
+    information_assets,
     risk_matrix,
 )
 

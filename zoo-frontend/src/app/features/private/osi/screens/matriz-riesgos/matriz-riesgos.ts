@@ -781,6 +781,11 @@ export default class MatrizRiesgos {
     this.showWizard.set(true);
   }
 
+  protected onWizardCompleted(entry: any): void {
+    this.showWizard.set(false);
+    this.loadRows();
+  }
+
   protected confirmRemoveRow(rowId: number): void {
     this.confirmService.confirm({
       message: "¿Estás seguro de eliminar esta fila de la matriz de riesgos?",

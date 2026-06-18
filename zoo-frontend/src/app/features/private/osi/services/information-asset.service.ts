@@ -31,7 +31,7 @@ export interface InformationAssetPayload {
 })
 export class InformationAssetService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/zooconnect/information-assets`;
+  private readonly url = `${environment.apiUrl}/information-assets`;
 
   list(): Observable<InformationAsset[]> {
     return this.http.get<InformationAsset[]>(this.url);

@@ -78,6 +78,4 @@ def init_db():
         print(f"!!! Error cargando datos iniciales: {e}")
         db.rollback()
     finally:
-        db.close()ollback()
-    finally:
         db.close()

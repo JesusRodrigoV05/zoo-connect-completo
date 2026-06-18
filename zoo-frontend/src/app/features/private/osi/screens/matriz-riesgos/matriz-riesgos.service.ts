@@ -39,7 +39,7 @@ export interface RiskMatrixEntryPayload {
 @Injectable({ providedIn: "root" })
 export class RiskMatrixService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/zooconnect/risk-matrix`;
+  private readonly url = `${environment.apiUrl}/risk-matrix`;
 
   list(): Observable<RiskMatrixEntryDto[]> {
     return this.http.get<RiskMatrixEntryDto[]>(this.url);
