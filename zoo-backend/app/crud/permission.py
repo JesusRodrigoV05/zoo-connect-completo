@@ -130,8 +130,11 @@ def ensure_role_permissions(db: Session) -> None:
             permission = permissions_by_code.get(permission_code)
             if not permission:
                 continue
-            exists = db.query(RolePermission).filter(RolePermission.role_id == role.id, RolePermission.permission_id == permission.id).first()
-            if not exists:
+            rp = db.query(RolePermission).filter(RolePermission.role_id == role.id, RolePermission.permission_id == permission.id).first()
+            if rp:
+                if not rp.allowed:
+                    rp.allowed = True
+            else:
                 db.add(RolePermission(role_id=role.id, permission_id=permission.id, allowed=True))
 
     db.commit()
